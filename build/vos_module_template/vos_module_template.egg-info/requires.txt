@@ -1,6 +1,0 @@
-setuptools>=65
-vos-base>=0.1.0
-vos_module_interfaces>=0.1.0
-
-[test]
-pytest

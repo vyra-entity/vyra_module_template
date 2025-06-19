@@ -1,7 +1,0 @@
-
-string[] capabilities
-# This service is used to retrieve the capabilities of the vos system.
-# The capabilities field contains a list of strings representing the capabilities.
-# Example usage:
-# - Request: (empty)
-# - Response: "capabilities": ["get_state", "set_state", "health_check"]

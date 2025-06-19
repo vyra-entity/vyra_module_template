@@ -1,6 +1,0 @@
-source;share/vos_module_template/hook/pythonpath.ps1
-source;share/vos_module_template/hook/pythonpath.dsv
-source;share/vos_module_template/hook/pythonpath.sh
-source;share/vos_module_template/hook/ament_prefix_path.ps1
-source;share/vos_module_template/hook/ament_prefix_path.dsv
-source;share/vos_module_template/hook/ament_prefix_path.sh

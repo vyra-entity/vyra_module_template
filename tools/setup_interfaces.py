@@ -216,23 +216,23 @@ def main():
     SELECT_PY_CPP = "py"
 
     try:
-        import vos_base
+        import vyra_base
     except ImportError:
-        print("vos_base not found. Will be installed from wheel.")
+        print("vyra_base not found. Will be installed from wheel.")
 
         run_wheel_install(Path(__file__).parent.parent / "wheels")
-        import vos_base
+        import vyra_base
         
     # User kann überschreiben
     # package_name = input(f"vos module name: ").strip()
-    interface_package_name = "vos_module_interfaces"
+    interface_package_name = "vyra_module_interfaces"
     # Workspace setup
     workspace_root = Path(__file__).parent.parent
     interface_package_path: Path = workspace_root / "src" / interface_package_name
     interface_package_path.mkdir(exist_ok=True)
 
     print(f"\nAdd default interfaces: {interface_package_name}")
-    vos_base.extract_ros_interfaces(interface_package_path)
+    vyra_base.extract_ros_interfaces(interface_package_path)
 
     if SELECT_PY_CPP == "py":
         print(f"\nUpdate package.xml for {interface_package_name}")
@@ -253,7 +253,7 @@ def main():
             print(interface_package_path / file)
             replace_libname_in_file(
                 interface_package_path / file,
-                "vos_base",
+                "vyra_base",
                 interface_package_name
             )
 
@@ -262,7 +262,7 @@ def main():
     
     print(f"✓ Package '{interface_package_name}' updated successfully!")
 
-    package_name = "vos_module_template"
+    package_name = "vyra_module_template"
     # Workspace setup    
     
 

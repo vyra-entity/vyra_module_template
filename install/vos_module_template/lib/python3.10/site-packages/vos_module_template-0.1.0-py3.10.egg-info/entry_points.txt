@@ -1,4 +1,0 @@
-[console_scripts]
-core = vos_module_template.Core:main
-listener = vos_module_template.SubscriberNode:main
-talker = vos_module_template.PublisherNode:main

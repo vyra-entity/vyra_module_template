@@ -1,4 +1,0 @@
-Invoking command in '/workspace/build/vos_module_interfaces': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/workspace/install/vos_module_template:/opt/ros/humble /usr/bin/cmake --build /workspace/build/vos_module_interfaces -- -j12 -l12
-Invoked command in '/workspace/build/vos_module_interfaces' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/workspace/install/vos_module_template:/opt/ros/humble /usr/bin/cmake --build /workspace/build/vos_module_interfaces -- -j12 -l12
-Invoking command in '/workspace/build/vos_module_interfaces': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/workspace/install/vos_module_template:/opt/ros/humble /usr/bin/cmake --install /workspace/build/vos_module_interfaces
-Invoked command in '/workspace/build/vos_module_interfaces' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/workspace/install/vos_module_template:/opt/ros/humble /usr/bin/cmake --install /workspace/build/vos_module_interfaces
