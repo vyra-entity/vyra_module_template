@@ -1,0 +1,30 @@
+2025-06-15 19:17:33,373 - varioboticos_base - ERROR - None
+2025-06-15 19:17:33,373 - varioboticos_base - ERROR -   File "/usr/local/lib/python3.10/dist-packages/vos_base/com/datalayer/service_server.py", line 82, in callback
+    self.service_info.callback(request, response))
+
+2025-06-15 19:18:45,281 - varioboticos_base - ERROR - None
+2025-06-15 19:18:45,281 - varioboticos_base - ERROR -   File "/usr/local/lib/python3.10/dist-packages/vos_base/com/datalayer/service_server.py", line 82, in callback
+    self.service_info.callback(request=request, response=response))
+
+2025-06-15 19:19:49,575 - varioboticos_base - ERROR - None
+2025-06-15 19:19:49,575 - varioboticos_base - ERROR -   File "/usr/local/lib/python3.10/dist-packages/vos_base/com/datalayer/service_server.py", line 82, in callback
+    self.service_info.callback(request=request, response=response))
+
+2025-06-15 19:32:21,618 - varioboticos_base - ERROR - None
+2025-06-15 19:32:21,618 - varioboticos_base - ERROR -   File "/usr/local/lib/python3.10/dist-packages/vos_base/com/datalayer/service_server.py", line 82, in callback
+    self.service_info.callback(request=request, response=response))
+
+2025-06-15 19:38:07,119 - varioboticos_base - ERROR - None
+2025-06-15 19:38:07,119 - varioboticos_base - ERROR -   File "/usr/local/lib/python3.10/dist-packages/vos_base/com/datalayer/service_server.py", line 81, in callback
+    self._async_loop.run_until_complete(
+
+  File "/usr/lib/python3.10/asyncio/base_events.py", line 625, in run_until_complete
+    self._check_running()
+
+  File "/usr/lib/python3.10/asyncio/base_events.py", line 584, in _check_running
+    raise RuntimeError('This event loop is already running')
+
+2025-06-15 19:49:37,878 - varioboticos_base - INFO - TEST
+2025-06-15 19:49:58,013 - varioboticos_base - INFO - TEST
+2025-06-15 19:49:59,677 - varioboticos_base - INFO - TEST
+2025-06-15 19:50:01,229 - varioboticos_base - INFO - TEST

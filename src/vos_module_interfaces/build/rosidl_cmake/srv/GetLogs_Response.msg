@@ -1,0 +1,7 @@
+
+# Response
+vos_base/LoggerStream[] log_messages
+
+# This service is used to retrieve logs from the vos system.
+# The log_lines field specifies the number of log lines to retrieve.
+# The log_level field specifies the minimum log level to retrieve (e.g., INFO, WARNING, ERROR).

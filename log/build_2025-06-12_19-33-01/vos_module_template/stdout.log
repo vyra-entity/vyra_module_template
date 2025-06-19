@@ -1,0 +1,42 @@
+running egg_info
+creating ../../build/vos_module_template/vos_module_template.egg-info
+writing ../../build/vos_module_template/vos_module_template.egg-info/PKG-INFO
+writing dependency_links to ../../build/vos_module_template/vos_module_template.egg-info/dependency_links.txt
+writing entry points to ../../build/vos_module_template/vos_module_template.egg-info/entry_points.txt
+writing requirements to ../../build/vos_module_template/vos_module_template.egg-info/requires.txt
+writing top-level names to ../../build/vos_module_template/vos_module_template.egg-info/top_level.txt
+writing manifest file '../../build/vos_module_template/vos_module_template.egg-info/SOURCES.txt'
+reading manifest file '../../build/vos_module_template/vos_module_template.egg-info/SOURCES.txt'
+writing manifest file '../../build/vos_module_template/vos_module_template.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /workspace/build/vos_module_template/build/lib/vos_module_template
+copying vos_module_template/Core.py -> /workspace/build/vos_module_template/build/lib/vos_module_template
+copying vos_module_template/PublisherNode.py -> /workspace/build/vos_module_template/build/lib/vos_module_template
+copying vos_module_template/__init__.py -> /workspace/build/vos_module_template/build/lib/vos_module_template
+copying vos_module_template/SubscriberNode.py -> /workspace/build/vos_module_template/build/lib/vos_module_template
+copying vos_module_template/Template.py -> /workspace/build/vos_module_template/build/lib/vos_module_template
+running install
+running install_lib
+creating /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template
+copying /workspace/build/vos_module_template/build/lib/vos_module_template/Core.py -> /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template
+copying /workspace/build/vos_module_template/build/lib/vos_module_template/PublisherNode.py -> /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template
+copying /workspace/build/vos_module_template/build/lib/vos_module_template/__init__.py -> /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template
+copying /workspace/build/vos_module_template/build/lib/vos_module_template/SubscriberNode.py -> /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template
+copying /workspace/build/vos_module_template/build/lib/vos_module_template/Template.py -> /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template
+byte-compiling /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template/Core.py to Core.cpython-310.pyc
+byte-compiling /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template/PublisherNode.py to PublisherNode.cpython-310.pyc
+byte-compiling /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template/__init__.py to __init__.cpython-310.pyc
+byte-compiling /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template/SubscriberNode.py to SubscriberNode.cpython-310.pyc
+byte-compiling /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template/Template.py to Template.cpython-310.pyc
+running install_data
+creating /workspace/install/vos_module_template/share/ament_index/resource_index/packages
+copying resource/vos_module_template -> /workspace/install/vos_module_template/share/ament_index/resource_index/packages
+copying package.xml -> /workspace/install/vos_module_template/share/vos_module_template
+running install_egg_info
+Copying ../../build/vos_module_template/vos_module_template.egg-info to /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template-0.1.0-py3.10.egg-info
+running install_scripts
+Installing core script to /workspace/install/vos_module_template/lib/vos_module_template
+Installing listener script to /workspace/install/vos_module_template/lib/vos_module_template
+Installing talker script to /workspace/install/vos_module_template/lib/vos_module_template
+writing list of installed files to '/workspace/build/vos_module_template/install.log'

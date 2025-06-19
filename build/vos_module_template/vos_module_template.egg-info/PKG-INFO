@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: vos_module_template
+Version: 0.1.0
+Summary: TODO: Package description
+Maintainer: holgder
+Maintainer-email: h.schernewski@variobotic.de
+License: ../../LICENSE.txt
+Requires-Dist: setuptools>=65
+Requires-Dist: vos-base>=0.1.0
+Requires-Dist: vos_module_interfaces>=0.1.0
+Provides-Extra: test
+Requires-Dist: pytest; extra == "test"
+Dynamic: license
+Dynamic: maintainer
+Dynamic: maintainer-email
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: summary

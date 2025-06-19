@@ -1,0 +1,31 @@
+// generated from rosidl_adapter/resource/srv.idl.em
+// with input from vos_module_interfaces/srv/HealthCheck.srv
+// generated code does not contain a copyright notice
+
+
+module vos_module_interfaces {
+  module srv {
+    @verbatim (language="comment", text=
+      "HealthCheck.srv")
+    struct HealthCheck_Request {
+      uint8 structure_needs_at_least_one_member;
+    };
+    struct HealthCheck_Response {
+      @verbatim (language="comment", text=
+        "Indicates if the system is alive/online and ready to process requests")
+      boolean alive;
+
+      @verbatim (language="comment", text=
+        "Current state of the system, e.g., \"active\", ...")
+      string state;
+
+      @verbatim (language="comment", text=
+        "Detailed health status of the system, e.g., \"all systems operational\", \"minor issues detected\", \"major issues detected\"")
+      string health_status;
+
+      @verbatim (language="comment", text=
+        "List of issues detected, if any, e.g., [\"disk space low\", \"network latency high\"]")
+      sequence<string> issues;
+    };
+  };
+};

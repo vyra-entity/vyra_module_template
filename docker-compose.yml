@@ -1,0 +1,7 @@
+services:
+  ros2-humble:
+    build: .
+    volumes:
+      - ./:/workspace/
+    stdin_open: true
+    tty: true

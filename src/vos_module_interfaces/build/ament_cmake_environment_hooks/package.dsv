@@ -1,0 +1,4 @@
+source;share/vos_module_interfaces/local_setup.bash
+source;share/vos_module_interfaces/local_setup.dsv
+source;share/vos_module_interfaces/local_setup.sh
+source;share/vos_module_interfaces/local_setup.zsh

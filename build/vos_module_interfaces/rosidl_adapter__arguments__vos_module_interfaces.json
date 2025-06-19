@@ -1,0 +1,14 @@
+{
+  "package_name": "vos_module_interfaces",
+  "non_idl_tuples": [
+    "/workspace/src/vos_module_interfaces:msg/NewsFeed.msg",
+    "/workspace/src/vos_module_interfaces:msg/ErrorFeed.msg",
+    "/workspace/src/vos_module_interfaces:msg/LoggerStream.msg",
+    "/workspace/src/vos_module_interfaces:msg/StateFeed.msg",
+    "/workspace/src/vos_module_interfaces:srv/HealthCheck.srv",
+    "/workspace/src/vos_module_interfaces:srv/GetCapabilities.srv",
+    "/workspace/src/vos_module_interfaces:srv/TriggerTransition.srv",
+    "/workspace/src/vos_module_interfaces:srv/GetLogs.srv",
+    "/workspace/src/vos_module_interfaces:action/InitiateUpdate.action"
+  ]
+}

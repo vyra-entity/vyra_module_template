@@ -1,0 +1,26 @@
+
+[tool.vos]
+module_name = "vos_module_template"
+module_template = "basic"
+module_description = "This template could be used to create a vos module with basic functionality."
+module_links = [
+    { name = "VarioboticOS-Documentation", url = "https://docs.variobotic.de/vos-module-template" }
+]
+
+
+[tool.poetry]
+name = "vos-module-template"
+version = "0.1.0"
+description = ""
+authors = ["HolgDer <h.schernewski@variobotic.de>"]
+license = "LICENSE"
+readme = "README.md"
+requires-python = ">=3.10, <4"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<4"
+setuptools = ">=65.5.1"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

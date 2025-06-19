@@ -1,0 +1,30 @@
+[0.667s] Invoking command in '/workspace/src/vos_module_template': PYTHONPATH=/workspace/build/vos_module_template/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/install/vos_module_template/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/vos_module_template build --build-base /workspace/build/vos_module_template/build install --record /workspace/build/vos_module_template/install.log --single-version-externally-managed install_data
+[0.921s] running egg_info
+[0.934s] writing ../../build/vos_module_template/vos_module_template.egg-info/PKG-INFO
+[0.935s] writing dependency_links to ../../build/vos_module_template/vos_module_template.egg-info/dependency_links.txt
+[0.935s] writing entry points to ../../build/vos_module_template/vos_module_template.egg-info/entry_points.txt
+[0.936s] writing requirements to ../../build/vos_module_template/vos_module_template.egg-info/requires.txt
+[0.936s] writing top-level names to ../../build/vos_module_template/vos_module_template.egg-info/top_level.txt
+[0.966s] reading manifest file '../../build/vos_module_template/vos_module_template.egg-info/SOURCES.txt'
+[0.968s] writing manifest file '../../build/vos_module_template/vos_module_template.egg-info/SOURCES.txt'
+[0.968s] running build
+[0.969s] running build_py
+[0.969s] copying vos_module_template/Core.py -> /workspace/build/vos_module_template/build/lib/vos_module_template
+[0.969s] copying vos_module_template/PublisherNode.py -> /workspace/build/vos_module_template/build/lib/vos_module_template
+[0.969s] copying vos_module_template/__init__.py -> /workspace/build/vos_module_template/build/lib/vos_module_template
+[0.970s] copying vos_module_template/SubscriberNode.py -> /workspace/build/vos_module_template/build/lib/vos_module_template
+[0.970s] copying vos_module_template/Template.py -> /workspace/build/vos_module_template/build/lib/vos_module_template
+[0.970s] running install
+[0.974s] running install_lib
+[0.989s] running install_data
+[0.990s] copying resource/vos_module_template -> /workspace/install/vos_module_template/share/ament_index/resource_index/packages
+[0.990s] copying package.xml -> /workspace/install/vos_module_template/share/vos_module_template
+[0.990s] running install_egg_info
+[1.005s] removing '/workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template-0.1.0-py3.10.egg-info' (and everything under it)
+[1.006s] Copying ../../build/vos_module_template/vos_module_template.egg-info to /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template-0.1.0-py3.10.egg-info
+[1.007s] running install_scripts
+[1.037s] Installing core script to /workspace/install/vos_module_template/lib/vos_module_template
+[1.037s] Installing listener script to /workspace/install/vos_module_template/lib/vos_module_template
+[1.038s] Installing talker script to /workspace/install/vos_module_template/lib/vos_module_template
+[1.038s] writing list of installed files to '/workspace/build/vos_module_template/install.log'
+[1.064s] Invoked command in '/workspace/src/vos_module_template' returned '0': PYTHONPATH=/workspace/build/vos_module_template/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/install/vos_module_template/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/vos_module_template build --build-base /workspace/build/vos_module_template/build install --record /workspace/build/vos_module_template/install.log --single-version-externally-managed install_data

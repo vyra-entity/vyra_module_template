@@ -1,0 +1,450 @@
+[0.000000] (-) TimerEvent: {}
+[0.000849] (vos_module_interfaces) JobQueued: {'identifier': 'vos_module_interfaces', 'dependencies': OrderedDict()}
+[0.000961] (vos_module_template) JobQueued: {'identifier': 'vos_module_template', 'dependencies': OrderedDict([('vos_module_interfaces', '/workspace/install/vos_module_interfaces')])}
+[0.001116] (vos_module_interfaces) JobStarted: {'identifier': 'vos_module_interfaces'}
+[0.010965] (vos_module_interfaces) JobProgress: {'identifier': 'vos_module_interfaces', 'progress': 'cmake'}
+[0.011584] (vos_module_interfaces) JobProgress: {'identifier': 'vos_module_interfaces', 'progress': 'build'}
+[0.012311] (vos_module_interfaces) Command: {'cmd': ['/usr/bin/cmake', '--build', '/workspace/build/vos_module_interfaces', '--', '-j12', '-l12'], 'cwd': '/workspace/build/vos_module_interfaces', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('HOSTNAME', '73b0950848fa'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/workspace/install/vos_module_interfaces/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/workspace'), ('ROS_PYTHON_VERSION', '3'), ('COLCON_PREFIX_PATH', '/workspace/install'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/workspace/install/vos_module_template:/workspace/install/vos_module_interfaces:/opt/ros/humble'), ('DEBIAN_FRONTEND', 'noninteractive'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('PWD', '/workspace/build/vos_module_interfaces'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/workspace/install/vos_module_template/lib/python3.10/site-packages:/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/install/vos_module_interfaces:/workspace/install/vos_module_template:/opt/ros/humble')]), 'shell': False}
+[0.051702] (vos_module_interfaces) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.099481] (-) TimerEvent: {}
+[0.199842] (-) TimerEvent: {}
+[0.227480] (vos_module_interfaces) StdoutLine: {'line': b'-- Found rosidl_default_generators: 1.2.0 (/opt/ros/humble/share/rosidl_default_generators/cmake)\n'}
+[0.232659] (vos_module_interfaces) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.241645] (vos_module_interfaces) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.6 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.280732] (vos_module_interfaces) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.299965] (-) TimerEvent: {}
+[0.313484] (vos_module_interfaces) StdoutLine: {'line': b'-- Found std_msgs: 4.8.0 (/opt/ros/humble/share/std_msgs/cmake)\n'}
+[0.400105] (-) TimerEvent: {}
+[0.500519] (-) TimerEvent: {}
+[0.601035] (-) TimerEvent: {}
+[0.701521] (-) TimerEvent: {}
+[0.801997] (-) TimerEvent: {}
+[0.818140] (vos_module_interfaces) StdoutLine: {'line': b'-- Found ament_cmake_ros: 0.10.0 (/opt/ros/humble/share/ament_cmake_ros/cmake)\n'}
+[0.902145] (-) TimerEvent: {}
+[1.002625] (-) TimerEvent: {}
+[1.103107] (-) TimerEvent: {}
+[1.152685] (vos_module_interfaces) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[1.203197] (-) TimerEvent: {}
+[1.303498] (-) TimerEvent: {}
+[1.403995] (-) TimerEvent: {}
+[1.504448] (-) TimerEvent: {}
+[1.595290] (vos_module_interfaces) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[1.604515] (-) TimerEvent: {}
+[1.620966] (vos_module_interfaces) StdoutLine: {'line': b'-- Found python_cmake_module: 0.10.0 (/opt/ros/humble/share/python_cmake_module/cmake)\n'}
+[1.647905] (vos_module_interfaces) StdoutLine: {'line': b'-- Using PYTHON_EXECUTABLE: /usr/bin/python3\n'}
+[1.648188] (vos_module_interfaces) StdoutLine: {'line': b'-- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.10\n'}
+[1.648379] (vos_module_interfaces) StdoutLine: {'line': b'-- Using PYTHON_LIBRARIES: /usr/lib/x86_64-linux-gnu/libpython3.10.so\n'}
+[1.704681] (-) TimerEvent: {}
+[1.710089] (vos_module_interfaces) StdoutLine: {'line': b'-- Configuring done\n'}
+[1.776637] (vos_module_interfaces) StdoutLine: {'line': b'-- Generating done\n'}
+[1.795152] (vos_module_interfaces) StdoutLine: {'line': b'-- Build files have been written to: /workspace/build/vos_module_interfaces\n'}
+[1.804790] (-) TimerEvent: {}
+[1.831285] (vos_module_interfaces) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target vos_module_interfaces__rosidl_generator_c\x1b[0m\n'}
+[1.843384] (vos_module_interfaces) StdoutLine: {'line': b'[  1%] Built target vos_module_interfaces__cpp\n'}
+[1.850890] (vos_module_interfaces) StdoutLine: {'line': b'[ 12%] Built target vos_module_interfaces__rosidl_generator_c\n'}
+[1.860017] (vos_module_interfaces) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target vos_module_interfaces__rosidl_typesupport_cpp\x1b[0m\n'}
+[1.860639] (vos_module_interfaces) StdoutLine: {'line': b'[ 12%] Built target ament_cmake_python_copy_vos_module_interfaces\n'}
+[1.860759] (vos_module_interfaces) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target vos_module_interfaces__rosidl_typesupport_introspection_cpp\x1b[0m\n'}
+[1.861308] (vos_module_interfaces) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target vos_module_interfaces__rosidl_typesupport_fastrtps_cpp\x1b[0m\n'}
+[1.867383] (vos_module_interfaces) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target vos_module_interfaces__rosidl_typesupport_fastrtps_c\x1b[0m\n'}
+[1.868736] (vos_module_interfaces) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target vos_module_interfaces__rosidl_typesupport_c\x1b[0m\n'}
+[1.870613] (vos_module_interfaces) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target vos_module_interfaces__rosidl_typesupport_introspection_c\x1b[0m\n'}
+[1.889674] (vos_module_interfaces) StdoutLine: {'line': b'[ 25%] Built target vos_module_interfaces__rosidl_typesupport_c\n'}
+[1.890201] (vos_module_interfaces) StdoutLine: {'line': b'[ 35%] Built target vos_module_interfaces__rosidl_typesupport_cpp\n'}
+[1.891534] (vos_module_interfaces) StdoutLine: {'line': b'[ 47%] Built target vos_module_interfaces__rosidl_typesupport_introspection_cpp\n'}
+[1.895050] (vos_module_interfaces) StdoutLine: {'line': b'[ 69%] Built target vos_module_interfaces__rosidl_typesupport_introspection_c\n'}
+[1.895279] (vos_module_interfaces) StdoutLine: {'line': b'[ 70%] Built target vos_module_interfaces__rosidl_typesupport_fastrtps_cpp\n'}
+[1.899190] (vos_module_interfaces) StdoutLine: {'line': b'[ 82%] Built target vos_module_interfaces__rosidl_typesupport_fastrtps_c\n'}
+[1.904897] (-) TimerEvent: {}
+[1.932361] (vos_module_interfaces) StdoutLine: {'line': b'[ 82%] Built target vos_module_interfaces\n'}
+[1.959410] (vos_module_interfaces) StdoutLine: {'line': b'[ 83%] Built target vos_module_interfaces__py\n'}
+[1.974511] (vos_module_interfaces) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target vos_module_interfaces__rosidl_generator_py\x1b[0m\n'}
+[2.002276] (vos_module_interfaces) StdoutLine: {'line': b'[ 93%] Built target vos_module_interfaces__rosidl_generator_py\n'}
+[2.004980] (-) TimerEvent: {}
+[2.015264] (vos_module_interfaces) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target vos_module_interfaces__rosidl_typesupport_c__pyext\x1b[0m\n'}
+[2.015506] (vos_module_interfaces) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target vos_module_interfaces__rosidl_typesupport_fastrtps_c__pyext\x1b[0m\n'}
+[2.018724] (vos_module_interfaces) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target vos_module_interfaces__rosidl_typesupport_introspection_c__pyext\x1b[0m\n'}
+[2.033974] (vos_module_interfaces) StdoutLine: {'line': b'[ 95%] Built target vos_module_interfaces__rosidl_typesupport_fastrtps_c__pyext\n'}
+[2.034451] (vos_module_interfaces) StdoutLine: {'line': b'[ 97%] Built target vos_module_interfaces__rosidl_typesupport_c__pyext\n'}
+[2.039190] (vos_module_interfaces) StdoutLine: {'line': b'[100%] Built target vos_module_interfaces__rosidl_typesupport_introspection_c__pyext\n'}
+[2.094238] (vos_module_interfaces) StdoutLine: {'line': b'running egg_info\n'}
+[2.105071] (-) TimerEvent: {}
+[2.108937] (vos_module_interfaces) StdoutLine: {'line': b'writing vos_module_interfaces.egg-info/PKG-INFO\n'}
+[2.109406] (vos_module_interfaces) StdoutLine: {'line': b'writing dependency_links to vos_module_interfaces.egg-info/dependency_links.txt\n'}
+[2.109756] (vos_module_interfaces) StdoutLine: {'line': b'writing top-level names to vos_module_interfaces.egg-info/top_level.txt\n'}
+[2.152603] (vos_module_interfaces) StdoutLine: {'line': b"reading manifest file 'vos_module_interfaces.egg-info/SOURCES.txt'\n"}
+[2.154142] (vos_module_interfaces) StdoutLine: {'line': b"writing manifest file 'vos_module_interfaces.egg-info/SOURCES.txt'\n"}
+[2.195504] (vos_module_interfaces) StdoutLine: {'line': b'[100%] Built target ament_cmake_python_build_vos_module_interfaces_egg\n'}
+[2.205217] (-) TimerEvent: {}
+[2.213688] (vos_module_interfaces) CommandEnded: {'returncode': 0}
+[2.215081] (vos_module_interfaces) JobProgress: {'identifier': 'vos_module_interfaces', 'progress': 'install'}
+[2.235695] (vos_module_interfaces) Command: {'cmd': ['/usr/bin/cmake', '--install', '/workspace/build/vos_module_interfaces'], 'cwd': '/workspace/build/vos_module_interfaces', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('HOSTNAME', '73b0950848fa'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/workspace/install/vos_module_interfaces/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/workspace'), ('ROS_PYTHON_VERSION', '3'), ('COLCON_PREFIX_PATH', '/workspace/install'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/workspace/install/vos_module_template:/workspace/install/vos_module_interfaces:/opt/ros/humble'), ('DEBIAN_FRONTEND', 'noninteractive'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('PWD', '/workspace/build/vos_module_interfaces'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/workspace/install/vos_module_template/lib/python3.10/site-packages:/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/install/vos_module_interfaces:/workspace/install/vos_module_template:/opt/ros/humble')]), 'shell': False}
+[2.256593] (vos_module_interfaces) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[2.256893] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/ament_index/resource_index/rosidl_interfaces/vos_module_interfaces\n'}
+[2.257102] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces\n'}
+[2.257222] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv\n'}
+[2.257349] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/get_logs.h\n'}
+[2.257475] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/health_check.h\n'}
+[2.257596] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail\n'}
+[2.257760] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__functions.c\n'}
+[2.257892] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__struct.h\n'}
+[2.258090] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__functions.c\n'}
+[2.258221] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__functions.h\n'}
+[2.258390] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__functions.c\n'}
+[2.258527] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__struct.h\n'}
+[2.258664] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__type_support.h\n'}
+[2.258799] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__struct.h\n'}
+[2.258893] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__functions.c\n'}
+[2.259055] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__functions.h\n'}
+[2.259180] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__type_support.h\n'}
+[2.259315] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__functions.h\n'}
+[2.259446] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__type_support.h\n'}
+[2.259550] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__type_support.h\n'}
+[2.259661] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__functions.h\n'}
+[2.259741] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__struct.h\n'}
+[2.259821] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/trigger_transition.h\n'}
+[2.259902] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/get_capabilities.h\n'}
+[2.259972] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg\n'}
+[2.260041] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/news_feed.h\n'}
+[2.260153] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/rosidl_generator_c__visibility_control.h\n'}
+[2.260224] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/error_feed.h\n'}
+[2.260293] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/state_feed.h\n'}
+[2.260369] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/logger_stream.h\n'}
+[2.260507] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail\n'}
+[2.260656] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__functions.h\n'}
+[2.260824] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__functions.c\n'}
+[2.260946] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__struct.h\n'}
+[2.261018] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__struct.h\n'}
+[2.261148] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__functions.h\n'}
+[2.261294] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__functions.h\n'}
+[2.261421] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__functions.c\n'}
+[2.261531] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__struct.h\n'}
+[2.261602] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__type_support.h\n'}
+[2.261671] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__type_support.h\n'}
+[2.261774] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__functions.c\n'}
+[2.261858] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__struct.h\n'}
+[2.261932] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__type_support.h\n'}
+[2.262037] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__type_support.h\n'}
+[2.262163] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__functions.h\n'}
+[2.262289] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__functions.c\n'}
+[2.262434] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action\n'}
+[2.262606] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/initiate_update.h\n'}
+[2.262691] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail\n'}
+[2.262863] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__functions.c\n'}
+[2.263018] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__struct.h\n'}
+[2.263163] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__type_support.h\n'}
+[2.263289] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__functions.h\n'}
+[2.263417] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/environment/library_path.sh\n'}
+[2.263489] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/environment/library_path.dsv\n'}
+[2.263558] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_generator_c.so\n'}
+[2.263663] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces\n'}
+[2.263733] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv\n'}
+[2.263804] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail\n'}
+[2.263892] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__rosidl_typesupport_fastrtps_c.h\n'}
+[2.263981] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__rosidl_typesupport_fastrtps_c.h\n'}
+[2.264091] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__rosidl_typesupport_fastrtps_c.h\n'}
+[2.264162] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__rosidl_typesupport_fastrtps_c.h\n'}
+[2.264232] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg\n'}
+[2.264340] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/rosidl_typesupport_fastrtps_c__visibility_control.h\n'}
+[2.264485] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail\n'}
+[2.264630] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__rosidl_typesupport_fastrtps_c.h\n'}
+[2.264755] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__rosidl_typesupport_fastrtps_c.h\n'}
+[2.264908] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__rosidl_typesupport_fastrtps_c.h\n'}
+[2.265059] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__rosidl_typesupport_fastrtps_c.h\n'}
+[2.265171] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action\n'}
+[2.265334] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail\n'}
+[2.265469] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__rosidl_typesupport_fastrtps_c.h\n'}
+[2.265594] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_fastrtps_c.so\n'}
+[2.265726] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces\n'}
+[2.265864] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv\n'}
+[2.266034] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail\n'}
+[2.266185] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__rosidl_typesupport_introspection_c.h\n'}
+[2.266329] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__type_support.c\n'}
+[2.266474] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__type_support.c\n'}
+[2.266609] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__type_support.c\n'}
+[2.266733] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__rosidl_typesupport_introspection_c.h\n'}
+[2.266889] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__rosidl_typesupport_introspection_c.h\n'}
+[2.267025] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__rosidl_typesupport_introspection_c.h\n'}
+[2.267149] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__type_support.c\n'}
+[2.267274] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg\n'}
+[2.267419] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/rosidl_typesupport_introspection_c__visibility_control.h\n'}
+[2.267528] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail\n'}
+[2.267693] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__type_support.c\n'}
+[2.267818] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__type_support.c\n'}
+[2.267972] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__rosidl_typesupport_introspection_c.h\n'}
+[2.268123] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__type_support.c\n'}
+[2.268197] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__rosidl_typesupport_introspection_c.h\n'}
+[2.268266] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__type_support.c\n'}
+[2.268335] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__rosidl_typesupport_introspection_c.h\n'}
+[2.268413] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__rosidl_typesupport_introspection_c.h\n'}
+[2.268523] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action\n'}
+[2.268593] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail\n'}
+[2.268661] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__rosidl_typesupport_introspection_c.h\n'}
+[2.268787] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__type_support.c\n'}
+[2.268883] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_introspection_c.so\n'}
+[2.268999] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_c.so\n'}
+[2.269206] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces\n'}
+[2.269333] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv\n'}
+[2.269459] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/get_capabilities.hpp\n'}
+[2.269604] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/get_logs.hpp\n'}
+[2.269748] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/trigger_transition.hpp\n'}
+[2.269911] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/health_check.hpp\n'}
+[2.270044] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail\n'}
+[2.270114] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__builder.hpp\n'}
+[2.270193] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__traits.hpp\n'}
+[2.270297] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__traits.hpp\n'}
+[2.270370] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__builder.hpp\n'}
+[2.270439] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__struct.hpp\n'}
+[2.270506] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__struct.hpp\n'}
+[2.270574] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__type_support.hpp\n'}
+[2.270643] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__traits.hpp\n'}
+[2.270751] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__traits.hpp\n'}
+[2.270848] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__type_support.hpp\n'}
+[2.270924] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__type_support.hpp\n'}
+[2.271052] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__builder.hpp\n'}
+[2.271122] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__struct.hpp\n'}
+[2.271191] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__type_support.hpp\n'}
+[2.271262] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__builder.hpp\n'}
+[2.271370] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__struct.hpp\n'}
+[2.271482] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg\n'}
+[2.271552] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/rosidl_generator_cpp__visibility_control.hpp\n'}
+[2.271621] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/logger_stream.hpp\n'}
+[2.271724] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/state_feed.hpp\n'}
+[2.271794] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/news_feed.hpp\n'}
+[2.271893] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail\n'}
+[2.272009] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__struct.hpp\n'}
+[2.272080] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__traits.hpp\n'}
+[2.272150] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__builder.hpp\n'}
+[2.272259] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__traits.hpp\n'}
+[2.272329] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__builder.hpp\n'}
+[2.272398] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__type_support.hpp\n'}
+[2.272500] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__type_support.hpp\n'}
+[2.272631] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__type_support.hpp\n'}
+[2.272784] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__builder.hpp\n'}
+[2.272878] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__struct.hpp\n'}
+[2.272993] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__struct.hpp\n'}
+[2.273117] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__struct.hpp\n'}
+[2.273280] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__traits.hpp\n'}
+[2.273428] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__type_support.hpp\n'}
+[2.273570] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__builder.hpp\n'}
+[2.273740] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__traits.hpp\n'}
+[2.273863] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/error_feed.hpp\n'}
+[2.273986] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action\n'}
+[2.274057] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/initiate_update.hpp\n'}
+[2.274191] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail\n'}
+[2.274323] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__builder.hpp\n'}
+[2.274393] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__struct.hpp\n'}
+[2.274461] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__traits.hpp\n'}
+[2.274530] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__type_support.hpp\n'}
+[2.274602] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces\n'}
+[2.274671] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv\n'}
+[2.274739] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail\n'}
+[2.274824] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[2.274905] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[2.274973] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[2.275041] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[2.275110] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/dds_fastrtps\n'}
+[2.275177] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg\n'}
+[2.275246] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h\n'}
+[2.275314] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail\n'}
+[2.275382] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[2.275450] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[2.275522] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[2.275591] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[2.275669] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/dds_fastrtps\n'}
+[2.275740] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action\n'}
+[2.275808] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail\n'}
+[2.275893] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[2.275962] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/dds_fastrtps\n'}
+[2.276047] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_fastrtps_cpp.so\n'}
+[2.276116] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces\n'}
+[2.276184] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv\n'}
+[2.276252] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail\n'}
+[2.276319] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__type_support.cpp\n'}
+[2.276387] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__rosidl_typesupport_introspection_cpp.hpp\n'}
+[2.276455] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__type_support.cpp\n'}
+[2.276523] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__type_support.cpp\n'}
+[2.276590] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__type_support.cpp\n'}
+[2.276670] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__rosidl_typesupport_introspection_cpp.hpp\n'}
+[2.276739] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__rosidl_typesupport_introspection_cpp.hpp\n'}
+[2.276808] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__rosidl_typesupport_introspection_cpp.hpp\n'}
+[2.276897] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg\n'}
+[2.276965] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail\n'}
+[2.277033] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__type_support.cpp\n'}
+[2.277111] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__type_support.cpp\n'}
+[2.277180] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__rosidl_typesupport_introspection_cpp.hpp\n'}
+[2.277248] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__rosidl_typesupport_introspection_cpp.hpp\n'}
+[2.277317] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__rosidl_typesupport_introspection_cpp.hpp\n'}
+[2.277384] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__rosidl_typesupport_introspection_cpp.hpp\n'}
+[2.277452] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__type_support.cpp\n'}
+[2.277524] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__type_support.cpp\n'}
+[2.277592] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action\n'}
+[2.277660] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail\n'}
+[2.277728] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__type_support.cpp\n'}
+[2.277796] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__rosidl_typesupport_introspection_cpp.hpp\n'}
+[2.277878] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_introspection_cpp.so\n'}
+[2.277949] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_cpp.so\n'}
+[2.278036] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/environment/pythonpath.sh\n'}
+[2.278105] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/environment/pythonpath.dsv\n'}
+[2.278173] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces-0.1.0-py3.10.egg-info\n'}
+[2.278240] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces-0.1.0-py3.10.egg-info/PKG-INFO\n'}
+[2.278308] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces-0.1.0-py3.10.egg-info/top_level.txt\n'}
+[2.278378] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces-0.1.0-py3.10.egg-info/SOURCES.txt\n'}
+[2.278446] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces-0.1.0-py3.10.egg-info/dependency_links.txt\n'}
+[2.278534] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces\n'}
+[2.278603] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv\n'}
+[2.278672] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_trigger_transition.py\n'}
+[2.278740] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_trigger_transition_s.c\n'}
+[2.278809] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_get_capabilities_s.c\n'}
+[2.278895] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_get_logs.py\n'}
+[2.278964] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_get_logs_s.c\n'}
+[2.279032] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_health_check.py\n'}
+[2.279101] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_health_check_s.c\n'}
+[2.279174] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/__init__.py\n'}
+[2.279243] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_get_capabilities.py\n'}
+[2.279312] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\n'}
+[2.279381] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg\n'}
+[2.279449] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_state_feed_s.c\n'}
+[2.279518] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_state_feed.py\n'}
+[2.279586] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_error_feed.py\n'}
+[2.279654] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_logger_stream.py\n'}
+[2.279722] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_news_feed.py\n'}
+[2.279790] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_news_feed_s.c\n'}
+[2.279873] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_logger_stream_s.c\n'}
+[2.279954] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/__init__.py\n'}
+[2.280023] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_error_feed_s.c\n'}
+[2.280092] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/libvos_module_interfaces__rosidl_generator_py.so\n'}
+[2.280175] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/_vos_module_interfaces_s.ep.rosidl_typesupport_fastrtps_c.c\n'}
+[2.280244] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/_vos_module_interfaces_s.ep.rosidl_typesupport_introspection_c.c\n'}
+[2.280315] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\n'}
+[2.280384] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\n'}
+[2.280461] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/__init__.py\n'}
+[2.280535] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/_vos_module_interfaces_s.ep.rosidl_typesupport_c.c\n'}
+[2.280605] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/action\n'}
+[2.280674] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/action/_initiate_update.py\n'}
+[2.280743] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/action/_initiate_update_s.c\n'}
+[2.280817] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/action/__init__.py\n'}
+[2.305306] (-) TimerEvent: {}
+[2.316695] (vos_module_interfaces) StdoutLine: {'line': b"Listing '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces'...\n"}
+[2.317019] (vos_module_interfaces) StdoutLine: {'line': b"Compiling '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/__init__.py'...\n"}
+[2.317215] (vos_module_interfaces) StdoutLine: {'line': b"Listing '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/action'...\n"}
+[2.317391] (vos_module_interfaces) StdoutLine: {'line': b"Listing '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg'...\n"}
+[2.317562] (vos_module_interfaces) StdoutLine: {'line': b"Listing '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv'...\n"}
+[2.322006] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\n'}
+[2.322595] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\n'}
+[2.323236] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\n'}
+[2.323843] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_generator_py.so\n'}
+[2.324219] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/msg/NewsFeed.idl\n'}
+[2.324477] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/msg/ErrorFeed.idl\n'}
+[2.324717] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/msg/LoggerStream.idl\n'}
+[2.325060] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/msg/StateFeed.idl\n'}
+[2.325389] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/HealthCheck.idl\n'}
+[2.325707] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/GetCapabilities.idl\n'}
+[2.325941] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/TriggerTransition.idl\n'}
+[2.326179] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/GetLogs.idl\n'}
+[2.326357] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/action/InitiateUpdate.idl\n'}
+[2.326593] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/msg/NewsFeed.msg\n'}
+[2.326835] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/msg/ErrorFeed.msg\n'}
+[2.327037] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/msg/LoggerStream.msg\n'}
+[2.327270] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/msg/StateFeed.msg\n'}
+[2.327495] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/HealthCheck.srv\n'}
+[2.327667] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/HealthCheck_Request.msg\n'}
+[2.327923] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/HealthCheck_Response.msg\n'}
+[2.328160] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/GetCapabilities.srv\n'}
+[2.328372] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/GetCapabilities_Request.msg\n'}
+[2.328694] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/GetCapabilities_Response.msg\n'}
+[2.329038] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/TriggerTransition.srv\n'}
+[2.329374] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/TriggerTransition_Request.msg\n'}
+[2.329758] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/TriggerTransition_Response.msg\n'}
+[2.330059] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/GetLogs.srv\n'}
+[2.330375] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/GetLogs_Request.msg\n'}
+[2.330663] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/GetLogs_Response.msg\n'}
+[2.330938] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/action/InitiateUpdate.action\n'}
+[2.331178] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/config\n'}
+[2.331414] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/config/base_metadata.config\n'}
+[2.331628] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/ament_index/resource_index/package_run_dependencies/vos_module_interfaces\n'}
+[2.331883] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/ament_index/resource_index/parent_prefix_path/vos_module_interfaces\n'}
+[2.332119] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/environment/ament_prefix_path.sh\n'}
+[2.332337] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/environment/ament_prefix_path.dsv\n'}
+[2.332515] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/environment/path.sh\n'}
+[2.332717] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/environment/path.dsv\n'}
+[2.332939] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/local_setup.bash\n'}
+[2.333171] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/local_setup.sh\n'}
+[2.333383] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/local_setup.zsh\n'}
+[2.333592] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/local_setup.dsv\n'}
+[2.333858] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/package.dsv\n'}
+[2.334132] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/ament_index/resource_index/packages/vos_module_interfaces\n'}
+[2.334344] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_generator_cExport.cmake\n'}
+[2.334559] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_generator_cExport-noconfig.cmake\n'}
+[2.334777] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_typesupport_fastrtps_cExport.cmake\n'}
+[2.335051] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_typesupport_fastrtps_cExport-noconfig.cmake\n'}
+[2.335332] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfaces__rosidl_typesupport_introspection_cExport.cmake\n'}
+[2.335507] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfaces__rosidl_typesupport_introspection_cExport-noconfig.cmake\n'}
+[2.335791] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfaces__rosidl_typesupport_cExport.cmake\n'}
+[2.336134] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfaces__rosidl_typesupport_cExport-noconfig.cmake\n'}
+[2.336436] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_generator_cppExport.cmake\n'}
+[2.336635] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_typesupport_fastrtps_cppExport.cmake\n'}
+[2.336839] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake\n'}
+[2.337119] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfaces__rosidl_typesupport_introspection_cppExport.cmake\n'}
+[2.337290] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfaces__rosidl_typesupport_introspection_cppExport-noconfig.cmake\n'}
+[2.337458] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfaces__rosidl_typesupport_cppExport.cmake\n'}
+[2.337634] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfaces__rosidl_typesupport_cppExport-noconfig.cmake\n'}
+[2.337802] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_generator_pyExport.cmake\n'}
+[2.338015] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_generator_pyExport-noconfig.cmake\n'}
+[2.338184] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/rosidl_cmake-extras.cmake\n'}
+[2.338349] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/ament_cmake_export_dependencies-extras.cmake\n'}
+[2.338516] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/ament_cmake_export_include_directories-extras.cmake\n'}
+[2.338686] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/ament_cmake_export_libraries-extras.cmake\n'}
+[2.338938] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/ament_cmake_export_targets-extras.cmake\n'}
+[2.339239] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake\n'}
+[2.339533] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake\n'}
+[2.339788] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfacesConfig.cmake\n'}
+[2.340085] (vos_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfacesConfig-version.cmake\n'}
+[2.340445] (vos_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/package.xml\n'}
+[2.341574] (vos_module_interfaces) CommandEnded: {'returncode': 0}
+[2.364938] (vos_module_interfaces) JobEnded: {'identifier': 'vos_module_interfaces', 'rc': 0}
+[2.367496] (vos_module_template) JobStarted: {'identifier': 'vos_module_template'}
+[2.405458] (-) TimerEvent: {}
+[2.505832] (-) TimerEvent: {}
+[2.606097] (-) TimerEvent: {}
+[2.706305] (-) TimerEvent: {}
+[2.806466] (-) TimerEvent: {}
+[2.906607] (-) TimerEvent: {}
+[2.988597] (vos_module_template) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'egg_info', '--egg-base', '../../build/vos_module_template', 'build', '--build-base', '/workspace/build/vos_module_template/build', 'install', '--record', '/workspace/build/vos_module_template/install.log', '--single-version-externally-managed', 'install_data'], 'cwd': '/workspace/src/vos_module_template', 'env': {'LESSOPEN': '| /usr/bin/lesspipe %s', 'HOSTNAME': '73b0950848fa', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/workspace/install/vos_module_interfaces/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib', 'HOME': '/root', 'OLDPWD': '/workspace', 'ROS_PYTHON_VERSION': '3', 'COLCON_PREFIX_PATH': '/workspace/install', 'ROS_DISTRO': 'humble', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'TERM': 'xterm', 'ROS_LOCALHOST_ONLY': '0', 'PATH': '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'LANG': 'C.UTF-8', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'AMENT_PREFIX_PATH': '/workspace/install/vos_module_template:/workspace/install/vos_module_interfaces:/opt/ros/humble', 'DEBIAN_FRONTEND': 'noninteractive', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'PWD': '/workspace/build/vos_module_template', 'LC_ALL': 'C.UTF-8', 'PYTHONPATH': '/workspace/build/vos_module_template/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/install/vos_module_template/lib/python3.10/site-packages:/workspace/install/vos_module_template/lib/python3.10/site-packages:/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/workspace/install/vos_module_interfaces'}, 'shell': False}
+[3.006683] (-) TimerEvent: {}
+[3.106844] (-) TimerEvent: {}
+[3.206987] (-) TimerEvent: {}
+[3.240872] (vos_module_template) StdoutLine: {'line': b'running egg_info\n'}
+[3.254475] (vos_module_template) StdoutLine: {'line': b'writing ../../build/vos_module_template/vos_module_template.egg-info/PKG-INFO\n'}
+[3.255163] (vos_module_template) StdoutLine: {'line': b'writing dependency_links to ../../build/vos_module_template/vos_module_template.egg-info/dependency_links.txt\n'}
+[3.255391] (vos_module_template) StdoutLine: {'line': b'writing entry points to ../../build/vos_module_template/vos_module_template.egg-info/entry_points.txt\n'}
+[3.255736] (vos_module_template) StdoutLine: {'line': b'writing requirements to ../../build/vos_module_template/vos_module_template.egg-info/requires.txt\n'}
+[3.255920] (vos_module_template) StdoutLine: {'line': b'writing top-level names to ../../build/vos_module_template/vos_module_template.egg-info/top_level.txt\n'}
+[3.285718] (vos_module_template) StdoutLine: {'line': b"reading manifest file '../../build/vos_module_template/vos_module_template.egg-info/SOURCES.txt'\n"}
+[3.287388] (vos_module_template) StdoutLine: {'line': b"writing manifest file '../../build/vos_module_template/vos_module_template.egg-info/SOURCES.txt'\n"}
+[3.287565] (vos_module_template) StdoutLine: {'line': b'running build\n'}
+[3.287712] (vos_module_template) StdoutLine: {'line': b'running build_py\n'}
+[3.287870] (vos_module_template) StdoutLine: {'line': b'copying vos_module_template/Core.py -> /workspace/build/vos_module_template/build/lib/vos_module_template\n'}
+[3.288125] (vos_module_template) StdoutLine: {'line': b'copying vos_module_template/PublisherNode.py -> /workspace/build/vos_module_template/build/lib/vos_module_template\n'}
+[3.288366] (vos_module_template) StdoutLine: {'line': b'copying vos_module_template/__init__.py -> /workspace/build/vos_module_template/build/lib/vos_module_template\n'}
+[3.288571] (vos_module_template) StdoutLine: {'line': b'copying vos_module_template/SubscriberNode.py -> /workspace/build/vos_module_template/build/lib/vos_module_template\n'}
+[3.288818] (vos_module_template) StdoutLine: {'line': b'copying vos_module_template/Template.py -> /workspace/build/vos_module_template/build/lib/vos_module_template\n'}
+[3.289239] (vos_module_template) StdoutLine: {'line': b'running install\n'}
+[3.293449] (vos_module_template) StdoutLine: {'line': b'running install_lib\n'}
+[3.307057] (-) TimerEvent: {}
+[3.307645] (vos_module_template) StdoutLine: {'line': b'copying /workspace/build/vos_module_template/build/lib/vos_module_template/Core.py -> /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template\n'}
+[3.308523] (vos_module_template) StdoutLine: {'line': b'byte-compiling /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template/Core.py to Core.cpython-310.pyc\n'}
+[3.309892] (vos_module_template) StdoutLine: {'line': b'running install_data\n'}
+[3.310124] (vos_module_template) StdoutLine: {'line': b'copying resource/vos_module_template -> /workspace/install/vos_module_template/share/ament_index/resource_index/packages\n'}
+[3.310392] (vos_module_template) StdoutLine: {'line': b'copying package.xml -> /workspace/install/vos_module_template/share/vos_module_template\n'}
+[3.310571] (vos_module_template) StdoutLine: {'line': b'running install_egg_info\n'}
+[3.326024] (vos_module_template) StdoutLine: {'line': b"removing '/workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template-0.1.0-py3.10.egg-info' (and everything under it)\n"}
+[3.326423] (vos_module_template) StdoutLine: {'line': b'Copying ../../build/vos_module_template/vos_module_template.egg-info to /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template-0.1.0-py3.10.egg-info\n'}
+[3.327731] (vos_module_template) StdoutLine: {'line': b'running install_scripts\n'}
+[3.357385] (vos_module_template) StdoutLine: {'line': b'Installing core script to /workspace/install/vos_module_template/lib/vos_module_template\n'}
+[3.357562] (vos_module_template) StdoutLine: {'line': b'Installing listener script to /workspace/install/vos_module_template/lib/vos_module_template\n'}
+[3.357752] (vos_module_template) StdoutLine: {'line': b'Installing talker script to /workspace/install/vos_module_template/lib/vos_module_template\n'}
+[3.358288] (vos_module_template) StdoutLine: {'line': b"writing list of installed files to '/workspace/build/vos_module_template/install.log'\n"}
+[3.383183] (vos_module_template) CommandEnded: {'returncode': 0}
+[3.398205] (vos_module_template) JobEnded: {'identifier': 'vos_module_template', 'rc': 0}
+[3.399094] (-) EventReactorShutdown: {}

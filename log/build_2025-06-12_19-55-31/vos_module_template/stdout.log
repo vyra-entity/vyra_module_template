@@ -1,0 +1,28 @@
+running egg_info
+writing ../../build/vos_module_template/vos_module_template.egg-info/PKG-INFO
+writing dependency_links to ../../build/vos_module_template/vos_module_template.egg-info/dependency_links.txt
+writing entry points to ../../build/vos_module_template/vos_module_template.egg-info/entry_points.txt
+writing requirements to ../../build/vos_module_template/vos_module_template.egg-info/requires.txt
+writing top-level names to ../../build/vos_module_template/vos_module_template.egg-info/top_level.txt
+reading manifest file '../../build/vos_module_template/vos_module_template.egg-info/SOURCES.txt'
+writing manifest file '../../build/vos_module_template/vos_module_template.egg-info/SOURCES.txt'
+running build
+running build_py
+copying vos_module_template/Core.py -> /workspace/build/vos_module_template/build/lib/vos_module_template
+copying vos_module_template/PublisherNode.py -> /workspace/build/vos_module_template/build/lib/vos_module_template
+copying vos_module_template/__init__.py -> /workspace/build/vos_module_template/build/lib/vos_module_template
+copying vos_module_template/SubscriberNode.py -> /workspace/build/vos_module_template/build/lib/vos_module_template
+copying vos_module_template/Template.py -> /workspace/build/vos_module_template/build/lib/vos_module_template
+running install
+running install_lib
+running install_data
+copying resource/vos_module_template -> /workspace/install/vos_module_template/share/ament_index/resource_index/packages
+copying package.xml -> /workspace/install/vos_module_template/share/vos_module_template
+running install_egg_info
+removing '/workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template-0.1.0-py3.10.egg-info' (and everything under it)
+Copying ../../build/vos_module_template/vos_module_template.egg-info to /workspace/install/vos_module_template/lib/python3.10/site-packages/vos_module_template-0.1.0-py3.10.egg-info
+running install_scripts
+Installing core script to /workspace/install/vos_module_template/lib/vos_module_template
+Installing listener script to /workspace/install/vos_module_template/lib/vos_module_template
+Installing talker script to /workspace/install/vos_module_template/lib/vos_module_template
+writing list of installed files to '/workspace/build/vos_module_template/install.log'

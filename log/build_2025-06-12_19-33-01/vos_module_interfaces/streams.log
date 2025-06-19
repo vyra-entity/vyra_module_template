@@ -1,0 +1,501 @@
+[0.013s] Invoking command in '/workspace/build/vos_module_interfaces': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /workspace/src/vos_module_interfaces -DCMAKE_INSTALL_PREFIX=/workspace/install/vos_module_interfaces
+[0.093s] -- The C compiler identification is GNU 11.4.0
+[0.160s] -- The CXX compiler identification is GNU 11.4.0
+[0.169s] -- Detecting C compiler ABI info
+[0.279s] -- Detecting C compiler ABI info - done
+[0.302s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.303s] -- Detecting C compile features
+[0.304s] -- Detecting C compile features - done
+[0.313s] -- Detecting CXX compiler ABI info
+[0.443s] -- Detecting CXX compiler ABI info - done
+[0.466s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.467s] -- Detecting CXX compile features
+[0.468s] -- Detecting CXX compile features - done
+[0.476s] -- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.899s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[1.040s] -- Found rosidl_default_generators: 1.2.0 (/opt/ros/humble/share/rosidl_default_generators/cmake)
+[1.043s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[1.050s] -- Found rosidl_adapter: 3.1.6 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[1.093s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[1.133s] -- Found std_msgs: 4.8.0 (/opt/ros/humble/share/std_msgs/cmake)
+[1.638s] -- Found ament_cmake_ros: 0.10.0 (/opt/ros/humble/share/ament_cmake_ros/cmake)
+[1.948s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[2.408s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[2.440s] -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.10.12", minimum required is "3.6") 
+[2.444s] -- Found python_cmake_module: 0.10.0 (/opt/ros/humble/share/python_cmake_module/cmake)
+[2.485s] -- Found PythonLibs: /usr/lib/x86_64-linux-gnu/libpython3.10.so (found suitable version "3.10.12", minimum required is "3.5") 
+[2.485s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[2.485s] -- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.10
+[2.485s] -- Using PYTHON_LIBRARIES: /usr/lib/x86_64-linux-gnu/libpython3.10.so
+[2.517s] -- Found PythonExtra: .so  
+[2.615s] -- Configuring done
+[2.683s] -- Generating done
+[2.700s] -- Build files have been written to: /workspace/build/vos_module_interfaces
+[2.707s] Invoked command in '/workspace/build/vos_module_interfaces' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /workspace/src/vos_module_interfaces -DCMAKE_INSTALL_PREFIX=/workspace/install/vos_module_interfaces
+[2.709s] Invoking command in '/workspace/build/vos_module_interfaces': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /workspace/build/vos_module_interfaces -- -j12 -l12
+[2.775s] [  1%] [34m[1mGenerating C code for ROS interfaces[0m
+[2.785s] [  2%] [34m[1mGenerating C++ code for ROS interfaces[0m
+[2.796s] [  2%] Built target ament_cmake_python_copy_vos_module_interfaces
+[3.024s] running egg_info
+[3.039s] creating vos_module_interfaces.egg-info
+[3.040s] writing vos_module_interfaces.egg-info/PKG-INFO
+[3.040s] writing dependency_links to vos_module_interfaces.egg-info/dependency_links.txt
+[3.040s] writing top-level names to vos_module_interfaces.egg-info/top_level.txt
+[3.041s] writing manifest file 'vos_module_interfaces.egg-info/SOURCES.txt'
+[3.085s] reading manifest file 'vos_module_interfaces.egg-info/SOURCES.txt'
+[3.087s] writing manifest file 'vos_module_interfaces.egg-info/SOURCES.txt'
+[3.121s] [  2%] Built target ament_cmake_python_build_vos_module_interfaces_egg
+[4.161s] [  2%] Built target vos_module_interfaces__cpp
+[4.178s] [  3%] [34m[1mGenerating C++ type support dispatch for ROS interfaces[0m
+[4.179s] [  4%] [34m[1mGenerating C++ type support for eProsima Fast-RTPS[0m
+[4.179s] [  5%] [34m[1mGenerating C++ introspection for ROS interfaces[0m
+[4.182s] [  8%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vos_module_interfaces/msg/detail/news_feed__functions.c.o[0m
+[4.182s] [  8%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vos_module_interfaces/msg/detail/logger_stream__functions.c.o[0m
+[4.182s] [  9%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vos_module_interfaces/msg/detail/state_feed__functions.c.o[0m
+[4.183s] [ 11%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vos_module_interfaces/srv/detail/trigger_transition__functions.c.o[0m
+[4.183s] [ 10%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vos_module_interfaces/srv/detail/get_capabilities__functions.c.o[0m
+[4.183s] [ 12%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vos_module_interfaces/action/detail/initiate_update__functions.c.o[0m
+[4.183s] [  8%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vos_module_interfaces/msg/detail/error_feed__functions.c.o[0m
+[4.184s] [ 13%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vos_module_interfaces/srv/detail/get_logs__functions.c.o[0m
+[4.184s] [ 14%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vos_module_interfaces/srv/detail/health_check__functions.c.o[0m
+[4.368s] [ 15%] [32m[1mLinking C shared library libvos_module_interfaces__rosidl_generator_c.so[0m
+[4.416s] [ 15%] Built target vos_module_interfaces__rosidl_generator_c
+[4.431s] [ 17%] [34m[1mGenerating C type support for eProsima Fast-RTPS[0m
+[4.431s] [ 17%] [34m[1mGenerating C introspection for ROS interfaces[0m
+[4.432s] [ 18%] [34m[1mGenerating C type support dispatch for ROS interfaces[0m
+[5.082s] [ 22%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vos_module_interfaces/msg/error_feed__type_support.cpp.o[0m
+[5.084s] [ 22%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vos_module_interfaces/msg/news_feed__type_support.cpp.o[0m
+[5.084s] [ 23%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vos_module_interfaces/srv/health_check__type_support.cpp.o[0m
+[5.085s] [ 24%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vos_module_interfaces/srv/trigger_transition__type_support.cpp.o[0m
+[5.085s] [ 25%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vos_module_interfaces/srv/get_capabilities__type_support.cpp.o[0m
+[5.085s] [ 26%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vos_module_interfaces/msg/logger_stream__type_support.cpp.o[0m
+[5.085s] [ 26%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vos_module_interfaces/msg/state_feed__type_support.cpp.o[0m
+[5.526s] [ 27%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vos_module_interfaces/srv/get_logs__type_support.cpp.o[0m
+[5.529s] [ 28%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vos_module_interfaces/action/initiate_update__type_support.cpp.o[0m
+[5.558s] [ 30%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vos_module_interfaces/msg/state_feed__type_support.cpp.o[0m
+[5.558s] [ 30%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vos_module_interfaces/msg/error_feed__type_support.cpp.o[0m
+[5.560s] [ 31%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vos_module_interfaces/msg/logger_stream__type_support.cpp.o[0m
+[5.568s] [ 32%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vos_module_interfaces/msg/news_feed__type_support.cpp.o[0m
+[5.572s] [ 33%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vos_module_interfaces/srv/health_check__type_support.cpp.o[0m
+[5.578s] [ 34%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vos_module_interfaces/msg/detail/news_feed__type_support.cpp.o[0m
+[5.587s] [ 35%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vos_module_interfaces/msg/detail/error_feed__type_support.cpp.o[0m
+[5.613s] [ 37%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vos_module_interfaces/msg/detail/logger_stream__type_support.cpp.o[0m
+[5.614s] [ 37%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vos_module_interfaces/srv/get_capabilities__type_support.cpp.o[0m
+[5.621s] [ 38%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vos_module_interfaces/srv/trigger_transition__type_support.cpp.o[0m
+[5.629s] [ 40%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vos_module_interfaces/msg/detail/state_feed__type_support.cpp.o[0m
+[5.635s] [ 41%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vos_module_interfaces/srv/detail/health_check__type_support.cpp.o[0m
+[5.674s] [ 42%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vos_module_interfaces/srv/get_logs__type_support.cpp.o[0m
+[5.683s] [ 43%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vos_module_interfaces/srv/detail/get_capabilities__type_support.cpp.o[0m
+[5.740s] [ 44%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vos_module_interfaces/action/initiate_update__type_support.cpp.o[0m
+[5.842s] [ 45%] [32m[1mLinking CXX shared library libvos_module_interfaces__rosidl_typesupport_c.so[0m
+[5.850s] [ 46%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vos_module_interfaces/msg/detail/dds_fastrtps/news_feed__type_support.cpp.o[0m
+[5.941s] [ 46%] Built target vos_module_interfaces__rosidl_typesupport_c
+[5.960s] [ 47%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vos_module_interfaces/srv/detail/trigger_transition__type_support.cpp.o[0m
+[5.994s] [ 48%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vos_module_interfaces/msg/detail/dds_fastrtps/error_feed__type_support.cpp.o[0m
+[6.115s] [ 49%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vos_module_interfaces/msg/detail/news_feed__type_support.c.o[0m
+[6.189s] [ 50%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vos_module_interfaces/msg/detail/news_feed__type_support_c.cpp.o[0m
+[6.195s] [ 51%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vos_module_interfaces/msg/detail/error_feed__type_support.c.o[0m
+[6.229s] [ 52%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vos_module_interfaces/msg/detail/logger_stream__type_support.c.o[0m
+[6.240s] [ 53%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vos_module_interfaces/msg/detail/dds_fastrtps/logger_stream__type_support.cpp.o[0m
+[6.273s] [ 54%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vos_module_interfaces/msg/detail/dds_fastrtps/state_feed__type_support.cpp.o[0m
+[6.281s] [ 55%] [32m[1mLinking CXX shared library libvos_module_interfaces__rosidl_typesupport_cpp.so[0m
+[6.304s] [ 56%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vos_module_interfaces/msg/detail/state_feed__type_support.c.o[0m
+[6.306s] [ 57%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vos_module_interfaces/srv/detail/dds_fastrtps/health_check__type_support.cpp.o[0m
+[6.344s] [ 58%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vos_module_interfaces/srv/detail/health_check__type_support.c.o[0m
+[6.350s] [ 60%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vos_module_interfaces/msg/detail/error_feed__type_support_c.cpp.o[0m
+[6.370s] [ 60%] Built target vos_module_interfaces__rosidl_typesupport_cpp
+[6.378s] [ 61%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vos_module_interfaces/msg/detail/logger_stream__type_support_c.cpp.o[0m
+[6.382s] [ 62%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vos_module_interfaces/msg/detail/state_feed__type_support_c.cpp.o[0m
+[6.390s] [ 63%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vos_module_interfaces/srv/detail/dds_fastrtps/get_capabilities__type_support.cpp.o[0m
+[6.427s] [ 64%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vos_module_interfaces/srv/detail/get_capabilities__type_support.c.o[0m
+[6.512s] [ 65%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vos_module_interfaces/srv/detail/trigger_transition__type_support.c.o[0m
+[6.552s] [ 66%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vos_module_interfaces/srv/detail/get_logs__type_support.c.o[0m
+[6.597s] [ 67%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vos_module_interfaces/srv/detail/get_logs__type_support.cpp.o[0m
+[6.629s] [ 68%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vos_module_interfaces/action/detail/initiate_update__type_support.c.o[0m
+[6.639s] [ 69%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vos_module_interfaces/srv/detail/health_check__type_support_c.cpp.o[0m
+[6.672s] [ 70%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vos_module_interfaces/srv/detail/get_capabilities__type_support_c.cpp.o[0m
+[6.729s] [ 71%] [32m[1mLinking C shared library libvos_module_interfaces__rosidl_typesupport_introspection_c.so[0m
+[6.801s] [ 71%] Built target vos_module_interfaces__rosidl_typesupport_introspection_c
+[6.803s] [ 72%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vos_module_interfaces/action/detail/initiate_update__type_support.cpp.o[0m
+[6.819s] [ 73%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vos_module_interfaces/srv/detail/trigger_transition__type_support_c.cpp.o[0m
+[6.925s] [ 74%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vos_module_interfaces/srv/detail/get_logs__type_support_c.cpp.o[0m
+[6.972s] [ 75%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vos_module_interfaces/srv/detail/dds_fastrtps/trigger_transition__type_support.cpp.o[0m
+[6.984s] [ 76%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vos_module_interfaces/srv/detail/dds_fastrtps/get_logs__type_support.cpp.o[0m
+[7.009s] [ 77%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vos_module_interfaces/action/detail/dds_fastrtps/initiate_update__type_support.cpp.o[0m
+[7.020s] [ 78%] [32mBuilding CXX object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vos_module_interfaces/action/detail/initiate_update__type_support_c.cpp.o[0m
+[7.528s] [ 80%] [32m[1mLinking CXX shared library libvos_module_interfaces__rosidl_typesupport_fastrtps_c.so[0m
+[7.603s] [ 81%] [32m[1mLinking CXX shared library libvos_module_interfaces__rosidl_typesupport_introspection_cpp.so[0m
+[7.660s] [ 81%] Built target vos_module_interfaces__rosidl_typesupport_fastrtps_c
+[7.724s] [ 81%] Built target vos_module_interfaces__rosidl_typesupport_introspection_cpp
+[7.793s] [ 82%] [32m[1mLinking CXX shared library libvos_module_interfaces__rosidl_typesupport_fastrtps_cpp.so[0m
+[7.916s] [ 82%] Built target vos_module_interfaces__rosidl_typesupport_fastrtps_cpp
+[7.956s] [ 82%] Built target vos_module_interfaces
+[7.982s] [ 83%] [34m[1mGenerating Python code for ROS interfaces[0m
+[10.406s] [ 83%] Built target vos_module_interfaces__py
+[10.434s] [ 85%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vos_module_interfaces/srv/_health_check_s.c.o[0m
+[10.434s] [ 85%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vos_module_interfaces/msg/_state_feed_s.c.o[0m
+[10.434s] [ 86%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vos_module_interfaces/msg/_news_feed_s.c.o[0m
+[10.434s] [ 89%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vos_module_interfaces/srv/_get_logs_s.c.o[0m
+[10.436s] [ 89%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vos_module_interfaces/msg/_error_feed_s.c.o[0m
+[10.436s] [ 89%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vos_module_interfaces/msg/_logger_stream_s.c.o[0m
+[10.436s] [ 91%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vos_module_interfaces/srv/_get_capabilities_s.c.o[0m
+[10.436s] [ 91%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vos_module_interfaces/srv/_trigger_transition_s.c.o[0m
+[10.437s] [ 92%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vos_module_interfaces/action/_initiate_update_s.c.o[0m
+[10.676s] [ 93%] [32m[1mLinking C shared library rosidl_generator_py/vos_module_interfaces/libvos_module_interfaces__rosidl_generator_py.so[0m
+[10.759s] [ 93%] Built target vos_module_interfaces__rosidl_generator_py
+[10.785s] [ 94%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_typesupport_introspection_c__pyext.dir/rosidl_generator_py/vos_module_interfaces/_vos_module_interfaces_s.ep.rosidl_typesupport_introspection_c.c.o[0m
+[10.788s] [ 95%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_typesupport_c__pyext.dir/rosidl_generator_py/vos_module_interfaces/_vos_module_interfaces_s.ep.rosidl_typesupport_c.c.o[0m
+[10.789s] [ 96%] [32mBuilding C object CMakeFiles/vos_module_interfaces__rosidl_typesupport_fastrtps_c__pyext.dir/rosidl_generator_py/vos_module_interfaces/_vos_module_interfaces_s.ep.rosidl_typesupport_fastrtps_c.c.o[0m
+[11.025s] [ 97%] [32m[1mLinking C shared library rosidl_generator_py/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so[0m
+[11.040s] [ 98%] [32m[1mLinking C shared library rosidl_generator_py/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so[0m
+[11.040s] [100%] [32m[1mLinking C shared library rosidl_generator_py/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so[0m
+[11.100s] [100%] Built target vos_module_interfaces__rosidl_typesupport_introspection_c__pyext
+[11.103s] [100%] Built target vos_module_interfaces__rosidl_typesupport_fastrtps_c__pyext
+[11.103s] [100%] Built target vos_module_interfaces__rosidl_typesupport_c__pyext
+[11.121s] Invoked command in '/workspace/build/vos_module_interfaces' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /workspace/build/vos_module_interfaces -- -j12 -l12
+[11.135s] Invoking command in '/workspace/build/vos_module_interfaces': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /workspace/build/vos_module_interfaces
+[11.154s] -- Install configuration: ""
+[11.154s] -- Installing: /workspace/install/vos_module_interfaces/share/ament_index/resource_index/rosidl_interfaces/vos_module_interfaces
+[11.154s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces
+[11.155s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv
+[11.155s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/get_logs.h
+[11.155s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/health_check.h
+[11.155s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail
+[11.156s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__functions.c
+[11.156s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__struct.h
+[11.156s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__functions.c
+[11.156s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__functions.h
+[11.156s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__functions.c
+[11.157s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__struct.h
+[11.157s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__type_support.h
+[11.157s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__struct.h
+[11.157s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__functions.c
+[11.158s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__functions.h
+[11.158s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__type_support.h
+[11.158s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__functions.h
+[11.158s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__type_support.h
+[11.159s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__type_support.h
+[11.159s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__functions.h
+[11.159s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__struct.h
+[11.159s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/trigger_transition.h
+[11.160s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/get_capabilities.h
+[11.160s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg
+[11.160s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/news_feed.h
+[11.160s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/rosidl_generator_c__visibility_control.h
+[11.161s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/error_feed.h
+[11.161s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/state_feed.h
+[11.161s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/logger_stream.h
+[11.161s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail
+[11.162s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__functions.h
+[11.162s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__functions.c
+[11.162s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__struct.h
+[11.162s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__struct.h
+[11.163s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__functions.h
+[11.163s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__functions.h
+[11.163s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__functions.c
+[11.163s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__struct.h
+[11.164s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__type_support.h
+[11.164s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__type_support.h
+[11.164s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__functions.c
+[11.164s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__struct.h
+[11.165s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__type_support.h
+[11.165s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__type_support.h
+[11.165s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__functions.h
+[11.165s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__functions.c
+[11.166s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action
+[11.166s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/initiate_update.h
+[11.166s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail
+[11.166s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__functions.c
+[11.166s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__struct.h
+[11.167s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__type_support.h
+[11.167s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__functions.h
+[11.167s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/environment/library_path.sh
+[11.167s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/environment/library_path.dsv
+[11.168s] -- Installing: /workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_generator_c.so
+[11.168s] -- Set runtime path of "/workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_generator_c.so" to ""
+[11.168s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces
+[11.168s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv
+[11.169s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail
+[11.169s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__rosidl_typesupport_fastrtps_c.h
+[11.169s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__rosidl_typesupport_fastrtps_c.h
+[11.170s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__rosidl_typesupport_fastrtps_c.h
+[11.170s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__rosidl_typesupport_fastrtps_c.h
+[11.170s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg
+[11.170s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/rosidl_typesupport_fastrtps_c__visibility_control.h
+[11.170s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail
+[11.171s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__rosidl_typesupport_fastrtps_c.h
+[11.171s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__rosidl_typesupport_fastrtps_c.h
+[11.171s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__rosidl_typesupport_fastrtps_c.h
+[11.171s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__rosidl_typesupport_fastrtps_c.h
+[11.172s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action
+[11.172s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail
+[11.172s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__rosidl_typesupport_fastrtps_c.h
+[11.173s] -- Installing: /workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_fastrtps_c.so
+[11.173s] -- Set runtime path of "/workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_fastrtps_c.so" to ""
+[11.173s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces
+[11.174s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv
+[11.174s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail
+[11.174s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__rosidl_typesupport_introspection_c.h
+[11.175s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__type_support.c
+[11.175s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__type_support.c
+[11.175s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__type_support.c
+[11.176s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__rosidl_typesupport_introspection_c.h
+[11.176s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__rosidl_typesupport_introspection_c.h
+[11.176s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__rosidl_typesupport_introspection_c.h
+[11.177s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__type_support.c
+[11.177s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg
+[11.177s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/rosidl_typesupport_introspection_c__visibility_control.h
+[11.178s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail
+[11.178s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__type_support.c
+[11.178s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__type_support.c
+[11.179s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__rosidl_typesupport_introspection_c.h
+[11.179s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__type_support.c
+[11.179s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__rosidl_typesupport_introspection_c.h
+[11.180s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__type_support.c
+[11.180s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__rosidl_typesupport_introspection_c.h
+[11.180s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__rosidl_typesupport_introspection_c.h
+[11.180s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action
+[11.181s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail
+[11.181s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__rosidl_typesupport_introspection_c.h
+[11.181s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__type_support.c
+[11.181s] -- Installing: /workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_introspection_c.so
+[11.182s] -- Set runtime path of "/workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_introspection_c.so" to ""
+[11.182s] -- Installing: /workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_c.so
+[11.182s] -- Set runtime path of "/workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_c.so" to ""
+[11.182s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces
+[11.183s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv
+[11.183s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/get_capabilities.hpp
+[11.183s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/get_logs.hpp
+[11.183s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/trigger_transition.hpp
+[11.184s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/health_check.hpp
+[11.184s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail
+[11.184s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__builder.hpp
+[11.184s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__traits.hpp
+[11.185s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__traits.hpp
+[11.185s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__builder.hpp
+[11.185s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__struct.hpp
+[11.186s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__struct.hpp
+[11.186s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__type_support.hpp
+[11.186s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__traits.hpp
+[11.187s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__traits.hpp
+[11.187s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__type_support.hpp
+[11.187s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__type_support.hpp
+[11.187s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__builder.hpp
+[11.188s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__struct.hpp
+[11.188s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__type_support.hpp
+[11.188s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__builder.hpp
+[11.188s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__struct.hpp
+[11.189s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg
+[11.189s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/rosidl_generator_cpp__visibility_control.hpp
+[11.189s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/logger_stream.hpp
+[11.189s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/state_feed.hpp
+[11.190s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/news_feed.hpp
+[11.190s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail
+[11.190s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__struct.hpp
+[11.190s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__traits.hpp
+[11.191s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__builder.hpp
+[11.191s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__traits.hpp
+[11.191s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__builder.hpp
+[11.191s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__type_support.hpp
+[11.192s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__type_support.hpp
+[11.192s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__type_support.hpp
+[11.192s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__builder.hpp
+[11.192s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__struct.hpp
+[11.193s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__struct.hpp
+[11.193s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__struct.hpp
+[11.193s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__traits.hpp
+[11.193s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__type_support.hpp
+[11.193s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__builder.hpp
+[11.194s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__traits.hpp
+[11.194s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/error_feed.hpp
+[11.194s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action
+[11.194s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/initiate_update.hpp
+[11.195s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail
+[11.195s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__builder.hpp
+[11.195s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__struct.hpp
+[11.195s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__traits.hpp
+[11.195s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__type_support.hpp
+[11.196s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces
+[11.196s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv
+[11.196s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail
+[11.196s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__rosidl_typesupport_fastrtps_cpp.hpp
+[11.197s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__rosidl_typesupport_fastrtps_cpp.hpp
+[11.197s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__rosidl_typesupport_fastrtps_cpp.hpp
+[11.197s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__rosidl_typesupport_fastrtps_cpp.hpp
+[11.197s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/dds_fastrtps
+[11.197s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg
+[11.198s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h
+[11.198s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail
+[11.198s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__rosidl_typesupport_fastrtps_cpp.hpp
+[11.198s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__rosidl_typesupport_fastrtps_cpp.hpp
+[11.198s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__rosidl_typesupport_fastrtps_cpp.hpp
+[11.199s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__rosidl_typesupport_fastrtps_cpp.hpp
+[11.199s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/dds_fastrtps
+[11.199s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action
+[11.199s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail
+[11.200s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__rosidl_typesupport_fastrtps_cpp.hpp
+[11.200s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/dds_fastrtps
+[11.200s] -- Installing: /workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_fastrtps_cpp.so
+[11.200s] -- Set runtime path of "/workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_fastrtps_cpp.so" to ""
+[11.201s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces
+[11.201s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv
+[11.201s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail
+[11.201s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__type_support.cpp
+[11.201s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__rosidl_typesupport_introspection_cpp.hpp
+[11.202s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__type_support.cpp
+[11.202s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__type_support.cpp
+[11.202s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/trigger_transition__type_support.cpp
+[11.202s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/health_check__rosidl_typesupport_introspection_cpp.hpp
+[11.203s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_capabilities__rosidl_typesupport_introspection_cpp.hpp
+[11.203s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/srv/detail/get_logs__rosidl_typesupport_introspection_cpp.hpp
+[11.203s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg
+[11.203s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail
+[11.203s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__type_support.cpp
+[11.204s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__type_support.cpp
+[11.204s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__rosidl_typesupport_introspection_cpp.hpp
+[11.204s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/logger_stream__rosidl_typesupport_introspection_cpp.hpp
+[11.204s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/error_feed__rosidl_typesupport_introspection_cpp.hpp
+[11.205s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__rosidl_typesupport_introspection_cpp.hpp
+[11.205s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/news_feed__type_support.cpp
+[11.205s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/msg/detail/state_feed__type_support.cpp
+[11.205s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action
+[11.205s] -- Up-to-date: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail
+[11.206s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__type_support.cpp
+[11.206s] -- Installing: /workspace/install/vos_module_interfaces/include/vos_module_interfaces/vos_module_interfaces/action/detail/initiate_update__rosidl_typesupport_introspection_cpp.hpp
+[11.206s] -- Installing: /workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_introspection_cpp.so
+[11.206s] -- Set runtime path of "/workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_introspection_cpp.so" to ""
+[11.206s] -- Installing: /workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_cpp.so
+[11.206s] -- Set runtime path of "/workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_typesupport_cpp.so" to ""
+[11.206s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/environment/pythonpath.sh
+[11.206s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/environment/pythonpath.dsv
+[11.206s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces-0.1.0-py3.10.egg-info
+[11.207s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces-0.1.0-py3.10.egg-info/PKG-INFO
+[11.207s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces-0.1.0-py3.10.egg-info/top_level.txt
+[11.207s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces-0.1.0-py3.10.egg-info/SOURCES.txt
+[11.207s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces-0.1.0-py3.10.egg-info/dependency_links.txt
+[11.207s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces
+[11.207s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv
+[11.207s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_trigger_transition.py
+[11.207s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_trigger_transition_s.c
+[11.207s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_get_capabilities_s.c
+[11.207s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_get_logs.py
+[11.207s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_get_logs_s.c
+[11.207s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_health_check.py
+[11.208s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_health_check_s.c
+[11.208s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/__init__.py
+[11.208s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_get_capabilities.py
+[11.208s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[11.208s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg
+[11.208s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_state_feed_s.c
+[11.208s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_state_feed.py
+[11.208s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_error_feed.py
+[11.208s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_logger_stream.py
+[11.208s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_news_feed.py
+[11.208s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_news_feed_s.c
+[11.209s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_logger_stream_s.c
+[11.209s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/__init__.py
+[11.209s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_error_feed_s.c
+[11.209s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/libvos_module_interfaces__rosidl_generator_py.so
+[11.209s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/_vos_module_interfaces_s.ep.rosidl_typesupport_fastrtps_c.c
+[11.209s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/_vos_module_interfaces_s.ep.rosidl_typesupport_introspection_c.c
+[11.209s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[11.209s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[11.209s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/__init__.py
+[11.209s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/_vos_module_interfaces_s.ep.rosidl_typesupport_c.c
+[11.209s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/action
+[11.209s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/action/_initiate_update.py
+[11.209s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/action/_initiate_update_s.c
+[11.209s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/action/__init__.py
+[11.275s] Listing '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces'...
+[11.275s] Compiling '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/__init__.py'...
+[11.275s] Listing '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/action'...
+[11.275s] Compiling '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/action/__init__.py'...
+[11.275s] Compiling '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/action/_initiate_update.py'...
+[11.275s] Listing '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg'...
+[11.275s] Compiling '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/__init__.py'...
+[11.275s] Compiling '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_error_feed.py'...
+[11.275s] Compiling '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_logger_stream.py'...
+[11.276s] Compiling '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_news_feed.py'...
+[11.276s] Compiling '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/msg/_state_feed.py'...
+[11.276s] Listing '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv'...
+[11.276s] Compiling '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/__init__.py'...
+[11.276s] Compiling '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_get_capabilities.py'...
+[11.276s] Compiling '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_get_logs.py'...
+[11.276s] Compiling '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_health_check.py'...
+[11.276s] Compiling '/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/srv/_trigger_transition.py'...
+[11.280s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[11.281s] -- Set runtime path of "/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so" to ""
+[11.281s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[11.282s] -- Set runtime path of "/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so" to ""
+[11.282s] -- Installing: /workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[11.283s] -- Set runtime path of "/workspace/install/vos_module_interfaces/local/lib/python3.10/dist-packages/vos_module_interfaces/vos_module_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so" to ""
+[11.283s] -- Installing: /workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_generator_py.so
+[11.283s] -- Set runtime path of "/workspace/install/vos_module_interfaces/lib/libvos_module_interfaces__rosidl_generator_py.so" to ""
+[11.283s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/msg/NewsFeed.idl
+[11.284s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/msg/ErrorFeed.idl
+[11.284s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/msg/LoggerStream.idl
+[11.284s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/msg/StateFeed.idl
+[11.284s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/HealthCheck.idl
+[11.285s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/GetCapabilities.idl
+[11.285s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/TriggerTransition.idl
+[11.285s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/GetLogs.idl
+[11.285s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/action/InitiateUpdate.idl
+[11.286s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/msg/NewsFeed.msg
+[11.286s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/msg/ErrorFeed.msg
+[11.286s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/msg/LoggerStream.msg
+[11.286s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/msg/StateFeed.msg
+[11.287s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/HealthCheck.srv
+[11.287s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/HealthCheck_Request.msg
+[11.287s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/HealthCheck_Response.msg
+[11.287s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/GetCapabilities.srv
+[11.288s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/GetCapabilities_Request.msg
+[11.288s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/GetCapabilities_Response.msg
+[11.288s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/TriggerTransition.srv
+[11.288s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/TriggerTransition_Request.msg
+[11.289s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/TriggerTransition_Response.msg
+[11.289s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/GetLogs.srv
+[11.289s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/GetLogs_Request.msg
+[11.289s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/srv/GetLogs_Response.msg
+[11.290s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/action/InitiateUpdate.action
+[11.290s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/config
+[11.290s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/config/base_metadata.config
+[11.290s] -- Installing: /workspace/install/vos_module_interfaces/share/ament_index/resource_index/package_run_dependencies/vos_module_interfaces
+[11.290s] -- Installing: /workspace/install/vos_module_interfaces/share/ament_index/resource_index/parent_prefix_path/vos_module_interfaces
+[11.291s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/environment/ament_prefix_path.sh
+[11.291s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/environment/ament_prefix_path.dsv
+[11.291s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/environment/path.sh
+[11.292s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/environment/path.dsv
+[11.292s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/local_setup.bash
+[11.293s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/local_setup.sh
+[11.293s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/local_setup.zsh
+[11.293s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/local_setup.dsv
+[11.294s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/package.dsv
+[11.294s] -- Installing: /workspace/install/vos_module_interfaces/share/ament_index/resource_index/packages/vos_module_interfaces
+[11.294s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_generator_cExport.cmake
+[11.295s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_generator_cExport-noconfig.cmake
+[11.295s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_typesupport_fastrtps_cExport.cmake
+[11.295s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_typesupport_fastrtps_cExport-noconfig.cmake
+[11.296s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfaces__rosidl_typesupport_introspection_cExport.cmake
+[11.296s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfaces__rosidl_typesupport_introspection_cExport-noconfig.cmake
+[11.296s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfaces__rosidl_typesupport_cExport.cmake
+[11.297s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfaces__rosidl_typesupport_cExport-noconfig.cmake
+[11.297s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_generator_cppExport.cmake
+[11.297s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_typesupport_fastrtps_cppExport.cmake
+[11.298s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake
+[11.298s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfaces__rosidl_typesupport_introspection_cppExport.cmake
+[11.298s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfaces__rosidl_typesupport_introspection_cppExport-noconfig.cmake
+[11.299s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfaces__rosidl_typesupport_cppExport.cmake
+[11.299s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfaces__rosidl_typesupport_cppExport-noconfig.cmake
+[11.299s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_generator_pyExport.cmake
+[11.300s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/export_vos_module_interfaces__rosidl_generator_pyExport-noconfig.cmake
+[11.300s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/rosidl_cmake-extras.cmake
+[11.300s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/ament_cmake_export_dependencies-extras.cmake
+[11.301s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/ament_cmake_export_include_directories-extras.cmake
+[11.301s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/ament_cmake_export_libraries-extras.cmake
+[11.301s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/ament_cmake_export_targets-extras.cmake
+[11.302s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake
+[11.302s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake
+[11.302s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfacesConfig.cmake
+[11.303s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/cmake/vos_module_interfacesConfig-version.cmake
+[11.304s] -- Installing: /workspace/install/vos_module_interfaces/share/vos_module_interfaces/package.xml
+[11.305s] Invoked command in '/workspace/build/vos_module_interfaces' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /workspace/build/vos_module_interfaces

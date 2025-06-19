@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "vos_module_interfaces__py",
+		"source" : "/workspace/build/vos_module_interfaces/vos_module_interfaces__py"
+	}
+}
