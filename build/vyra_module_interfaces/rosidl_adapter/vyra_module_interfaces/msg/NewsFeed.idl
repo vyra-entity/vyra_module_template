@@ -1,0 +1,23 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from vyra_module_interfaces/msg/NewsFeed.msg
+// generated code does not contain a copyright notice
+
+#include "builtin_interfaces/msg/Time.idl"
+
+module vyra_module_interfaces {
+  module msg {
+    @verbatim (language="comment", text=
+      "NewsFeed.msg")
+    struct NewsFeed {
+      string type;
+
+      string message;
+
+      builtin_interfaces::msg::Time timestamp;
+
+      string module_id;
+
+      string module_name;
+    };
+  };
+};

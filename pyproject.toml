@@ -1,15 +1,15 @@
 
-[tool.vos]
-module_name = "vos_module_template"
+[tool.vyra]
+module_name = "vyra_module_template"
 module_template = "basic"
-module_description = "This template could be used to create a vos module with basic functionality."
+module_description = "This template could be used to create a vyra module with basic functionality."
 module_links = [
-    { name = "VarioboticOS-Documentation", url = "https://docs.variobotic.de/vos-module-template" }
+    { name = "VarioboticOS-Documentation", url = "https://docs.variobotic.de/vyra-module-template" }
 ]
 
 
 [tool.poetry]
-name = "vos-module-template"
+name = "vyra-module-template"
 version = "0.1.0"
 description = ""
 authors = ["HolgDer <h.schernewski@variobotic.de>"]

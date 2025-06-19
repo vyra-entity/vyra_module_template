@@ -1,0 +1,23 @@
+// generated from rosidl_adapter/resource/srv.idl.em
+// with input from vyra_module_interfaces/srv/GetLogs.srv
+// generated code does not contain a copyright notice
+
+#include "vyra_module_interfaces/msg/LoggerStream.idl"
+
+module vyra_module_interfaces {
+  module srv {
+    @verbatim (language="comment", text=
+      "GetLogs.srv" "\n"
+      "Request")
+    struct GetLogs_Request {
+      int32 log_lines;
+
+      uint8 log_level;
+    };
+    @verbatim (language="comment", text=
+      "Response")
+    struct GetLogs_Response {
+      sequence<vyra_module_interfaces::msg::LoggerStream> log_messages;
+    };
+  };
+};

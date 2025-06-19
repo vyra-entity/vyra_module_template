@@ -1,0 +1,9 @@
+running egg_info
+creating ../../build/vyra_module_template/vyra_module_template.egg-info
+writing ../../build/vyra_module_template/vyra_module_template.egg-info/PKG-INFO
+writing dependency_links to ../../build/vyra_module_template/vyra_module_template.egg-info/dependency_links.txt
+writing entry points to ../../build/vyra_module_template/vyra_module_template.egg-info/entry_points.txt
+writing requirements to ../../build/vyra_module_template/vyra_module_template.egg-info/requires.txt
+writing top-level names to ../../build/vyra_module_template/vyra_module_template.egg-info/top_level.txt
+writing manifest file '../../build/vyra_module_template/vyra_module_template.egg-info/SOURCES.txt'
+error: package directory 'vyra_module_template' does not exist

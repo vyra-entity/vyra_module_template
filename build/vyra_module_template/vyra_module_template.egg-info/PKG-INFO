@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: vyra-module-template
+Version: 0.1.0
+Summary: TODO: Package description
+Maintainer: holgder
+Maintainer-email: h.schernewski@variobotic.de
+License: ../../LICENSE.txt
+Provides-Extra: test

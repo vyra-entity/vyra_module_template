@@ -33,7 +33,7 @@ setup(
     ],
     install_requires=[
         'setuptools>=65',
-        'vos-base>=0.1.0',],
+        'vyra_base>=0.1.0',],
     zip_safe=True,
     maintainer='holgder',
     maintainer_email='h.schernewski@variobotic.de',

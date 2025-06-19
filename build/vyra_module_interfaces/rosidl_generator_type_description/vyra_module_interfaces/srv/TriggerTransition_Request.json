@@ -1,0 +1,26 @@
+{
+  "type_description_msg": {
+    "type_description": {
+      "type_name": "vyra_module_interfaces/srv/TriggerTransition_Request",
+      "fields": [
+        {
+          "name": "transition_name",
+          "type": {
+            "type_id": 17,
+            "capacity": 0,
+            "string_capacity": 0,
+            "nested_type_name": ""
+          },
+          "default_value": ""
+        }
+      ]
+    },
+    "referenced_type_descriptions": []
+  },
+  "type_hashes": [
+    {
+      "type_name": "vyra_module_interfaces/srv/TriggerTransition_Request",
+      "hash_string": "RIHS01_a723fb58bd6193c074755132267700c06505004cee89668fab3bc3c0a5be6ad8"
+    }
+  ]
+}

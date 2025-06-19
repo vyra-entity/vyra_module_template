@@ -1,1 +1,1 @@
-Template framework for building new python vos modules
+Template framework for building new python vyra modules

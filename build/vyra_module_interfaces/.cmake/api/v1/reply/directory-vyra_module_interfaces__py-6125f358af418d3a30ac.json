@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "vyra_module_interfaces__py",
+		"source" : "/home/holgder-dach/VYRA/vyra_module_template/build/vyra_module_interfaces/vyra_module_interfaces__py"
+	}
+}

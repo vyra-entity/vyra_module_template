@@ -1,0 +1,36 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/action/initiate_update__type_support.cpp.o"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/action/initiate_update__type_support.cpp.o.d"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/msg/error_feed__type_support.cpp.o"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/msg/error_feed__type_support.cpp.o.d"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/msg/logger_stream__type_support.cpp.o"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/msg/logger_stream__type_support.cpp.o.d"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/msg/news_feed__type_support.cpp.o"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/msg/news_feed__type_support.cpp.o.d"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/msg/state_feed__type_support.cpp.o"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/msg/state_feed__type_support.cpp.o.d"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/srv/get_capabilities__type_support.cpp.o"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/srv/get_capabilities__type_support.cpp.o.d"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/srv/get_logs__type_support.cpp.o"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/srv/get_logs__type_support.cpp.o.d"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/srv/health_check__type_support.cpp.o"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/srv/health_check__type_support.cpp.o.d"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/srv/trigger_transition__type_support.cpp.o"
+  "CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/srv/trigger_transition__type_support.cpp.o.d"
+  "libvyra_module_interfaces__rosidl_typesupport_cpp.pdb"
+  "libvyra_module_interfaces__rosidl_typesupport_cpp.so"
+  "rosidl_typesupport_cpp/vyra_module_interfaces/action/initiate_update__type_support.cpp"
+  "rosidl_typesupport_cpp/vyra_module_interfaces/msg/error_feed__type_support.cpp"
+  "rosidl_typesupport_cpp/vyra_module_interfaces/msg/logger_stream__type_support.cpp"
+  "rosidl_typesupport_cpp/vyra_module_interfaces/msg/news_feed__type_support.cpp"
+  "rosidl_typesupport_cpp/vyra_module_interfaces/msg/state_feed__type_support.cpp"
+  "rosidl_typesupport_cpp/vyra_module_interfaces/srv/get_capabilities__type_support.cpp"
+  "rosidl_typesupport_cpp/vyra_module_interfaces/srv/get_logs__type_support.cpp"
+  "rosidl_typesupport_cpp/vyra_module_interfaces/srv/health_check__type_support.cpp"
+  "rosidl_typesupport_cpp/vyra_module_interfaces/srv/trigger_transition__type_support.cpp"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()
