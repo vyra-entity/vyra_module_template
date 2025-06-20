@@ -9,23 +9,11 @@
 #include "rosidl_runtime_c/message_type_support_struct.h"
 #include "rosidl_typesupport_interface/macros.h"
 #include "vyra_module_interfaces/msg/rosidl_typesupport_fastrtps_c__visibility_control.h"
-#include "vyra_module_interfaces/srv/detail/get_logs__struct.h"
-#include "fastcdr/Cdr.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-bool cdr_serialize_vyra_module_interfaces__srv__GetLogs_Request(
-  const vyra_module_interfaces__srv__GetLogs_Request * ros_message,
-  eprosima::fastcdr::Cdr & cdr);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-bool cdr_deserialize_vyra_module_interfaces__srv__GetLogs_Request(
-  eprosima::fastcdr::Cdr &,
-  vyra_module_interfaces__srv__GetLogs_Request * ros_message);
 
 ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
 size_t get_serialized_size_vyra_module_interfaces__srv__GetLogs_Request(
@@ -34,22 +22,6 @@ size_t get_serialized_size_vyra_module_interfaces__srv__GetLogs_Request(
 
 ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
 size_t max_serialized_size_vyra_module_interfaces__srv__GetLogs_Request(
-  bool & full_bounded,
-  bool & is_plain,
-  size_t current_alignment);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-bool cdr_serialize_key_vyra_module_interfaces__srv__GetLogs_Request(
-  const vyra_module_interfaces__srv__GetLogs_Request * ros_message,
-  eprosima::fastcdr::Cdr & cdr);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-size_t get_serialized_size_key_vyra_module_interfaces__srv__GetLogs_Request(
-  const void * untyped_ros_message,
-  size_t current_alignment);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-size_t max_serialized_size_key_vyra_module_interfaces__srv__GetLogs_Request(
   bool & full_bounded,
   bool & is_plain,
   size_t current_alignment);
@@ -70,25 +42,11 @@ ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_fastrtps_c,
 // #include "rosidl_typesupport_interface/macros.h"
 // already included above
 // #include "vyra_module_interfaces/msg/rosidl_typesupport_fastrtps_c__visibility_control.h"
-// already included above
-// #include "vyra_module_interfaces/srv/detail/get_logs__struct.h"
-// already included above
-// #include "fastcdr/Cdr.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-bool cdr_serialize_vyra_module_interfaces__srv__GetLogs_Response(
-  const vyra_module_interfaces__srv__GetLogs_Response * ros_message,
-  eprosima::fastcdr::Cdr & cdr);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-bool cdr_deserialize_vyra_module_interfaces__srv__GetLogs_Response(
-  eprosima::fastcdr::Cdr &,
-  vyra_module_interfaces__srv__GetLogs_Response * ros_message);
 
 ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
 size_t get_serialized_size_vyra_module_interfaces__srv__GetLogs_Response(
@@ -102,87 +60,8 @@ size_t max_serialized_size_vyra_module_interfaces__srv__GetLogs_Response(
   size_t current_alignment);
 
 ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-bool cdr_serialize_key_vyra_module_interfaces__srv__GetLogs_Response(
-  const vyra_module_interfaces__srv__GetLogs_Response * ros_message,
-  eprosima::fastcdr::Cdr & cdr);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-size_t get_serialized_size_key_vyra_module_interfaces__srv__GetLogs_Response(
-  const void * untyped_ros_message,
-  size_t current_alignment);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-size_t max_serialized_size_key_vyra_module_interfaces__srv__GetLogs_Response(
-  bool & full_bounded,
-  bool & is_plain,
-  size_t current_alignment);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
 const rosidl_message_type_support_t *
 ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_fastrtps_c, vyra_module_interfaces, srv, GetLogs_Response)();
-
-#ifdef __cplusplus
-}
-#endif
-
-// already included above
-// #include <stddef.h>
-// already included above
-// #include "rosidl_runtime_c/message_type_support_struct.h"
-// already included above
-// #include "rosidl_typesupport_interface/macros.h"
-// already included above
-// #include "vyra_module_interfaces/msg/rosidl_typesupport_fastrtps_c__visibility_control.h"
-// already included above
-// #include "vyra_module_interfaces/srv/detail/get_logs__struct.h"
-// already included above
-// #include "fastcdr/Cdr.h"
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-bool cdr_serialize_vyra_module_interfaces__srv__GetLogs_Event(
-  const vyra_module_interfaces__srv__GetLogs_Event * ros_message,
-  eprosima::fastcdr::Cdr & cdr);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-bool cdr_deserialize_vyra_module_interfaces__srv__GetLogs_Event(
-  eprosima::fastcdr::Cdr &,
-  vyra_module_interfaces__srv__GetLogs_Event * ros_message);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-size_t get_serialized_size_vyra_module_interfaces__srv__GetLogs_Event(
-  const void * untyped_ros_message,
-  size_t current_alignment);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-size_t max_serialized_size_vyra_module_interfaces__srv__GetLogs_Event(
-  bool & full_bounded,
-  bool & is_plain,
-  size_t current_alignment);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-bool cdr_serialize_key_vyra_module_interfaces__srv__GetLogs_Event(
-  const vyra_module_interfaces__srv__GetLogs_Event * ros_message,
-  eprosima::fastcdr::Cdr & cdr);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-size_t get_serialized_size_key_vyra_module_interfaces__srv__GetLogs_Event(
-  const void * untyped_ros_message,
-  size_t current_alignment);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-size_t max_serialized_size_key_vyra_module_interfaces__srv__GetLogs_Event(
-  bool & full_bounded,
-  bool & is_plain,
-  size_t current_alignment);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-const rosidl_message_type_support_t *
-ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_fastrtps_c, vyra_module_interfaces, srv, GetLogs_Event)();
 
 #ifdef __cplusplus
 }

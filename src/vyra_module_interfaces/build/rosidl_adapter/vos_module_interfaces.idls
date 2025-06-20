@@ -1,9 +1,0 @@
-/workspace/src/vos_module_interfaces/build/rosidl_adapter/vos_module_interfaces:msg/StateFeed.idl
-/workspace/src/vos_module_interfaces/build/rosidl_adapter/vos_module_interfaces:msg/LoggerStream.idl
-/workspace/src/vos_module_interfaces/build/rosidl_adapter/vos_module_interfaces:msg/NewsFeed.idl
-/workspace/src/vos_module_interfaces/build/rosidl_adapter/vos_module_interfaces:msg/ErrorFeed.idl
-/workspace/src/vos_module_interfaces/build/rosidl_adapter/vos_module_interfaces:srv/HealthCheck.idl
-/workspace/src/vos_module_interfaces/build/rosidl_adapter/vos_module_interfaces:srv/GetCapabilities.idl
-/workspace/src/vos_module_interfaces/build/rosidl_adapter/vos_module_interfaces:srv/TriggerTransition.idl
-/workspace/src/vos_module_interfaces/build/rosidl_adapter/vos_module_interfaces:srv/GetLogs.idl
-/workspace/src/vos_module_interfaces/build/rosidl_adapter/vos_module_interfaces:action/InitiateUpdate.idl

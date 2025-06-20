@@ -2,10 +2,8 @@
 // with input from vyra_module_interfaces:msg/ErrorFeed.idl
 // generated code does not contain a copyright notice
 #include "vyra_module_interfaces/msg/detail/error_feed__rosidl_typesupport_fastrtps_cpp.hpp"
-#include "vyra_module_interfaces/msg/detail/error_feed__functions.h"
 #include "vyra_module_interfaces/msg/detail/error_feed__struct.hpp"
 
-#include <cstddef>
 #include <limits>
 #include <stdexcept>
 #include <string>
@@ -13,7 +11,6 @@
 #include "rosidl_typesupport_fastrtps_cpp/identifier.hpp"
 #include "rosidl_typesupport_fastrtps_cpp/message_type_support.h"
 #include "rosidl_typesupport_fastrtps_cpp/message_type_support_decl.hpp"
-#include "rosidl_typesupport_fastrtps_cpp/serialization_helpers.hpp"
 #include "rosidl_typesupport_fastrtps_cpp/wstring_conversion.hpp"
 #include "fastcdr/Cdr.h"
 
@@ -39,17 +36,6 @@ max_serialized_size_Time(
   bool & full_bounded,
   bool & is_plain,
   size_t current_alignment);
-bool cdr_serialize_key(
-  const builtin_interfaces::msg::Time &,
-  eprosima::fastcdr::Cdr &);
-size_t get_serialized_size_key(
-  const builtin_interfaces::msg::Time &,
-  size_t current_alignment);
-size_t
-max_serialized_size_key_Time(
-  bool & full_bounded,
-  bool & is_plain,
-  size_t current_alignment);
 }  // namespace typesupport_fastrtps_cpp
 }  // namespace msg
 }  // namespace builtin_interfaces
@@ -64,7 +50,6 @@ namespace msg
 namespace typesupport_fastrtps_cpp
 {
 
-
 bool
 ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
 cdr_serialize(
@@ -73,24 +58,18 @@ cdr_serialize(
 {
   // Member: error_code
   cdr << ros_message.error_code;
-
   // Member: module_id
   cdr << ros_message.module_id;
-
   // Member: description
   cdr << ros_message.description;
-
   // Member: solution
   cdr << ros_message.solution;
-
   // Member: miscellaneous
   cdr << ros_message.miscellaneous;
-
   // Member: timestamp
   builtin_interfaces::msg::typesupport_fastrtps_cpp::cdr_serialize(
     ros_message.timestamp,
     cdr);
-
   return true;
 }
 
@@ -122,7 +101,6 @@ cdr_deserialize(
   return true;
 }
 
-
 size_t
 ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
 get_serialized_size(
@@ -142,35 +120,30 @@ get_serialized_size(
     current_alignment += item_size +
       eprosima::fastcdr::Cdr::alignment(current_alignment, item_size);
   }
-
   // Member: module_id
   current_alignment += padding +
     eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
     (ros_message.module_id.size() + 1);
-
   // Member: description
   current_alignment += padding +
     eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
     (ros_message.description.size() + 1);
-
   // Member: solution
   current_alignment += padding +
     eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
     (ros_message.solution.size() + 1);
-
   // Member: miscellaneous
   current_alignment += padding +
     eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
     (ros_message.miscellaneous.size() + 1);
-
   // Member: timestamp
+
   current_alignment +=
     builtin_interfaces::msg::typesupport_fastrtps_cpp::get_serialized_size(
     ros_message.timestamp, current_alignment);
 
   return current_alignment - initial_alignment;
 }
-
 
 size_t
 ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
@@ -191,16 +164,20 @@ max_serialized_size_ErrorFeed(
   full_bounded = true;
   is_plain = true;
 
+
   // Member: error_code
   {
     size_t array_size = 1;
+
     last_member_size = array_size * sizeof(uint32_t);
     current_alignment += array_size * sizeof(uint32_t) +
       eprosima::fastcdr::Cdr::alignment(current_alignment, sizeof(uint32_t));
   }
+
   // Member: module_id
   {
     size_t array_size = 1;
+
     full_bounded = false;
     is_plain = false;
     for (size_t index = 0; index < array_size; ++index) {
@@ -209,9 +186,11 @@ max_serialized_size_ErrorFeed(
         1;
     }
   }
+
   // Member: description
   {
     size_t array_size = 1;
+
     full_bounded = false;
     is_plain = false;
     for (size_t index = 0; index < array_size; ++index) {
@@ -220,9 +199,11 @@ max_serialized_size_ErrorFeed(
         1;
     }
   }
+
   // Member: solution
   {
     size_t array_size = 1;
+
     full_bounded = false;
     is_plain = false;
     for (size_t index = 0; index < array_size; ++index) {
@@ -231,9 +212,11 @@ max_serialized_size_ErrorFeed(
         1;
     }
   }
+
   // Member: miscellaneous
   {
     size_t array_size = 1;
+
     full_bounded = false;
     is_plain = false;
     for (size_t index = 0; index < array_size; ++index) {
@@ -242,9 +225,12 @@ max_serialized_size_ErrorFeed(
         1;
     }
   }
+
   // Member: timestamp
   {
     size_t array_size = 1;
+
+
     last_member_size = 0;
     for (size_t index = 0; index < array_size; ++index) {
       bool inner_full_bounded;
@@ -274,192 +260,6 @@ max_serialized_size_ErrorFeed(
 
   return ret_val;
 }
-
-bool
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-cdr_serialize_key(
-  const vyra_module_interfaces::msg::ErrorFeed & ros_message,
-  eprosima::fastcdr::Cdr & cdr)
-{
-  // Member: error_code
-  cdr << ros_message.error_code;
-
-  // Member: module_id
-  cdr << ros_message.module_id;
-
-  // Member: description
-  cdr << ros_message.description;
-
-  // Member: solution
-  cdr << ros_message.solution;
-
-  // Member: miscellaneous
-  cdr << ros_message.miscellaneous;
-
-  // Member: timestamp
-  builtin_interfaces::msg::typesupport_fastrtps_cpp::cdr_serialize_key(
-    ros_message.timestamp,
-    cdr);
-
-  return true;
-}
-
-size_t
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-get_serialized_size_key(
-  const vyra_module_interfaces::msg::ErrorFeed & ros_message,
-  size_t current_alignment)
-{
-  size_t initial_alignment = current_alignment;
-
-  const size_t padding = 4;
-  const size_t wchar_size = 4;
-  (void)padding;
-  (void)wchar_size;
-
-  // Member: error_code
-  {
-    size_t item_size = sizeof(ros_message.error_code);
-    current_alignment += item_size +
-      eprosima::fastcdr::Cdr::alignment(current_alignment, item_size);
-  }
-
-  // Member: module_id
-  current_alignment += padding +
-    eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
-    (ros_message.module_id.size() + 1);
-
-  // Member: description
-  current_alignment += padding +
-    eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
-    (ros_message.description.size() + 1);
-
-  // Member: solution
-  current_alignment += padding +
-    eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
-    (ros_message.solution.size() + 1);
-
-  // Member: miscellaneous
-  current_alignment += padding +
-    eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
-    (ros_message.miscellaneous.size() + 1);
-
-  // Member: timestamp
-  current_alignment +=
-    builtin_interfaces::msg::typesupport_fastrtps_cpp::get_serialized_size_key(
-    ros_message.timestamp, current_alignment);
-
-  return current_alignment - initial_alignment;
-}
-
-size_t
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-max_serialized_size_key_ErrorFeed(
-  bool & full_bounded,
-  bool & is_plain,
-  size_t current_alignment)
-{
-  size_t initial_alignment = current_alignment;
-
-  const size_t padding = 4;
-  const size_t wchar_size = 4;
-  size_t last_member_size = 0;
-  (void)last_member_size;
-  (void)padding;
-  (void)wchar_size;
-
-  full_bounded = true;
-  is_plain = true;
-
-  // Member: error_code
-  {
-    size_t array_size = 1;
-    last_member_size = array_size * sizeof(uint32_t);
-    current_alignment += array_size * sizeof(uint32_t) +
-      eprosima::fastcdr::Cdr::alignment(current_alignment, sizeof(uint32_t));
-  }
-
-  // Member: module_id
-  {
-    size_t array_size = 1;
-    full_bounded = false;
-    is_plain = false;
-    for (size_t index = 0; index < array_size; ++index) {
-      current_alignment += padding +
-        eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
-        1;
-    }
-  }
-
-  // Member: description
-  {
-    size_t array_size = 1;
-    full_bounded = false;
-    is_plain = false;
-    for (size_t index = 0; index < array_size; ++index) {
-      current_alignment += padding +
-        eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
-        1;
-    }
-  }
-
-  // Member: solution
-  {
-    size_t array_size = 1;
-    full_bounded = false;
-    is_plain = false;
-    for (size_t index = 0; index < array_size; ++index) {
-      current_alignment += padding +
-        eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
-        1;
-    }
-  }
-
-  // Member: miscellaneous
-  {
-    size_t array_size = 1;
-    full_bounded = false;
-    is_plain = false;
-    for (size_t index = 0; index < array_size; ++index) {
-      current_alignment += padding +
-        eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
-        1;
-    }
-  }
-
-  // Member: timestamp
-  {
-    size_t array_size = 1;
-    last_member_size = 0;
-    for (size_t index = 0; index < array_size; ++index) {
-      bool inner_full_bounded;
-      bool inner_is_plain;
-      size_t inner_size =
-        builtin_interfaces::msg::typesupport_fastrtps_cpp::max_serialized_size_key_Time(
-        inner_full_bounded, inner_is_plain, current_alignment);
-      last_member_size += inner_size;
-      current_alignment += inner_size;
-      full_bounded &= inner_full_bounded;
-      is_plain &= inner_is_plain;
-    }
-  }
-
-  size_t ret_val = current_alignment - initial_alignment;
-  if (is_plain) {
-    // All members are plain, and type is not empty.
-    // We still need to check that the in-memory alignment
-    // is the same as the CDR mandated alignment.
-    using DataType = vyra_module_interfaces::msg::ErrorFeed;
-    is_plain =
-      (
-      offsetof(DataType, timestamp) +
-      last_member_size
-      ) == ret_val;
-  }
-
-  return ret_val;
-}
-
 
 static bool _ErrorFeed__cdr_serialize(
   const void * untyped_ros_message,
@@ -510,17 +310,13 @@ static message_type_support_callbacks_t _ErrorFeed__callbacks = {
   _ErrorFeed__cdr_serialize,
   _ErrorFeed__cdr_deserialize,
   _ErrorFeed__get_serialized_size,
-  _ErrorFeed__max_serialized_size,
-  nullptr
+  _ErrorFeed__max_serialized_size
 };
 
 static rosidl_message_type_support_t _ErrorFeed__handle = {
   rosidl_typesupport_fastrtps_cpp::typesupport_identifier,
   &_ErrorFeed__callbacks,
   get_message_typesupport_handle_function,
-  &vyra_module_interfaces__msg__ErrorFeed__get_type_hash,
-  &vyra_module_interfaces__msg__ErrorFeed__get_type_description,
-  &vyra_module_interfaces__msg__ErrorFeed__get_type_description_sources,
 };
 
 }  // namespace typesupport_fastrtps_cpp

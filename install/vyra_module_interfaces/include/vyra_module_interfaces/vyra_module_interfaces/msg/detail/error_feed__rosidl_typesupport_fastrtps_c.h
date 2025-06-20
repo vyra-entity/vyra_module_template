@@ -9,23 +9,11 @@
 #include "rosidl_runtime_c/message_type_support_struct.h"
 #include "rosidl_typesupport_interface/macros.h"
 #include "vyra_module_interfaces/msg/rosidl_typesupport_fastrtps_c__visibility_control.h"
-#include "vyra_module_interfaces/msg/detail/error_feed__struct.h"
-#include "fastcdr/Cdr.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-bool cdr_serialize_vyra_module_interfaces__msg__ErrorFeed(
-  const vyra_module_interfaces__msg__ErrorFeed * ros_message,
-  eprosima::fastcdr::Cdr & cdr);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-bool cdr_deserialize_vyra_module_interfaces__msg__ErrorFeed(
-  eprosima::fastcdr::Cdr &,
-  vyra_module_interfaces__msg__ErrorFeed * ros_message);
 
 ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
 size_t get_serialized_size_vyra_module_interfaces__msg__ErrorFeed(
@@ -34,22 +22,6 @@ size_t get_serialized_size_vyra_module_interfaces__msg__ErrorFeed(
 
 ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
 size_t max_serialized_size_vyra_module_interfaces__msg__ErrorFeed(
-  bool & full_bounded,
-  bool & is_plain,
-  size_t current_alignment);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-bool cdr_serialize_key_vyra_module_interfaces__msg__ErrorFeed(
-  const vyra_module_interfaces__msg__ErrorFeed * ros_message,
-  eprosima::fastcdr::Cdr & cdr);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-size_t get_serialized_size_key_vyra_module_interfaces__msg__ErrorFeed(
-  const void * untyped_ros_message,
-  size_t current_alignment);
-
-ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_vyra_module_interfaces
-size_t max_serialized_size_key_vyra_module_interfaces__msg__ErrorFeed(
   bool & full_bounded,
   bool & is_plain,
   size_t current_alignment);

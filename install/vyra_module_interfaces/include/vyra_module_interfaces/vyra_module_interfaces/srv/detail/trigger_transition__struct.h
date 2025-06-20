@@ -2,9 +2,6 @@
 // with input from vyra_module_interfaces:srv/TriggerTransition.idl
 // generated code does not contain a copyright notice
 
-// IWYU pragma: private, include "vyra_module_interfaces/srv/trigger_transition.h"
-
-
 #ifndef VYRA_MODULE_INTERFACES__SRV__DETAIL__TRIGGER_TRANSITION__STRUCT_H_
 #define VYRA_MODULE_INTERFACES__SRV__DETAIL__TRIGGER_TRANSITION__STRUCT_H_
 
@@ -42,6 +39,7 @@ typedef struct vyra_module_interfaces__srv__TriggerTransition_Request__Sequence
   size_t capacity;
 } vyra_module_interfaces__srv__TriggerTransition_Request__Sequence;
 
+
 // Constants defined in the message
 
 // Include directives for member types
@@ -67,42 +65,6 @@ typedef struct vyra_module_interfaces__srv__TriggerTransition_Response__Sequence
   /// The number of allocated items in data
   size_t capacity;
 } vyra_module_interfaces__srv__TriggerTransition_Response__Sequence;
-
-// Constants defined in the message
-
-// Include directives for member types
-// Member 'info'
-#include "service_msgs/msg/detail/service_event_info__struct.h"
-
-// constants for array fields with an upper bound
-// request
-enum
-{
-  vyra_module_interfaces__srv__TriggerTransition_Event__request__MAX_SIZE = 1
-};
-// response
-enum
-{
-  vyra_module_interfaces__srv__TriggerTransition_Event__response__MAX_SIZE = 1
-};
-
-/// Struct defined in srv/TriggerTransition in the package vyra_module_interfaces.
-typedef struct vyra_module_interfaces__srv__TriggerTransition_Event
-{
-  service_msgs__msg__ServiceEventInfo info;
-  vyra_module_interfaces__srv__TriggerTransition_Request__Sequence request;
-  vyra_module_interfaces__srv__TriggerTransition_Response__Sequence response;
-} vyra_module_interfaces__srv__TriggerTransition_Event;
-
-// Struct for a sequence of vyra_module_interfaces__srv__TriggerTransition_Event.
-typedef struct vyra_module_interfaces__srv__TriggerTransition_Event__Sequence
-{
-  vyra_module_interfaces__srv__TriggerTransition_Event * data;
-  /// The number of valid items in data
-  size_t size;
-  /// The number of allocated items in data
-  size_t capacity;
-} vyra_module_interfaces__srv__TriggerTransition_Event__Sequence;
 
 #ifdef __cplusplus
 }

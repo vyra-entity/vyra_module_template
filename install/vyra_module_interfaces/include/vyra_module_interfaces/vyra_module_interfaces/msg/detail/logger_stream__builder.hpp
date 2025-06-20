@@ -2,9 +2,6 @@
 // with input from vyra_module_interfaces:msg/LoggerStream.idl
 // generated code does not contain a copyright notice
 
-// IWYU pragma: private, include "vyra_module_interfaces/msg/logger_stream.hpp"
-
-
 #ifndef VYRA_MODULE_INTERFACES__MSG__DETAIL__LOGGER_STREAM__BUILDER_HPP_
 #define VYRA_MODULE_INTERFACES__MSG__DETAIL__LOGGER_STREAM__BUILDER_HPP_
 

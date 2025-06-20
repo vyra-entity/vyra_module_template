@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'vos_module_template'
+package_name = 'vyra_module_template'
 
 setup(
     name=package_name,

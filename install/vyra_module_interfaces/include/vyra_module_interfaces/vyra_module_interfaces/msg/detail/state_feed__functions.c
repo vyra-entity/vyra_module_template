@@ -113,7 +113,7 @@ vyra_module_interfaces__msg__StateFeed__copy(
 }
 
 vyra_module_interfaces__msg__StateFeed *
-vyra_module_interfaces__msg__StateFeed__create(void)
+vyra_module_interfaces__msg__StateFeed__create()
 {
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
   vyra_module_interfaces__msg__StateFeed * msg = (vyra_module_interfaces__msg__StateFeed *)allocator.allocate(sizeof(vyra_module_interfaces__msg__StateFeed), allocator.state);

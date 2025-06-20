@@ -6,7 +6,6 @@
 #include "rosidl_runtime_c/message_type_support_struct.h"
 #include "vyra_module_interfaces/msg/detail/error_feed__struct.h"
 #include "vyra_module_interfaces/msg/detail/error_feed__type_support.h"
-#include "vyra_module_interfaces/msg/detail/error_feed__functions.h"
 #include "rosidl_typesupport_c/identifier.h"
 #include "rosidl_typesupport_c/message_type_support_dispatch.h"
 #include "rosidl_typesupport_c/type_support_map.h"
@@ -73,9 +72,6 @@ static const rosidl_message_type_support_t ErrorFeed_message_type_support_handle
   rosidl_typesupport_c__typesupport_identifier,
   reinterpret_cast<const type_support_map_t *>(&_ErrorFeed_message_typesupport_map),
   rosidl_typesupport_c__get_message_typesupport_handle_function,
-  &vyra_module_interfaces__msg__ErrorFeed__get_type_hash,
-  &vyra_module_interfaces__msg__ErrorFeed__get_type_description,
-  &vyra_module_interfaces__msg__ErrorFeed__get_type_description_sources,
 };
 
 }  // namespace rosidl_typesupport_c

@@ -1,8 +1,8 @@
-# Install script for directory: /home/holgder-dach/VYRA/vyra_module_template/build/vyra_module_interfaces/vyra_module_interfaces__py
+# Install script for directory: /workspace/build/vyra_module_interfaces/vyra_module_interfaces__py
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/holgder-dach/VYRA/vyra_module_template/install/vyra_module_interfaces")
+  set(CMAKE_INSTALL_PREFIX "/workspace/install/vyra_module_interfaces")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 

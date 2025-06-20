@@ -153,7 +153,7 @@ vyra_module_interfaces__msg__NewsFeed__copy(
 }
 
 vyra_module_interfaces__msg__NewsFeed *
-vyra_module_interfaces__msg__NewsFeed__create(void)
+vyra_module_interfaces__msg__NewsFeed__create()
 {
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
   vyra_module_interfaces__msg__NewsFeed * msg = (vyra_module_interfaces__msg__NewsFeed *)allocator.allocate(sizeof(vyra_module_interfaces__msg__NewsFeed), allocator.state);

@@ -2,9 +2,6 @@
 // with input from vyra_module_interfaces:msg/LoggerStream.idl
 // generated code does not contain a copyright notice
 
-// IWYU pragma: private, include "vyra_module_interfaces/msg/logger_stream.h"
-
-
 #ifndef VYRA_MODULE_INTERFACES__MSG__DETAIL__LOGGER_STREAM__STRUCT_H_
 #define VYRA_MODULE_INTERFACES__MSG__DETAIL__LOGGER_STREAM__STRUCT_H_
 
@@ -16,6 +13,7 @@ extern "C"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+
 
 // Constants defined in the message
 

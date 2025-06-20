@@ -29,29 +29,32 @@ bool vyra_module_interfaces__msg__state_feed__convert_from_py(PyObject * _pymsg,
 {
   // check that the passed message is of the expected Python class
   {
-    PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
-    if (class_attr == NULL) {
-      return false;
+    char full_classname_dest[49];
+    {
+      char * class_name = NULL;
+      char * module_name = NULL;
+      {
+        PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
+        if (class_attr) {
+          PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
+          if (name_attr) {
+            class_name = (char *)PyUnicode_1BYTE_DATA(name_attr);
+            Py_DECREF(name_attr);
+          }
+          PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
+          if (module_attr) {
+            module_name = (char *)PyUnicode_1BYTE_DATA(module_attr);
+            Py_DECREF(module_attr);
+          }
+          Py_DECREF(class_attr);
+        }
+      }
+      if (!class_name || !module_name) {
+        return false;
+      }
+      snprintf(full_classname_dest, sizeof(full_classname_dest), "%s.%s", module_name, class_name);
     }
-    PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
-    if (name_attr == NULL) {
-      Py_DECREF(class_attr);
-      return false;
-    }
-    PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
-    if (module_attr == NULL) {
-      Py_DECREF(name_attr);
-      Py_DECREF(class_attr);
-      return false;
-    }
-
-    // PyUnicode_1BYTE_DATA is just a cast
-    assert(strncmp("vyra_module_interfaces.msg._state_feed", (char *)PyUnicode_1BYTE_DATA(module_attr), 38) == 0);
-    assert(strncmp("StateFeed", (char *)PyUnicode_1BYTE_DATA(name_attr), 9) == 0);
-
-    Py_DECREF(module_attr);
-    Py_DECREF(name_attr);
-    Py_DECREF(class_attr);
+    assert(strncmp("vyra_module_interfaces.msg._state_feed.StateFeed", full_classname_dest, 48) == 0);
   }
   vyra_module_interfaces__msg__StateFeed * ros_message = _ros_message;
   {  // prev_state

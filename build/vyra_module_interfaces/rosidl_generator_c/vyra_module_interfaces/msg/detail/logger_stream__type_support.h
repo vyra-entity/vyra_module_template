@@ -2,9 +2,6 @@
 // with input from vyra_module_interfaces:msg/LoggerStream.idl
 // generated code does not contain a copyright notice
 
-// IWYU pragma: private, include "vyra_module_interfaces/msg/logger_stream.h"
-
-
 #ifndef VYRA_MODULE_INTERFACES__MSG__DETAIL__LOGGER_STREAM__TYPE_SUPPORT_H_
 #define VYRA_MODULE_INTERFACES__MSG__DETAIL__LOGGER_STREAM__TYPE_SUPPORT_H_
 
@@ -27,7 +24,7 @@ ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(
   vyra_module_interfaces,
   msg,
   LoggerStream
-)(void);
+)();
 
 #ifdef __cplusplus
 }

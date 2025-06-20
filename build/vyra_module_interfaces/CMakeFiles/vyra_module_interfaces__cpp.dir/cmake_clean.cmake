@@ -24,7 +24,6 @@ file(REMOVE_RECURSE
   "rosidl_generator_cpp/vyra_module_interfaces/msg/error_feed.hpp"
   "rosidl_generator_cpp/vyra_module_interfaces/msg/logger_stream.hpp"
   "rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp"
-  "rosidl_generator_cpp/vyra_module_interfaces/msg/rosidl_generator_cpp__visibility_control.hpp"
   "rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp"
   "rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_capabilities__builder.hpp"
   "rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_capabilities__struct.hpp"

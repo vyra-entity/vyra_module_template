@@ -2,9 +2,6 @@
 // with input from vyra_module_interfaces:action/InitiateUpdate.idl
 // generated code does not contain a copyright notice
 
-// IWYU pragma: private, include "vyra_module_interfaces/action/initiate_update.hpp"
-
-
 #ifndef VYRA_MODULE_INTERFACES__ACTION__DETAIL__INITIATE_UPDATE__BUILDER_HPP_
 #define VYRA_MODULE_INTERFACES__ACTION__DETAIL__INITIATE_UPDATE__BUILDER_HPP_
 
@@ -362,80 +359,6 @@ namespace action
 namespace builder
 {
 
-class Init_InitiateUpdate_SendGoal_Event_response
-{
-public:
-  explicit Init_InitiateUpdate_SendGoal_Event_response(::vyra_module_interfaces::action::InitiateUpdate_SendGoal_Event & msg)
-  : msg_(msg)
-  {}
-  ::vyra_module_interfaces::action::InitiateUpdate_SendGoal_Event response(::vyra_module_interfaces::action::InitiateUpdate_SendGoal_Event::_response_type arg)
-  {
-    msg_.response = std::move(arg);
-    return std::move(msg_);
-  }
-
-private:
-  ::vyra_module_interfaces::action::InitiateUpdate_SendGoal_Event msg_;
-};
-
-class Init_InitiateUpdate_SendGoal_Event_request
-{
-public:
-  explicit Init_InitiateUpdate_SendGoal_Event_request(::vyra_module_interfaces::action::InitiateUpdate_SendGoal_Event & msg)
-  : msg_(msg)
-  {}
-  Init_InitiateUpdate_SendGoal_Event_response request(::vyra_module_interfaces::action::InitiateUpdate_SendGoal_Event::_request_type arg)
-  {
-    msg_.request = std::move(arg);
-    return Init_InitiateUpdate_SendGoal_Event_response(msg_);
-  }
-
-private:
-  ::vyra_module_interfaces::action::InitiateUpdate_SendGoal_Event msg_;
-};
-
-class Init_InitiateUpdate_SendGoal_Event_info
-{
-public:
-  Init_InitiateUpdate_SendGoal_Event_info()
-  : msg_(::rosidl_runtime_cpp::MessageInitialization::SKIP)
-  {}
-  Init_InitiateUpdate_SendGoal_Event_request info(::vyra_module_interfaces::action::InitiateUpdate_SendGoal_Event::_info_type arg)
-  {
-    msg_.info = std::move(arg);
-    return Init_InitiateUpdate_SendGoal_Event_request(msg_);
-  }
-
-private:
-  ::vyra_module_interfaces::action::InitiateUpdate_SendGoal_Event msg_;
-};
-
-}  // namespace builder
-
-}  // namespace action
-
-template<typename MessageType>
-auto build();
-
-template<>
-inline
-auto build<::vyra_module_interfaces::action::InitiateUpdate_SendGoal_Event>()
-{
-  return vyra_module_interfaces::action::builder::Init_InitiateUpdate_SendGoal_Event_info();
-}
-
-}  // namespace vyra_module_interfaces
-
-
-namespace vyra_module_interfaces
-{
-
-namespace action
-{
-
-namespace builder
-{
-
 class Init_InitiateUpdate_GetResult_Request_goal_id
 {
 public:
@@ -522,80 +445,6 @@ inline
 auto build<::vyra_module_interfaces::action::InitiateUpdate_GetResult_Response>()
 {
   return vyra_module_interfaces::action::builder::Init_InitiateUpdate_GetResult_Response_status();
-}
-
-}  // namespace vyra_module_interfaces
-
-
-namespace vyra_module_interfaces
-{
-
-namespace action
-{
-
-namespace builder
-{
-
-class Init_InitiateUpdate_GetResult_Event_response
-{
-public:
-  explicit Init_InitiateUpdate_GetResult_Event_response(::vyra_module_interfaces::action::InitiateUpdate_GetResult_Event & msg)
-  : msg_(msg)
-  {}
-  ::vyra_module_interfaces::action::InitiateUpdate_GetResult_Event response(::vyra_module_interfaces::action::InitiateUpdate_GetResult_Event::_response_type arg)
-  {
-    msg_.response = std::move(arg);
-    return std::move(msg_);
-  }
-
-private:
-  ::vyra_module_interfaces::action::InitiateUpdate_GetResult_Event msg_;
-};
-
-class Init_InitiateUpdate_GetResult_Event_request
-{
-public:
-  explicit Init_InitiateUpdate_GetResult_Event_request(::vyra_module_interfaces::action::InitiateUpdate_GetResult_Event & msg)
-  : msg_(msg)
-  {}
-  Init_InitiateUpdate_GetResult_Event_response request(::vyra_module_interfaces::action::InitiateUpdate_GetResult_Event::_request_type arg)
-  {
-    msg_.request = std::move(arg);
-    return Init_InitiateUpdate_GetResult_Event_response(msg_);
-  }
-
-private:
-  ::vyra_module_interfaces::action::InitiateUpdate_GetResult_Event msg_;
-};
-
-class Init_InitiateUpdate_GetResult_Event_info
-{
-public:
-  Init_InitiateUpdate_GetResult_Event_info()
-  : msg_(::rosidl_runtime_cpp::MessageInitialization::SKIP)
-  {}
-  Init_InitiateUpdate_GetResult_Event_request info(::vyra_module_interfaces::action::InitiateUpdate_GetResult_Event::_info_type arg)
-  {
-    msg_.info = std::move(arg);
-    return Init_InitiateUpdate_GetResult_Event_request(msg_);
-  }
-
-private:
-  ::vyra_module_interfaces::action::InitiateUpdate_GetResult_Event msg_;
-};
-
-}  // namespace builder
-
-}  // namespace action
-
-template<typename MessageType>
-auto build();
-
-template<>
-inline
-auto build<::vyra_module_interfaces::action::InitiateUpdate_GetResult_Event>()
-{
-  return vyra_module_interfaces::action::builder::Init_InitiateUpdate_GetResult_Event_info();
 }
 
 }  // namespace vyra_module_interfaces

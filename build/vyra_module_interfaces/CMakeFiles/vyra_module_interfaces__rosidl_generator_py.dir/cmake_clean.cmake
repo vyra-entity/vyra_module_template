@@ -17,8 +17,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/vyra_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vyra_module_interfaces/srv/_health_check_s.c.o.d"
   "CMakeFiles/vyra_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vyra_module_interfaces/srv/_trigger_transition_s.c.o"
   "CMakeFiles/vyra_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vyra_module_interfaces/srv/_trigger_transition_s.c.o.d"
-  "libvyra_module_interfaces__rosidl_generator_py.pdb"
-  "libvyra_module_interfaces__rosidl_generator_py.so"
+  "rosidl_generator_py/vyra_module_interfaces/libvyra_module_interfaces__rosidl_generator_py.pdb"
+  "rosidl_generator_py/vyra_module_interfaces/libvyra_module_interfaces__rosidl_generator_py.so"
 )
 
 # Per-language clean rules from dependency scanning.

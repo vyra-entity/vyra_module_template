@@ -224,7 +224,7 @@ def main():
         import vyra_base
         
     # User kann überschreiben
-    # package_name = input(f"vos module name: ").strip()
+    # package_name = input(f"V.Y.R.A. module name: ").strip()
     interface_package_name = "vyra_module_interfaces"
     # Workspace setup
     workspace_root = Path(__file__).parent.parent

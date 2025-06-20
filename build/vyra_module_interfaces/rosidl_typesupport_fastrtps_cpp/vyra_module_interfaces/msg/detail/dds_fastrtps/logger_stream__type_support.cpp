@@ -2,10 +2,8 @@
 // with input from vyra_module_interfaces:msg/LoggerStream.idl
 // generated code does not contain a copyright notice
 #include "vyra_module_interfaces/msg/detail/logger_stream__rosidl_typesupport_fastrtps_cpp.hpp"
-#include "vyra_module_interfaces/msg/detail/logger_stream__functions.h"
 #include "vyra_module_interfaces/msg/detail/logger_stream__struct.hpp"
 
-#include <cstddef>
 #include <limits>
 #include <stdexcept>
 #include <string>
@@ -13,7 +11,6 @@
 #include "rosidl_typesupport_fastrtps_cpp/identifier.hpp"
 #include "rosidl_typesupport_fastrtps_cpp/message_type_support.h"
 #include "rosidl_typesupport_fastrtps_cpp/message_type_support_decl.hpp"
-#include "rosidl_typesupport_fastrtps_cpp/serialization_helpers.hpp"
 #include "rosidl_typesupport_fastrtps_cpp/wstring_conversion.hpp"
 #include "fastcdr/Cdr.h"
 
@@ -39,17 +36,6 @@ max_serialized_size_Time(
   bool & full_bounded,
   bool & is_plain,
   size_t current_alignment);
-bool cdr_serialize_key(
-  const builtin_interfaces::msg::Time &,
-  eprosima::fastcdr::Cdr &);
-size_t get_serialized_size_key(
-  const builtin_interfaces::msg::Time &,
-  size_t current_alignment);
-size_t
-max_serialized_size_key_Time(
-  bool & full_bounded,
-  bool & is_plain,
-  size_t current_alignment);
 }  // namespace typesupport_fastrtps_cpp
 }  // namespace msg
 }  // namespace builtin_interfaces
@@ -64,7 +50,6 @@ namespace msg
 namespace typesupport_fastrtps_cpp
 {
 
-
 bool
 ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
 cdr_serialize(
@@ -73,15 +58,12 @@ cdr_serialize(
 {
   // Member: log_level
   cdr << ros_message.log_level;
-
   // Member: log_message
   cdr << ros_message.log_message;
-
   // Member: timestamp
   builtin_interfaces::msg::typesupport_fastrtps_cpp::cdr_serialize(
     ros_message.timestamp,
     cdr);
-
   return true;
 }
 
@@ -104,7 +86,6 @@ cdr_deserialize(
   return true;
 }
 
-
 size_t
 ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
 get_serialized_size(
@@ -122,20 +103,18 @@ get_serialized_size(
   current_alignment += padding +
     eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
     (ros_message.log_level.size() + 1);
-
   // Member: log_message
   current_alignment += padding +
     eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
     (ros_message.log_message.size() + 1);
-
   // Member: timestamp
+
   current_alignment +=
     builtin_interfaces::msg::typesupport_fastrtps_cpp::get_serialized_size(
     ros_message.timestamp, current_alignment);
 
   return current_alignment - initial_alignment;
 }
-
 
 size_t
 ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
@@ -156,9 +135,11 @@ max_serialized_size_LoggerStream(
   full_bounded = true;
   is_plain = true;
 
+
   // Member: log_level
   {
     size_t array_size = 1;
+
     full_bounded = false;
     is_plain = false;
     for (size_t index = 0; index < array_size; ++index) {
@@ -167,9 +148,11 @@ max_serialized_size_LoggerStream(
         1;
     }
   }
+
   // Member: log_message
   {
     size_t array_size = 1;
+
     full_bounded = false;
     is_plain = false;
     for (size_t index = 0; index < array_size; ++index) {
@@ -178,9 +161,12 @@ max_serialized_size_LoggerStream(
         1;
     }
   }
+
   // Member: timestamp
   {
     size_t array_size = 1;
+
+
     last_member_size = 0;
     for (size_t index = 0; index < array_size; ++index) {
       bool inner_full_bounded;
@@ -210,134 +196,6 @@ max_serialized_size_LoggerStream(
 
   return ret_val;
 }
-
-bool
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-cdr_serialize_key(
-  const vyra_module_interfaces::msg::LoggerStream & ros_message,
-  eprosima::fastcdr::Cdr & cdr)
-{
-  // Member: log_level
-  cdr << ros_message.log_level;
-
-  // Member: log_message
-  cdr << ros_message.log_message;
-
-  // Member: timestamp
-  builtin_interfaces::msg::typesupport_fastrtps_cpp::cdr_serialize_key(
-    ros_message.timestamp,
-    cdr);
-
-  return true;
-}
-
-size_t
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-get_serialized_size_key(
-  const vyra_module_interfaces::msg::LoggerStream & ros_message,
-  size_t current_alignment)
-{
-  size_t initial_alignment = current_alignment;
-
-  const size_t padding = 4;
-  const size_t wchar_size = 4;
-  (void)padding;
-  (void)wchar_size;
-
-  // Member: log_level
-  current_alignment += padding +
-    eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
-    (ros_message.log_level.size() + 1);
-
-  // Member: log_message
-  current_alignment += padding +
-    eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
-    (ros_message.log_message.size() + 1);
-
-  // Member: timestamp
-  current_alignment +=
-    builtin_interfaces::msg::typesupport_fastrtps_cpp::get_serialized_size_key(
-    ros_message.timestamp, current_alignment);
-
-  return current_alignment - initial_alignment;
-}
-
-size_t
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-max_serialized_size_key_LoggerStream(
-  bool & full_bounded,
-  bool & is_plain,
-  size_t current_alignment)
-{
-  size_t initial_alignment = current_alignment;
-
-  const size_t padding = 4;
-  const size_t wchar_size = 4;
-  size_t last_member_size = 0;
-  (void)last_member_size;
-  (void)padding;
-  (void)wchar_size;
-
-  full_bounded = true;
-  is_plain = true;
-
-  // Member: log_level
-  {
-    size_t array_size = 1;
-    full_bounded = false;
-    is_plain = false;
-    for (size_t index = 0; index < array_size; ++index) {
-      current_alignment += padding +
-        eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
-        1;
-    }
-  }
-
-  // Member: log_message
-  {
-    size_t array_size = 1;
-    full_bounded = false;
-    is_plain = false;
-    for (size_t index = 0; index < array_size; ++index) {
-      current_alignment += padding +
-        eprosima::fastcdr::Cdr::alignment(current_alignment, padding) +
-        1;
-    }
-  }
-
-  // Member: timestamp
-  {
-    size_t array_size = 1;
-    last_member_size = 0;
-    for (size_t index = 0; index < array_size; ++index) {
-      bool inner_full_bounded;
-      bool inner_is_plain;
-      size_t inner_size =
-        builtin_interfaces::msg::typesupport_fastrtps_cpp::max_serialized_size_key_Time(
-        inner_full_bounded, inner_is_plain, current_alignment);
-      last_member_size += inner_size;
-      current_alignment += inner_size;
-      full_bounded &= inner_full_bounded;
-      is_plain &= inner_is_plain;
-    }
-  }
-
-  size_t ret_val = current_alignment - initial_alignment;
-  if (is_plain) {
-    // All members are plain, and type is not empty.
-    // We still need to check that the in-memory alignment
-    // is the same as the CDR mandated alignment.
-    using DataType = vyra_module_interfaces::msg::LoggerStream;
-    is_plain =
-      (
-      offsetof(DataType, timestamp) +
-      last_member_size
-      ) == ret_val;
-  }
-
-  return ret_val;
-}
-
 
 static bool _LoggerStream__cdr_serialize(
   const void * untyped_ros_message,
@@ -388,17 +246,13 @@ static message_type_support_callbacks_t _LoggerStream__callbacks = {
   _LoggerStream__cdr_serialize,
   _LoggerStream__cdr_deserialize,
   _LoggerStream__get_serialized_size,
-  _LoggerStream__max_serialized_size,
-  nullptr
+  _LoggerStream__max_serialized_size
 };
 
 static rosidl_message_type_support_t _LoggerStream__handle = {
   rosidl_typesupport_fastrtps_cpp::typesupport_identifier,
   &_LoggerStream__callbacks,
   get_message_typesupport_handle_function,
-  &vyra_module_interfaces__msg__LoggerStream__get_type_hash,
-  &vyra_module_interfaces__msg__LoggerStream__get_type_description,
-  &vyra_module_interfaces__msg__LoggerStream__get_type_description_sources,
 };
 
 }  // namespace typesupport_fastrtps_cpp

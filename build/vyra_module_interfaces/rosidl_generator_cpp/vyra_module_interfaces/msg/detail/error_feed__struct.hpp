@@ -2,9 +2,6 @@
 // with input from vyra_module_interfaces:msg/ErrorFeed.idl
 // generated code does not contain a copyright notice
 
-// IWYU pragma: private, include "vyra_module_interfaces/msg/error_feed.hpp"
-
-
 #ifndef VYRA_MODULE_INTERFACES__MSG__DETAIL__ERROR_FEED__STRUCT_HPP_
 #define VYRA_MODULE_INTERFACES__MSG__DETAIL__ERROR_FEED__STRUCT_HPP_
 

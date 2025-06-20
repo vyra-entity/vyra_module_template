@@ -46,7 +46,6 @@ static rosidl_typesupport_introspection_c__MessageMember vyra_module_interfaces_
     rosidl_typesupport_introspection_c__ROS_TYPE_STRING,  // type
     0,  // upper bound of string
     NULL,  // members of sub message
-    false,  // is key
     false,  // is array
     0,  // array size
     false,  // is upper bound
@@ -64,7 +63,6 @@ static rosidl_typesupport_introspection_c__MessageMember vyra_module_interfaces_
     rosidl_typesupport_introspection_c__ROS_TYPE_STRING,  // type
     0,  // upper bound of string
     NULL,  // members of sub message
-    false,  // is key
     false,  // is array
     0,  // array size
     false,  // is upper bound
@@ -82,7 +80,6 @@ static rosidl_typesupport_introspection_c__MessageMember vyra_module_interfaces_
     rosidl_typesupport_introspection_c__ROS_TYPE_MESSAGE,  // type
     0,  // upper bound of string
     NULL,  // members of sub message (initialized later)
-    false,  // is key
     false,  // is array
     0,  // array size
     false,  // is upper bound
@@ -102,7 +99,6 @@ static const rosidl_typesupport_introspection_c__MessageMembers vyra_module_inte
   "StateFeed",  // message name
   3,  // number of fields
   sizeof(vyra_module_interfaces__msg__StateFeed),
-  false,  // has_any_key_member_
   vyra_module_interfaces__msg__StateFeed__rosidl_typesupport_introspection_c__StateFeed_message_member_array,  // message members
   vyra_module_interfaces__msg__StateFeed__rosidl_typesupport_introspection_c__StateFeed_init_function,  // function to initialize message memory (memory has to be allocated)
   vyra_module_interfaces__msg__StateFeed__rosidl_typesupport_introspection_c__StateFeed_fini_function  // function to terminate message instance (will not free memory)
@@ -114,9 +110,6 @@ static rosidl_message_type_support_t vyra_module_interfaces__msg__StateFeed__ros
   0,
   &vyra_module_interfaces__msg__StateFeed__rosidl_typesupport_introspection_c__StateFeed_message_members,
   get_message_typesupport_handle_function,
-  &vyra_module_interfaces__msg__StateFeed__get_type_hash,
-  &vyra_module_interfaces__msg__StateFeed__get_type_description,
-  &vyra_module_interfaces__msg__StateFeed__get_type_description_sources,
 };
 
 ROSIDL_TYPESUPPORT_INTROSPECTION_C_EXPORT_vyra_module_interfaces

@@ -2,9 +2,6 @@
 // with input from vyra_module_interfaces:msg/StateFeed.idl
 // generated code does not contain a copyright notice
 
-// IWYU pragma: private, include "vyra_module_interfaces/msg/state_feed.hpp"
-
-
 #ifndef VYRA_MODULE_INTERFACES__MSG__DETAIL__STATE_FEED__TRAITS_HPP_
 #define VYRA_MODULE_INTERFACES__MSG__DETAIL__STATE_FEED__TRAITS_HPP_
 

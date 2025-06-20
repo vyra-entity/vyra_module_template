@@ -25,29 +25,32 @@ bool vyra_module_interfaces__action__initiate_update__goal__convert_from_py(PyOb
 {
   // check that the passed message is of the expected Python class
   {
-    PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
-    if (class_attr == NULL) {
-      return false;
+    char full_classname_dest[67];
+    {
+      char * class_name = NULL;
+      char * module_name = NULL;
+      {
+        PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
+        if (class_attr) {
+          PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
+          if (name_attr) {
+            class_name = (char *)PyUnicode_1BYTE_DATA(name_attr);
+            Py_DECREF(name_attr);
+          }
+          PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
+          if (module_attr) {
+            module_name = (char *)PyUnicode_1BYTE_DATA(module_attr);
+            Py_DECREF(module_attr);
+          }
+          Py_DECREF(class_attr);
+        }
+      }
+      if (!class_name || !module_name) {
+        return false;
+      }
+      snprintf(full_classname_dest, sizeof(full_classname_dest), "%s.%s", module_name, class_name);
     }
-    PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
-    if (name_attr == NULL) {
-      Py_DECREF(class_attr);
-      return false;
-    }
-    PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
-    if (module_attr == NULL) {
-      Py_DECREF(name_attr);
-      Py_DECREF(class_attr);
-      return false;
-    }
-
-    // PyUnicode_1BYTE_DATA is just a cast
-    assert(strncmp("vyra_module_interfaces.action._initiate_update", (char *)PyUnicode_1BYTE_DATA(module_attr), 46) == 0);
-    assert(strncmp("InitiateUpdate_Goal", (char *)PyUnicode_1BYTE_DATA(name_attr), 19) == 0);
-
-    Py_DECREF(module_attr);
-    Py_DECREF(name_attr);
-    Py_DECREF(class_attr);
+    assert(strncmp("vyra_module_interfaces.action._initiate_update.InitiateUpdate_Goal", full_classname_dest, 66) == 0);
   }
   vyra_module_interfaces__action__InitiateUpdate_Goal * ros_message = _ros_message;
   {  // module_name
@@ -250,29 +253,32 @@ bool vyra_module_interfaces__action__initiate_update__result__convert_from_py(Py
 {
   // check that the passed message is of the expected Python class
   {
-    PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
-    if (class_attr == NULL) {
-      return false;
+    char full_classname_dest[69];
+    {
+      char * class_name = NULL;
+      char * module_name = NULL;
+      {
+        PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
+        if (class_attr) {
+          PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
+          if (name_attr) {
+            class_name = (char *)PyUnicode_1BYTE_DATA(name_attr);
+            Py_DECREF(name_attr);
+          }
+          PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
+          if (module_attr) {
+            module_name = (char *)PyUnicode_1BYTE_DATA(module_attr);
+            Py_DECREF(module_attr);
+          }
+          Py_DECREF(class_attr);
+        }
+      }
+      if (!class_name || !module_name) {
+        return false;
+      }
+      snprintf(full_classname_dest, sizeof(full_classname_dest), "%s.%s", module_name, class_name);
     }
-    PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
-    if (name_attr == NULL) {
-      Py_DECREF(class_attr);
-      return false;
-    }
-    PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
-    if (module_attr == NULL) {
-      Py_DECREF(name_attr);
-      Py_DECREF(class_attr);
-      return false;
-    }
-
-    // PyUnicode_1BYTE_DATA is just a cast
-    assert(strncmp("vyra_module_interfaces.action._initiate_update", (char *)PyUnicode_1BYTE_DATA(module_attr), 46) == 0);
-    assert(strncmp("InitiateUpdate_Result", (char *)PyUnicode_1BYTE_DATA(name_attr), 21) == 0);
-
-    Py_DECREF(module_attr);
-    Py_DECREF(name_attr);
-    Py_DECREF(class_attr);
+    assert(strncmp("vyra_module_interfaces.action._initiate_update.InitiateUpdate_Result", full_classname_dest, 68) == 0);
   }
   vyra_module_interfaces__action__InitiateUpdate_Result * ros_message = _ros_message;
   {  // success
@@ -379,29 +385,32 @@ bool vyra_module_interfaces__action__initiate_update__feedback__convert_from_py(
 {
   // check that the passed message is of the expected Python class
   {
-    PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
-    if (class_attr == NULL) {
-      return false;
+    char full_classname_dest[71];
+    {
+      char * class_name = NULL;
+      char * module_name = NULL;
+      {
+        PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
+        if (class_attr) {
+          PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
+          if (name_attr) {
+            class_name = (char *)PyUnicode_1BYTE_DATA(name_attr);
+            Py_DECREF(name_attr);
+          }
+          PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
+          if (module_attr) {
+            module_name = (char *)PyUnicode_1BYTE_DATA(module_attr);
+            Py_DECREF(module_attr);
+          }
+          Py_DECREF(class_attr);
+        }
+      }
+      if (!class_name || !module_name) {
+        return false;
+      }
+      snprintf(full_classname_dest, sizeof(full_classname_dest), "%s.%s", module_name, class_name);
     }
-    PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
-    if (name_attr == NULL) {
-      Py_DECREF(class_attr);
-      return false;
-    }
-    PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
-    if (module_attr == NULL) {
-      Py_DECREF(name_attr);
-      Py_DECREF(class_attr);
-      return false;
-    }
-
-    // PyUnicode_1BYTE_DATA is just a cast
-    assert(strncmp("vyra_module_interfaces.action._initiate_update", (char *)PyUnicode_1BYTE_DATA(module_attr), 46) == 0);
-    assert(strncmp("InitiateUpdate_Feedback", (char *)PyUnicode_1BYTE_DATA(name_attr), 23) == 0);
-
-    Py_DECREF(module_attr);
-    Py_DECREF(name_attr);
-    Py_DECREF(class_attr);
+    assert(strncmp("vyra_module_interfaces.action._initiate_update.InitiateUpdate_Feedback", full_classname_dest, 70) == 0);
   }
   vyra_module_interfaces__action__InitiateUpdate_Feedback * ros_message = _ros_message;
   {  // status_message
@@ -509,29 +518,32 @@ bool vyra_module_interfaces__action__initiate_update__send_goal__request__conver
 {
   // check that the passed message is of the expected Python class
   {
-    PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
-    if (class_attr == NULL) {
-      return false;
+    char full_classname_dest[79];
+    {
+      char * class_name = NULL;
+      char * module_name = NULL;
+      {
+        PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
+        if (class_attr) {
+          PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
+          if (name_attr) {
+            class_name = (char *)PyUnicode_1BYTE_DATA(name_attr);
+            Py_DECREF(name_attr);
+          }
+          PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
+          if (module_attr) {
+            module_name = (char *)PyUnicode_1BYTE_DATA(module_attr);
+            Py_DECREF(module_attr);
+          }
+          Py_DECREF(class_attr);
+        }
+      }
+      if (!class_name || !module_name) {
+        return false;
+      }
+      snprintf(full_classname_dest, sizeof(full_classname_dest), "%s.%s", module_name, class_name);
     }
-    PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
-    if (name_attr == NULL) {
-      Py_DECREF(class_attr);
-      return false;
-    }
-    PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
-    if (module_attr == NULL) {
-      Py_DECREF(name_attr);
-      Py_DECREF(class_attr);
-      return false;
-    }
-
-    // PyUnicode_1BYTE_DATA is just a cast
-    assert(strncmp("vyra_module_interfaces.action._initiate_update", (char *)PyUnicode_1BYTE_DATA(module_attr), 46) == 0);
-    assert(strncmp("InitiateUpdate_SendGoal_Request", (char *)PyUnicode_1BYTE_DATA(name_attr), 31) == 0);
-
-    Py_DECREF(module_attr);
-    Py_DECREF(name_attr);
-    Py_DECREF(class_attr);
+    assert(strncmp("vyra_module_interfaces.action._initiate_update.InitiateUpdate_SendGoal_Request", full_classname_dest, 78) == 0);
   }
   vyra_module_interfaces__action__InitiateUpdate_SendGoal_Request * ros_message = _ros_message;
   {  // goal_id
@@ -635,29 +647,32 @@ bool vyra_module_interfaces__action__initiate_update__send_goal__response__conve
 {
   // check that the passed message is of the expected Python class
   {
-    PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
-    if (class_attr == NULL) {
-      return false;
+    char full_classname_dest[80];
+    {
+      char * class_name = NULL;
+      char * module_name = NULL;
+      {
+        PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
+        if (class_attr) {
+          PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
+          if (name_attr) {
+            class_name = (char *)PyUnicode_1BYTE_DATA(name_attr);
+            Py_DECREF(name_attr);
+          }
+          PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
+          if (module_attr) {
+            module_name = (char *)PyUnicode_1BYTE_DATA(module_attr);
+            Py_DECREF(module_attr);
+          }
+          Py_DECREF(class_attr);
+        }
+      }
+      if (!class_name || !module_name) {
+        return false;
+      }
+      snprintf(full_classname_dest, sizeof(full_classname_dest), "%s.%s", module_name, class_name);
     }
-    PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
-    if (name_attr == NULL) {
-      Py_DECREF(class_attr);
-      return false;
-    }
-    PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
-    if (module_attr == NULL) {
-      Py_DECREF(name_attr);
-      Py_DECREF(class_attr);
-      return false;
-    }
-
-    // PyUnicode_1BYTE_DATA is just a cast
-    assert(strncmp("vyra_module_interfaces.action._initiate_update", (char *)PyUnicode_1BYTE_DATA(module_attr), 46) == 0);
-    assert(strncmp("InitiateUpdate_SendGoal_Response", (char *)PyUnicode_1BYTE_DATA(name_attr), 32) == 0);
-
-    Py_DECREF(module_attr);
-    Py_DECREF(name_attr);
-    Py_DECREF(class_attr);
+    assert(strncmp("vyra_module_interfaces.action._initiate_update.InitiateUpdate_SendGoal_Response", full_classname_dest, 79) == 0);
   }
   vyra_module_interfaces__action__InitiateUpdate_SendGoal_Response * ros_message = _ros_message;
   {  // accepted
@@ -746,240 +761,6 @@ PyObject * vyra_module_interfaces__action__initiate_update__send_goal__response_
 // already included above
 // #include "vyra_module_interfaces/action/detail/initiate_update__functions.h"
 
-#include "rosidl_runtime_c/primitives_sequence.h"
-#include "rosidl_runtime_c/primitives_sequence_functions.h"
-
-// Nested array functions includes
-
-
-// end nested array functions include
-ROSIDL_GENERATOR_C_IMPORT
-bool service_msgs__msg__service_event_info__convert_from_py(PyObject * _pymsg, void * _ros_message);
-ROSIDL_GENERATOR_C_IMPORT
-PyObject * service_msgs__msg__service_event_info__convert_to_py(void * raw_ros_message);
-bool vyra_module_interfaces__action__initiate_update__send_goal__request__convert_from_py(PyObject * _pymsg, void * _ros_message);
-PyObject * vyra_module_interfaces__action__initiate_update__send_goal__request__convert_to_py(void * raw_ros_message);
-bool vyra_module_interfaces__action__initiate_update__send_goal__response__convert_from_py(PyObject * _pymsg, void * _ros_message);
-PyObject * vyra_module_interfaces__action__initiate_update__send_goal__response__convert_to_py(void * raw_ros_message);
-
-ROSIDL_GENERATOR_C_EXPORT
-bool vyra_module_interfaces__action__initiate_update__send_goal__event__convert_from_py(PyObject * _pymsg, void * _ros_message)
-{
-  // check that the passed message is of the expected Python class
-  {
-    PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
-    if (class_attr == NULL) {
-      return false;
-    }
-    PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
-    if (name_attr == NULL) {
-      Py_DECREF(class_attr);
-      return false;
-    }
-    PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
-    if (module_attr == NULL) {
-      Py_DECREF(name_attr);
-      Py_DECREF(class_attr);
-      return false;
-    }
-
-    // PyUnicode_1BYTE_DATA is just a cast
-    assert(strncmp("vyra_module_interfaces.action._initiate_update", (char *)PyUnicode_1BYTE_DATA(module_attr), 46) == 0);
-    assert(strncmp("InitiateUpdate_SendGoal_Event", (char *)PyUnicode_1BYTE_DATA(name_attr), 29) == 0);
-
-    Py_DECREF(module_attr);
-    Py_DECREF(name_attr);
-    Py_DECREF(class_attr);
-  }
-  vyra_module_interfaces__action__InitiateUpdate_SendGoal_Event * ros_message = _ros_message;
-  {  // info
-    PyObject * field = PyObject_GetAttrString(_pymsg, "info");
-    if (!field) {
-      return false;
-    }
-    if (!service_msgs__msg__service_event_info__convert_from_py(field, &ros_message->info)) {
-      Py_DECREF(field);
-      return false;
-    }
-    Py_DECREF(field);
-  }
-  {  // request
-    PyObject * field = PyObject_GetAttrString(_pymsg, "request");
-    if (!field) {
-      return false;
-    }
-    PyObject * seq_field = PySequence_Fast(field, "expected a sequence in 'request'");
-    if (!seq_field) {
-      Py_DECREF(field);
-      return false;
-    }
-    Py_ssize_t size = PySequence_Size(field);
-    if (-1 == size) {
-      Py_DECREF(seq_field);
-      Py_DECREF(field);
-      return false;
-    }
-    if (!vyra_module_interfaces__action__InitiateUpdate_SendGoal_Request__Sequence__init(&(ros_message->request), size)) {
-      PyErr_SetString(PyExc_RuntimeError, "unable to create vyra_module_interfaces__action__InitiateUpdate_SendGoal_Request__Sequence ros_message");
-      Py_DECREF(seq_field);
-      Py_DECREF(field);
-      return false;
-    }
-    vyra_module_interfaces__action__InitiateUpdate_SendGoal_Request * dest = ros_message->request.data;
-    for (Py_ssize_t i = 0; i < size; ++i) {
-      if (!vyra_module_interfaces__action__initiate_update__send_goal__request__convert_from_py(PySequence_Fast_GET_ITEM(seq_field, i), &dest[i])) {
-        Py_DECREF(seq_field);
-        Py_DECREF(field);
-        return false;
-      }
-    }
-    Py_DECREF(seq_field);
-    Py_DECREF(field);
-  }
-  {  // response
-    PyObject * field = PyObject_GetAttrString(_pymsg, "response");
-    if (!field) {
-      return false;
-    }
-    PyObject * seq_field = PySequence_Fast(field, "expected a sequence in 'response'");
-    if (!seq_field) {
-      Py_DECREF(field);
-      return false;
-    }
-    Py_ssize_t size = PySequence_Size(field);
-    if (-1 == size) {
-      Py_DECREF(seq_field);
-      Py_DECREF(field);
-      return false;
-    }
-    if (!vyra_module_interfaces__action__InitiateUpdate_SendGoal_Response__Sequence__init(&(ros_message->response), size)) {
-      PyErr_SetString(PyExc_RuntimeError, "unable to create vyra_module_interfaces__action__InitiateUpdate_SendGoal_Response__Sequence ros_message");
-      Py_DECREF(seq_field);
-      Py_DECREF(field);
-      return false;
-    }
-    vyra_module_interfaces__action__InitiateUpdate_SendGoal_Response * dest = ros_message->response.data;
-    for (Py_ssize_t i = 0; i < size; ++i) {
-      if (!vyra_module_interfaces__action__initiate_update__send_goal__response__convert_from_py(PySequence_Fast_GET_ITEM(seq_field, i), &dest[i])) {
-        Py_DECREF(seq_field);
-        Py_DECREF(field);
-        return false;
-      }
-    }
-    Py_DECREF(seq_field);
-    Py_DECREF(field);
-  }
-
-  return true;
-}
-
-ROSIDL_GENERATOR_C_EXPORT
-PyObject * vyra_module_interfaces__action__initiate_update__send_goal__event__convert_to_py(void * raw_ros_message)
-{
-  /* NOTE(esteve): Call constructor of InitiateUpdate_SendGoal_Event */
-  PyObject * _pymessage = NULL;
-  {
-    PyObject * pymessage_module = PyImport_ImportModule("vyra_module_interfaces.action._initiate_update");
-    assert(pymessage_module);
-    PyObject * pymessage_class = PyObject_GetAttrString(pymessage_module, "InitiateUpdate_SendGoal_Event");
-    assert(pymessage_class);
-    Py_DECREF(pymessage_module);
-    _pymessage = PyObject_CallObject(pymessage_class, NULL);
-    Py_DECREF(pymessage_class);
-    if (!_pymessage) {
-      return NULL;
-    }
-  }
-  vyra_module_interfaces__action__InitiateUpdate_SendGoal_Event * ros_message = (vyra_module_interfaces__action__InitiateUpdate_SendGoal_Event *)raw_ros_message;
-  {  // info
-    PyObject * field = NULL;
-    field = service_msgs__msg__service_event_info__convert_to_py(&ros_message->info);
-    if (!field) {
-      return NULL;
-    }
-    {
-      int rc = PyObject_SetAttrString(_pymessage, "info", field);
-      Py_DECREF(field);
-      if (rc) {
-        return NULL;
-      }
-    }
-  }
-  {  // request
-    PyObject * field = NULL;
-    size_t size = ros_message->request.size;
-    field = PyList_New(size);
-    if (!field) {
-      return NULL;
-    }
-    vyra_module_interfaces__action__InitiateUpdate_SendGoal_Request * item;
-    for (size_t i = 0; i < size; ++i) {
-      item = &(ros_message->request.data[i]);
-      PyObject * pyitem = vyra_module_interfaces__action__initiate_update__send_goal__request__convert_to_py(item);
-      if (!pyitem) {
-        Py_DECREF(field);
-        return NULL;
-      }
-      int rc = PyList_SetItem(field, i, pyitem);
-      (void)rc;
-      assert(rc == 0);
-    }
-    assert(PySequence_Check(field));
-    {
-      int rc = PyObject_SetAttrString(_pymessage, "request", field);
-      Py_DECREF(field);
-      if (rc) {
-        return NULL;
-      }
-    }
-  }
-  {  // response
-    PyObject * field = NULL;
-    size_t size = ros_message->response.size;
-    field = PyList_New(size);
-    if (!field) {
-      return NULL;
-    }
-    vyra_module_interfaces__action__InitiateUpdate_SendGoal_Response * item;
-    for (size_t i = 0; i < size; ++i) {
-      item = &(ros_message->response.data[i]);
-      PyObject * pyitem = vyra_module_interfaces__action__initiate_update__send_goal__response__convert_to_py(item);
-      if (!pyitem) {
-        Py_DECREF(field);
-        return NULL;
-      }
-      int rc = PyList_SetItem(field, i, pyitem);
-      (void)rc;
-      assert(rc == 0);
-    }
-    assert(PySequence_Check(field));
-    {
-      int rc = PyObject_SetAttrString(_pymessage, "response", field);
-      Py_DECREF(field);
-      if (rc) {
-        return NULL;
-      }
-    }
-  }
-
-  // ownership of _pymessage is transferred to the caller
-  return _pymessage;
-}
-
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-// already included above
-// #include <Python.h>
-// already included above
-// #include <stdbool.h>
-// already included above
-// #include "numpy/ndarrayobject.h"
-// already included above
-// #include "rosidl_runtime_c/visibility_control.h"
-// already included above
-// #include "vyra_module_interfaces/action/detail/initiate_update__struct.h"
-// already included above
-// #include "vyra_module_interfaces/action/detail/initiate_update__functions.h"
-
 ROSIDL_GENERATOR_C_IMPORT
 bool unique_identifier_msgs__msg__uuid__convert_from_py(PyObject * _pymsg, void * _ros_message);
 ROSIDL_GENERATOR_C_IMPORT
@@ -990,29 +771,32 @@ bool vyra_module_interfaces__action__initiate_update__get_result__request__conve
 {
   // check that the passed message is of the expected Python class
   {
-    PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
-    if (class_attr == NULL) {
-      return false;
+    char full_classname_dest[80];
+    {
+      char * class_name = NULL;
+      char * module_name = NULL;
+      {
+        PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
+        if (class_attr) {
+          PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
+          if (name_attr) {
+            class_name = (char *)PyUnicode_1BYTE_DATA(name_attr);
+            Py_DECREF(name_attr);
+          }
+          PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
+          if (module_attr) {
+            module_name = (char *)PyUnicode_1BYTE_DATA(module_attr);
+            Py_DECREF(module_attr);
+          }
+          Py_DECREF(class_attr);
+        }
+      }
+      if (!class_name || !module_name) {
+        return false;
+      }
+      snprintf(full_classname_dest, sizeof(full_classname_dest), "%s.%s", module_name, class_name);
     }
-    PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
-    if (name_attr == NULL) {
-      Py_DECREF(class_attr);
-      return false;
-    }
-    PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
-    if (module_attr == NULL) {
-      Py_DECREF(name_attr);
-      Py_DECREF(class_attr);
-      return false;
-    }
-
-    // PyUnicode_1BYTE_DATA is just a cast
-    assert(strncmp("vyra_module_interfaces.action._initiate_update", (char *)PyUnicode_1BYTE_DATA(module_attr), 46) == 0);
-    assert(strncmp("InitiateUpdate_GetResult_Request", (char *)PyUnicode_1BYTE_DATA(name_attr), 32) == 0);
-
-    Py_DECREF(module_attr);
-    Py_DECREF(name_attr);
-    Py_DECREF(class_attr);
+    assert(strncmp("vyra_module_interfaces.action._initiate_update.InitiateUpdate_GetResult_Request", full_classname_dest, 79) == 0);
   }
   vyra_module_interfaces__action__InitiateUpdate_GetResult_Request * ros_message = _ros_message;
   {  // goal_id
@@ -1089,29 +873,32 @@ bool vyra_module_interfaces__action__initiate_update__get_result__response__conv
 {
   // check that the passed message is of the expected Python class
   {
-    PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
-    if (class_attr == NULL) {
-      return false;
+    char full_classname_dest[81];
+    {
+      char * class_name = NULL;
+      char * module_name = NULL;
+      {
+        PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
+        if (class_attr) {
+          PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
+          if (name_attr) {
+            class_name = (char *)PyUnicode_1BYTE_DATA(name_attr);
+            Py_DECREF(name_attr);
+          }
+          PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
+          if (module_attr) {
+            module_name = (char *)PyUnicode_1BYTE_DATA(module_attr);
+            Py_DECREF(module_attr);
+          }
+          Py_DECREF(class_attr);
+        }
+      }
+      if (!class_name || !module_name) {
+        return false;
+      }
+      snprintf(full_classname_dest, sizeof(full_classname_dest), "%s.%s", module_name, class_name);
     }
-    PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
-    if (name_attr == NULL) {
-      Py_DECREF(class_attr);
-      return false;
-    }
-    PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
-    if (module_attr == NULL) {
-      Py_DECREF(name_attr);
-      Py_DECREF(class_attr);
-      return false;
-    }
-
-    // PyUnicode_1BYTE_DATA is just a cast
-    assert(strncmp("vyra_module_interfaces.action._initiate_update", (char *)PyUnicode_1BYTE_DATA(module_attr), 46) == 0);
-    assert(strncmp("InitiateUpdate_GetResult_Response", (char *)PyUnicode_1BYTE_DATA(name_attr), 33) == 0);
-
-    Py_DECREF(module_attr);
-    Py_DECREF(name_attr);
-    Py_DECREF(class_attr);
+    assert(strncmp("vyra_module_interfaces.action._initiate_update.InitiateUpdate_GetResult_Response", full_classname_dest, 80) == 0);
   }
   vyra_module_interfaces__action__InitiateUpdate_GetResult_Response * ros_message = _ros_message;
   {  // status
@@ -1200,242 +987,6 @@ PyObject * vyra_module_interfaces__action__initiate_update__get_result__response
 // already included above
 // #include "vyra_module_interfaces/action/detail/initiate_update__functions.h"
 
-// already included above
-// #include "rosidl_runtime_c/primitives_sequence.h"
-// already included above
-// #include "rosidl_runtime_c/primitives_sequence_functions.h"
-
-// Nested array functions includes
-
-
-// end nested array functions include
-ROSIDL_GENERATOR_C_IMPORT
-bool service_msgs__msg__service_event_info__convert_from_py(PyObject * _pymsg, void * _ros_message);
-ROSIDL_GENERATOR_C_IMPORT
-PyObject * service_msgs__msg__service_event_info__convert_to_py(void * raw_ros_message);
-bool vyra_module_interfaces__action__initiate_update__get_result__request__convert_from_py(PyObject * _pymsg, void * _ros_message);
-PyObject * vyra_module_interfaces__action__initiate_update__get_result__request__convert_to_py(void * raw_ros_message);
-bool vyra_module_interfaces__action__initiate_update__get_result__response__convert_from_py(PyObject * _pymsg, void * _ros_message);
-PyObject * vyra_module_interfaces__action__initiate_update__get_result__response__convert_to_py(void * raw_ros_message);
-
-ROSIDL_GENERATOR_C_EXPORT
-bool vyra_module_interfaces__action__initiate_update__get_result__event__convert_from_py(PyObject * _pymsg, void * _ros_message)
-{
-  // check that the passed message is of the expected Python class
-  {
-    PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
-    if (class_attr == NULL) {
-      return false;
-    }
-    PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
-    if (name_attr == NULL) {
-      Py_DECREF(class_attr);
-      return false;
-    }
-    PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
-    if (module_attr == NULL) {
-      Py_DECREF(name_attr);
-      Py_DECREF(class_attr);
-      return false;
-    }
-
-    // PyUnicode_1BYTE_DATA is just a cast
-    assert(strncmp("vyra_module_interfaces.action._initiate_update", (char *)PyUnicode_1BYTE_DATA(module_attr), 46) == 0);
-    assert(strncmp("InitiateUpdate_GetResult_Event", (char *)PyUnicode_1BYTE_DATA(name_attr), 30) == 0);
-
-    Py_DECREF(module_attr);
-    Py_DECREF(name_attr);
-    Py_DECREF(class_attr);
-  }
-  vyra_module_interfaces__action__InitiateUpdate_GetResult_Event * ros_message = _ros_message;
-  {  // info
-    PyObject * field = PyObject_GetAttrString(_pymsg, "info");
-    if (!field) {
-      return false;
-    }
-    if (!service_msgs__msg__service_event_info__convert_from_py(field, &ros_message->info)) {
-      Py_DECREF(field);
-      return false;
-    }
-    Py_DECREF(field);
-  }
-  {  // request
-    PyObject * field = PyObject_GetAttrString(_pymsg, "request");
-    if (!field) {
-      return false;
-    }
-    PyObject * seq_field = PySequence_Fast(field, "expected a sequence in 'request'");
-    if (!seq_field) {
-      Py_DECREF(field);
-      return false;
-    }
-    Py_ssize_t size = PySequence_Size(field);
-    if (-1 == size) {
-      Py_DECREF(seq_field);
-      Py_DECREF(field);
-      return false;
-    }
-    if (!vyra_module_interfaces__action__InitiateUpdate_GetResult_Request__Sequence__init(&(ros_message->request), size)) {
-      PyErr_SetString(PyExc_RuntimeError, "unable to create vyra_module_interfaces__action__InitiateUpdate_GetResult_Request__Sequence ros_message");
-      Py_DECREF(seq_field);
-      Py_DECREF(field);
-      return false;
-    }
-    vyra_module_interfaces__action__InitiateUpdate_GetResult_Request * dest = ros_message->request.data;
-    for (Py_ssize_t i = 0; i < size; ++i) {
-      if (!vyra_module_interfaces__action__initiate_update__get_result__request__convert_from_py(PySequence_Fast_GET_ITEM(seq_field, i), &dest[i])) {
-        Py_DECREF(seq_field);
-        Py_DECREF(field);
-        return false;
-      }
-    }
-    Py_DECREF(seq_field);
-    Py_DECREF(field);
-  }
-  {  // response
-    PyObject * field = PyObject_GetAttrString(_pymsg, "response");
-    if (!field) {
-      return false;
-    }
-    PyObject * seq_field = PySequence_Fast(field, "expected a sequence in 'response'");
-    if (!seq_field) {
-      Py_DECREF(field);
-      return false;
-    }
-    Py_ssize_t size = PySequence_Size(field);
-    if (-1 == size) {
-      Py_DECREF(seq_field);
-      Py_DECREF(field);
-      return false;
-    }
-    if (!vyra_module_interfaces__action__InitiateUpdate_GetResult_Response__Sequence__init(&(ros_message->response), size)) {
-      PyErr_SetString(PyExc_RuntimeError, "unable to create vyra_module_interfaces__action__InitiateUpdate_GetResult_Response__Sequence ros_message");
-      Py_DECREF(seq_field);
-      Py_DECREF(field);
-      return false;
-    }
-    vyra_module_interfaces__action__InitiateUpdate_GetResult_Response * dest = ros_message->response.data;
-    for (Py_ssize_t i = 0; i < size; ++i) {
-      if (!vyra_module_interfaces__action__initiate_update__get_result__response__convert_from_py(PySequence_Fast_GET_ITEM(seq_field, i), &dest[i])) {
-        Py_DECREF(seq_field);
-        Py_DECREF(field);
-        return false;
-      }
-    }
-    Py_DECREF(seq_field);
-    Py_DECREF(field);
-  }
-
-  return true;
-}
-
-ROSIDL_GENERATOR_C_EXPORT
-PyObject * vyra_module_interfaces__action__initiate_update__get_result__event__convert_to_py(void * raw_ros_message)
-{
-  /* NOTE(esteve): Call constructor of InitiateUpdate_GetResult_Event */
-  PyObject * _pymessage = NULL;
-  {
-    PyObject * pymessage_module = PyImport_ImportModule("vyra_module_interfaces.action._initiate_update");
-    assert(pymessage_module);
-    PyObject * pymessage_class = PyObject_GetAttrString(pymessage_module, "InitiateUpdate_GetResult_Event");
-    assert(pymessage_class);
-    Py_DECREF(pymessage_module);
-    _pymessage = PyObject_CallObject(pymessage_class, NULL);
-    Py_DECREF(pymessage_class);
-    if (!_pymessage) {
-      return NULL;
-    }
-  }
-  vyra_module_interfaces__action__InitiateUpdate_GetResult_Event * ros_message = (vyra_module_interfaces__action__InitiateUpdate_GetResult_Event *)raw_ros_message;
-  {  // info
-    PyObject * field = NULL;
-    field = service_msgs__msg__service_event_info__convert_to_py(&ros_message->info);
-    if (!field) {
-      return NULL;
-    }
-    {
-      int rc = PyObject_SetAttrString(_pymessage, "info", field);
-      Py_DECREF(field);
-      if (rc) {
-        return NULL;
-      }
-    }
-  }
-  {  // request
-    PyObject * field = NULL;
-    size_t size = ros_message->request.size;
-    field = PyList_New(size);
-    if (!field) {
-      return NULL;
-    }
-    vyra_module_interfaces__action__InitiateUpdate_GetResult_Request * item;
-    for (size_t i = 0; i < size; ++i) {
-      item = &(ros_message->request.data[i]);
-      PyObject * pyitem = vyra_module_interfaces__action__initiate_update__get_result__request__convert_to_py(item);
-      if (!pyitem) {
-        Py_DECREF(field);
-        return NULL;
-      }
-      int rc = PyList_SetItem(field, i, pyitem);
-      (void)rc;
-      assert(rc == 0);
-    }
-    assert(PySequence_Check(field));
-    {
-      int rc = PyObject_SetAttrString(_pymessage, "request", field);
-      Py_DECREF(field);
-      if (rc) {
-        return NULL;
-      }
-    }
-  }
-  {  // response
-    PyObject * field = NULL;
-    size_t size = ros_message->response.size;
-    field = PyList_New(size);
-    if (!field) {
-      return NULL;
-    }
-    vyra_module_interfaces__action__InitiateUpdate_GetResult_Response * item;
-    for (size_t i = 0; i < size; ++i) {
-      item = &(ros_message->response.data[i]);
-      PyObject * pyitem = vyra_module_interfaces__action__initiate_update__get_result__response__convert_to_py(item);
-      if (!pyitem) {
-        Py_DECREF(field);
-        return NULL;
-      }
-      int rc = PyList_SetItem(field, i, pyitem);
-      (void)rc;
-      assert(rc == 0);
-    }
-    assert(PySequence_Check(field));
-    {
-      int rc = PyObject_SetAttrString(_pymessage, "response", field);
-      Py_DECREF(field);
-      if (rc) {
-        return NULL;
-      }
-    }
-  }
-
-  // ownership of _pymessage is transferred to the caller
-  return _pymessage;
-}
-
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-// already included above
-// #include <Python.h>
-// already included above
-// #include <stdbool.h>
-// already included above
-// #include "numpy/ndarrayobject.h"
-// already included above
-// #include "rosidl_runtime_c/visibility_control.h"
-// already included above
-// #include "vyra_module_interfaces/action/detail/initiate_update__struct.h"
-// already included above
-// #include "vyra_module_interfaces/action/detail/initiate_update__functions.h"
-
 ROSIDL_GENERATOR_C_IMPORT
 bool unique_identifier_msgs__msg__uuid__convert_from_py(PyObject * _pymsg, void * _ros_message);
 ROSIDL_GENERATOR_C_IMPORT
@@ -1448,29 +999,32 @@ bool vyra_module_interfaces__action__initiate_update__feedback_message__convert_
 {
   // check that the passed message is of the expected Python class
   {
-    PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
-    if (class_attr == NULL) {
-      return false;
+    char full_classname_dest[78];
+    {
+      char * class_name = NULL;
+      char * module_name = NULL;
+      {
+        PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
+        if (class_attr) {
+          PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
+          if (name_attr) {
+            class_name = (char *)PyUnicode_1BYTE_DATA(name_attr);
+            Py_DECREF(name_attr);
+          }
+          PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
+          if (module_attr) {
+            module_name = (char *)PyUnicode_1BYTE_DATA(module_attr);
+            Py_DECREF(module_attr);
+          }
+          Py_DECREF(class_attr);
+        }
+      }
+      if (!class_name || !module_name) {
+        return false;
+      }
+      snprintf(full_classname_dest, sizeof(full_classname_dest), "%s.%s", module_name, class_name);
     }
-    PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
-    if (name_attr == NULL) {
-      Py_DECREF(class_attr);
-      return false;
-    }
-    PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
-    if (module_attr == NULL) {
-      Py_DECREF(name_attr);
-      Py_DECREF(class_attr);
-      return false;
-    }
-
-    // PyUnicode_1BYTE_DATA is just a cast
-    assert(strncmp("vyra_module_interfaces.action._initiate_update", (char *)PyUnicode_1BYTE_DATA(module_attr), 46) == 0);
-    assert(strncmp("InitiateUpdate_FeedbackMessage", (char *)PyUnicode_1BYTE_DATA(name_attr), 30) == 0);
-
-    Py_DECREF(module_attr);
-    Py_DECREF(name_attr);
-    Py_DECREF(class_attr);
+    assert(strncmp("vyra_module_interfaces.action._initiate_update.InitiateUpdate_FeedbackMessage", full_classname_dest, 77) == 0);
   }
   vyra_module_interfaces__action__InitiateUpdate_FeedbackMessage * ros_message = _ros_message;
   {  // goal_id

@@ -5,7 +5,6 @@
 #ifndef VYRA_MODULE_INTERFACES__SRV__DETAIL__GET_LOGS__ROSIDL_TYPESUPPORT_FASTRTPS_CPP_HPP_
 #define VYRA_MODULE_INTERFACES__SRV__DETAIL__GET_LOGS__ROSIDL_TYPESUPPORT_FASTRTPS_CPP_HPP_
 
-#include <cstddef>
 #include "rosidl_runtime_c/message_type_support_struct.h"
 #include "rosidl_typesupport_interface/macros.h"
 #include "vyra_module_interfaces/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h"
@@ -59,25 +58,6 @@ max_serialized_size_GetLogs_Request(
   bool & is_plain,
   size_t current_alignment);
 
-bool
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-cdr_serialize_key(
-  const vyra_module_interfaces::srv::GetLogs_Request & ros_message,
-  eprosima::fastcdr::Cdr &);
-
-size_t
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-get_serialized_size_key(
-  const vyra_module_interfaces::srv::GetLogs_Request & ros_message,
-  size_t current_alignment);
-
-size_t
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-max_serialized_size_key_GetLogs_Request(
-  bool & full_bounded,
-  bool & is_plain,
-  size_t current_alignment);
-
 }  // namespace typesupport_fastrtps_cpp
 
 }  // namespace srv
@@ -97,8 +77,6 @@ const rosidl_message_type_support_t *
 }
 #endif
 
-// already included above
-// #include <cstddef>
 // already included above
 // #include "rosidl_runtime_c/message_type_support_struct.h"
 // already included above
@@ -157,25 +135,6 @@ max_serialized_size_GetLogs_Response(
   bool & is_plain,
   size_t current_alignment);
 
-bool
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-cdr_serialize_key(
-  const vyra_module_interfaces::srv::GetLogs_Response & ros_message,
-  eprosima::fastcdr::Cdr &);
-
-size_t
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-get_serialized_size_key(
-  const vyra_module_interfaces::srv::GetLogs_Response & ros_message,
-  size_t current_alignment);
-
-size_t
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-max_serialized_size_key_GetLogs_Response(
-  bool & full_bounded,
-  bool & is_plain,
-  size_t current_alignment);
-
 }  // namespace typesupport_fastrtps_cpp
 
 }  // namespace srv
@@ -190,104 +149,6 @@ extern "C"
 ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
 const rosidl_message_type_support_t *
   ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_fastrtps_cpp, vyra_module_interfaces, srv, GetLogs_Response)();
-
-#ifdef __cplusplus
-}
-#endif
-
-// already included above
-// #include <cstddef>
-// already included above
-// #include "rosidl_runtime_c/message_type_support_struct.h"
-// already included above
-// #include "rosidl_typesupport_interface/macros.h"
-// already included above
-// #include "vyra_module_interfaces/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h"
-// already included above
-// #include "vyra_module_interfaces/srv/detail/get_logs__struct.hpp"
-
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wunused-parameter"
-# ifdef __clang__
-#  pragma clang diagnostic ignored "-Wdeprecated-register"
-#  pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
-# endif
-#endif
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
-
-// already included above
-// #include "fastcdr/Cdr.h"
-
-namespace vyra_module_interfaces
-{
-
-namespace srv
-{
-
-namespace typesupport_fastrtps_cpp
-{
-
-bool
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-cdr_serialize(
-  const vyra_module_interfaces::srv::GetLogs_Event & ros_message,
-  eprosima::fastcdr::Cdr & cdr);
-
-bool
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-cdr_deserialize(
-  eprosima::fastcdr::Cdr & cdr,
-  vyra_module_interfaces::srv::GetLogs_Event & ros_message);
-
-size_t
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-get_serialized_size(
-  const vyra_module_interfaces::srv::GetLogs_Event & ros_message,
-  size_t current_alignment);
-
-size_t
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-max_serialized_size_GetLogs_Event(
-  bool & full_bounded,
-  bool & is_plain,
-  size_t current_alignment);
-
-bool
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-cdr_serialize_key(
-  const vyra_module_interfaces::srv::GetLogs_Event & ros_message,
-  eprosima::fastcdr::Cdr &);
-
-size_t
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-get_serialized_size_key(
-  const vyra_module_interfaces::srv::GetLogs_Event & ros_message,
-  size_t current_alignment);
-
-size_t
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-max_serialized_size_key_GetLogs_Event(
-  bool & full_bounded,
-  bool & is_plain,
-  size_t current_alignment);
-
-}  // namespace typesupport_fastrtps_cpp
-
-}  // namespace srv
-
-}  // namespace vyra_module_interfaces
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-const rosidl_message_type_support_t *
-  ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_fastrtps_cpp, vyra_module_interfaces, srv, GetLogs_Event)();
 
 #ifdef __cplusplus
 }

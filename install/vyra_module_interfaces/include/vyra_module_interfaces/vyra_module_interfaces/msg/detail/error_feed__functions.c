@@ -161,7 +161,7 @@ vyra_module_interfaces__msg__ErrorFeed__copy(
 }
 
 vyra_module_interfaces__msg__ErrorFeed *
-vyra_module_interfaces__msg__ErrorFeed__create(void)
+vyra_module_interfaces__msg__ErrorFeed__create()
 {
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
   vyra_module_interfaces__msg__ErrorFeed * msg = (vyra_module_interfaces__msg__ErrorFeed *)allocator.allocate(sizeof(vyra_module_interfaces__msg__ErrorFeed), allocator.state);

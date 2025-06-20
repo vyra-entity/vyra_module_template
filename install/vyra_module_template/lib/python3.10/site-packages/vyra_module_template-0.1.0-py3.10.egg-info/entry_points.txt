@@ -1,0 +1,4 @@
+[console_scripts]
+core = vyra_module_template.Core:main
+listener = vyra_module_template.SubscriberNode:main
+talker = vyra_module_template.PublisherNode:main

@@ -5,7 +5,6 @@
 #ifndef VYRA_MODULE_INTERFACES__MSG__DETAIL__STATE_FEED__ROSIDL_TYPESUPPORT_FASTRTPS_CPP_HPP_
 #define VYRA_MODULE_INTERFACES__MSG__DETAIL__STATE_FEED__ROSIDL_TYPESUPPORT_FASTRTPS_CPP_HPP_
 
-#include <cstddef>
 #include "rosidl_runtime_c/message_type_support_struct.h"
 #include "rosidl_typesupport_interface/macros.h"
 #include "vyra_module_interfaces/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h"
@@ -55,25 +54,6 @@ get_serialized_size(
 size_t
 ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
 max_serialized_size_StateFeed(
-  bool & full_bounded,
-  bool & is_plain,
-  size_t current_alignment);
-
-bool
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-cdr_serialize_key(
-  const vyra_module_interfaces::msg::StateFeed & ros_message,
-  eprosima::fastcdr::Cdr &);
-
-size_t
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-get_serialized_size_key(
-  const vyra_module_interfaces::msg::StateFeed & ros_message,
-  size_t current_alignment);
-
-size_t
-ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_vyra_module_interfaces
-max_serialized_size_key_StateFeed(
   bool & full_bounded,
   bool & is_plain,
   size_t current_alignment);

@@ -113,7 +113,7 @@ vyra_module_interfaces__msg__LoggerStream__copy(
 }
 
 vyra_module_interfaces__msg__LoggerStream *
-vyra_module_interfaces__msg__LoggerStream__create(void)
+vyra_module_interfaces__msg__LoggerStream__create()
 {
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
   vyra_module_interfaces__msg__LoggerStream * msg = (vyra_module_interfaces__msg__LoggerStream *)allocator.allocate(sizeof(vyra_module_interfaces__msg__LoggerStream), allocator.state);

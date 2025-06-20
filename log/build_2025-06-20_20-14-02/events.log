@@ -1,0 +1,678 @@
+[0.000000] (-) TimerEvent: {}
+[0.000700] (vyra_module_interfaces) JobQueued: {'identifier': 'vyra_module_interfaces', 'dependencies': OrderedDict()}
+[0.000792] (vyra_module_template) JobQueued: {'identifier': 'vyra_module_template', 'dependencies': OrderedDict([('vyra_module_interfaces', '/workspace/install/vyra_module_interfaces')])}
+[0.000856] (vyra_module_interfaces) JobStarted: {'identifier': 'vyra_module_interfaces'}
+[0.012866] (vyra_module_interfaces) JobProgress: {'identifier': 'vyra_module_interfaces', 'progress': 'cmake'}
+[0.013654] (vyra_module_interfaces) Command: {'cmd': ['/usr/bin/cmake', '/workspace/src/vyra_module_interfaces', '-DCMAKE_INSTALL_PREFIX=/workspace/install/vyra_module_interfaces'], 'cwd': '/workspace/build/vyra_module_interfaces', 'env': OrderedDict([('HOSTNAME', 'c9118e793162'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/workspace/install/vyra_module_interfaces/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/workspace'), ('ROS_PYTHON_VERSION', '3'), ('COLCON_PREFIX_PATH', '/workspace/install'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/workspace/install/vyra_module_template:/workspace/install/vyra_module_interfaces:/opt/ros/humble'), ('DEBIAN_FRONTEND', 'noninteractive'), ('PWD', '/workspace/build/vyra_module_interfaces'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/workspace/install/vyra_module_template/lib/python3.12/site-packages:/workspace/install/vyra_module_interfaces/lib/python3.12/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/install/vyra_module_interfaces:/workspace/install/vyra_module_template:/opt/ros/humble')]), 'shell': False}
+[0.088760] (vyra_module_interfaces) StdoutLine: {'line': b'-- The C compiler identification is GNU 11.4.0\n'}
+[0.099176] (-) TimerEvent: {}
+[0.159736] (vyra_module_interfaces) StdoutLine: {'line': b'-- The CXX compiler identification is GNU 11.4.0\n'}
+[0.169051] (vyra_module_interfaces) StdoutLine: {'line': b'-- Detecting C compiler ABI info\n'}
+[0.199270] (-) TimerEvent: {}
+[0.268714] (vyra_module_interfaces) StdoutLine: {'line': b'-- Detecting C compiler ABI info - done\n'}
+[0.289915] (vyra_module_interfaces) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc - skipped\n'}
+[0.290716] (vyra_module_interfaces) StdoutLine: {'line': b'-- Detecting C compile features\n'}
+[0.291896] (vyra_module_interfaces) StdoutLine: {'line': b'-- Detecting C compile features - done\n'}
+[0.299392] (-) TimerEvent: {}
+[0.301292] (vyra_module_interfaces) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info\n'}
+[0.399542] (-) TimerEvent: {}
+[0.430988] (vyra_module_interfaces) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info - done\n'}
+[0.454132] (vyra_module_interfaces) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++ - skipped\n'}
+[0.454923] (vyra_module_interfaces) StdoutLine: {'line': b'-- Detecting CXX compile features\n'}
+[0.456298] (vyra_module_interfaces) StdoutLine: {'line': b'-- Detecting CXX compile features - done\n'}
+[0.464662] (vyra_module_interfaces) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.499651] (-) TimerEvent: {}
+[0.600006] (-) TimerEvent: {}
+[0.700435] (-) TimerEvent: {}
+[0.800913] (-) TimerEvent: {}
+[0.901329] (-) TimerEvent: {}
+[0.926984] (vyra_module_interfaces) StdoutLine: {'line': b'-- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter \n'}
+[1.001466] (-) TimerEvent: {}
+[1.073122] (vyra_module_interfaces) StdoutLine: {'line': b'-- Found rosidl_default_generators: 1.2.0 (/opt/ros/humble/share/rosidl_default_generators/cmake)\n'}
+[1.076638] (vyra_module_interfaces) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[1.084439] (vyra_module_interfaces) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.6 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[1.101602] (-) TimerEvent: {}
+[1.129178] (vyra_module_interfaces) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[1.171685] (vyra_module_interfaces) StdoutLine: {'line': b'-- Found std_msgs: 4.8.0 (/opt/ros/humble/share/std_msgs/cmake)\n'}
+[1.201739] (-) TimerEvent: {}
+[1.302103] (-) TimerEvent: {}
+[1.402519] (-) TimerEvent: {}
+[1.502982] (-) TimerEvent: {}
+[1.603394] (-) TimerEvent: {}
+[1.669315] (vyra_module_interfaces) StdoutLine: {'line': b'-- Found ament_cmake_ros: 0.10.0 (/opt/ros/humble/share/ament_cmake_ros/cmake)\n'}
+[1.703520] (-) TimerEvent: {}
+[1.803896] (-) TimerEvent: {}
+[1.904221] (-) TimerEvent: {}
+[2.004525] (-) TimerEvent: {}
+[2.019899] (vyra_module_interfaces) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[2.104630] (-) TimerEvent: {}
+[2.204981] (-) TimerEvent: {}
+[2.305405] (-) TimerEvent: {}
+[2.405853] (-) TimerEvent: {}
+[2.454880] (vyra_module_interfaces) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[2.492369] (vyra_module_interfaces) StdoutLine: {'line': b'-- Found PythonInterp: /usr/bin/python3 (found suitable version "3.10.12", minimum required is "3.6") \n'}
+[2.496570] (vyra_module_interfaces) StdoutLine: {'line': b'-- Found python_cmake_module: 0.10.0 (/opt/ros/humble/share/python_cmake_module/cmake)\n'}
+[2.505958] (-) TimerEvent: {}
+[2.539381] (vyra_module_interfaces) StdoutLine: {'line': b'-- Found PythonLibs: /usr/lib/x86_64-linux-gnu/libpython3.10.so (found suitable version "3.10.12", minimum required is "3.5") \n'}
+[2.539841] (vyra_module_interfaces) StdoutLine: {'line': b'-- Using PYTHON_EXECUTABLE: /usr/bin/python3\n'}
+[2.540036] (vyra_module_interfaces) StdoutLine: {'line': b'-- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.10\n'}
+[2.540214] (vyra_module_interfaces) StdoutLine: {'line': b'-- Using PYTHON_LIBRARIES: /usr/lib/x86_64-linux-gnu/libpython3.10.so\n'}
+[2.570951] (vyra_module_interfaces) StdoutLine: {'line': b'-- Found PythonExtra: .so  \n'}
+[2.606081] (-) TimerEvent: {}
+[2.667334] (vyra_module_interfaces) StdoutLine: {'line': b'-- Configuring done\n'}
+[2.706220] (-) TimerEvent: {}
+[2.733224] (vyra_module_interfaces) StdoutLine: {'line': b'-- Generating done\n'}
+[2.750038] (vyra_module_interfaces) StdoutLine: {'line': b'-- Build files have been written to: /workspace/build/vyra_module_interfaces\n'}
+[2.757603] (vyra_module_interfaces) CommandEnded: {'returncode': 0}
+[2.758197] (vyra_module_interfaces) JobProgress: {'identifier': 'vyra_module_interfaces', 'progress': 'build'}
+[2.758930] (vyra_module_interfaces) Command: {'cmd': ['/usr/bin/cmake', '--build', '/workspace/build/vyra_module_interfaces', '--', '-j12', '-l12'], 'cwd': '/workspace/build/vyra_module_interfaces', 'env': OrderedDict([('HOSTNAME', 'c9118e793162'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/workspace/install/vyra_module_interfaces/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/workspace'), ('ROS_PYTHON_VERSION', '3'), ('COLCON_PREFIX_PATH', '/workspace/install'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/workspace/install/vyra_module_template:/workspace/install/vyra_module_interfaces:/opt/ros/humble'), ('DEBIAN_FRONTEND', 'noninteractive'), ('PWD', '/workspace/build/vyra_module_interfaces'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/workspace/install/vyra_module_template/lib/python3.12/site-packages:/workspace/install/vyra_module_interfaces/lib/python3.12/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/install/vyra_module_interfaces:/workspace/install/vyra_module_template:/opt/ros/humble')]), 'shell': False}
+[2.806362] (-) TimerEvent: {}
+[2.812891] (vyra_module_interfaces) StdoutLine: {'line': b'[  1%] \x1b[34m\x1b[1mGenerating C code for ROS interfaces\x1b[0m\n'}
+[2.826032] (vyra_module_interfaces) StdoutLine: {'line': b'[  2%] \x1b[34m\x1b[1mGenerating C++ code for ROS interfaces\x1b[0m\n'}
+[2.846013] (vyra_module_interfaces) StdoutLine: {'line': b'[  2%] Built target ament_cmake_python_copy_vyra_module_interfaces\n'}
+[2.906489] (-) TimerEvent: {}
+[3.006899] (-) TimerEvent: {}
+[3.073431] (vyra_module_interfaces) StdoutLine: {'line': b'running egg_info\n'}
+[3.087908] (vyra_module_interfaces) StdoutLine: {'line': b'creating vyra_module_interfaces.egg-info\n'}
+[3.088332] (vyra_module_interfaces) StdoutLine: {'line': b'writing vyra_module_interfaces.egg-info/PKG-INFO\n'}
+[3.088595] (vyra_module_interfaces) StdoutLine: {'line': b'writing dependency_links to vyra_module_interfaces.egg-info/dependency_links.txt\n'}
+[3.088986] (vyra_module_interfaces) StdoutLine: {'line': b'writing top-level names to vyra_module_interfaces.egg-info/top_level.txt\n'}
+[3.089175] (vyra_module_interfaces) StdoutLine: {'line': b"writing manifest file 'vyra_module_interfaces.egg-info/SOURCES.txt'\n"}
+[3.106996] (-) TimerEvent: {}
+[3.130736] (vyra_module_interfaces) StdoutLine: {'line': b"reading manifest file 'vyra_module_interfaces.egg-info/SOURCES.txt'\n"}
+[3.131844] (vyra_module_interfaces) StdoutLine: {'line': b"writing manifest file 'vyra_module_interfaces.egg-info/SOURCES.txt'\n"}
+[3.165231] (vyra_module_interfaces) StdoutLine: {'line': b'[  2%] Built target ament_cmake_python_build_vyra_module_interfaces_egg\n'}
+[3.207141] (-) TimerEvent: {}
+[3.307527] (-) TimerEvent: {}
+[3.407967] (-) TimerEvent: {}
+[3.508349] (-) TimerEvent: {}
+[3.608775] (-) TimerEvent: {}
+[3.709160] (-) TimerEvent: {}
+[3.809579] (-) TimerEvent: {}
+[3.909982] (-) TimerEvent: {}
+[4.010354] (-) TimerEvent: {}
+[4.111800] (-) TimerEvent: {}
+[4.181829] (vyra_module_interfaces) StdoutLine: {'line': b'[  2%] Built target vyra_module_interfaces__cpp\n'}
+[4.198370] (vyra_module_interfaces) StdoutLine: {'line': b'[  4%] \x1b[34m\x1b[1mGenerating C++ type support dispatch for ROS interfaces\x1b[0m\n'}
+[4.198697] (vyra_module_interfaces) StdoutLine: {'line': b'[  4%] \x1b[34m\x1b[1mGenerating C++ type support for eProsima Fast-RTPS\x1b[0m\n'}
+[4.202862] (vyra_module_interfaces) StdoutLine: {'line': b'[  5%] \x1b[34m\x1b[1mGenerating C++ introspection for ROS interfaces\x1b[0m\n'}
+[4.212857] (-) TimerEvent: {}
+[4.254017] (vyra_module_interfaces) StdoutLine: {'line': b'[  8%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vyra_module_interfaces/msg/detail/state_feed__functions.c.o\x1b[0m\n'}
+[4.254287] (vyra_module_interfaces) StdoutLine: {'line': b'[  9%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vyra_module_interfaces/srv/detail/get_capabilities__functions.c.o\x1b[0m\n'}
+[4.254429] (vyra_module_interfaces) StdoutLine: {'line': b'[  9%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vyra_module_interfaces/srv/detail/health_check__functions.c.o\x1b[0m\n'}
+[4.256031] (vyra_module_interfaces) StdoutLine: {'line': b'[ 10%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vyra_module_interfaces/srv/detail/trigger_transition__functions.c.o\x1b[0m\n'}
+[4.256327] (vyra_module_interfaces) StdoutLine: {'line': b'[ 11%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vyra_module_interfaces/msg/detail/error_feed__functions.c.o\x1b[0m\n'}
+[4.256437] (vyra_module_interfaces) StdoutLine: {'line': b'[ 12%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vyra_module_interfaces/srv/detail/get_logs__functions.c.o\x1b[0m\n'}
+[4.256515] (vyra_module_interfaces) StdoutLine: {'line': b'[ 12%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vyra_module_interfaces/msg/detail/logger_stream__functions.c.o\x1b[0m\n'}
+[4.256646] (vyra_module_interfaces) StdoutLine: {'line': b'[ 13%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vyra_module_interfaces/msg/detail/news_feed__functions.c.o\x1b[0m\n'}
+[4.259917] (vyra_module_interfaces) StdoutLine: {'line': b'[ 14%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_c.dir/rosidl_generator_c/vyra_module_interfaces/action/detail/initiate_update__functions.c.o\x1b[0m\n'}
+[4.314645] (-) TimerEvent: {}
+[4.415314] (-) TimerEvent: {}
+[4.467373] (vyra_module_interfaces) StdoutLine: {'line': b'[ 15%] \x1b[32m\x1b[1mLinking C shared library libvyra_module_interfaces__rosidl_generator_c.so\x1b[0m\n'}
+[4.515399] (vyra_module_interfaces) StdoutLine: {'line': b'[ 15%] Built target vyra_module_interfaces__rosidl_generator_c\n'}
+[4.515627] (-) TimerEvent: {}
+[4.528966] (vyra_module_interfaces) StdoutLine: {'line': b'[ 16%] \x1b[34m\x1b[1mGenerating C type support for eProsima Fast-RTPS\x1b[0m\n'}
+[4.529218] (vyra_module_interfaces) StdoutLine: {'line': b'[ 17%] \x1b[34m\x1b[1mGenerating C type support dispatch for ROS interfaces\x1b[0m\n'}
+[4.535171] (vyra_module_interfaces) StdoutLine: {'line': b'[ 18%] \x1b[34m\x1b[1mGenerating C introspection for ROS interfaces\x1b[0m\n'}
+[4.615740] (-) TimerEvent: {}
+[4.716055] (-) TimerEvent: {}
+[4.816362] (-) TimerEvent: {}
+[4.916680] (-) TimerEvent: {}
+[5.016978] (-) TimerEvent: {}
+[5.117283] (-) TimerEvent: {}
+[5.134620] (vyra_module_interfaces) StdoutLine: {'line': b'[ 20%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/msg/news_feed__type_support.cpp.o\x1b[0m\n'}
+[5.134865] (vyra_module_interfaces) StdoutLine: {'line': b'[ 21%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/srv/health_check__type_support.cpp.o\x1b[0m\n'}
+[5.134973] (vyra_module_interfaces) StdoutLine: {'line': b'[ 22%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/msg/logger_stream__type_support.cpp.o\x1b[0m\n'}
+[5.135075] (vyra_module_interfaces) StdoutLine: {'line': b'[ 23%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/msg/state_feed__type_support.cpp.o\x1b[0m\n'}
+[5.135246] (vyra_module_interfaces) StdoutLine: {'line': b'[ 24%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/msg/error_feed__type_support.cpp.o\x1b[0m\n'}
+[5.136998] (vyra_module_interfaces) StdoutLine: {'line': b'[ 25%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/srv/get_capabilities__type_support.cpp.o\x1b[0m\n'}
+[5.137285] (vyra_module_interfaces) StdoutLine: {'line': b'[ 26%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/srv/trigger_transition__type_support.cpp.o\x1b[0m\n'}
+[5.217385] (-) TimerEvent: {}
+[5.321133] (-) TimerEvent: {}
+[5.422081] (-) TimerEvent: {}
+[5.522822] (-) TimerEvent: {}
+[5.581707] (vyra_module_interfaces) StdoutLine: {'line': b'[ 27%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vyra_module_interfaces/msg/detail/news_feed__type_support.cpp.o\x1b[0m\n'}
+[5.586855] (vyra_module_interfaces) StdoutLine: {'line': b'[ 28%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/srv/get_logs__type_support.cpp.o\x1b[0m\n'}
+[5.595399] (vyra_module_interfaces) StdoutLine: {'line': b'[ 29%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vyra_module_interfaces/msg/detail/error_feed__type_support.cpp.o\x1b[0m\n'}
+[5.606238] (vyra_module_interfaces) StdoutLine: {'line': b'[ 30%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vyra_module_interfaces/msg/detail/logger_stream__type_support.cpp.o\x1b[0m\n'}
+[5.613698] (vyra_module_interfaces) StdoutLine: {'line': b'[ 31%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vyra_module_interfaces/msg/detail/state_feed__type_support.cpp.o\x1b[0m\n'}
+[5.616191] (vyra_module_interfaces) StdoutLine: {'line': b'[ 32%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vyra_module_interfaces/srv/detail/health_check__type_support.cpp.o\x1b[0m\n'}
+[5.622938] (-) TimerEvent: {}
+[5.633371] (vyra_module_interfaces) StdoutLine: {'line': b'[ 33%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vyra_module_interfaces/srv/detail/get_capabilities__type_support.cpp.o\x1b[0m\n'}
+[5.635884] (vyra_module_interfaces) StdoutLine: {'line': b'[ 34%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vyra_module_interfaces/srv/detail/trigger_transition__type_support.cpp.o\x1b[0m\n'}
+[5.637248] (vyra_module_interfaces) StdoutLine: {'line': b'[ 35%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vyra_module_interfaces/msg/news_feed__type_support.cpp.o\x1b[0m\n'}
+[5.690618] (vyra_module_interfaces) StdoutLine: {'line': b'[ 36%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vyra_module_interfaces/msg/error_feed__type_support.cpp.o\x1b[0m\n'}
+[5.723070] (-) TimerEvent: {}
+[5.742627] (vyra_module_interfaces) StdoutLine: {'line': b'[ 37%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vyra_module_interfaces/msg/logger_stream__type_support.cpp.o\x1b[0m\n'}
+[5.798621] (vyra_module_interfaces) StdoutLine: {'line': b'[ 38%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vyra_module_interfaces/msg/state_feed__type_support.cpp.o\x1b[0m\n'}
+[5.824629] (-) TimerEvent: {}
+[5.856726] (vyra_module_interfaces) StdoutLine: {'line': b'[ 40%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vyra_module_interfaces/msg/detail/dds_fastrtps/news_feed__type_support.cpp.o\x1b[0m\n'}
+[5.860969] (vyra_module_interfaces) StdoutLine: {'line': b'[ 41%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vyra_module_interfaces/srv/health_check__type_support.cpp.o\x1b[0m\n'}
+[5.924758] (-) TimerEvent: {}
+[5.930916] (vyra_module_interfaces) StdoutLine: {'line': b'[ 42%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vyra_module_interfaces/srv/get_capabilities__type_support.cpp.o\x1b[0m\n'}
+[5.985379] (vyra_module_interfaces) StdoutLine: {'line': b'[ 43%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vyra_module_interfaces/srv/trigger_transition__type_support.cpp.o\x1b[0m\n'}
+[6.024898] (-) TimerEvent: {}
+[6.042527] (vyra_module_interfaces) StdoutLine: {'line': b'[ 44%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vyra_module_interfaces/srv/get_logs__type_support.cpp.o\x1b[0m\n'}
+[6.082014] (vyra_module_interfaces) StdoutLine: {'line': b'[ 45%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vyra_module_interfaces/action/initiate_update__type_support.cpp.o\x1b[0m\n'}
+[6.100623] (vyra_module_interfaces) StdoutLine: {'line': b'[ 46%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/vyra_module_interfaces/action/initiate_update__type_support.cpp.o\x1b[0m\n'}
+[6.125022] (-) TimerEvent: {}
+[6.177317] (vyra_module_interfaces) StdoutLine: {'line': b'[ 47%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vyra_module_interfaces/msg/detail/news_feed__type_support.c.o\x1b[0m\n'}
+[6.191022] (vyra_module_interfaces) StdoutLine: {'line': b'[ 48%] \x1b[32m\x1b[1mLinking CXX shared library libvyra_module_interfaces__rosidl_typesupport_c.so\x1b[0m\n'}
+[6.227518] (-) TimerEvent: {}
+[6.241765] (vyra_module_interfaces) StdoutLine: {'line': b'[ 49%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vyra_module_interfaces/msg/detail/error_feed__type_support.c.o\x1b[0m\n'}
+[6.270173] (vyra_module_interfaces) StdoutLine: {'line': b'[ 50%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vyra_module_interfaces/msg/detail/logger_stream__type_support.c.o\x1b[0m\n'}
+[6.272088] (vyra_module_interfaces) StdoutLine: {'line': b'[ 51%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vyra_module_interfaces/msg/detail/dds_fastrtps/error_feed__type_support.cpp.o\x1b[0m\n'}
+[6.281587] (vyra_module_interfaces) StdoutLine: {'line': b'[ 52%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vyra_module_interfaces/msg/detail/dds_fastrtps/logger_stream__type_support.cpp.o\x1b[0m\n'}
+[6.281848] (vyra_module_interfaces) StdoutLine: {'line': b'[ 52%] Built target vyra_module_interfaces__rosidl_typesupport_c\n'}
+[6.299732] (vyra_module_interfaces) StdoutLine: {'line': b'[ 54%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vyra_module_interfaces/srv/detail/get_logs__type_support.cpp.o\x1b[0m\n'}
+[6.300012] (vyra_module_interfaces) StdoutLine: {'line': b'[ 54%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vyra_module_interfaces/msg/detail/state_feed__type_support.c.o\x1b[0m\n'}
+[6.303102] (vyra_module_interfaces) StdoutLine: {'line': b'[ 55%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vyra_module_interfaces/msg/detail/dds_fastrtps/state_feed__type_support.cpp.o\x1b[0m\n'}
+[6.317620] (vyra_module_interfaces) StdoutLine: {'line': b'[ 56%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vyra_module_interfaces/srv/detail/dds_fastrtps/health_check__type_support.cpp.o\x1b[0m\n'}
+[6.327645] (-) TimerEvent: {}
+[6.330523] (vyra_module_interfaces) StdoutLine: {'line': b'[ 58%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vyra_module_interfaces/msg/detail/news_feed__type_support_c.cpp.o\x1b[0m\n'}
+[6.333623] (vyra_module_interfaces) StdoutLine: {'line': b'[ 58%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vyra_module_interfaces/srv/detail/dds_fastrtps/get_capabilities__type_support.cpp.o\x1b[0m\n'}
+[6.337502] (vyra_module_interfaces) StdoutLine: {'line': b'[ 60%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vyra_module_interfaces/srv/detail/dds_fastrtps/trigger_transition__type_support.cpp.o\x1b[0m\n'}
+[6.349331] (vyra_module_interfaces) StdoutLine: {'line': b'[ 61%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vyra_module_interfaces/srv/detail/health_check__type_support.c.o\x1b[0m\n'}
+[6.364119] (vyra_module_interfaces) StdoutLine: {'line': b'[ 62%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vyra_module_interfaces/srv/detail/dds_fastrtps/get_logs__type_support.cpp.o\x1b[0m\n'}
+[6.419256] (vyra_module_interfaces) StdoutLine: {'line': b'[ 63%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vyra_module_interfaces/srv/detail/get_capabilities__type_support.c.o\x1b[0m\n'}
+[6.427768] (-) TimerEvent: {}
+[6.487996] (vyra_module_interfaces) StdoutLine: {'line': b'[ 64%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vyra_module_interfaces/srv/detail/trigger_transition__type_support.c.o\x1b[0m\n'}
+[6.527958] (-) TimerEvent: {}
+[6.558298] (vyra_module_interfaces) StdoutLine: {'line': b'[ 65%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vyra_module_interfaces/srv/detail/get_logs__type_support.c.o\x1b[0m\n'}
+[6.578734] (vyra_module_interfaces) StdoutLine: {'line': b'[ 66%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/vyra_module_interfaces/action/detail/initiate_update__type_support.c.o\x1b[0m\n'}
+[6.630431] (-) TimerEvent: {}
+[6.639522] (vyra_module_interfaces) StdoutLine: {'line': b'[ 67%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vyra_module_interfaces/msg/detail/error_feed__type_support_c.cpp.o\x1b[0m\n'}
+[6.681731] (vyra_module_interfaces) StdoutLine: {'line': b'[ 68%] \x1b[32m\x1b[1mLinking C shared library libvyra_module_interfaces__rosidl_typesupport_introspection_c.so\x1b[0m\n'}
+[6.730586] (-) TimerEvent: {}
+[6.756079] (vyra_module_interfaces) StdoutLine: {'line': b'[ 68%] Built target vyra_module_interfaces__rosidl_typesupport_introspection_c\n'}
+[6.773490] (vyra_module_interfaces) StdoutLine: {'line': b'[ 69%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vyra_module_interfaces/action/detail/initiate_update__type_support.cpp.o\x1b[0m\n'}
+[6.830790] (-) TimerEvent: {}
+[6.892657] (vyra_module_interfaces) StdoutLine: {'line': b'[ 70%] \x1b[32m\x1b[1mLinking CXX shared library libvyra_module_interfaces__rosidl_typesupport_cpp.so\x1b[0m\n'}
+[6.930879] (-) TimerEvent: {}
+[6.954063] (vyra_module_interfaces) StdoutLine: {'line': b'[ 71%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vyra_module_interfaces/action/detail/dds_fastrtps/initiate_update__type_support.cpp.o\x1b[0m\n'}
+[6.985614] (vyra_module_interfaces) StdoutLine: {'line': b'[ 71%] Built target vyra_module_interfaces__rosidl_typesupport_cpp\n'}
+[6.994669] (vyra_module_interfaces) StdoutLine: {'line': b'[ 72%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vyra_module_interfaces/msg/detail/logger_stream__type_support_c.cpp.o\x1b[0m\n'}
+[7.003747] (vyra_module_interfaces) StdoutLine: {'line': b'[ 73%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vyra_module_interfaces/msg/detail/state_feed__type_support_c.cpp.o\x1b[0m\n'}
+[7.010792] (vyra_module_interfaces) StdoutLine: {'line': b'[ 74%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vyra_module_interfaces/srv/detail/health_check__type_support_c.cpp.o\x1b[0m\n'}
+[7.019292] (vyra_module_interfaces) StdoutLine: {'line': b'[ 75%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vyra_module_interfaces/srv/detail/get_capabilities__type_support_c.cpp.o\x1b[0m\n'}
+[7.031010] (-) TimerEvent: {}
+[7.053946] (vyra_module_interfaces) StdoutLine: {'line': b'[ 76%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vyra_module_interfaces/srv/detail/trigger_transition__type_support_c.cpp.o\x1b[0m\n'}
+[7.085583] (vyra_module_interfaces) StdoutLine: {'line': b'[ 77%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vyra_module_interfaces/srv/detail/get_logs__type_support_c.cpp.o\x1b[0m\n'}
+[7.107841] (vyra_module_interfaces) StdoutLine: {'line': b'[ 78%] \x1b[32mBuilding CXX object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/vyra_module_interfaces/action/detail/initiate_update__type_support_c.cpp.o\x1b[0m\n'}
+[7.131158] (-) TimerEvent: {}
+[7.231612] (-) TimerEvent: {}
+[7.331974] (-) TimerEvent: {}
+[7.432367] (-) TimerEvent: {}
+[7.532778] (-) TimerEvent: {}
+[7.633157] (-) TimerEvent: {}
+[7.687797] (vyra_module_interfaces) StdoutLine: {'line': b'[ 80%] \x1b[32m\x1b[1mLinking CXX shared library libvyra_module_interfaces__rosidl_typesupport_introspection_cpp.so\x1b[0m\n'}
+[7.707986] (vyra_module_interfaces) StdoutLine: {'line': b'[ 81%] \x1b[32m\x1b[1mLinking CXX shared library libvyra_module_interfaces__rosidl_typesupport_fastrtps_cpp.so\x1b[0m\n'}
+[7.715053] (vyra_module_interfaces) StdoutLine: {'line': b'[ 82%] \x1b[32m\x1b[1mLinking CXX shared library libvyra_module_interfaces__rosidl_typesupport_fastrtps_c.so\x1b[0m\n'}
+[7.733276] (-) TimerEvent: {}
+[7.812515] (vyra_module_interfaces) StdoutLine: {'line': b'[ 82%] Built target vyra_module_interfaces__rosidl_typesupport_introspection_cpp\n'}
+[7.823059] (vyra_module_interfaces) StdoutLine: {'line': b'[ 82%] Built target vyra_module_interfaces__rosidl_typesupport_fastrtps_cpp\n'}
+[7.833402] (-) TimerEvent: {}
+[7.838113] (vyra_module_interfaces) StdoutLine: {'line': b'[ 82%] Built target vyra_module_interfaces__rosidl_typesupport_fastrtps_c\n'}
+[7.873652] (vyra_module_interfaces) StdoutLine: {'line': b'[ 82%] Built target vyra_module_interfaces\n'}
+[7.908892] (vyra_module_interfaces) StdoutLine: {'line': b'[ 83%] \x1b[34m\x1b[1mGenerating Python code for ROS interfaces\x1b[0m\n'}
+[7.933545] (-) TimerEvent: {}
+[8.033960] (-) TimerEvent: {}
+[8.134366] (-) TimerEvent: {}
+[8.234794] (-) TimerEvent: {}
+[8.335152] (-) TimerEvent: {}
+[8.435503] (-) TimerEvent: {}
+[8.535891] (-) TimerEvent: {}
+[8.636263] (-) TimerEvent: {}
+[8.736628] (-) TimerEvent: {}
+[8.837008] (-) TimerEvent: {}
+[8.937402] (-) TimerEvent: {}
+[9.037800] (-) TimerEvent: {}
+[9.138147] (-) TimerEvent: {}
+[9.238576] (-) TimerEvent: {}
+[9.338940] (-) TimerEvent: {}
+[9.439279] (-) TimerEvent: {}
+[9.539612] (-) TimerEvent: {}
+[9.639951] (-) TimerEvent: {}
+[9.740329] (-) TimerEvent: {}
+[9.840724] (-) TimerEvent: {}
+[9.941091] (-) TimerEvent: {}
+[10.041484] (-) TimerEvent: {}
+[10.141901] (-) TimerEvent: {}
+[10.242261] (-) TimerEvent: {}
+[10.344645] (-) TimerEvent: {}
+[10.370269] (vyra_module_interfaces) StdoutLine: {'line': b'[ 83%] Built target vyra_module_interfaces__py\n'}
+[10.397795] (vyra_module_interfaces) StdoutLine: {'line': b'[ 85%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vyra_module_interfaces/srv/_health_check_s.c.o\x1b[0m\n'}
+[10.398074] (vyra_module_interfaces) StdoutLine: {'line': b'[ 85%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vyra_module_interfaces/msg/_state_feed_s.c.o\x1b[0m\n'}
+[10.398621] (vyra_module_interfaces) StdoutLine: {'line': b'[ 86%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vyra_module_interfaces/msg/_news_feed_s.c.o\x1b[0m\n'}
+[10.398744] (vyra_module_interfaces) StdoutLine: {'line': b'[ 87%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vyra_module_interfaces/msg/_logger_stream_s.c.o\x1b[0m\n'}
+[10.399602] (vyra_module_interfaces) StdoutLine: {'line': b'[ 88%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vyra_module_interfaces/srv/_get_capabilities_s.c.o\x1b[0m\n'}
+[10.400404] (vyra_module_interfaces) StdoutLine: {'line': b'[ 89%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vyra_module_interfaces/srv/_trigger_transition_s.c.o\x1b[0m\n'}
+[10.401337] (vyra_module_interfaces) StdoutLine: {'line': b'[ 90%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vyra_module_interfaces/action/_initiate_update_s.c.o\x1b[0m\n'}
+[10.401940] (vyra_module_interfaces) StdoutLine: {'line': b'[ 91%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vyra_module_interfaces/srv/_get_logs_s.c.o\x1b[0m\n'}
+[10.405190] (vyra_module_interfaces) StdoutLine: {'line': b'[ 92%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_generator_py.dir/rosidl_generator_py/vyra_module_interfaces/msg/_error_feed_s.c.o\x1b[0m\n'}
+[10.444767] (-) TimerEvent: {}
+[10.545203] (-) TimerEvent: {}
+[10.632564] (vyra_module_interfaces) StdoutLine: {'line': b'[ 93%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/vyra_module_interfaces/libvyra_module_interfaces__rosidl_generator_py.so\x1b[0m\n'}
+[10.645269] (-) TimerEvent: {}
+[10.706186] (vyra_module_interfaces) StdoutLine: {'line': b'[ 93%] Built target vyra_module_interfaces__rosidl_generator_py\n'}
+[10.732282] (vyra_module_interfaces) StdoutLine: {'line': b'[ 95%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_fastrtps_c__pyext.dir/rosidl_generator_py/vyra_module_interfaces/_vyra_module_interfaces_s.ep.rosidl_typesupport_fastrtps_c.c.o\x1b[0m\n'}
+[10.732470] (vyra_module_interfaces) StdoutLine: {'line': b'[ 95%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_introspection_c__pyext.dir/rosidl_generator_py/vyra_module_interfaces/_vyra_module_interfaces_s.ep.rosidl_typesupport_introspection_c.c.o\x1b[0m\n'}
+[10.741100] (vyra_module_interfaces) StdoutLine: {'line': b'[ 96%] \x1b[32mBuilding C object CMakeFiles/vyra_module_interfaces__rosidl_typesupport_c__pyext.dir/rosidl_generator_py/vyra_module_interfaces/_vyra_module_interfaces_s.ep.rosidl_typesupport_c.c.o\x1b[0m\n'}
+[10.745359] (-) TimerEvent: {}
+[10.845645] (-) TimerEvent: {}
+[10.946076] (-) TimerEvent: {}
+[10.963211] (vyra_module_interfaces) StdoutLine: {'line': b'[ 97%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/vyra_module_interfaces/vyra_module_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\x1b[0m\n'}
+[10.971644] (vyra_module_interfaces) StdoutLine: {'line': b'[ 98%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/vyra_module_interfaces/vyra_module_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\x1b[0m\n'}
+[10.972899] (vyra_module_interfaces) StdoutLine: {'line': b'[100%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/vyra_module_interfaces/vyra_module_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\x1b[0m\n'}
+[11.019377] (vyra_module_interfaces) StdoutLine: {'line': b'[100%] Built target vyra_module_interfaces__rosidl_typesupport_c__pyext\n'}
+[11.026506] (vyra_module_interfaces) StdoutLine: {'line': b'[100%] Built target vyra_module_interfaces__rosidl_typesupport_introspection_c__pyext\n'}
+[11.038588] (vyra_module_interfaces) StdoutLine: {'line': b'[100%] Built target vyra_module_interfaces__rosidl_typesupport_fastrtps_c__pyext\n'}
+[11.046165] (-) TimerEvent: {}
+[11.058866] (vyra_module_interfaces) CommandEnded: {'returncode': 0}
+[11.059487] (vyra_module_interfaces) JobProgress: {'identifier': 'vyra_module_interfaces', 'progress': 'install'}
+[11.080132] (vyra_module_interfaces) Command: {'cmd': ['/usr/bin/cmake', '--install', '/workspace/build/vyra_module_interfaces'], 'cwd': '/workspace/build/vyra_module_interfaces', 'env': OrderedDict([('HOSTNAME', 'c9118e793162'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/workspace/install/vyra_module_interfaces/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/workspace'), ('ROS_PYTHON_VERSION', '3'), ('COLCON_PREFIX_PATH', '/workspace/install'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/workspace/install/vyra_module_template:/workspace/install/vyra_module_interfaces:/opt/ros/humble'), ('DEBIAN_FRONTEND', 'noninteractive'), ('PWD', '/workspace/build/vyra_module_interfaces'), ('LC_ALL', 'C.UTF-8'), ('PYTHONPATH', '/workspace/install/vyra_module_template/lib/python3.12/site-packages:/workspace/install/vyra_module_interfaces/lib/python3.12/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/workspace/install/vyra_module_interfaces:/workspace/install/vyra_module_template:/opt/ros/humble')]), 'shell': False}
+[11.099597] (vyra_module_interfaces) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[11.099934] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/ament_index/resource_index/rosidl_interfaces/vyra_module_interfaces\n'}
+[11.100197] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces\n'}
+[11.100468] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv\n'}
+[11.100746] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/get_logs.h\n'}
+[11.100934] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/health_check.h\n'}
+[11.101205] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail\n'}
+[11.101388] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_capabilities__functions.c\n'}
+[11.101586] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_logs__struct.h\n'}
+[11.101892] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_logs__functions.c\n'}
+[11.102087] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/health_check__functions.h\n'}
+[11.102261] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/health_check__functions.c\n'}
+[11.102533] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/health_check__struct.h\n'}
+[11.102802] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_logs__type_support.h\n'}
+[11.103017] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_capabilities__struct.h\n'}
+[11.103186] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/trigger_transition__functions.c\n'}
+[11.103359] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/trigger_transition__functions.h\n'}
+[11.103645] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_capabilities__type_support.h\n'}
+[11.103849] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_capabilities__functions.h\n'}
+[11.104023] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/health_check__type_support.h\n'}
+[11.104262] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/trigger_transition__type_support.h\n'}
+[11.104575] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_logs__functions.h\n'}
+[11.104778] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/trigger_transition__struct.h\n'}
+[11.104954] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/trigger_transition.h\n'}
+[11.105127] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/get_capabilities.h\n'}
+[11.105439] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg\n'}
+[11.105676] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/news_feed.h\n'}
+[11.105907] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/rosidl_generator_c__visibility_control.h\n'}
+[11.106082] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/error_feed.h\n'}
+[11.106254] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/state_feed.h\n'}
+[11.106519] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/logger_stream.h\n'}
+[11.106770] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail\n'}
+[11.106952] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/error_feed__functions.h\n'}
+[11.107198] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/logger_stream__functions.c\n'}
+[11.107376] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/error_feed__struct.h\n'}
+[11.107547] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/news_feed__struct.h\n'}
+[11.107764] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/logger_stream__functions.h\n'}
+[11.107937] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/state_feed__functions.h\n'}
+[11.108253] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/news_feed__functions.c\n'}
+[11.108423] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/state_feed__struct.h\n'}
+[11.108691] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/news_feed__type_support.h\n'}
+[11.108881] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/logger_stream__type_support.h\n'}
+[11.109052] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/error_feed__functions.c\n'}
+[11.109223] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/logger_stream__struct.h\n'}
+[11.109392] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/error_feed__type_support.h\n'}
+[11.109584] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/state_feed__type_support.h\n'}
+[11.109888] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/news_feed__functions.h\n'}
+[11.110061] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/state_feed__functions.c\n'}
+[11.110233] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action\n'}
+[11.110405] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/initiate_update.h\n'}
+[11.110699] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail\n'}
+[11.110915] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail/initiate_update__functions.c\n'}
+[11.111075] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail/initiate_update__struct.h\n'}
+[11.111247] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail/initiate_update__type_support.h\n'}
+[11.111418] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail/initiate_update__functions.h\n'}
+[11.111606] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/environment/library_path.sh\n'}
+[11.111868] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/environment/library_path.dsv\n'}
+[11.112025] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/lib/libvyra_module_interfaces__rosidl_generator_c.so\n'}
+[11.112514] (vyra_module_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/workspace/install/vyra_module_interfaces/lib/libvyra_module_interfaces__rosidl_generator_c.so" to ""\n'}
+[11.112799] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces\n'}
+[11.112980] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv\n'}
+[11.113264] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail\n'}
+[11.113434] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/health_check__rosidl_typesupport_fastrtps_c.h\n'}
+[11.113780] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_capabilities__rosidl_typesupport_fastrtps_c.h\n'}
+[11.113963] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_logs__rosidl_typesupport_fastrtps_c.h\n'}
+[11.114135] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/trigger_transition__rosidl_typesupport_fastrtps_c.h\n'}
+[11.114306] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg\n'}
+[11.114590] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/rosidl_typesupport_fastrtps_c__visibility_control.h\n'}
+[11.114828] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail\n'}
+[11.115004] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/logger_stream__rosidl_typesupport_fastrtps_c.h\n'}
+[11.115284] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/news_feed__rosidl_typesupport_fastrtps_c.h\n'}
+[11.115448] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/error_feed__rosidl_typesupport_fastrtps_c.h\n'}
+[11.115627] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/state_feed__rosidl_typesupport_fastrtps_c.h\n'}
+[11.115801] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action\n'}
+[11.115958] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail\n'}
+[11.116114] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail/initiate_update__rosidl_typesupport_fastrtps_c.h\n'}
+[11.116276] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/lib/libvyra_module_interfaces__rosidl_typesupport_fastrtps_c.so\n'}
+[11.116569] (vyra_module_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/workspace/install/vyra_module_interfaces/lib/libvyra_module_interfaces__rosidl_typesupport_fastrtps_c.so" to ""\n'}
+[11.116775] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces\n'}
+[11.116945] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv\n'}
+[11.117114] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail\n'}
+[11.117391] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/trigger_transition__rosidl_typesupport_introspection_c.h\n'}
+[11.117588] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_logs__type_support.c\n'}
+[11.117856] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/trigger_transition__type_support.c\n'}
+[11.118029] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_capabilities__type_support.c\n'}
+[11.118198] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/health_check__rosidl_typesupport_introspection_c.h\n'}
+[11.118491] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_logs__rosidl_typesupport_introspection_c.h\n'}
+[11.118706] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_capabilities__rosidl_typesupport_introspection_c.h\n'}
+[11.118886] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/health_check__type_support.c\n'}
+[11.119133] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg\n'}
+[11.119369] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/rosidl_typesupport_introspection_c__visibility_control.h\n'}
+[11.119543] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail\n'}
+[11.119800] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/error_feed__type_support.c\n'}
+[11.120034] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/logger_stream__type_support.c\n'}
+[11.120198] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/error_feed__rosidl_typesupport_introspection_c.h\n'}
+[11.120370] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/news_feed__type_support.c\n'}
+[11.120542] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/news_feed__rosidl_typesupport_introspection_c.h\n'}
+[11.120872] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/state_feed__type_support.c\n'}
+[11.121031] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/logger_stream__rosidl_typesupport_introspection_c.h\n'}
+[11.121198] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/state_feed__rosidl_typesupport_introspection_c.h\n'}
+[11.121368] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action\n'}
+[11.121538] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail\n'}
+[11.121799] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail/initiate_update__rosidl_typesupport_introspection_c.h\n'}
+[11.121959] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail/initiate_update__type_support.c\n'}
+[11.122131] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/lib/libvyra_module_interfaces__rosidl_typesupport_introspection_c.so\n'}
+[11.122386] (vyra_module_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/workspace/install/vyra_module_interfaces/lib/libvyra_module_interfaces__rosidl_typesupport_introspection_c.so" to ""\n'}
+[11.122566] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/lib/libvyra_module_interfaces__rosidl_typesupport_c.so\n'}
+[11.122930] (vyra_module_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/workspace/install/vyra_module_interfaces/lib/libvyra_module_interfaces__rosidl_typesupport_c.so" to ""\n'}
+[11.123192] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces\n'}
+[11.123355] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv\n'}
+[11.123523] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/get_capabilities.hpp\n'}
+[11.123781] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/get_logs.hpp\n'}
+[11.123955] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/trigger_transition.hpp\n'}
+[11.124229] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/health_check.hpp\n'}
+[11.124395] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail\n'}
+[11.124626] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_logs__builder.hpp\n'}
+[11.124818] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/trigger_transition__traits.hpp\n'}
+[11.125087] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/health_check__traits.hpp\n'}
+[11.125255] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/trigger_transition__builder.hpp\n'}
+[11.125485] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_capabilities__struct.hpp\n'}
+[11.125770] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_logs__struct.hpp\n'}
+[11.125939] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/health_check__type_support.hpp\n'}
+[11.126112] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_logs__traits.hpp\n'}
+[11.126392] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_capabilities__traits.hpp\n'}
+[11.126581] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/trigger_transition__type_support.hpp\n'}
+[11.126823] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_logs__type_support.hpp\n'}
+[11.126996] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_capabilities__builder.hpp\n'}
+[11.127262] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/trigger_transition__struct.hpp\n'}
+[11.127449] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_capabilities__type_support.hpp\n'}
+[11.127696] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/health_check__builder.hpp\n'}
+[11.127881] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/health_check__struct.hpp\n'}
+[11.128174] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg\n'}
+[11.128340] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/rosidl_generator_cpp__visibility_control.hpp\n'}
+[11.128512] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/logger_stream.hpp\n'}
+[11.128793] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/state_feed.hpp\n'}
+[11.129008] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/news_feed.hpp\n'}
+[11.129177] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail\n'}
+[11.129347] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/news_feed__struct.hpp\n'}
+[11.129517] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/error_feed__traits.hpp\n'}
+[11.129826] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/state_feed__builder.hpp\n'}
+[11.130004] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/logger_stream__traits.hpp\n'}
+[11.130174] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/news_feed__builder.hpp\n'}
+[11.130344] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/news_feed__type_support.hpp\n'}
+[11.130643] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/logger_stream__type_support.hpp\n'}
+[11.130847] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/error_feed__type_support.hpp\n'}
+[11.131020] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/error_feed__builder.hpp\n'}
+[11.131191] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/state_feed__struct.hpp\n'}
+[11.131494] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/error_feed__struct.hpp\n'}
+[11.131772] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/logger_stream__struct.hpp\n'}
+[11.131955] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/news_feed__traits.hpp\n'}
+[11.132125] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/state_feed__type_support.hpp\n'}
+[11.132297] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/logger_stream__builder.hpp\n'}
+[11.132610] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/state_feed__traits.hpp\n'}
+[11.132851] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/error_feed.hpp\n'}
+[11.133012] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action\n'}
+[11.133185] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/initiate_update.hpp\n'}
+[11.133359] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail\n'}
+[11.133530] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail/initiate_update__builder.hpp\n'}
+[11.133857] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail/initiate_update__struct.hpp\n'}
+[11.134039] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail/initiate_update__traits.hpp\n'}
+[11.134211] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail/initiate_update__type_support.hpp\n'}
+[11.134387] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces\n'}
+[11.134574] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv\n'}
+[11.134927] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail\n'}
+[11.135101] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_logs__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[11.135274] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/trigger_transition__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[11.135444] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/health_check__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[11.135722] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_capabilities__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[11.135962] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/dds_fastrtps\n'}
+[11.136135] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg\n'}
+[11.136307] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h\n'}
+[11.136476] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail\n'}
+[11.136815] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/news_feed__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[11.136996] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/error_feed__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[11.137154] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/state_feed__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[11.137334] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/logger_stream__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[11.137491] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/dds_fastrtps\n'}
+[11.137714] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action\n'}
+[11.137954] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail\n'}
+[11.138129] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail/initiate_update__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[11.138303] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail/dds_fastrtps\n'}
+[11.138475] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/lib/libvyra_module_interfaces__rosidl_typesupport_fastrtps_cpp.so\n'}
+[11.138796] (vyra_module_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/workspace/install/vyra_module_interfaces/lib/libvyra_module_interfaces__rosidl_typesupport_fastrtps_cpp.so" to ""\n'}
+[11.138977] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces\n'}
+[11.139151] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv\n'}
+[11.139323] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail\n'}
+[11.139496] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/health_check__type_support.cpp\n'}
+[11.139790] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/trigger_transition__rosidl_typesupport_introspection_cpp.hpp\n'}
+[11.140017] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_capabilities__type_support.cpp\n'}
+[11.140190] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_logs__type_support.cpp\n'}
+[11.140359] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/trigger_transition__type_support.cpp\n'}
+[11.140528] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/health_check__rosidl_typesupport_introspection_cpp.hpp\n'}
+[11.140827] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_capabilities__rosidl_typesupport_introspection_cpp.hpp\n'}
+[11.141006] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/srv/detail/get_logs__rosidl_typesupport_introspection_cpp.hpp\n'}
+[11.141175] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg\n'}
+[11.141344] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail\n'}
+[11.141513] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/logger_stream__type_support.cpp\n'}
+[11.141830] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/error_feed__type_support.cpp\n'}
+[11.142049] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/state_feed__rosidl_typesupport_introspection_cpp.hpp\n'}
+[11.142282] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/logger_stream__rosidl_typesupport_introspection_cpp.hpp\n'}
+[11.142463] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/error_feed__rosidl_typesupport_introspection_cpp.hpp\n'}
+[11.142667] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/news_feed__rosidl_typesupport_introspection_cpp.hpp\n'}
+[11.142933] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/news_feed__type_support.cpp\n'}
+[11.143093] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/msg/detail/state_feed__type_support.cpp\n'}
+[11.143249] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action\n'}
+[11.143404] (vyra_module_interfaces) StdoutLine: {'line': b'-- Up-to-date: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail\n'}
+[11.143595] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail/initiate_update__type_support.cpp\n'}
+[11.143777] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/include/vyra_module_interfaces/vyra_module_interfaces/action/detail/initiate_update__rosidl_typesupport_introspection_cpp.hpp\n'}
+[11.143952] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/lib/libvyra_module_interfaces__rosidl_typesupport_introspection_cpp.so\n'}
+[11.144214] (vyra_module_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/workspace/install/vyra_module_interfaces/lib/libvyra_module_interfaces__rosidl_typesupport_introspection_cpp.so" to ""\n'}
+[11.144465] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/lib/libvyra_module_interfaces__rosidl_typesupport_cpp.so\n'}
+[11.144743] (vyra_module_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/workspace/install/vyra_module_interfaces/lib/libvyra_module_interfaces__rosidl_typesupport_cpp.so" to ""\n'}
+[11.144999] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/environment/pythonpath.sh\n'}
+[11.145242] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/environment/pythonpath.dsv\n'}
+[11.145455] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces-0.1.0-py3.10.egg-info\n'}
+[11.145725] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces-0.1.0-py3.10.egg-info/PKG-INFO\n'}
+[11.145982] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces-0.1.0-py3.10.egg-info/top_level.txt\n'}
+[11.146226] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces-0.1.0-py3.10.egg-info/SOURCES.txt\n'}
+[11.146400] (-) TimerEvent: {}
+[11.146676] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces-0.1.0-py3.10.egg-info/dependency_links.txt\n'}
+[11.146985] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces\n'}
+[11.147197] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/srv\n'}
+[11.147373] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/srv/_trigger_transition.py\n'}
+[11.147669] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/srv/_trigger_transition_s.c\n'}
+[11.147865] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/srv/_get_capabilities_s.c\n'}
+[11.148038] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/srv/_get_logs.py\n'}
+[11.148209] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/srv/_get_logs_s.c\n'}
+[11.148471] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/srv/_health_check.py\n'}
+[11.148724] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/srv/_health_check_s.c\n'}
+[11.148906] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/srv/__init__.py\n'}
+[11.149078] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/srv/_get_capabilities.py\n'}
+[11.149351] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/msg\n'}
+[11.149528] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/msg/_state_feed_s.c\n'}
+[11.149818] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/msg/_state_feed.py\n'}
+[11.149999] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/msg/_error_feed.py\n'}
+[11.150171] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/msg/_logger_stream.py\n'}
+[11.150340] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/msg/_news_feed.py\n'}
+[11.150612] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/msg/_news_feed_s.c\n'}
+[11.150890] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/msg/_logger_stream_s.c\n'}
+[11.151064] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/msg/__init__.py\n'}
+[11.151235] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/msg/_error_feed_s.c\n'}
+[11.151508] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/_vyra_module_interfaces_s.ep.rosidl_typesupport_introspection_c.c\n'}
+[11.151706] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/_vyra_module_interfaces_s.ep.rosidl_typesupport_c.c\n'}
+[11.151875] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/_vyra_module_interfaces_s.ep.rosidl_typesupport_fastrtps_c.c\n'}
+[11.152117] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/vyra_module_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\n'}
+[11.152367] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/libvyra_module_interfaces__rosidl_generator_py.so\n'}
+[11.152592] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/__init__.py\n'}
+[11.152872] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/vyra_module_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\n'}
+[11.153141] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/action\n'}
+[11.153307] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/action/_initiate_update.py\n'}
+[11.153539] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/action/_initiate_update_s.c\n'}
+[11.153810] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/action/__init__.py\n'}
+[11.154053] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/vyra_module_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\n'}
+[11.212718] (vyra_module_interfaces) StdoutLine: {'line': b"Listing '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces'...\n"}
+[11.213127] (vyra_module_interfaces) StdoutLine: {'line': b"Compiling '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/__init__.py'...\n"}
+[11.213309] (vyra_module_interfaces) StdoutLine: {'line': b"Listing '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/action'...\n"}
+[11.213474] (vyra_module_interfaces) StdoutLine: {'line': b"Compiling '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/action/__init__.py'...\n"}
+[11.213673] (vyra_module_interfaces) StdoutLine: {'line': b"Compiling '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/action/_initiate_update.py'...\n"}
+[11.213847] (vyra_module_interfaces) StdoutLine: {'line': b"Listing '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/msg'...\n"}
+[11.214006] (vyra_module_interfaces) StdoutLine: {'line': b"Compiling '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/msg/__init__.py'...\n"}
+[11.214165] (vyra_module_interfaces) StdoutLine: {'line': b"Compiling '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/msg/_error_feed.py'...\n"}
+[11.214324] (vyra_module_interfaces) StdoutLine: {'line': b"Compiling '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/msg/_logger_stream.py'...\n"}
+[11.214514] (vyra_module_interfaces) StdoutLine: {'line': b"Compiling '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/msg/_news_feed.py'...\n"}
+[11.214709] (vyra_module_interfaces) StdoutLine: {'line': b"Compiling '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/msg/_state_feed.py'...\n"}
+[11.214873] (vyra_module_interfaces) StdoutLine: {'line': b"Listing '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/srv'...\n"}
+[11.215031] (vyra_module_interfaces) StdoutLine: {'line': b"Compiling '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/srv/__init__.py'...\n"}
+[11.215186] (vyra_module_interfaces) StdoutLine: {'line': b"Compiling '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/srv/_get_capabilities.py'...\n"}
+[11.215360] (vyra_module_interfaces) StdoutLine: {'line': b"Compiling '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/srv/_get_logs.py'...\n"}
+[11.215517] (vyra_module_interfaces) StdoutLine: {'line': b"Compiling '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/srv/_health_check.py'...\n"}
+[11.215733] (vyra_module_interfaces) StdoutLine: {'line': b"Compiling '/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/srv/_trigger_transition.py'...\n"}
+[11.218138] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/vyra_module_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\n'}
+[11.218702] (vyra_module_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/vyra_module_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so" to ""\n'}
+[11.218998] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/vyra_module_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\n'}
+[11.219610] (vyra_module_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/vyra_module_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so" to ""\n'}
+[11.219895] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/vyra_module_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\n'}
+[11.220483] (vyra_module_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages/vyra_module_interfaces/vyra_module_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so" to ""\n'}
+[11.220769] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/lib/libvyra_module_interfaces__rosidl_generator_py.so\n'}
+[11.221319] (vyra_module_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/workspace/install/vyra_module_interfaces/lib/libvyra_module_interfaces__rosidl_generator_py.so" to ""\n'}
+[11.221576] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/msg/NewsFeed.idl\n'}
+[11.221827] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/msg/ErrorFeed.idl\n'}
+[11.222052] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/msg/LoggerStream.idl\n'}
+[11.222284] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/msg/StateFeed.idl\n'}
+[11.222516] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/srv/HealthCheck.idl\n'}
+[11.222790] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/srv/GetCapabilities.idl\n'}
+[11.223034] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/srv/TriggerTransition.idl\n'}
+[11.223256] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/srv/GetLogs.idl\n'}
+[11.223536] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/action/InitiateUpdate.idl\n'}
+[11.223837] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/msg/NewsFeed.msg\n'}
+[11.224079] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/msg/ErrorFeed.msg\n'}
+[11.224314] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/msg/LoggerStream.msg\n'}
+[11.224546] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/msg/StateFeed.msg\n'}
+[11.224786] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/srv/HealthCheck.srv\n'}
+[11.225049] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/srv/HealthCheck_Request.msg\n'}
+[11.225285] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/srv/HealthCheck_Response.msg\n'}
+[11.225517] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/srv/GetCapabilities.srv\n'}
+[11.225785] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/srv/GetCapabilities_Request.msg\n'}
+[11.226027] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/srv/GetCapabilities_Response.msg\n'}
+[11.226262] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/srv/TriggerTransition.srv\n'}
+[11.226494] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/srv/TriggerTransition_Request.msg\n'}
+[11.226760] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/srv/TriggerTransition_Response.msg\n'}
+[11.227001] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/srv/GetLogs.srv\n'}
+[11.227231] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/srv/GetLogs_Request.msg\n'}
+[11.227461] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/srv/GetLogs_Response.msg\n'}
+[11.227746] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/action/InitiateUpdate.action\n'}
+[11.227997] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/config\n'}
+[11.228243] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/config/base_metadata.config\n'}
+[11.228486] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/ament_index/resource_index/package_run_dependencies/vyra_module_interfaces\n'}
+[11.228758] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/ament_index/resource_index/parent_prefix_path/vyra_module_interfaces\n'}
+[11.229000] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/environment/ament_prefix_path.sh\n'}
+[11.229222] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/environment/ament_prefix_path.dsv\n'}
+[11.229482] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/environment/path.sh\n'}
+[11.229737] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/environment/path.dsv\n'}
+[11.229983] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/local_setup.bash\n'}
+[11.230224] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/local_setup.sh\n'}
+[11.230481] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/local_setup.zsh\n'}
+[11.230750] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/local_setup.dsv\n'}
+[11.230990] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/package.dsv\n'}
+[11.231267] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/ament_index/resource_index/packages/vyra_module_interfaces\n'}
+[11.231607] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/export_vyra_module_interfaces__rosidl_generator_cExport.cmake\n'}
+[11.231871] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/export_vyra_module_interfaces__rosidl_generator_cExport-noconfig.cmake\n'}
+[11.232120] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/export_vyra_module_interfaces__rosidl_typesupport_fastrtps_cExport.cmake\n'}
+[11.232393] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/export_vyra_module_interfaces__rosidl_typesupport_fastrtps_cExport-noconfig.cmake\n'}
+[11.232684] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/vyra_module_interfaces__rosidl_typesupport_introspection_cExport.cmake\n'}
+[11.232931] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/vyra_module_interfaces__rosidl_typesupport_introspection_cExport-noconfig.cmake\n'}
+[11.233209] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/vyra_module_interfaces__rosidl_typesupport_cExport.cmake\n'}
+[11.233475] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/vyra_module_interfaces__rosidl_typesupport_cExport-noconfig.cmake\n'}
+[11.233757] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/export_vyra_module_interfaces__rosidl_generator_cppExport.cmake\n'}
+[11.234014] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/export_vyra_module_interfaces__rosidl_typesupport_fastrtps_cppExport.cmake\n'}
+[11.234288] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/export_vyra_module_interfaces__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake\n'}
+[11.234575] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/vyra_module_interfaces__rosidl_typesupport_introspection_cppExport.cmake\n'}
+[11.234848] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/vyra_module_interfaces__rosidl_typesupport_introspection_cppExport-noconfig.cmake\n'}
+[11.235108] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/vyra_module_interfaces__rosidl_typesupport_cppExport.cmake\n'}
+[11.235388] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/vyra_module_interfaces__rosidl_typesupport_cppExport-noconfig.cmake\n'}
+[11.235670] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/export_vyra_module_interfaces__rosidl_generator_pyExport.cmake\n'}
+[11.235939] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/export_vyra_module_interfaces__rosidl_generator_pyExport-noconfig.cmake\n'}
+[11.236186] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/rosidl_cmake-extras.cmake\n'}
+[11.236437] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/ament_cmake_export_dependencies-extras.cmake\n'}
+[11.236709] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/ament_cmake_export_include_directories-extras.cmake\n'}
+[11.236963] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/ament_cmake_export_libraries-extras.cmake\n'}
+[11.237219] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/ament_cmake_export_targets-extras.cmake\n'}
+[11.237469] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake\n'}
+[11.237758] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake\n'}
+[11.238016] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/vyra_module_interfacesConfig.cmake\n'}
+[11.238251] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/cmake/vyra_module_interfacesConfig-version.cmake\n'}
+[11.238485] (vyra_module_interfaces) StdoutLine: {'line': b'-- Installing: /workspace/install/vyra_module_interfaces/share/vyra_module_interfaces/package.xml\n'}
+[11.241765] (vyra_module_interfaces) CommandEnded: {'returncode': 0}
+[11.246730] (-) TimerEvent: {}
+[11.265284] (vyra_module_interfaces) JobEnded: {'identifier': 'vyra_module_interfaces', 'rc': 0}
+[11.266470] (vyra_module_template) JobStarted: {'identifier': 'vyra_module_template'}
+[11.346889] (-) TimerEvent: {}
+[11.447324] (-) TimerEvent: {}
+[11.547755] (-) TimerEvent: {}
+[11.648105] (-) TimerEvent: {}
+[11.748459] (-) TimerEvent: {}
+[11.848876] (-) TimerEvent: {}
+[11.921873] (vyra_module_template) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'egg_info', '--egg-base', '../../build/vyra_module_template', 'build', '--build-base', '/workspace/build/vyra_module_template/build', 'install', '--record', '/workspace/build/vyra_module_template/install.log', '--single-version-externally-managed', 'install_data'], 'cwd': '/workspace/src/vyra_module_template', 'env': {'HOSTNAME': 'c9118e793162', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/workspace/install/vyra_module_interfaces/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib', 'HOME': '/root', 'OLDPWD': '/workspace', 'ROS_PYTHON_VERSION': '3', 'COLCON_PREFIX_PATH': '/workspace/install', 'ROS_DISTRO': 'humble', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'TERM': 'xterm', 'ROS_LOCALHOST_ONLY': '0', 'PATH': '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'LANG': 'C.UTF-8', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'AMENT_PREFIX_PATH': '/workspace/install/vyra_module_template:/workspace/install/vyra_module_interfaces:/opt/ros/humble', 'DEBIAN_FRONTEND': 'noninteractive', 'PWD': '/workspace/build/vyra_module_template', 'LC_ALL': 'C.UTF-8', 'PYTHONPATH': '/workspace/build/vyra_module_template/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/workspace/install/vyra_module_template/lib/python3.10/site-packages:/workspace/install/vyra_module_interfaces/local/lib/python3.10/dist-packages:/workspace/install/vyra_module_template/lib/python3.12/site-packages:/workspace/install/vyra_module_interfaces/lib/python3.12/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/workspace/install/vyra_module_interfaces'}, 'shell': False}
+[11.948995] (-) TimerEvent: {}
+[12.049334] (-) TimerEvent: {}
+[12.149641] (-) TimerEvent: {}
+[12.181821] (vyra_module_template) StdoutLine: {'line': b'running egg_info\n'}
+[12.194858] (vyra_module_template) StdoutLine: {'line': b'creating ../../build/vyra_module_template/vyra_module_template.egg-info\n'}
+[12.195182] (vyra_module_template) StdoutLine: {'line': b'writing ../../build/vyra_module_template/vyra_module_template.egg-info/PKG-INFO\n'}
+[12.195827] (vyra_module_template) StdoutLine: {'line': b'writing dependency_links to ../../build/vyra_module_template/vyra_module_template.egg-info/dependency_links.txt\n'}
+[12.196106] (vyra_module_template) StdoutLine: {'line': b'writing entry points to ../../build/vyra_module_template/vyra_module_template.egg-info/entry_points.txt\n'}
+[12.196479] (vyra_module_template) StdoutLine: {'line': b'writing requirements to ../../build/vyra_module_template/vyra_module_template.egg-info/requires.txt\n'}
+[12.196761] (vyra_module_template) StdoutLine: {'line': b'writing top-level names to ../../build/vyra_module_template/vyra_module_template.egg-info/top_level.txt\n'}
+[12.197003] (vyra_module_template) StdoutLine: {'line': b"writing manifest file '../../build/vyra_module_template/vyra_module_template.egg-info/SOURCES.txt'\n"}
+[12.226226] (vyra_module_template) StdoutLine: {'line': b"reading manifest file '../../build/vyra_module_template/vyra_module_template.egg-info/SOURCES.txt'\n"}
+[12.227542] (vyra_module_template) StdoutLine: {'line': b"writing manifest file '../../build/vyra_module_template/vyra_module_template.egg-info/SOURCES.txt'\n"}
+[12.227899] (vyra_module_template) StdoutLine: {'line': b'running build\n'}
+[12.228096] (vyra_module_template) StdoutLine: {'line': b'running build_py\n'}
+[12.228360] (vyra_module_template) StdoutLine: {'line': b'creating /workspace/build/vyra_module_template/build/lib/vyra_module_template\n'}
+[12.228543] (vyra_module_template) StdoutLine: {'line': b'copying vyra_module_template/Core.py -> /workspace/build/vyra_module_template/build/lib/vyra_module_template\n'}
+[12.228801] (vyra_module_template) StdoutLine: {'line': b'copying vyra_module_template/PublisherNode.py -> /workspace/build/vyra_module_template/build/lib/vyra_module_template\n'}
+[12.228976] (vyra_module_template) StdoutLine: {'line': b'copying vyra_module_template/__init__.py -> /workspace/build/vyra_module_template/build/lib/vyra_module_template\n'}
+[12.229226] (vyra_module_template) StdoutLine: {'line': b'copying vyra_module_template/SubscriberNode.py -> /workspace/build/vyra_module_template/build/lib/vyra_module_template\n'}
+[12.229405] (vyra_module_template) StdoutLine: {'line': b'copying vyra_module_template/Template.py -> /workspace/build/vyra_module_template/build/lib/vyra_module_template\n'}
+[12.229652] (vyra_module_template) StdoutLine: {'line': b'running install\n'}
+[12.233570] (vyra_module_template) StdoutLine: {'line': b'running install_lib\n'}
+[12.247459] (vyra_module_template) StdoutLine: {'line': b'creating /workspace/install/vyra_module_template/lib/python3.10/site-packages/vyra_module_template\n'}
+[12.247805] (vyra_module_template) StdoutLine: {'line': b'copying /workspace/build/vyra_module_template/build/lib/vyra_module_template/Core.py -> /workspace/install/vyra_module_template/lib/python3.10/site-packages/vyra_module_template\n'}
+[12.248001] (vyra_module_template) StdoutLine: {'line': b'copying /workspace/build/vyra_module_template/build/lib/vyra_module_template/PublisherNode.py -> /workspace/install/vyra_module_template/lib/python3.10/site-packages/vyra_module_template\n'}
+[12.248270] (vyra_module_template) StdoutLine: {'line': b'copying /workspace/build/vyra_module_template/build/lib/vyra_module_template/__init__.py -> /workspace/install/vyra_module_template/lib/python3.10/site-packages/vyra_module_template\n'}
+[12.248445] (vyra_module_template) StdoutLine: {'line': b'copying /workspace/build/vyra_module_template/build/lib/vyra_module_template/SubscriberNode.py -> /workspace/install/vyra_module_template/lib/python3.10/site-packages/vyra_module_template\n'}
+[12.248635] (vyra_module_template) StdoutLine: {'line': b'copying /workspace/build/vyra_module_template/build/lib/vyra_module_template/Template.py -> /workspace/install/vyra_module_template/lib/python3.10/site-packages/vyra_module_template\n'}
+[12.248848] (vyra_module_template) StdoutLine: {'line': b'byte-compiling /workspace/install/vyra_module_template/lib/python3.10/site-packages/vyra_module_template/Core.py to Core.cpython-310.pyc\n'}
+[12.249721] (-) TimerEvent: {}
+[12.249965] (vyra_module_template) StdoutLine: {'line': b'byte-compiling /workspace/install/vyra_module_template/lib/python3.10/site-packages/vyra_module_template/PublisherNode.py to PublisherNode.cpython-310.pyc\n'}
+[12.250451] (vyra_module_template) StdoutLine: {'line': b'byte-compiling /workspace/install/vyra_module_template/lib/python3.10/site-packages/vyra_module_template/__init__.py to __init__.cpython-310.pyc\n'}
+[12.250720] (vyra_module_template) StdoutLine: {'line': b'byte-compiling /workspace/install/vyra_module_template/lib/python3.10/site-packages/vyra_module_template/SubscriberNode.py to SubscriberNode.cpython-310.pyc\n'}
+[12.251073] (vyra_module_template) StdoutLine: {'line': b'byte-compiling /workspace/install/vyra_module_template/lib/python3.10/site-packages/vyra_module_template/Template.py to Template.cpython-310.pyc\n'}
+[12.251862] (vyra_module_template) StdoutLine: {'line': b'running install_data\n'}
+[12.252122] (vyra_module_template) StdoutLine: {'line': b'creating /workspace/install/vyra_module_template/share/ament_index/resource_index/packages\n'}
+[12.252357] (vyra_module_template) StdoutLine: {'line': b'copying resource/vyra_module_template -> /workspace/install/vyra_module_template/share/ament_index/resource_index/packages\n'}
+[12.252632] (vyra_module_template) StdoutLine: {'line': b'copying package.xml -> /workspace/install/vyra_module_template/share/vyra_module_template\n'}
+[12.252823] (vyra_module_template) StdoutLine: {'line': b'running install_egg_info\n'}
+[12.267729] (vyra_module_template) StdoutLine: {'line': b'Copying ../../build/vyra_module_template/vyra_module_template.egg-info to /workspace/install/vyra_module_template/lib/python3.10/site-packages/vyra_module_template-0.1.0-py3.10.egg-info\n'}
+[12.269016] (vyra_module_template) StdoutLine: {'line': b'running install_scripts\n'}
+[12.298576] (vyra_module_template) StdoutLine: {'line': b'Installing core script to /workspace/install/vyra_module_template/lib/vyra_module_template\n'}
+[12.298916] (vyra_module_template) StdoutLine: {'line': b'Installing listener script to /workspace/install/vyra_module_template/lib/vyra_module_template\n'}
+[12.299141] (vyra_module_template) StdoutLine: {'line': b'Installing talker script to /workspace/install/vyra_module_template/lib/vyra_module_template\n'}
+[12.299534] (vyra_module_template) StdoutLine: {'line': b"writing list of installed files to '/workspace/build/vyra_module_template/install.log'\n"}
+[12.324464] (vyra_module_template) CommandEnded: {'returncode': 0}
+[12.339129] (vyra_module_template) JobEnded: {'identifier': 'vyra_module_template', 'rc': 0}
+[12.340405] (-) EventReactorShutdown: {}
