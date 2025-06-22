@@ -13,3 +13,41 @@
 2025-06-20 20:41:47,160 - varioboticos_base - INFO - TEST
 2025-06-20 20:42:01,349 - varioboticos_base - INFO - TEST
 2025-06-20 20:42:04,484 - varioboticos_base - INFO - TEST
+2025-06-22 19:59:11,337 - varioboticos_base - INFO - TEST
+2025-06-22 19:59:45,338 - varioboticos_base - INFO - TEST
+2025-06-22 20:03:16,951 - varioboticos_base - INFO - TEST
+2025-06-22 20:08:20,276 - varioboticos_base - INFO - TEST
+2025-06-22 20:08:22,747 - varioboticos_base - INFO - TEST
+2025-06-22 20:15:06,364 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-22 20:15:06,383 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-22 20:15:51,395 - varioboticos_base - INFO - TEST
+2025-06-22 20:15:58,064 - varioboticos_base - INFO - TEST
+2025-06-22 20:16:35,999 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-22 20:16:36,019 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-22 20:16:38,494 - varioboticos_base - INFO - TEST
+2025-06-22 20:17:47,244 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-22 20:17:47,265 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-22 20:18:11,412 - varioboticos_base - INFO - TEST
+2025-06-22 20:18:11,412 - varioboticos_base - ERROR - None
+2025-06-22 20:18:11,412 - varioboticos_base - ERROR -   File "/usr/local/lib/python3.10/dist-packages/vyra_base/com/datalayer/service_server.py", line 81, in callback
+    await self.service_info.callback(request=request, response=response)
+
+  File "/usr/local/lib/python3.10/dist-packages/vyra_base/com/datalayer/interface_factory.py", line 285, in async_wrapper
+    result = await func(*args, **kwargs)
+
+  File "/usr/local/lib/python3.10/dist-packages/vyra_base/core/entity.py", line 187, in trigger_transition
+    getattr(self.state_machine.model, f"enter_{request.transition_name}")()
+
+2025-06-22 20:23:14,263 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-22 20:23:14,281 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-22 20:23:24,430 - varioboticos_base - INFO - TEST
+2025-06-22 20:23:24,431 - varioboticos_base - ERROR - None
+2025-06-22 20:23:24,431 - varioboticos_base - ERROR -   File "/usr/local/lib/python3.10/dist-packages/vyra_base/com/datalayer/service_server.py", line 81, in callback
+    await self.service_info.callback(request=request, response=response)
+
+  File "/usr/local/lib/python3.10/dist-packages/vyra_base/com/datalayer/interface_factory.py", line 285, in async_wrapper
+    result = await func(*args, **kwargs)
+
+  File "/usr/local/lib/python3.10/dist-packages/vyra_base/core/entity.py", line 187, in trigger_transition
+    getattr(self.state_machine.model, f"enter_{request.transition_name}")()
+
