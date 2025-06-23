@@ -51,3 +51,59 @@
   File "/usr/local/lib/python3.10/dist-packages/vyra_base/core/entity.py", line 187, in trigger_transition
     getattr(self.state_machine.model, f"enter_{request.transition_name}")()
 
+2025-06-23 19:04:12,294 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 19:04:12,318 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-23 19:10:57,486 - varioboticos_base - INFO - TEST
+2025-06-23 19:10:57,486 - varioboticos_base - ERROR - None
+2025-06-23 19:10:57,487 - varioboticos_base - ERROR -   File "/usr/local/lib/python3.10/dist-packages/vyra_base/com/datalayer/service_server.py", line 81, in callback
+    await self.service_info.callback(request=request, response=response)
+
+  File "/usr/local/lib/python3.10/dist-packages/vyra_base/com/datalayer/interface_factory.py", line 285, in async_wrapper
+    result = await func(*args, **kwargs)
+
+  File "/usr/local/lib/python3.10/dist-packages/vyra_base/core/entity.py", line 187, in trigger_transition
+    getattr(self.state_machine.model, f"enter_{request.transition_name}")()
+
+2025-06-23 19:21:22,516 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 19:21:22,532 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-23 19:49:26,908 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 19:49:26,927 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-23 19:49:26,927 - varioboticos_base - INFO - vyra_base.state.state_config state method generated.
+2025-06-23 19:51:44,536 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 19:51:44,551 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-23 19:51:44,552 - varioboticos_base - INFO - ['vyra_base.state.state_config', 'Resting', 'Awakening', 'Attentive', 'Active', 'Reflecting', 'Learning', 'Alert', 'Delegating', 'Recovering', 'Overloaded', 'ShuttingDown', 'Interrupting'] states initialized.
+2025-06-23 19:51:44,552 - varioboticos_base - INFO - vyra_base.state.state_config state method generated.
+2025-06-23 19:54:03,091 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 19:54:03,109 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-23 19:54:03,109 - varioboticos_base - INFO - ['vyra_base.state.state_config', 'Resting', 'Awakening', 'Attentive', 'Active', 'Reflecting', 'Learning', 'Alert', 'Delegating', 'Recovering', 'Overloaded', 'ShuttingDown', 'Interrupting'] states initialized.
+2025-06-23 19:54:03,109 - varioboticos_base - INFO - vyra_base.state.state_config state method generated.
+2025-06-23 19:55:26,782 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 19:55:26,800 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-23 19:55:26,800 - varioboticos_base - INFO - vyra_base.state.state_config state method generated.
+2025-06-23 19:55:43,008 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 19:55:43,027 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-23 19:55:43,027 - varioboticos_base - INFO - vyra_base.state.state_config state method generated.
+2025-06-23 19:56:27,109 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 19:56:27,109 - varioboticos_base - INFO - ['vyra_base.state.state_config', 'Resting', 'Awakening', 'Attentive', 'Active', 'Reflecting', 'Learning', 'Alert', 'Delegating', 'Recovering', 'Overloaded', 'ShuttingDown', 'Interrupting'] states initialized.
+2025-06-23 19:56:27,127 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-23 19:56:27,127 - varioboticos_base - INFO - vyra_base.state.state_config state method generated.
+2025-06-23 19:59:01,362 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 19:59:01,362 - varioboticos_base - INFO - dict_values(['vyra_base.state.state_config', {'Resting': <class 'str'>, 'Awakening': <class 'str'>, 'Attentive': <class 'str'>, 'Active': <class 'str'>, 'Reflecting': <class 'str'>, 'Learning': <class 'str'>, 'Alert': <class 'str'>, 'Delegating': <class 'str'>, 'Recovering': <class 'str'>, 'Overloaded': <class 'str'>, 'ShuttingDown': <class 'str'>, 'Interrupting': <class 'str'>}, 'Resting', 'Awakening', 'Attentive', 'Active', 'Reflecting', 'Learning', 'Alert', 'Delegating', 'Recovering', 'Overloaded', 'ShuttingDown', 'Interrupting', <attribute '__dict__' of 'Vyra_STATES' objects>, <attribute '__weakref__' of 'Vyra_STATES' objects>, None]) states initialized.
+2025-06-23 19:59:01,380 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-23 19:59:01,381 - varioboticos_base - INFO - vyra_base.state.state_config state method generated.
+2025-06-23 20:07:02,599 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 20:07:02,618 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-23 20:16:26,345 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 20:16:26,365 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-23 20:23:49,544 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 20:23:49,563 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-23 20:25:06,687 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 20:25:06,702 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-23 20:25:56,377 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 20:25:56,395 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-23 20:27:00,920 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 20:27:00,940 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-23 20:27:32,752 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 20:27:32,770 - varioboticos_base - INFO - Initialize state model with state Resting.
+2025-06-23 20:28:16,676 - varioboticos_base - INFO - INIT ROS2HANDLER
+2025-06-23 20:28:16,691 - varioboticos_base - INFO - Initialize state model with state Resting.
