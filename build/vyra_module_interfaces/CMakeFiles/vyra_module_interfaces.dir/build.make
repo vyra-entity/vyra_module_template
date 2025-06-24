@@ -66,10 +66,10 @@ include CMakeFiles/vyra_module_interfaces.dir/compiler_depend.make
 # Include the progress variables for this target.
 include CMakeFiles/vyra_module_interfaces.dir/progress.make
 
+CMakeFiles/vyra_module_interfaces: /workspace/src/vyra_module_interfaces/msg/StateFeed.msg
+CMakeFiles/vyra_module_interfaces: /workspace/src/vyra_module_interfaces/msg/LoggerStream.msg
 CMakeFiles/vyra_module_interfaces: /workspace/src/vyra_module_interfaces/msg/NewsFeed.msg
 CMakeFiles/vyra_module_interfaces: /workspace/src/vyra_module_interfaces/msg/ErrorFeed.msg
-CMakeFiles/vyra_module_interfaces: /workspace/src/vyra_module_interfaces/msg/LoggerStream.msg
-CMakeFiles/vyra_module_interfaces: /workspace/src/vyra_module_interfaces/msg/StateFeed.msg
 CMakeFiles/vyra_module_interfaces: /workspace/src/vyra_module_interfaces/srv/HealthCheck.srv
 CMakeFiles/vyra_module_interfaces: rosidl_cmake/srv/HealthCheck_Request.msg
 CMakeFiles/vyra_module_interfaces: rosidl_cmake/srv/HealthCheck_Response.msg

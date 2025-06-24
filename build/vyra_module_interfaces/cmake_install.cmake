@@ -356,11 +356,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/vyra_module_interfaces/msg" TYPE FILE FILES "/workspace/build/vyra_module_interfaces/rosidl_adapter/vyra_module_interfaces/msg/NewsFeed.idl")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/vyra_module_interfaces/msg" TYPE FILE FILES "/workspace/build/vyra_module_interfaces/rosidl_adapter/vyra_module_interfaces/msg/ErrorFeed.idl")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/vyra_module_interfaces/msg" TYPE FILE FILES "/workspace/build/vyra_module_interfaces/rosidl_adapter/vyra_module_interfaces/msg/StateFeed.idl")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
@@ -368,7 +364,11 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/vyra_module_interfaces/msg" TYPE FILE FILES "/workspace/build/vyra_module_interfaces/rosidl_adapter/vyra_module_interfaces/msg/StateFeed.idl")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/vyra_module_interfaces/msg" TYPE FILE FILES "/workspace/build/vyra_module_interfaces/rosidl_adapter/vyra_module_interfaces/msg/NewsFeed.idl")
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/vyra_module_interfaces/msg" TYPE FILE FILES "/workspace/build/vyra_module_interfaces/rosidl_adapter/vyra_module_interfaces/msg/ErrorFeed.idl")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
@@ -392,11 +392,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/vyra_module_interfaces/msg" TYPE FILE FILES "/workspace/src/vyra_module_interfaces/msg/NewsFeed.msg")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/vyra_module_interfaces/msg" TYPE FILE FILES "/workspace/src/vyra_module_interfaces/msg/ErrorFeed.msg")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/vyra_module_interfaces/msg" TYPE FILE FILES "/workspace/src/vyra_module_interfaces/msg/StateFeed.msg")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
@@ -404,7 +400,11 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/vyra_module_interfaces/msg" TYPE FILE FILES "/workspace/src/vyra_module_interfaces/msg/StateFeed.msg")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/vyra_module_interfaces/msg" TYPE FILE FILES "/workspace/src/vyra_module_interfaces/msg/NewsFeed.msg")
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/vyra_module_interfaces/msg" TYPE FILE FILES "/workspace/src/vyra_module_interfaces/msg/ErrorFeed.msg")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)

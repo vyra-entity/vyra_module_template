@@ -6,10 +6,10 @@ find_package(rosidl_default_generators REQUIRED)
 find_package(std_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/StateFeed.msg"
+  "msg/LoggerStream.msg"
   "msg/NewsFeed.msg"
   "msg/ErrorFeed.msg"
-  "msg/LoggerStream.msg"
-  "msg/StateFeed.msg"
   "srv/HealthCheck.srv"
   "srv/GetCapabilities.srv"
   "srv/TriggerTransition.srv"
@@ -19,6 +19,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   DEPENDENCIES std_msgs
   # Add additional dependencies here
 )
+
+
 
 
 

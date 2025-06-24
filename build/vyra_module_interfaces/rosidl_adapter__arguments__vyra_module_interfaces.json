@@ -1,10 +1,10 @@
 {
   "package_name": "vyra_module_interfaces",
   "non_idl_tuples": [
+    "/workspace/src/vyra_module_interfaces:msg/StateFeed.msg",
+    "/workspace/src/vyra_module_interfaces:msg/LoggerStream.msg",
     "/workspace/src/vyra_module_interfaces:msg/NewsFeed.msg",
     "/workspace/src/vyra_module_interfaces:msg/ErrorFeed.msg",
-    "/workspace/src/vyra_module_interfaces:msg/LoggerStream.msg",
-    "/workspace/src/vyra_module_interfaces:msg/StateFeed.msg",
     "/workspace/src/vyra_module_interfaces:srv/HealthCheck.srv",
     "/workspace/src/vyra_module_interfaces:srv/GetCapabilities.srv",
     "/workspace/src/vyra_module_interfaces:srv/TriggerTransition.srv",

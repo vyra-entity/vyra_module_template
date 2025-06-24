@@ -66,6 +66,16 @@ include CMakeFiles/vyra_module_interfaces__cpp.dir/compiler_depend.make
 # Include the progress variables for this target.
 include CMakeFiles/vyra_module_interfaces__cpp.dir/progress.make
 
+CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
+CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__builder.hpp
+CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__struct.hpp
+CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__traits.hpp
+CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__type_support.hpp
+CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/logger_stream.hpp
+CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__builder.hpp
+CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__struct.hpp
+CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__traits.hpp
+CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__type_support.hpp
 CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
 CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__builder.hpp
 CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__struct.hpp
@@ -76,16 +86,6 @@ CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfa
 CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__struct.hpp
 CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__traits.hpp
 CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__type_support.hpp
-CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/logger_stream.hpp
-CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__builder.hpp
-CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__struct.hpp
-CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__traits.hpp
-CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__type_support.hpp
-CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
-CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__builder.hpp
-CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__struct.hpp
-CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__traits.hpp
-CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__type_support.hpp
 CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/srv/health_check.hpp
 CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/srv/detail/health_check__builder.hpp
 CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/srv/detail/health_check__struct.hpp
@@ -113,200 +113,200 @@ CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfa
 CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/action/detail/initiate_update__type_support.hpp
 CMakeFiles/vyra_module_interfaces__cpp: rosidl_generator_cpp/vyra_module_interfaces/msg/rosidl_generator_cpp__visibility_control.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/lib/rosidl_generator_cpp/rosidl_generator_cpp
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/local/lib/python3.10/dist-packages/rosidl_generator_cpp/__init__.py
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/action__builder.hpp.em
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/action__struct.hpp.em
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/action__traits.hpp.em
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/idl.hpp.em
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/idl__builder.hpp.em
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/idl__struct.hpp.em
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/idl__traits.hpp.em
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/msg__builder.hpp.em
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/msg__struct.hpp.em
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/msg__traits.hpp.em
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/srv__builder.hpp.em
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/srv__struct.hpp.em
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/srv__traits.hpp.em
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: rosidl_adapter/vyra_module_interfaces/msg/NewsFeed.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: rosidl_adapter/vyra_module_interfaces/msg/ErrorFeed.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: rosidl_adapter/vyra_module_interfaces/msg/LoggerStream.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: rosidl_adapter/vyra_module_interfaces/msg/StateFeed.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: rosidl_adapter/vyra_module_interfaces/srv/HealthCheck.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: rosidl_adapter/vyra_module_interfaces/srv/GetCapabilities.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: rosidl_adapter/vyra_module_interfaces/srv/TriggerTransition.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: rosidl_adapter/vyra_module_interfaces/srv/GetLogs.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: rosidl_adapter/vyra_module_interfaces/action/InitiateUpdate.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Bool.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Byte.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/ByteMultiArray.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Char.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/ColorRGBA.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Empty.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Float32.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Float32MultiArray.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Float64.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Float64MultiArray.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Header.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Int16.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Int16MultiArray.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Int32.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Int32MultiArray.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Int64.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Int64MultiArray.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Int8.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Int8MultiArray.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/MultiArrayDimension.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/MultiArrayLayout.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/String.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/UInt16.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/UInt16MultiArray.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/UInt32.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/UInt32MultiArray.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/UInt64.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/UInt64MultiArray.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/UInt8.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/std_msgs/msg/UInt8MultiArray.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/builtin_interfaces/msg/Duration.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/builtin_interfaces/msg/Time.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/action_msgs/msg/GoalInfo.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/action_msgs/msg/GoalStatus.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/action_msgs/msg/GoalStatusArray.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/action_msgs/srv/CancelGoal.idl
-rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: /opt/ros/humble/share/unique_identifier_msgs/msg/UUID.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/lib/rosidl_generator_cpp/rosidl_generator_cpp
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/local/lib/python3.10/dist-packages/rosidl_generator_cpp/__init__.py
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/action__builder.hpp.em
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/action__struct.hpp.em
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/action__traits.hpp.em
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/idl.hpp.em
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/idl__builder.hpp.em
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/idl__struct.hpp.em
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/idl__traits.hpp.em
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/msg__builder.hpp.em
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/msg__struct.hpp.em
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/msg__traits.hpp.em
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/srv__builder.hpp.em
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/srv__struct.hpp.em
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/rosidl_generator_cpp/resource/srv__traits.hpp.em
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: rosidl_adapter/vyra_module_interfaces/msg/StateFeed.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: rosidl_adapter/vyra_module_interfaces/msg/LoggerStream.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: rosidl_adapter/vyra_module_interfaces/msg/NewsFeed.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: rosidl_adapter/vyra_module_interfaces/msg/ErrorFeed.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: rosidl_adapter/vyra_module_interfaces/srv/HealthCheck.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: rosidl_adapter/vyra_module_interfaces/srv/GetCapabilities.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: rosidl_adapter/vyra_module_interfaces/srv/TriggerTransition.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: rosidl_adapter/vyra_module_interfaces/srv/GetLogs.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: rosidl_adapter/vyra_module_interfaces/action/InitiateUpdate.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Bool.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Byte.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/ByteMultiArray.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Char.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/ColorRGBA.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Empty.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Float32.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Float32MultiArray.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Float64.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Float64MultiArray.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Header.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Int16.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Int16MultiArray.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Int32.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Int32MultiArray.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Int64.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Int64MultiArray.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Int8.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/Int8MultiArray.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/MultiArrayDimension.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/MultiArrayLayout.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/String.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/UInt16.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/UInt16MultiArray.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/UInt32.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/UInt32MultiArray.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/UInt64.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/UInt64MultiArray.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/UInt8.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/std_msgs/msg/UInt8MultiArray.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/builtin_interfaces/msg/Duration.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/builtin_interfaces/msg/Time.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/action_msgs/msg/GoalInfo.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/action_msgs/msg/GoalStatus.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/action_msgs/msg/GoalStatusArray.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/action_msgs/srv/CancelGoal.idl
+rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: /opt/ros/humble/share/unique_identifier_msgs/msg/UUID.idl
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/workspace/build/vyra_module_interfaces/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating C++ code for ROS interfaces"
 	/usr/bin/python3 /opt/ros/humble/share/rosidl_generator_cpp/cmake/../../../lib/rosidl_generator_cpp/rosidl_generator_cpp --generator-arguments-file /workspace/build/vyra_module_interfaces/rosidl_generator_cpp__arguments.json
 
-rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
-	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__builder.hpp
-
-rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
-	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__struct.hpp
-
-rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
-	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__traits.hpp
-
-rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
-	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__type_support.hpp
-
-rosidl_generator_cpp/vyra_module_interfaces/msg/error_feed.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
-	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/error_feed.hpp
-
-rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
-	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__builder.hpp
-
-rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
-	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__struct.hpp
-
-rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
-	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__traits.hpp
-
-rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
-	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__type_support.hpp
-
-rosidl_generator_cpp/vyra_module_interfaces/msg/logger_stream.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
-	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/logger_stream.hpp
-
-rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
-	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__builder.hpp
-
-rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
-	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__struct.hpp
-
-rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
-	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__traits.hpp
-
-rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
-	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__type_support.hpp
-
-rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
-	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
-
-rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__builder.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__struct.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__traits.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/state_feed__type_support.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/health_check.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/msg/logger_stream.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/logger_stream.hpp
+
+rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__builder.hpp
+
+rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__struct.hpp
+
+rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__traits.hpp
+
+rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/logger_stream__type_support.hpp
+
+rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+
+rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__builder.hpp
+
+rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__struct.hpp
+
+rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__traits.hpp
+
+rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/news_feed__type_support.hpp
+
+rosidl_generator_cpp/vyra_module_interfaces/msg/error_feed.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/error_feed.hpp
+
+rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__builder.hpp
+
+rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__struct.hpp
+
+rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__traits.hpp
+
+rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/msg/detail/error_feed__type_support.hpp
+
+rosidl_generator_cpp/vyra_module_interfaces/srv/health_check.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/health_check.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/detail/health_check__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/detail/health_check__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/detail/health_check__builder.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/detail/health_check__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/detail/health_check__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/detail/health_check__struct.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/detail/health_check__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/detail/health_check__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/detail/health_check__traits.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/detail/health_check__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/detail/health_check__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/detail/health_check__type_support.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/get_capabilities.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/get_capabilities.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/get_capabilities.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_capabilities__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_capabilities__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_capabilities__builder.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_capabilities__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_capabilities__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_capabilities__struct.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_capabilities__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_capabilities__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_capabilities__traits.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_capabilities__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_capabilities__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_capabilities__type_support.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/trigger_transition.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/trigger_transition.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/trigger_transition.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/detail/trigger_transition__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/detail/trigger_transition__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/detail/trigger_transition__builder.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/detail/trigger_transition__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/detail/trigger_transition__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/detail/trigger_transition__struct.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/detail/trigger_transition__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/detail/trigger_transition__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/detail/trigger_transition__traits.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/detail/trigger_transition__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/detail/trigger_transition__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/detail/trigger_transition__type_support.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/get_logs.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/get_logs.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/get_logs.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_logs__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_logs__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_logs__builder.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_logs__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_logs__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_logs__struct.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_logs__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_logs__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_logs__traits.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_logs__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_logs__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/srv/detail/get_logs__type_support.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/action/initiate_update.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/action/initiate_update.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/action/initiate_update.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/action/detail/initiate_update__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/action/detail/initiate_update__builder.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/action/detail/initiate_update__builder.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/action/detail/initiate_update__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/action/detail/initiate_update__struct.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/action/detail/initiate_update__struct.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/action/detail/initiate_update__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/action/detail/initiate_update__traits.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/action/detail/initiate_update__traits.hpp
 
-rosidl_generator_cpp/vyra_module_interfaces/action/detail/initiate_update__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/news_feed.hpp
+rosidl_generator_cpp/vyra_module_interfaces/action/detail/initiate_update__type_support.hpp: rosidl_generator_cpp/vyra_module_interfaces/msg/state_feed.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/vyra_module_interfaces/action/detail/initiate_update__type_support.hpp
 
 vyra_module_interfaces__cpp: CMakeFiles/vyra_module_interfaces__cpp
