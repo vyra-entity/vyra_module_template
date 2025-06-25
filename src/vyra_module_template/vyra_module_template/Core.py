@@ -17,7 +17,7 @@ from pathlib import Path
 
 # msg
 from vyra_module_interfaces.msg import ErrorFeed
-from vyra_module_interfaces.msg import LoggerStream
+# from vyra_module_interfaces.msg import LogFeed
 from vyra_module_interfaces.msg import NewsFeed
 from vyra_module_interfaces.msg import StateFeed
 
@@ -39,6 +39,8 @@ from vyra_base.defaults.entries import FunctionConfigBaseTypes
 
 from vyra_base.defaults.entries import ModuleEntry
 from vyra_base.defaults.entries import StateEntry
+from vyra_base.defaults.entries import NewsEntry
+from vyra_base.defaults.entries import ErrorEntry
 
 from vyra_base.helper.file_reader import FileReader
 
@@ -87,17 +89,31 @@ async def runner():
         se = StateEntry(
             previous='initial',
             current='running',
-            module_uuid=me.uuid,
+            module_id=me.uuid,
             module_name=me.name,
             timestamp=datetime.now(),
             type=StateFeed
+        )
+
+        ne = NewsEntry(
+            module_id=me.uuid,
+            module_name=me.name,
+            type=NewsFeed
+        )
+
+        ee = ErrorEntry(
+            module_id=me.uuid,
+            module_name=me.name,
+            type=ErrorFeed
         )
 
         print("Creating V.Y.R.A. Entity with state entry and module config...")
 
         entity = VyraEntity(
             state_entry=se,
-            module_config=me
+            module_config=me,
+            news_entry=ne,
+            error_entry=ee
         )
 
         base_functions = []

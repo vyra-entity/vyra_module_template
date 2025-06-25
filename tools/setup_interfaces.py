@@ -130,6 +130,9 @@ def update_CMakefile(package_path: Path):
         cmake_content += "\n" + rosidl_line + "\n"
         print("✓ CMakeLists.txt: rosidl_generate_interfaces() hinzugefügt.")
 
+    # Remove all empty lines in cmake_content
+    cmake_content = re.sub(r'\n\s*\n', '\n', cmake_content)
+
     with open(cmake_path, "w") as f:
         f.write(cmake_content)
 
