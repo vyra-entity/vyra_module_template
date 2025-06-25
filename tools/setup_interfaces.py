@@ -156,7 +156,7 @@ def update_setup_py(package_path, package_name):
         key = f'share/{package_name}/{interface_type}'
         if key in content:
             print(
-                f"⚠️ Info: {key} already exists in file, "
+                f"⚠️ Info: {key} already exists in setup.py, "
                 "do not overwrite. Please remove manually "
                 "if you want to update.")
             continue

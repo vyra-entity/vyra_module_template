@@ -1,4 +1,0 @@
-source;share/vyra_module_interfaces/local_setup.bash
-source;share/vyra_module_interfaces/local_setup.dsv
-source;share/vyra_module_interfaces/local_setup.sh
-source;share/vyra_module_interfaces/local_setup.zsh
