@@ -42,51 +42,86 @@ from vyra_base.helper.file_reader import FileReader
 from vyra_base.helper.logger import Logger
 
 
-def _load_resource(package_name: str, resource_name: Path) -> list[dict[str, Any]]:
+def _load_resource(package_name: str, resource_name: Path) -> Any:
     package_path = get_package_share_directory(package_name)
     resource_path = Path(package_path) / resource_name
 
     if not resource_path.exists():
-        raise FileNotFoundError(f"Resource {resource_name} not found in package {package_name}")
+        raise FileNotFoundError(
+            f"Resource {resource_name} not found in package {package_name}")
     
-    with open(resource_path, 'r', encoding='utf-8') as f:
-        config = json.load(f)
+    Logger.log(f"Loading resource from {resource_path}")
 
+    with open(resource_path, 'r', encoding='utf-8') as f:
+        match resource_name.suffix:
+            case '.ini':
+                from configparser import ConfigParser
+                parser = ConfigParser()
+                parser.read_file(f)
+                # Convert ConfigParser object to a dictionary
+                config = {
+                    section: dict(parser.items(section)) for section in parser.sections()}
+            case '.json':
+                import json
+                config = json.load(f)
+            case '.yaml' | '.yml':
+                import yaml
+                config = yaml.safe_load(f)
+            case _:
+                fail_msg = (
+                    f"Unsupported file type: {resource_name.suffix}. "
+                    "Supported types are .ini, .json, .yaml/.yml"
+                )
+                Logger.error(fail_msg)
+                raise ValueError(fail_msg)
     return config
 
-def _create_interfaces() -> list[FunctionConfigEntry]:
-    base_metadata: list = _load_resource(
+def _create_interfaces(interface_files: list[str]=[]) -> list[FunctionConfigEntry]:
+    interface_metadata: list = _load_resource(
             'vyra_module_interfaces',
-            Path('config', 'base_metadata.config'))
+            Path('config', 'base_metadata.json'))
     
-    base_functions = []
-
-    for metadata in base_metadata:
-        if metadata['type'] == FunctionConfigBaseTypes.callable.value:
-            ros2_type: str = metadata['filetype'].split('/')[-1]
-            ros2_type = ros2_type.split('.')[0]
-
-            metadata['ros2type'] = getattr(
-                sys.modules['vyra_module_interfaces.srv'], ros2_type)
-
-            base_functions.append(
-                FunctionConfigEntry(
-                    tags=metadata['tags'],
-                    type=metadata['type'],
-                    ros2type=metadata['ros2type'],
-                    functionname=metadata['functionname'],
-                    displayname=metadata['displayname'],
-                    description=metadata['description'],
-                    displaystyle=metadata['displaystyle'],
-                    params=metadata['params'],
-                    returns=metadata['returns'],
-                    qosprofile=metadata.get('qosprofile', 10),
-                    callback=None,
-                    periodic=None
-                )
+    for custom_interface in interface_files:
+        if isinstance(custom_interface, str):
+            interface_metadata.append(_load_resource(
+                'vyra_module_interfaces',
+                Path('config', custom_interface))
             )
 
-    return base_functions
+    interface_functions = []
+
+    for metadata in interface_metadata:
+        try:
+            if metadata['type'] == FunctionConfigBaseTypes.callable.value:
+                ros2_type: str = metadata['filetype'].split('/')[-1]
+                ros2_type = ros2_type.split('.')[0]
+
+                metadata['ros2type'] = getattr(
+                    sys.modules['vyra_module_interfaces.srv'], ros2_type)
+
+                interface_functions.append(
+                    FunctionConfigEntry(
+                        tags=metadata['tags'],
+                        type=metadata['type'],
+                        ros2type=metadata['ros2type'],
+                        functionname=metadata['functionname'],
+                        displayname=metadata['displayname'],
+                        description=metadata['description'],
+                        displaystyle=metadata['displaystyle'],
+                        params=metadata['params'],
+                        returns=metadata['returns'],
+                        qosprofile=metadata.get('qosprofile', 10),
+                        callback=None,
+                        periodic=None
+                    )
+                )
+        except KeyError as e:
+            Logger.error(
+                f"Missing key <{e}> in interface data <{metadata}>."
+                "Interface will not be created.")
+            continue
+
+    return interface_functions
 
 async def _load_project_settings() -> dict[str, Any]:
     pkg_dir = Path(get_package_share_directory('vyra_module_template'))
@@ -101,9 +136,7 @@ async def _load_project_settings() -> dict[str, Any]:
     
     return project_settings
 
-async def build_base():
-    project_settings: dict[str, Any] = await _load_project_settings()
-        
+def build_entity(project_settings):
     me = ModuleEntry(
         uuid= uuid.uuid4(),
         name=project_settings['module_name'],
@@ -134,15 +167,50 @@ async def build_base():
         _type=ErrorFeed
     )
 
-    entity = VyraEntity(
+    return VyraEntity(
         state_entry=se,
         module_config=me,
         news_entry=ne,
         error_entry=ee
     )
 
-    Logger.log("Created V.Y.R.A. Entity with state entry and module config")
+async def create_db_storage(entity: VyraEntity) -> None:
+    """Create database storage for the entity. The configuration is loaded from the
+    ros2 vyra_module_interfaces package. Check for adoptions in the
+    vyra_module_interfaces/config/db_config.ini file.
+    Arguments:
+        entity (VyraEntity): The entity for which the database storage should be created.
+    Raises:
+        FileNotFoundError: If the db_config.ini file is not found in the vyra_module_interfaces package.
+        ValueError: If the db_config.ini file is not valid or does not contain the required sections.
+    Returns:
+        None: The function does not return anything, but sets the storage in the entity.
+    """
 
+    from vyra_base.storage.db_access import DbAccess
+    from vyra_base.storage.tb_base import Base as DbBase
+
+    db_config: dict = _load_resource(
+            'vyra_module_interfaces',
+            Path('config', 'db_config.ini'))
+
+    db_access = DbAccess(
+        module_name=entity.module_config.name,
+        db_config= db_config
+    )
+
+    await db_access.create_all_tables()
+
+    entity.register_storage(db_access)
+    Logger.log("Storage access created and set in entity")
+
+async def build_base():
+    project_settings: dict[str, Any] = await _load_project_settings()
+    entity = build_entity(project_settings)
     await entity.add_interface(_create_interfaces())
+    
+    await create_db_storage(entity)
+
+    Logger.log("Created V.Y.R.A. Entity with state entry and module config")
 
     return entity

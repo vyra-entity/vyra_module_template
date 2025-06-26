@@ -28,9 +28,7 @@ setup(
     extras_require={"test": ["pytest"]},
     entry_points={
         'console_scripts': [
-                'talker = vyra_module_template.PublisherNode:main',
-                'listener = vyra_module_template.SubscriberNode:main',
-                'core = vyra_module_template.Core:main',
+                'core = vyra_module_template.ModuleAccess:main',
         ],
     },
 )

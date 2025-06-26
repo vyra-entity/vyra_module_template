@@ -18,9 +18,11 @@ async def runner():
         pass
 
     finally:
-        if rclpy.ok():
+        if hasattr(locals, 'entity'):
             Logger.log('Shutting down ROS 2 node...')
             entity.ros2_node.destroy_node()
+
+        if rclpy.ok():
             Logger.log('ROS 2 node destroyed.')
             rclpy.shutdown()
         else:
