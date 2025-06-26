@@ -7,6 +7,8 @@ pip install wheels/vyra_base-0.1.5-py3-none-any.whl
 
 python3 tools/setup_interfaces.py
 
+rm -rf log/build_*
+
 colcon build
 source install/setup.bash
 
