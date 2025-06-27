@@ -4,7 +4,7 @@ module_name = "vyra_module_template"
 module_template = "basic"
 module_description = "This template could be used to create a vyra module with basic functionality."
 module_links = [
-    { name = "VarioboticOS-Documentation", url = "https://docs.variobotic.de/vyra-module-template" }
+    { name = "Vyra-Documentation", url = "https://vyra-entity.github.io/vyra_base_python/" }
 ]
 
 
@@ -12,7 +12,7 @@ module_links = [
 name = "vyra-module-template"
 version = "0.1.0"
 description = ""
-authors = ["HolgDer <h.schernewski@variobotic.de>"]
+authors = ["HolgDer <vyra.0a1@gmail.com>"]
 license = "LICENSE"
 readme = "README.md"
 requires-python = ">=3.10, <4"

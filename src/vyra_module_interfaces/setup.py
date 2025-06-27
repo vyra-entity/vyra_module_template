@@ -28,8 +28,8 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='HolgDer',
-    maintainer_email='h.schernewski@variobotic.de',
+    maintainer='H. Schernewski',
+    maintainer_email='vyra.0a1@gmail.com',
     description='TODO: Package description',
     license='TODO: License declaration',
     entry_points={

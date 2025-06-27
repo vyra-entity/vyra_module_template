@@ -3,7 +3,7 @@
 	<name>vyra_module_template</name>
 	<version>0.1.0</version>
 	<description>TODO: Package description</description>
-	<maintainer email="h.schernewski@variobotic.de">holgder</maintainer>
+	<maintainer email="vyra.0a1@gmail.com">holgder</maintainer>
 	<license>TODO: License declaration</license>
 	<test_depend>ament_copyright</test_depend>
 	<test_depend>ament_flake8</test_depend>
