@@ -1,7 +1,14 @@
 services:
+  # redis:
+  #   image: redis:7
+  #   container_name: redis
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - ./redis-data:/data
   vyra-humble:
-    build: .
+    build: ./vyra_module_template
     volumes:
-      - ./:/workspace/
+      - ./vyra_module_template:/workspace/
     stdin_open: true
     tty: true
