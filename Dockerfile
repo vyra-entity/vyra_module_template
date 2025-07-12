@@ -33,8 +33,8 @@ RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
     && rm get-pip.py
 
 # Poetry installieren
-RUN curl -sSL https://install.python-poetry.org | python3.10 - \
-    && ln -s ~/.local/bin/poetry /usr/local/bin/poetry
+# RUN curl -sSL https://install.python-poetry.org | python3.10 - \
+#     && ln -s ~/.local/bin/poetry /usr/local/bin/poetry
 
 # Arbeitsverzeichnis
 WORKDIR /workspace
@@ -43,10 +43,10 @@ WORKDIR /workspace
 COPY . .
 
 # Policies ins Image kopieren
-COPY security/policies /workspace/security/policies
+# COPY security/policies /workspace/security/policies
 
 # Poetry ohne virtuelle Umgebung
-RUN poetry config virtualenvs.create false
+# RUN poetry config virtualenvs.create false
 
 # Python-Tools aktualisieren
 RUN python3 -m pip install --upgrade pip setuptools packaging
@@ -67,6 +67,11 @@ RUN python3 /workspace/tools/setup_interfaces.py
 RUN source /opt/ros/humble/setup.bash && colcon build
 
 # Sicherheitsvariablen
+# RUN mkdir -p /workspace/sros2_keystore
+# RUN chmod 700 /workspace/sros2_keystore
+# RUN chown -R root:root /workspace/sros2_keystore
+ENV ROS_DOMAIN_ID=0
+ENV ROS_SECURITY_KEYSTORE=/workspace/sros2_keystore
 ENV ROS_SECURITY_ENABLE=true
 ENV ROS_SECURITY_STRATEGY=Enforce
 ENV ROS_SECURITY_ROOT_DIRECTORY=/workspace/sros2_keystore

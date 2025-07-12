@@ -7,8 +7,8 @@ services:
   #   volumes:
   #     - ./redis-data:/data
   vyra-humble:
-    build: ./vyra_module_template
+    build: .
     volumes:
-      - ./vyra_module_template:/workspace/
+      - .:/workspace/
     stdin_open: true
     tty: true

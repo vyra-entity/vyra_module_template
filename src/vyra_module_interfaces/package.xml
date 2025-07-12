@@ -34,4 +34,6 @@
 	<build_depend>TriggerTransition</build_depend>
 	<build_depend>GetLogs</build_depend>
 	<build_depend>InitiateUpdate</build_depend>
+	<exec_depend>RequestAcess</exec_depend>
+	<build_depend>RequestAcess</build_depend>
 </package>
