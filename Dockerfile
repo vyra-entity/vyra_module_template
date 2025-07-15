@@ -66,10 +66,8 @@ RUN python3 /workspace/tools/setup_interfaces.py
 # ROS 2 Workspace bauen
 RUN source /opt/ros/humble/setup.bash && colcon build
 
-# Sicherheitsvariablen
-# RUN mkdir -p /workspace/sros2_keystore
-# RUN chmod 700 /workspace/sros2_keystore
-# RUN chown -R root:root /workspace/sros2_keystore
+
+# Umgebungsvariablen für ROS 2
 ENV ROS_DOMAIN_ID=0
 ENV ROS_SECURITY_KEYSTORE=/workspace/sros2_keystore
 ENV ROS_SECURITY_ENABLE=true
