@@ -20,7 +20,7 @@ RUN apt update && apt install -y \
     python3.10-venv \
     python3.10-dev \
     python3.10-distutils \
-    ros-humble-sros2 \
+    # ros-humble-sros2 \
     python3-colcon-common-extensions \
     && locale-gen en_US.UTF-8
 
@@ -66,13 +66,12 @@ RUN python3 /workspace/tools/setup_interfaces.py
 # ROS 2 Workspace bauen
 RUN source /opt/ros/humble/setup.bash && colcon build
 
-
-# Umgebungsvariablen für ROS 2
-ENV ROS_DOMAIN_ID=0
-ENV ROS_SECURITY_KEYSTORE=/workspace/sros2_keystore
-ENV ROS_SECURITY_ENABLE=true
-ENV ROS_SECURITY_STRATEGY=Enforce
-ENV ROS_SECURITY_ROOT_DIRECTORY=/workspace/sros2_keystore
+# # Umgebungsvariablen für ROS 2
+# ENV ROS_DOMAIN_ID=0
+# ENV ROS_SECURITY_KEYSTORE=/workspace/sros2_keystore
+# ENV ROS_SECURITY_ENABLE=true
+# ENV ROS_SECURITY_STRATEGY=Enforce
+# ENV ROS_SECURITY_ROOT_DIRECTORY=/workspace/sros2_keystore
 
 # Einstiegspunkt
 ENTRYPOINT ["/workspace/ros_entrypoint.sh"]
