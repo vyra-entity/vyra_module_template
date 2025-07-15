@@ -12,7 +12,7 @@ async def runner():
 
         entity = await _Base_.build_base()
 
-        rclpy.spin(entity.ros2_node)
+        rclpy.spin(entity.node)
 
     except (KeyboardInterrupt, ExternalShutdownException):
         pass
