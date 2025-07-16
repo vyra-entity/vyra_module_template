@@ -12,7 +12,7 @@ async def runner():
 
         entity = await _Base_.build_base()
 
-        rclpy.spin(entity.ros2_node)
+        rclpy.spin(entity.node)
 
     except (KeyboardInterrupt, ExternalShutdownException):
         pass
@@ -20,7 +20,7 @@ async def runner():
     finally:
         if hasattr(locals, 'entity'):
             Logger.log('Shutting down ROS 2 node...')
-            entity.ros2_node.destroy_node()
+            entity.node.destroy_node()
 
         if rclpy.ok():
             Logger.log('ROS 2 node destroyed.')
