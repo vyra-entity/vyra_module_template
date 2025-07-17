@@ -1,0 +1,19 @@
+module_access:
+  level_4:
+    username: "user"
+    password: "user"
+  level_5:
+    username: "AdminVar"
+    password: "Admin123"
+
+startup:
+  self_bootstrap:
+    enabled: true
+    wait_sec_before_bootstrap: 5
+  simulation:
+    enabled: true
+    simulation_name: "Vyra Simulation"
+    simulation_description: "Simulation for Vyra Module Template"
+  
+development:
+  enabled: true
