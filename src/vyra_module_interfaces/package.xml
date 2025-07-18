@@ -36,4 +36,16 @@
 	<build_depend>InitiateUpdate</build_depend>
 	<exec_depend>RequestAcess</exec_depend>
 	<build_depend>RequestAcess</build_depend>
+	<exec_depend>VolatileSet</exec_depend>
+	<exec_depend>VolatileList</exec_depend>
+	<exec_depend>KeyValue</exec_depend>
+	<exec_depend>VolatileString</exec_depend>
+	<exec_depend>VolatileHash</exec_depend>
+	<exec_depend>StartUp</exec_depend>
+	<build_depend>VolatileSet</build_depend>
+	<build_depend>VolatileList</build_depend>
+	<build_depend>KeyValue</build_depend>
+	<build_depend>VolatileString</build_depend>
+	<build_depend>VolatileHash</build_depend>
+	<build_depend>StartUp</build_depend>
 </package>

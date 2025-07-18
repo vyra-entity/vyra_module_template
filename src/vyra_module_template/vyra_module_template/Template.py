@@ -90,7 +90,7 @@ async def runner():
 
         entity = VyraEntity(
             state_entry=se,
-            module_config=me
+            module_entry=me
         )
         
         rclpy.spin(minimal_publisher)

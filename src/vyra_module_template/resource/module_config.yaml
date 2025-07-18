@@ -6,14 +6,15 @@ module_access:
     username: "AdminVar"
     password: "Admin123"
 
-startup:
-  self_bootstrap:
+lifecycle:
+  auto_startup:
     enabled: true
-    wait_sec_before_bootstrap: 5
-  simulation:
-    enabled: true
-    simulation_name: "Vyra Simulation"
-    simulation_description: "Simulation for Vyra Module Template"
+    wait_sec_before_startup: 5
+  
+simulation:
+  enabled: true
+  simulation_name: "Vyra Simulation"
+  simulation_description: "Simulation for Vyra Module Template"
   
 development:
   enabled: true

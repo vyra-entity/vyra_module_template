@@ -1,10 +1,13 @@
 import os
 import sys
 import subprocess
+import glob
 
 from setuptools import find_packages, setup
 
 package_name = 'vyra_module_template'
+
+resource_files = glob.glob('resource/*')
 
 setup(
     version='0.1.0',
@@ -15,6 +18,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        ('share/' + package_name + '/resource', resource_files),
     ],
     install_requires=[
         'setuptools>=65',

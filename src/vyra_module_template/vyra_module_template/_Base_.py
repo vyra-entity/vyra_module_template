@@ -13,21 +13,26 @@ from rclpy.node import Node
 
 from ament_index_python.packages import get_package_share_directory
 
-from std_msgs.msg import String
+from std_msgs.msg import String # pyright: ignore[reportAttributeAccessIssue]
 
 # msg
-from vyra_module_interfaces.msg import ErrorFeed
-from vyra_module_interfaces.msg import NewsFeed
-from vyra_module_interfaces.msg import StateFeed
+from vyra_base import storage
+from vyra_module_interfaces.msg import ErrorFeed # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.msg import NewsFeed # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.msg import StateFeed # pyright: ignore[reportAttributeAccessIssue]
 
+from vyra_module_interfaces.msg import VolatileList # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.msg import VolatileSet # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.msg import VolatileHash # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.msg import VolatileString # pyright: ignore[reportAttributeAccessIssue]
 # srv
-from vyra_module_interfaces.srv import GetCapabilities
-from vyra_module_interfaces.srv import GetLogs
-from vyra_module_interfaces.srv import HealthCheck
-from vyra_module_interfaces.srv import TriggerTransition
+from vyra_module_interfaces.srv import GetCapabilities # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.srv import GetLogs # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.srv import HealthCheck # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.srv import TriggerTransition # pyright: ignore[reportAttributeAccessIssue]
 
 # action
-from vyra_module_interfaces.action import InitiateUpdate
+from vyra_module_interfaces.action import InitiateUpdate # pyright: ignore[reportAttributeAccessIssue]
 
 from vyra_base.core.entity import VyraEntity
 from vyra_base.defaults.entries import (
@@ -41,10 +46,17 @@ from vyra_base.defaults.entries import (
 from vyra_base.helper.file_reader import FileReader
 from vyra_base.helper.logger import Logger
 
+if __package__:
+    PACKAGE_NAME = __package__.split('.')[0]
+else:
+    sys.exit("Package name not found. Please run this script as part of a package.")
+
 
 def _load_resource(package_name: str, resource_name: Path) -> Any:
     package_path = get_package_share_directory(package_name)
     resource_path = Path(package_path) / resource_name
+
+    print(PACKAGE_NAME, package_path, resource_name, resource_path)
 
     if not resource_path.exists():
         raise FileNotFoundError(
@@ -123,8 +135,37 @@ def _create_interfaces(interface_files: list[str]=[]) -> list[FunctionConfigEntr
 
     return interface_functions
 
+def _load_storage_config() -> dict[str, Any]:
+    """
+    Load the storage configuration from the resource/storage_config.ini file.
+    Returns:
+        dict: The storage configuration.
+    Raises:
+        FileNotFoundError: If the storage_config.ini file is not found.
+        ValueError: If the storage_config.ini file is not valid or does not contain the required sections.
+    """
+    return _load_resource(
+        PACKAGE_NAME,
+        Path('resource', 'storage_config.ini')
+    )
+
+def _load_module_config() -> dict[str, Any]:
+    """
+    Load the module configuration from the pyproject.toml file.
+    Returns:
+        dict: The module configuration.
+    Raises:
+        FileNotFoundError: If the pyproject.toml file is not found.
+        ValueError: If the pyproject.toml file is not valid or does not contain the required sections.
+    """
+    return _load_resource(
+        PACKAGE_NAME,
+        Path('resource', 'module_config.yaml')
+    )
+
+
 async def _load_project_settings() -> dict[str, Any]:
-    pkg_dir = Path(get_package_share_directory('vyra_module_template'))
+    pkg_dir = Path(get_package_share_directory(PACKAGE_NAME))
     pyproject_path: Path = pkg_dir.parents[3] / "pyproject.toml"
     module_settings: dict[str, Any] = await FileReader.open_toml_file(pyproject_path)
 
@@ -167,12 +208,28 @@ def build_entity(project_settings):
         _type=ErrorFeed
     )
 
-    return VyraEntity(
+    module_config = _load_module_config()
+    storage_config = _load_storage_config()
+
+    entity = VyraEntity(
         state_entry=se,
-        module_config=me,
+        module_entry=me,
         news_entry=ne,
-        error_entry=ee
+        error_entry=ee,
+        module_config=module_config
     )
+
+    transient_base_types: dict[str, Any] = {
+        'VolatileString': VolatileString,
+        'VolatileHash': VolatileHash,
+        'VolatileList': VolatileList,
+        'VolatileSet': VolatileSet
+    }
+
+    entity.setup_storage(storage_config, transient_base_types)
+
+    return entity
+
 
 async def create_db_storage(entity: VyraEntity) -> None:
     """Create database storage for the entity. The configuration is loaded from the
@@ -195,7 +252,7 @@ async def create_db_storage(entity: VyraEntity) -> None:
             Path('config', 'db_config.ini'))
 
     db_access = DbAccess(
-        module_name=entity.module_config.name,
+        module_name=entity.module_entry.name,
         db_config= db_config
     )
 
