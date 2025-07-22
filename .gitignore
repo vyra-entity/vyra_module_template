@@ -1,6 +1,8 @@
 build/*
 log/*
 install/*
+sros2_keystore/*
+security/*
 
 temp/*
 
