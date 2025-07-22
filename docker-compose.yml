@@ -13,3 +13,8 @@ services:
       - .:/workspace/
     stdin_open: true
     tty: true
+    environment:
+      - ROS_SECURITY_ENABLE=true
+      - ROS_SECURITY_STRATEGY=Enforce
+      - ROS_SECURITY_ROOT_DIRECTORY=/workspace/security
+      - ROS_SECURITY_KEYSTORE=/workspace/sros2_keystore

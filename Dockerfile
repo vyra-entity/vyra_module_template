@@ -39,7 +39,18 @@ RUN python3 -m pip install --upgrade setuptools --break-system-packages \
 WORKDIR /workspace
 
 # Projektdateien kopieren
-COPY . .
+# COPY . .
+COPY src /workspace/src
+COPY tools /workspace/tools
+COPY wheels /workspace/wheels
+COPY docs /workspace/docs
+COPY sros2_keystore /workspace/sros2_keystore
+
+COPY .env /workspace/.env
+COPY LICENSE /workspace/LICENSE
+COPY README.md /workspace/README.md
+COPY pyproject.toml /workspace/pyproject.toml
+COPY ros_entrypoint.sh /workspace/ros_entrypoint.sh
 
 # Policies ins Image kopieren
 # COPY security/policies /workspace/security/policies
@@ -60,10 +71,10 @@ RUN source /opt/ros/kilted/setup.bash && colcon build
 
 # Umgebungsvariablen für ROS 2 Security (SROS2)
 ENV ROS_DOMAIN_ID=0
-ENV ROS_SECURITY_KEYSTORE=/workspace/sros2_keystore
-ENV ROS_SECURITY_ENABLE=true
-ENV ROS_SECURITY_STRATEGY=Enforce
-ENV ROS_SECURITY_ROOT_DIRECTORY=/workspace/sros2_keystore
+# ENV ROS_SECURITY_KEYSTORE=/workspace/sros2_keystore
+# ENV ROS_SECURITY_ENABLE=true
+# ENV ROS_SECURITY_STRATEGY=Enforce
+# ENV ROS_SECURITY_ROOT_DIRECTORY=/workspace/sros2_keystore
 
 # Einstiegspunkt
 ENTRYPOINT ["/workspace/ros_entrypoint.sh"]
