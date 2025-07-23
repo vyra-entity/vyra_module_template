@@ -33,6 +33,7 @@ setup(
     entry_points={
         'console_scripts': [
                 'core = vyra_module_template.ModuleAccess:main',
+                'template = vyra_module_template.Template:main',
         ],
     },
 )

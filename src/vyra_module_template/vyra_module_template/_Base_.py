@@ -177,7 +177,7 @@ async def _load_project_settings() -> dict[str, Any]:
     
     return project_settings
 
-def build_entity(project_settings):
+async def build_entity(project_settings):
     me = ModuleEntry(
         uuid= uuid.uuid4(),
         name=project_settings['module_name'],
@@ -226,20 +226,20 @@ def build_entity(project_settings):
         'VolatileSet': VolatileSet
     }
 
-    entity.setup_storage(storage_config, transient_base_types)
+    await entity.setup_storage(storage_config, transient_base_types)
 
     return entity
 
 
 async def create_db_storage(entity: VyraEntity) -> None:
     """Create database storage for the entity. The configuration is loaded from the
-    ros2 vyra_module_interfaces package. Check for adoptions in the
-    vyra_module_interfaces/config/db_config.ini file.
+    ros2 vyra_module_template package. Check for adoptions in the
+    vyra_module_template/config/storage_config.ini file.
     Arguments:
         entity (VyraEntity): The entity for which the database storage should be created.
     Raises:
-        FileNotFoundError: If the db_config.ini file is not found in the vyra_module_interfaces package.
-        ValueError: If the db_config.ini file is not valid or does not contain the required sections.
+        FileNotFoundError: If the storage_config.ini file is not found in the vyra_module_template package.
+        ValueError: If the storage_config.ini file is not valid or does not contain the required sections.
     Returns:
         None: The function does not return anything, but sets the storage in the entity.
     """
@@ -247,13 +247,11 @@ async def create_db_storage(entity: VyraEntity) -> None:
     from vyra_base.storage.db_access import DbAccess
     from vyra_base.storage.tb_base import Base as DbBase
 
-    db_config: dict = _load_resource(
-            'vyra_module_interfaces',
-            Path('config', 'db_config.ini'))
+    storage_config: dict[str, Any] = _load_storage_config()
 
     db_access = DbAccess(
         module_name=entity.module_entry.name,
-        db_config= db_config
+        db_config=storage_config
     )
 
     await db_access.create_all_tables()
@@ -263,7 +261,7 @@ async def create_db_storage(entity: VyraEntity) -> None:
 
 async def build_base():
     project_settings: dict[str, Any] = await _load_project_settings()
-    entity = build_entity(project_settings)
+    entity = await build_entity(project_settings)
     await entity.add_interface(_create_interfaces())
     
     await create_db_storage(entity)

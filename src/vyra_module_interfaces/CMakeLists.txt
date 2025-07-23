@@ -5,21 +5,21 @@ find_package(rosidl_default_generators REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(unique_identifier_msgs REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/NewsFeed.msg"
-  "msg/VolatileList.msg"
-  "msg/VolatileHash.msg"
-  "msg/ErrorFeed.msg"
-  "msg/LoggerStream.msg"
   "msg/VolatileSet.msg"
-  "msg/KeyValue.msg"
-  "msg/VolatileString.msg"
+  "msg/VolatileList.msg"
   "msg/StateFeed.msg"
-  "srv/RequestAcess.srv"
+  "msg/LoggerStream.msg"
+  "msg/KeyValue.msg"
+  "msg/NewsFeed.msg"
+  "msg/ErrorFeed.msg"
+  "msg/VolatileString.msg"
+  "msg/VolatileHash.msg"
   "srv/HealthCheck.srv"
   "srv/GetCapabilities.srv"
-  "srv/TriggerTransition.srv"
-  "srv/GetLogs.srv"
   "srv/StartUp.srv"
+  "srv/TriggerTransition.srv"
+  "srv/RequestAcess.srv"
+  "srv/GetLogs.srv"
   "action/InitiateUpdate.action"
   DEPENDENCIES std_msgs
   # Add additional dependencies here

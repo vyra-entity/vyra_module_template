@@ -12,9 +12,10 @@ services:
     volumes:
       - .:/workspace/
     stdin_open: true
+    # entrypoint: /ros_entrypoint.sh
     tty: true
     environment:
-      - ROS_SECURITY_ENABLE=true
-      - ROS_SECURITY_STRATEGY=Enforce
-      - ROS_SECURITY_ROOT_DIRECTORY=/workspace/security
-      - ROS_SECURITY_KEYSTORE=/workspace/sros2_keystore
+    - ROS_SECURITY_ENABLE=true
+    - ROS_SECURITY_STRATEGY=Enforce
+    - ROS_SECURITY_KEYSTORE=/workspace/sros2_keystore
+    - VYRA_MODULE_NAME=/vyra_module_template

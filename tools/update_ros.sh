@@ -12,8 +12,8 @@ rm -rf log/build_*
 colcon build
 source install/setup.bash
 
-export ROS_SECURITY_ENCLAVE=/workspace/sros2_keystore/enclaves/vyra_module_template
+export ROS_SECURITY_ENCLAVE="$VYRA_MODULE_NAME/core"
 
-ros2 run vyra_module_template core
+ros2 run vyra_module_template core --ros-args --enclave $ROS_SECURITY_ENCLAVE
 
 popd
