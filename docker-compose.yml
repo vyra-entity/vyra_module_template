@@ -7,6 +7,8 @@ services:
       - "8001:8001"      # Web UI (optional, erreichbar auf http://localhost:8001)
     volumes:
       - ./redis-data:/data
+    networks:
+      - vyra-network
   vyra-kilted:
     build: .
     volumes:
@@ -15,7 +17,12 @@ services:
     # entrypoint: /ros_entrypoint.sh
     tty: true
     environment:
-    - ROS_SECURITY_ENABLE=true
-    - ROS_SECURITY_STRATEGY=Enforce
-    - ROS_SECURITY_KEYSTORE=/workspace/sros2_keystore
-    - VYRA_MODULE_NAME=/vyra_module_template
+      - ROS_SECURITY_ENABLE=true
+      - ROS_SECURITY_STRATEGY=Enforce
+      - ROS_SECURITY_KEYSTORE=/workspace/sros2_keystore
+      - VYRA_MODULE_NAME=/vyra_module_template
+    networks:
+      - vyra-network
+networks:
+  vyra-network:
+    external: true

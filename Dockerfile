@@ -51,9 +51,6 @@ COPY src /workspace/src
 COPY tools /workspace/tools
 COPY wheels /workspace/wheels
 COPY docs /workspace/docs
-COPY sros2_keystore /workspace/sros2_keystore
-
-COPY .env /workspace/.env
 COPY LICENSE /workspace/LICENSE
 COPY README.md /workspace/README.md
 COPY pyproject.toml /workspace/pyproject.toml
