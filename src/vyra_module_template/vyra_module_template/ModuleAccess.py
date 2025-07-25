@@ -3,8 +3,8 @@ import rclpy
 
 from rclpy.executors import ExternalShutdownException
 
-from vyra_module_template import _Base_
-from vyra_module_template.application import application
+from . import _Base_
+from .application import application
 from vyra_base.helper.logger import Logger
 
 
@@ -14,9 +14,11 @@ async def runner():
 
         entity = await _Base_.build_base()
 
-        async_loop = asyncio.get_event_loop()
+        await application.main(entity)
 
-        application.main(async_loop, entity)
+        if entity.node is None:
+            Logger.log('No ROS 2 node created, exiting...')
+            return
 
         rclpy.spin(entity.node)
 
@@ -28,7 +30,7 @@ async def runner():
             Logger.log('Shutting down ROS 2 node...')
             if hasattr(entity, 'node') and entity.node is not None:
                 # Ensure the node is destroyed properly
-                await entity.node.destroy_async()
+                entity.node.destroy_node()
             else:
                 Logger.log('No ROS 2 node to destroy.')
 
@@ -39,7 +41,7 @@ async def runner():
             Logger.log('ROS 2 node was not running, nothing to destroy.')
 
 
-def vyra_startup():
+def main():
     try:
         asyncio.run(runner())
         Logger.log('Exit module')
@@ -51,4 +53,4 @@ def vyra_startup():
         Logger.log('Finally exit module')
 
 if __name__ == '__main__':
-    vyra_startup()
+    main()

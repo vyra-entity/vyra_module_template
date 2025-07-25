@@ -13,7 +13,11 @@ setup(
     version='0.1.0',
     name=package_name,
     # packages=find_packages(exclude=['test']),
-    packages=[package_name],
+    packages=[
+        package_name, 
+        f"{package_name}.application",
+        f"{package_name}.domain",
+        f"{package_name}.plugin"],
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),

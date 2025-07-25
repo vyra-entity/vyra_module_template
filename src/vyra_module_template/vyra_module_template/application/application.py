@@ -1,10 +1,6 @@
 
 
+from vyra_base.helper.logger import Logger
 
-
-
-
-
-
-def main(async_loop=None, entity=None):
-    pass
+async def main(entity=None):
+    Logger.info("Starting Vyra Module Template Application")
