@@ -20,9 +20,9 @@ services:
       - ROS_SECURITY_ENABLE=true
       - ROS_SECURITY_STRATEGY=Enforce
       - ROS_SECURITY_KEYSTORE=/workspace/sros2_keystore
-      - VYRA_MODULE_NAME=/vyra_module_template
     networks:
       - vyra-network
+    command: bash -c "source /workspace/tools/update_ros.sh"
 networks:
   vyra-network:
     external: true

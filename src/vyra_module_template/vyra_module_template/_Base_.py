@@ -8,11 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import rclpy
-from rclpy.executors import ExternalShutdownException
-from rclpy.node import Node
-
 from ament_index_python.packages import get_package_share_directory
-
 from std_msgs.msg import String # pyright: ignore[reportAttributeAccessIssue]
 
 # msg
@@ -232,13 +228,13 @@ async def build_entity(project_settings):
 
 
 async def create_db_storage(entity: VyraEntity) -> None:
-    """Create database storage for the entity. The configuration is loaded from the
-    ros2 vyra_module_template package. Check for adoptions in the
-    vyra_module_template/config/storage_config.ini file.
+    """Create database storage for the entity. The configuration is loaded from this
+    ros2 package. Check for adoptions in the
+    <your_package>/config/storage_config.ini file.
     Arguments:
         entity (VyraEntity): The entity for which the database storage should be created.
     Raises:
-        FileNotFoundError: If the storage_config.ini file is not found in the vyra_module_template package.
+        FileNotFoundError: If the storage_config.ini file is not found in this package.
         ValueError: If the storage_config.ini file is not valid or does not contain the required sections.
     Returns:
         None: The function does not return anything, but sets the storage in the entity.

@@ -1,0 +1,9 @@
+name: plugin-name
+version: 1.0.0
+description: plugin dummy
+author: dummy author
+license: plugin license
+dependencies: 
+  - global-plugin-dependency1
+  - global-plugin-dependency2
+enabled: True

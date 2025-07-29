@@ -7,7 +7,7 @@ ENV LC_ALL=C.UTF-8
 
 # User und Gruppe anlegen (z.B. vyrauser mit UID 1000)
 RUN groupadd -r vyrauser && useradd -r -g vyrauser vyrauser
-RUN mkdir /workspace && chown vyrauser:vyrauser /workspace
+RUN mkdir /workspace
 RUN usermod -aG sudo vyrauser
 RUN echo "vyrauser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
@@ -46,7 +46,6 @@ RUN python3 -m pip install --upgrade setuptools --break-system-packages \
 WORKDIR /workspace
 
 # Projektdateien kopieren
-# COPY . .
 COPY src /workspace/src
 COPY tools /workspace/tools
 COPY wheels /workspace/wheels
@@ -55,6 +54,8 @@ COPY LICENSE /workspace/LICENSE
 COPY README.md /workspace/README.md
 COPY pyproject.toml /workspace/pyproject.toml
 COPY vyra_entrypoint.sh /workspace/vyra_entrypoint.sh
+
+RUN ls -la /workspace/src
 
 # Policies ins Image kopieren
 # COPY security/policies /workspace/security/policies
@@ -70,16 +71,13 @@ RUN chmod +x /workspace/vyra_entrypoint.sh
 # Interfaces vorbereiten
 RUN python3 /workspace/tools/setup_interfaces.py
 
-# ROS 2 Workspace bauen
-RUN source /opt/ros/kilted/setup.bash && colcon build
-
 # Umgebungsvariablen für ROS 2 Security (SROS2)
-ENV ROS_DOMAIN_ID=0
+ENV ROS_DOMAIN_ID=42
 # ENV ROS_SECURITY_KEYSTORE=/workspace/sros2_keystore
 # ENV ROS_SECURITY_ENABLE=true
 # ENV ROS_SECURITY_STRATEGY=Enforce
-# ENV ROS_SECURITY_ROOT_DIRECTORY=/workspace/sros2_keystore
+ENV ROS_SECURITY_ROOT_DIRECTORY=/workspace/sros2_keystore
 
 # Einstiegspunkt
 ENTRYPOINT ["/workspace/vyra_entrypoint.sh"]
-CMD ["bash"]
+# CMD ["bash"]
