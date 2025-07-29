@@ -1,6 +1,8 @@
 ### Registration Process
 
-There is a vyra modulemanager that is the one and only sro2 certificate authentication to sign certificates and permission files.
+
+
+<!-- There is a vyra modulemanager that is the one and only sro2 certificate authentication to sign certificates and permission files.
 
 The modulemanager will create a default minimual permission.p7s file which allows a node to publish on a given registration topic.
 
@@ -16,4 +18,4 @@ Registration:
 1. The module send a request to the registration process with (new_permission_file, certificate_to_be_signed)
 2. If the module is not on blacklist "it could be authenticated"
 3. Response (Signed_certificate, signed_permission)
-4. Node can now present its services and actions and publications and subscriptions on its topics
+4. Node can now present its services and actions and publications and subscriptions on its topics -->
