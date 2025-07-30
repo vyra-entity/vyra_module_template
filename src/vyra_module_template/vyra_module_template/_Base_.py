@@ -258,7 +258,7 @@ async def create_db_storage(entity: VyraEntity) -> None:
 async def build_base():
     project_settings: dict[str, Any] = await _load_project_settings()
     entity = await build_entity(project_settings)
-    await entity.add_interface(_create_interfaces())
+    await entity.set_interfaces(_create_interfaces())
     
     await create_db_storage(entity)
 
