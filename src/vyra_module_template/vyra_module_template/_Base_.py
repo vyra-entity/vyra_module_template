@@ -1,18 +1,14 @@
-import asyncio
-import json
 import sys
-import time
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
-import rclpy
 from ament_index_python.packages import get_package_share_directory
-from std_msgs.msg import String # pyright: ignore[reportAttributeAccessIssue]
+
+from std_msgs.msg import String # pyright: ignore[reportMissingImports]
 
 # msg
-from vyra_base import storage
 from vyra_module_interfaces.msg import ErrorFeed # pyright: ignore[reportAttributeAccessIssue]
 from vyra_module_interfaces.msg import NewsFeed # pyright: ignore[reportAttributeAccessIssue]
 from vyra_module_interfaces.msg import StateFeed # pyright: ignore[reportAttributeAccessIssue]
@@ -40,7 +36,8 @@ from vyra_base.defaults.entries import (
     ErrorEntry,
 )
 from vyra_base.helper.file_reader import FileReader
-from vyra_base.helper.logger import Logger
+from vyra_base.helper.file_writer import FileWriter
+from vyra_base.helper.logger import Logger, LogEntry
 
 if __package__:
     PACKAGE_NAME = __package__.split('.')[0]
@@ -48,11 +45,9 @@ else:
     sys.exit("Package name not found. Please run this script as part of a package.")
 
 
-def _load_resource(package_name: str, resource_name: Path) -> Any:
+async def load_resource(package_name: str, resource_name: Path) -> Any:
     package_path = get_package_share_directory(package_name)
-    resource_path = Path(package_path) / resource_name
-
-    print(PACKAGE_NAME, package_path, resource_name, resource_path)
+    resource_path: Path = Path(package_path) / resource_name
 
     if not resource_path.exists():
         raise FileNotFoundError(
@@ -60,43 +55,39 @@ def _load_resource(package_name: str, resource_name: Path) -> Any:
     
     Logger.log(f"Loading resource from {resource_path}")
 
-    with open(resource_path, 'r', encoding='utf-8') as f:
-        match resource_name.suffix:
-            case '.ini':
-                from configparser import ConfigParser
-                parser = ConfigParser()
-                parser.read_file(f)
-                # Convert ConfigParser object to a dictionary
-                config = {
-                    section: dict(parser.items(section)) for section in parser.sections()}
-            case '.json':
-                import json
-                config = json.load(f)
-            case '.yaml' | '.yml':
-                import yaml
-                config = yaml.safe_load(f)
-            case _:
-                fail_msg = (
-                    f"Unsupported file type: {resource_name.suffix}. "
-                    "Supported types are .ini, .json, .yaml/.yml"
-                )
-                Logger.error(fail_msg)
-                raise ValueError(fail_msg)
-    return config
 
-def _create_interfaces(interface_files: list[str]=[]) -> list[FunctionConfigEntry]:
-    interface_metadata: list = _load_resource(
-            'vyra_module_interfaces',
-            Path('config', 'base_metadata.json'))
-    
-    for custom_interface in interface_files:
-        if isinstance(custom_interface, str):
-            interface_metadata.append(_load_resource(
+    match resource_name.suffix:
+        case '.ini':
+            return await FileReader.open_ini_file(resource_path)
+        case '.json':
+            return await FileReader.open_json_file(resource_path)
+        case '.yaml' | '.yml':
+            return await FileReader.open_yaml_file(resource_path)
+        case _:
+            fail_msg = (
+                f"Unsupported file type: {resource_name.suffix}. "
+                "Supported types are .ini, .json, .yaml/.yml"
+            )
+            Logger.error(fail_msg)
+            raise ValueError(fail_msg)
+
+async def _create_base_interfaces() -> list[FunctionConfigEntry]:
+    interface_metadata: list = []
+
+    base_interfaces: list[str] = [
+        'vyra_core_meta.json',
+        'vyra_com_meta.json',
+        'vyra_security_meta.json'
+    ]
+
+    for interface_file in base_interfaces:
+        if isinstance(interface_file, str):
+            interface_metadata.extend(await load_resource(
                 'vyra_module_interfaces',
-                Path('config', custom_interface))
+                Path('config', interface_file))
             )
 
-    interface_functions = []
+    interface_functions: list[FunctionConfigEntry] = []
 
     for metadata in interface_metadata:
         try:
@@ -127,43 +118,91 @@ def _create_interfaces(interface_files: list[str]=[]) -> list[FunctionConfigEntr
             Logger.error(
                 f"Missing key <{e}> in interface data <{metadata}>."
                 "Interface will not be created.")
-            continue
+            raise
+        except TypeError as e:
+            Logger.error(
+                f"Type error in interface data <{metadata}>: {e}."
+                "Interface will not be created.")
+            raise
 
     return interface_functions
 
-def _load_storage_config() -> dict[str, Any]:
+async def _load_storage_config() -> dict[str, Any]:
     """
     Load the storage configuration from the resource/storage_config.ini file.
     Returns:
         dict: The storage configuration.
     Raises:
         FileNotFoundError: If the storage_config.ini file is not found.
-        ValueError: If the storage_config.ini file is not valid or does not contain the required sections.
+        ValueError: If the storage_config.ini file is not valid or does not 
+        contain the required sections.
     """
-    return _load_resource(
+    return await load_resource(
         PACKAGE_NAME,
         Path('resource', 'storage_config.ini')
     )
 
-def _load_module_config() -> dict[str, Any]:
+async def _load_module_config() -> dict[str, Any]:
     """
     Load the module configuration from the pyproject.toml file.
     Returns:
         dict: The module configuration.
     Raises:
         FileNotFoundError: If the pyproject.toml file is not found.
-        ValueError: If the pyproject.toml file is not valid or does not contain the required sections.
+        ValueError: If the pyproject.toml file is not valid or does not contain 
+        the required sections.
     """
-    return _load_resource(
+    return await load_resource(
         PACKAGE_NAME,
         Path('resource', 'module_config.yaml')
     )
 
+async def _load_module_data() -> Optional[dict[str, Any]]:
+    """
+    Load the module data from the resource/module_data.yaml file.
+    Returns:
+        dict: The module data.
+    Raises:
+        FileNotFoundError: If the module_data.yaml file is not found.
+        ValueError: If the module_data.yaml file is not valid or does not contain
+        the required sections.
+    """
+    pkg_dir = Path(get_package_share_directory(PACKAGE_NAME))
+    data_path: Path = pkg_dir.parents[3] / ".module" / "module_data.yaml"
+
+    try:
+        module_data: Optional[dict[str, Any]] = await FileReader.open_yaml_file(data_path)
+    except (FileNotFoundError) as e:
+        # Create .module directory if it does not exist
+        Logger.error(f"Module data file not found: {e}. Creating new module_data.yaml.")
+        if not data_path.parent.exists():
+            data_path.parent.mkdir(parents=True)
+        return None
+    
+    return module_data
+
+async def _write_module_data(data: dict[str, Any]) -> None:
+    """
+    Write the module data to the resource/module_data.yaml file.
+    Args:
+        data (dict): The module data to write.
+    Raises:
+        FileNotFoundError: If the resource directory does not exist.
+        ValueError: If the data is not valid or does not contain the required sections.
+    """
+    pkg_dir = Path(get_package_share_directory(PACKAGE_NAME))
+
+    data_path: Path = pkg_dir.parents[3] / ".module" / "module_data.yaml"
+
+    await FileWriter.write_yaml_file(data_path, data)
 
 async def _load_project_settings() -> dict[str, Any]:
     pkg_dir = Path(get_package_share_directory(PACKAGE_NAME))
     pyproject_path: Path = pkg_dir.parents[3] / "pyproject.toml"
-    module_settings: dict[str, Any] = await FileReader.open_toml_file(pyproject_path)
+    module_settings: Optional[dict[str, Any]] = await FileReader.open_toml_file(pyproject_path)
+
+    if not module_settings:
+        raise ValueError("Module settings not found in pyproject.toml")
 
     project_settings = module_settings['tool']['vyra']
     project_settings['version'] = module_settings['tool']['poetry']['version']
@@ -174,13 +213,55 @@ async def _load_project_settings() -> dict[str, Any]:
     return project_settings
 
 async def build_entity(project_settings):
-    me = ModuleEntry(
-        uuid= uuid.uuid4(),
-        name=project_settings['module_name'],
-        template=project_settings['module_template'],
-        description=project_settings['module_description'],
-        version=project_settings['version'],
-    )
+    module_data: Optional[dict] = await _load_module_data()
+    needed_fields: list[str] = ['uuid', 'name', 'template', 'description', 'version']
+
+    if not module_data or module_data == {}:
+        Logger.pre_log_buffer.append(LogEntry(
+            "Creating new module entry from project settings. "
+            "Module data is empty."
+        ))
+
+        me = ModuleEntry(
+            uuid= ModuleEntry.gen_uuid(),
+            name=project_settings['module_name'],
+            template=project_settings['module_template'],
+            description=project_settings['module_description'],
+            version=project_settings['version'],
+        )
+        await _write_module_data(me.to_dict())
+    elif not all(field in module_data for field in needed_fields):
+        missing_field: list[str] = [
+            field for field in needed_fields if field not in module_data]
+        
+        Logger.pre_log_buffer.append(LogEntry(
+            message="Module data is incomplete. "
+                    f"Missing fields: {missing_field}. Will be recovered "
+                    f"from project settings."
+        ))
+        me = ModuleEntry(
+            uuid=module_data.get('uuid', ModuleEntry.gen_uuid()),
+            name=module_data.get('name', project_settings['name']),
+            template=module_data.get('template', project_settings['template']),
+            description=module_data.get('description', project_settings['description']),
+            version=module_data.get('version', project_settings['version']),
+        )
+        await _write_module_data(me.to_dict())
+        Logger.log("Module data recovered from project settings.")
+    else:
+        Logger.pre_log_buffer.append(LogEntry(
+            message="Module data complete. "
+                    "Using project settings to create a new module entry."
+        ))
+
+        me = ModuleEntry(
+            uuid=module_data['uuid'],
+            name=module_data['name'],
+            template=module_data['template'],
+            description=module_data['description'],
+            version=module_data['version'],
+        )
+    Logger.info(f"Module_data: {me.to_dict()}")
 
     se = StateEntry(
         previous='initial',
@@ -204,8 +285,8 @@ async def build_entity(project_settings):
         _type=ErrorFeed
     )
 
-    module_config = _load_module_config()
-    storage_config = _load_storage_config()
+    module_config = await _load_module_config()
+    storage_config = await _load_storage_config()
 
     entity = VyraEntity(
         state_entry=se,
@@ -243,7 +324,7 @@ async def create_db_storage(entity: VyraEntity) -> None:
     from vyra_base.storage.db_access import DbAccess
     from vyra_base.storage.tb_base import Base as DbBase
 
-    storage_config: dict[str, Any] = _load_storage_config()
+    storage_config: dict[str, Any] = await _load_storage_config()
 
     db_access = DbAccess(
         module_name=entity.module_entry.name,
@@ -258,7 +339,7 @@ async def create_db_storage(entity: VyraEntity) -> None:
 async def build_base():
     project_settings: dict[str, Any] = await _load_project_settings()
     entity = await build_entity(project_settings)
-    await entity.set_interfaces(_create_interfaces())
+    await entity.set_interfaces(await _create_base_interfaces())
     
     await create_db_storage(entity)
 

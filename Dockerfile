@@ -57,9 +57,6 @@ COPY vyra_entrypoint.sh /workspace/vyra_entrypoint.sh
 
 RUN ls -la /workspace/src
 
-# Policies ins Image kopieren
-# COPY security/policies /workspace/security/policies
-
 # Alte ROS-Builds löschen
 RUN rm -rf build/ install/ log/
 
@@ -72,7 +69,7 @@ RUN chmod +x /workspace/vyra_entrypoint.sh
 RUN python3 /workspace/tools/setup_interfaces.py
 
 # Umgebungsvariablen für ROS 2 Security (SROS2)
-ENV ROS_DOMAIN_ID=42
+ENV ROS_DOMAIN_ID=0
 # ENV ROS_SECURITY_KEYSTORE=/workspace/sros2_keystore
 # ENV ROS_SECURITY_ENABLE=true
 # ENV ROS_SECURITY_STRATEGY=Enforce
