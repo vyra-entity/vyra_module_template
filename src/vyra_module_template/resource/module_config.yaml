@@ -6,6 +6,9 @@ module_access:
     username: "AdminVar"
     password: "Admin123"
 
+logger:
+  level: DEBUG
+  
 lifecycle:
   auto_startup:
     enabled: true
