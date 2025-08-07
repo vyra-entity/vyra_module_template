@@ -14,38 +14,6 @@
 	<member_of_group>rosidl_interface_packages</member_of_group>
 	<depend>unique_identifier_msgs</depend>
 	<exec_depend>rosidl_default_runtime</exec_depend>
-	<exec_depend>StateFeed</exec_depend>
-	<exec_depend>LoggerStream</exec_depend>
-	<exec_depend>NewsFeed</exec_depend>
-	<exec_depend>ErrorFeed</exec_depend>
-	<exec_depend>HealthCheck</exec_depend>
-	<exec_depend>GetCapabilities</exec_depend>
-	<exec_depend>TriggerTransition</exec_depend>
-	<exec_depend>GetLogs</exec_depend>
-	<exec_depend>InitiateUpdate</exec_depend>
 	<build_depend>builtin_interfaces</build_depend>
 	<build_depend>rosidl_default_generators</build_depend>
-	<build_depend>StateFeed</build_depend>
-	<build_depend>LoggerStream</build_depend>
-	<build_depend>NewsFeed</build_depend>
-	<build_depend>ErrorFeed</build_depend>
-	<build_depend>HealthCheck</build_depend>
-	<build_depend>GetCapabilities</build_depend>
-	<build_depend>TriggerTransition</build_depend>
-	<build_depend>GetLogs</build_depend>
-	<build_depend>InitiateUpdate</build_depend>
-	<exec_depend>RequestAcess</exec_depend>
-	<build_depend>RequestAcess</build_depend>
-	<exec_depend>VolatileSet</exec_depend>
-	<exec_depend>VolatileList</exec_depend>
-	<exec_depend>KeyValue</exec_depend>
-	<exec_depend>VolatileString</exec_depend>
-	<exec_depend>VolatileHash</exec_depend>
-	<exec_depend>StartUp</exec_depend>
-	<build_depend>VolatileSet</build_depend>
-	<build_depend>VolatileList</build_depend>
-	<build_depend>KeyValue</build_depend>
-	<build_depend>VolatileString</build_depend>
-	<build_depend>VolatileHash</build_depend>
-	<build_depend>StartUp</build_depend>
 </package>
