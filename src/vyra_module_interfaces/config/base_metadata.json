@@ -6,7 +6,7 @@
         "displayname": "Error Feed",
         "description": "Communicate error information in the system between different components or modules.",
         "filetype": "msg/ErrorFeed.msg",
-        "params": [
+        "returns": [
             {
                 "datatype": "uint32",
                 "displayname": "error_code",
@@ -48,7 +48,7 @@
         "displayname": "State Feed",
         "description": "Communicate state information in the system between different components or modules.",
         "filetype": "msg/ErrorFeed.msg",
-        "params": [
+        "returns": [
             {
                 "datatype": "string",
                 "displayname": "previous",
@@ -77,7 +77,7 @@
         "displayname": "News Feed",
         "description": "Communicate news in the system between different components or modules.",
         "filetype": "msg/NewsFeed.msg",
-        "params": [
+        "returns": [
             {
                 "datatype": "string",
                 "displayname": "type",
