@@ -61,6 +61,7 @@ class TaskManager:
         self.tasks.clear()
 
 async def application_runner(entity):
+    Logger.log('Starting application runner...')
     await application.main(entity)
 
 async def main_communication_spinner(entity):
@@ -76,10 +77,13 @@ async def runner():
 
         entity: VyraEntity = await _Base_.build_base()
 
-        tm.add_task(main_communication_spinner, entity)
-        await asyncio.sleep(0.1)  # Ensure the node is initialized before starting tasks
+        Logger.log('Starting application runner...')
         tm.add_task(application_runner, entity)
-
+        await asyncio.sleep(0.1)  # Ensure the node is initialized before starting tasks
+        
+        Logger.log('Starting node spinner...')
+        tm.add_task(main_communication_spinner, entity)
+        
         if entity.node is None:
             Logger.log('No ROS 2 node created, exiting...')
             return

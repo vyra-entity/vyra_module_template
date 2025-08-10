@@ -1,31 +1,19 @@
 from pathlib import Path
 import json
+import sys
 
 from ament_index_python.packages import get_package_share_directory
 
 from vyra_base.core.entity import VyraEntity
 from vyra_base.defaults.entries import FunctionConfigEntry
 from vyra_base.defaults.entries import FunctionConfigBaseTypes
+from vyra_base.helper.error_handler import ErrorTraceback
 
 from vyra_base.helper.logger import Logger
 from typing import Callable
-from ._Base_ import load_resource
 
-def _load_metadata(package_name: str, resource_folder: Path) -> list[dict]:
-    """Loads metadata from a specified package and resource."""
-    package_path = get_package_share_directory(package_name)
-    resource_path = Path(package_path) / resource_folder
-    meta_paths: list[Path] = list(resource_path.rglob("*.json"))
 
-    metadata: list[dict] = []
-
-    for meta_path in meta_paths:
-        Logger.log(f"Loading resource from {meta_path}")
-
-        with open(meta_path, 'r', encoding='utf-8') as f:
-            metadata.extend(json.load(f))
-    return metadata
-
+@ErrorTraceback.w_check_error_exist
 async def auto_register_interfaces(entity: VyraEntity, callback_list: list[Callable]) -> None:
     """Automatically registers interfaces for the entity. The list of callbacks must
     contain all functions that are defined in the interface metadata.
@@ -39,8 +27,13 @@ async def auto_register_interfaces(entity: VyraEntity, callback_list: list[Calla
     interface_functions: list[FunctionConfigEntry] = []
 
     for metadata in interface_metadata:
+        ros2_type: str = metadata['filetype'].split('/')[-1]
+        ros2_type = ros2_type.split('.')[0]
+        
         match metadata['type']:
             case FunctionConfigBaseTypes.callable.value:
+                metadata['ros2type'] = getattr(
+                    sys.modules['vyra_module_interfaces.srv'], ros2_type)
                 callback = next(
                     (c for c in callback_list if c.__name__ == metadata['functionname']), None
                 )
@@ -58,18 +51,42 @@ async def auto_register_interfaces(entity: VyraEntity, callback_list: list[Calla
                 ))
 
             case FunctionConfigBaseTypes.speaker.value:
+                metadata['ros2type'] = getattr(
+                    sys.modules['vyra_module_interfaces.msg'], ros2_type)
+                
                 interface_functions.append(_register_speaker_interface(
                     metadata=metadata
                 ))
 
             case FunctionConfigBaseTypes.job.value:
+                metadata['ros2type'] = getattr(
+                    sys.modules['vyra_module_interfaces.action'], ros2_type)
+                
                 interface_functions.append(_register_job_interface(
                     metadata=metadata,
                     callbacks={}
                 ))
 
+    Logger.info(f"Registering {len(interface_functions)} interfaces for entity")
     await entity.set_interfaces(interface_functions)
     return 
+
+def _load_metadata(package_name: str, resource_folder: Path) -> list[dict]:
+    """Loads metadata from a specified package and resource."""
+    package_path = get_package_share_directory(package_name)
+    resource_path = Path(package_path) / resource_folder
+    meta_paths: list[Path] = list(resource_path.rglob("*.json"))
+
+    metadata: list[dict] = []
+
+    Logger.log(f"Meta paths: {meta_paths}")
+
+    for meta_path in meta_paths:
+        Logger.log(f"Loading custom interface resource from {meta_path}")
+
+        with open(meta_path, 'r', encoding='utf-8') as f:
+            metadata.extend(json.load(f))
+    return metadata
 
 def _register_speaker_interface(
         metadata: dict) -> FunctionConfigEntry:
@@ -80,7 +97,10 @@ def _register_speaker_interface(
         functionname=metadata['functionname'],
         displayname=metadata['displayname'],
         description=metadata['description'],
-        displaystyle=metadata['displaystyle'],
+        displaystyle=metadata.get('displaystyle', {
+            "visible": False,
+            "published": False
+        }),
         returns=metadata['returns'],
         qosprofile=metadata.get('qosprofile', 10),
         periodic=metadata.get('periodic', None)
@@ -98,7 +118,10 @@ def _register_callable_interface(
         functionname=metadata['functionname'],
         displayname=metadata['displayname'],
         description=metadata['description'],
-        displaystyle=metadata['displaystyle'],
+        displaystyle=metadata.get('displaystyle', {
+            "visible": False,
+            "published": False
+        }),
         params=metadata['params'],
         returns=metadata['returns'],
         qosprofile=metadata.get('qosprofile', 10),
@@ -116,7 +139,10 @@ def _register_job_interface(
         functionname=metadata['functionname'],
         displayname=metadata['displayname'],
         description=metadata['description'],
-        displaystyle=metadata['displaystyle'],
+        displaystyle=metadata.get('displaystyle', {
+            "visible": False,
+            "published": False
+        }),
         params=metadata['params'],
         returns=metadata['returns'],
         qosprofile=metadata.get('qosprofile', 10)

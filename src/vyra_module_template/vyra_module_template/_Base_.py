@@ -9,22 +9,23 @@ from ament_index_python.packages import get_package_share_directory
 from std_msgs.msg import String # pyright: ignore[reportMissingImports]
 
 # msg
-from vyra_module_interfaces.msg import ErrorFeed # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.msg import NewsFeed # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.msg import StateFeed # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.msg import VBASEErrorFeed # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.msg import VBASEVolatileList # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.msg import VBASEStateFeed # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.msg import VBASENewsFeed # pyright: ignore[reportAttributeAccessIssue]
 
-from vyra_module_interfaces.msg import VolatileList # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.msg import VolatileSet # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.msg import VolatileHash # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.msg import VolatileString # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.msg import VBASEVolatileList # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.msg import VBASEVolatileSet # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.msg import VBASEVolatileHash # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.msg import VBASEVolatileString # pyright: ignore[reportAttributeAccessIssue]
 # srv
-from vyra_module_interfaces.srv import GetCapabilities # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.srv import GetLogs # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.srv import HealthCheck # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.srv import TriggerTransition # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.srv import VBASEGetCapabilities # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.srv import VBASEGetLogs # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.srv import VBASEHealthCheck # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.srv import VBASETriggerTransition # pyright: ignore[reportAttributeAccessIssue]
 
 # action
-from vyra_module_interfaces.action import InitiateUpdate # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.action import VBASEInitiateUpdate # pyright: ignore[reportAttributeAccessIssue]
 
 from vyra_base.core.entity import VyraEntity
 from vyra_base.defaults.entries import (
@@ -270,19 +271,19 @@ async def build_entity(project_settings):
         module_id=me.uuid,
         module_name=me.name,
         timestamp=datetime.now(),
-        _type=StateFeed
+        _type=VBASEStateFeed
     )
 
     ne = NewsEntry(
         module_id=me.uuid,
         module_name=me.name,
-        _type=NewsFeed
+        _type=VBASENewsFeed
     )
 
     ee = ErrorEntry(
         module_id=me.uuid,
         module_name=me.name,
-        _type=ErrorFeed
+        _type=VBASEErrorFeed
     )
 
     module_config = await _load_module_config()
@@ -297,10 +298,10 @@ async def build_entity(project_settings):
     )
 
     transient_base_types: dict[str, Any] = {
-        'VolatileString': VolatileString,
-        'VolatileHash': VolatileHash,
-        'VolatileList': VolatileList,
-        'VolatileSet': VolatileSet
+        'VolatileString': VBASEVolatileString,
+        'VolatileHash': VBASEVolatileHash,
+        'VolatileList': VBASEVolatileList,
+        'VolatileSet': VBASEVolatileSet
     }
 
     await entity.setup_storage(storage_config, transient_base_types)
