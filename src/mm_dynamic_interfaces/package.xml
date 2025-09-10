@@ -3,8 +3,8 @@
 <package format="3">
   <name>mm_dynamic_interfaces</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="h.schernewski@variobotic.de">HolgDer</maintainer>
+  <description>Dynamic package interface for external modules</description>
+  <maintainer email="vyra.0a1@gmail.com">V.Y.R.A.</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
