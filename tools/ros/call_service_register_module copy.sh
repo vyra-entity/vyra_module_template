@@ -1,0 +1,1 @@
+ros2 service call /vyra_module_template_733256b82d6b48a48bc52b5ec73ebfff/callable/register_module vyra_module_interfaces/srv/MMRegisterModule "{'module_name': '', 'module_id': '', 'description': '', 'dependencies': [], 'author':'', 'version':'', 'license':''}"

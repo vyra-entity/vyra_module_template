@@ -1,0 +1,5 @@
+description: This template could be used to create a vyra module with basic functionality.
+name: vyra_module_template
+template: basic
+uuid: 
+version: 0.1.0

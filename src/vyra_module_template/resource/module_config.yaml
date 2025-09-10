@@ -1,3 +1,5 @@
+package_name: vyra_module_template
+
 module_access:
   level_4:
     username: "user"
@@ -6,9 +8,6 @@ module_access:
     username: "AdminVar"
     password: "Admin123"
 
-logger:
-  level: DEBUG
-  
 lifecycle:
   auto_startup:
     enabled: true

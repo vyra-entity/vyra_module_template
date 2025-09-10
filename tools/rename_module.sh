@@ -21,7 +21,8 @@ done
 echo "Renaming module from '$TEMPLATE_NAME' to '$1'"
 
 # safe filepath of this script
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+echo "Script directory: $SCRIPT_DIR"
 
 NEW_NAME=$1
 
@@ -80,8 +81,7 @@ fi
 SETUP_CFG="$SCRIPT_DIR/../src/$NEW_NAME/setup.cfg"
 if [ -f "$SETUP_CFG" ]; then
     echo "✅ Renaming module in setup.cfg file: $SETUP_CFG"
-    sed -i "s/^script_dir\s*=\s*.*/script_dir = \$base\/lib\/$NEW_NAME/" "$SETUP_CFG"
-    sed -i "s/^install_scripts\s*=\s*.*/install_scripts = \$base\/lib\/$NEW_NAME/" "$SETUP_CFG"
+    sed -i "s/$TEMPLATE_NAME/$NEW_NAME/g" "$SETUP_CFG"
 else
     echo "⚠️ Setup.cfg file $SETUP_CFG not found."
 fi
@@ -90,7 +90,7 @@ fi
 UPDATE_ROS_FILE="$SCRIPT_DIR/../tools/update_ros.sh"
 if [ -f "$UPDATE_ROS_FILE" ]; then
     echo "✅ Renaming module in update_ros.sh: $UPDATE_ROS_FILE"
-    sed -i "s/vyra_module_template/$NEW_NAME/g" "$UPDATE_ROS_FILE"
+    sed -i "s/$TEMPLATE_NAME/$NEW_NAME/g" "$UPDATE_ROS_FILE"
 else
     echo "⚠️ Update ROS script $UPDATE_ROS_FILE not found."
 fi
@@ -99,7 +99,7 @@ fi
 ENTRYPOINT_FILE="$SCRIPT_DIR/../vyra_entrypoint.sh"
 if [ -f "$ENTRYPOINT_FILE" ]; then
     echo "✅ Renaming module in vyra_entrypoint.sh: $ENTRYPOINT_FILE"
-    sed -i "s/vyra_module_template/$NEW_NAME/g" "$ENTRYPOINT_FILE"
+    sed -i "s/$TEMPLATE_NAME/$NEW_NAME/g" "$ENTRYPOINT_FILE"
 else
     echo "⚠️ Entry point script $ENTRYPOINT_FILE not found."
 fi

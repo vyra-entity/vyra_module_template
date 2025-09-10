@@ -13,6 +13,7 @@ from vyra_module_interfaces.msg import VBASEErrorFeed # pyright: ignore[reportAt
 from vyra_module_interfaces.msg import VBASEVolatileList # pyright: ignore[reportAttributeAccessIssue]
 from vyra_module_interfaces.msg import VBASEStateFeed # pyright: ignore[reportAttributeAccessIssue]
 from vyra_module_interfaces.msg import VBASENewsFeed # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_interfaces.msg import VBASEUpdateParamEvent # pyright: ignore[reportAttributeAccessIssue]
 
 from vyra_module_interfaces.msg import VBASEVolatileList # pyright: ignore[reportAttributeAccessIssue]
 from vyra_module_interfaces.msg import VBASEVolatileSet # pyright: ignore[reportAttributeAccessIssue]
@@ -30,6 +31,7 @@ from vyra_module_interfaces.action import VBASEInitiateUpdate # pyright: ignore[
 from vyra_base.core.entity import VyraEntity
 from vyra_base.defaults.entries import (
     FunctionConfigEntry,
+    FunctionConfigDisplaystyle,
     FunctionConfigBaseTypes,
     ModuleEntry,
     StateEntry,
@@ -99,6 +101,11 @@ async def _create_base_interfaces() -> list[FunctionConfigEntry]:
                 metadata['ros2type'] = getattr(
                     sys.modules['vyra_module_interfaces.srv'], ros2_type)
 
+                displaystyle = FunctionConfigDisplaystyle(
+                    visible=metadata.get('displaystyle', {}).get('visible', False),
+                    published=metadata.get('displaystyle', {}).get('published', False)
+                )
+
                 interface_functions.append(
                     FunctionConfigEntry(
                         tags=metadata['tags'],
@@ -107,7 +114,7 @@ async def _create_base_interfaces() -> list[FunctionConfigEntry]:
                         functionname=metadata['functionname'],
                         displayname=metadata['displayname'],
                         description=metadata['description'],
-                        displaystyle=metadata['displaystyle'],
+                        displaystyle=displaystyle,
                         params=metadata['params'],
                         returns=metadata['returns'],
                         qosprofile=metadata.get('qosprofile', 10),
@@ -304,7 +311,14 @@ async def build_entity(project_settings):
         'VolatileSet': VBASEVolatileSet
     }
 
-    await entity.setup_storage(storage_config, transient_base_types)
+    parameter_types: dict[str, Any] = {
+        'UpdateParamEvent': VBASEUpdateParamEvent
+    }
+
+    await entity.setup_storage(
+        storage_config, 
+        transient_base_types, 
+        parameter_types)
 
     return entity
 

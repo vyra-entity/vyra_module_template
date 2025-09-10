@@ -1,12 +1,38 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
 import sys
 import os
 import re
-import shutil
 import subprocess
+import shutil
 from pathlib import Path
-from turtle import update
 import xml.etree.ElementTree as ET
+    
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Script to set up ROS2 interfaces for V.Y.R.A. modules."
+    )
+
+    parser.add_argument(
+        "--interface_pkg",
+        type=str,
+        default="vyra_module_interfaces",
+        help=(
+            "Name of the interface package to create or update "
+            "(default: vyra_module_interfaces)"
+        )
+    )
+    parser.add_argument(
+        "--dynamic_src_path",
+        type=Path,
+        help=(
+            "Path to the temporary source directory for dynamic interface packages."
+        )
+    )
+
+    return parser.parse_args()
 
 def update_package_xml(package_path: Path):
     """Fügt nötige Dependencies zur package.xml hinzu."""
@@ -72,16 +98,23 @@ def replace_libname_in_file(filepath, old_word, new_word):
             f.write(content_new)
         print(f"Ersetzt in {filepath}")
 
-
 def collect_interface_files(package_path):
     interface_dirs = ['msg', 'srv', 'action']
     interface_files = {}
     for dir_name in interface_dirs:
         dir_path = os.path.join(package_path, dir_name)
+        collected_files = []
         if os.path.isdir(dir_path):
-            files = [f"{dir_name}/{f}" for f in os.listdir(dir_path) if f.endswith(f".{dir_name}")]
-            if files:
-                interface_files[dir_name] = files
+            # Walk through all subdirectories
+            for root, _, files in os.walk(dir_path):
+                for f in files:
+                    if f.endswith(f".{dir_name}"):
+                        # Get relative path from package_path
+                        rel_path = os.path.relpath(
+                            os.path.join(root, f), package_path)
+                        collected_files.append(rel_path)
+            if collected_files:
+                interface_files[dir_name] = collected_files
     return interface_files
 
 
@@ -157,12 +190,7 @@ def update_setup_py(package_path, package_name):
 
     for interface_type, files in interface_files.items():
         key = f'share/{package_name}/{interface_type}'
-        if key in content:
-            print(
-                f"⚠️ Info: {key} already exists in setup.py, "
-                "do not overwrite. Please remove manually "
-                "if you want to update.")
-            continue
+
         if key not in new_data:
             new_data[key] = []
         for f in files:
@@ -179,8 +207,8 @@ def update_setup_py(package_path, package_name):
     new_content = content.replace(data_files_str, new_data_files_str)
 
     # Backup erstellen
-    with open(setup_path + '.bak', 'w') as f:
-        f.write(content)
+    # with open(setup_path + '.bak', 'w') as f:
+    #     f.write(content)
 
     # Setup.py überschreiben
     with open(setup_path, 'w') as f:
@@ -204,48 +232,95 @@ def run_wheel_install(wheel_dir):
             print(f"Error installing wheel {file}: {e}", file=sys.stderr)
             sys.exit(1)
 
-def derive_package_name_from_pip(pip_package_name):
-    """Leitet ROS2 Package-Namen vom pip Package-Namen ab"""
-    # Konventionen für die Umwandlung
-    ros_name = pip_package_name.replace('-', '_').replace('_', '_')
-    
-    # # Füge _interfaces suffix hinzu falls nicht vorhanden
-    # if not ros_name.endswith('_interfaces'):
-    #     ros_name += '_interfaces'
-    
-    return ros_name
-
-def main():
-    SELECT_PY_CPP = "py"
-
+def load_default_interfaces(interface_package_name, interface_package_path):
+    print(f"Load default interfaces: {interface_package_name}")
     try:
         import vyra_base
     except ImportError:
         print("vyra_base not found. Will be installed from wheel.")
-
         run_wheel_install(Path(__file__).parent.parent / "wheels")
         import vyra_base
-        
-    # User kann überschreiben
-    # package_name = input(f"V.Y.R.A. module name: ").strip()
-    interface_package_name = "vyra_module_interfaces"
-    # Workspace setup
-    workspace_root = Path(__file__).parent.parent
-    interface_package_path: Path = workspace_root / "src" / interface_package_name
-    interface_package_path.mkdir(exist_ok=True)
 
-    print(f"\nAdd default interfaces: {interface_package_name}")
     vyra_base.extract_ros_interfaces(interface_package_path)
 
-    if SELECT_PY_CPP == "py":
-        print(f"\nUpdate package.xml for {interface_package_name}")
-        update_package_xml(interface_package_path)
-    elif SELECT_PY_CPP == "cpp":
-        pass
-        # here cpp specific setup code
+def update_dynamic_interfaces(
+    interface_package_name, 
+    interfaces_src_path: Path,
+    interface_target_path: Path
+):
+    """Loading interfaces from src directory to target package."""
+    print(f"Update dynamic interfaces: {interface_package_name}")
+    
+    source_path = interfaces_src_path
+    target_path = interface_target_path
+    
+    # Copy interface files from source to target
+    print(f"Extracting ROS2 interfaces from {source_path} to {target_path}")
+    for interface_type in ['msg', 'srv', 'action']:
+        source_dir: Path = source_path / interface_type
+        target_dir: Path = target_path / interface_type
+        
+        if source_dir.exists():
+            target_dir.mkdir(exist_ok=True)
+            for file in source_dir.rglob(f'*.{interface_type}'):
+                shutil.copy2(file, target_dir / file.name)
+                print(f"Copied {file.name} to {target_dir}")
+
+    config_path: Path = source_path / 'config'
+    target_config: Path = target_path / 'config'
+    
+    if not target_config.exists():
+        target_config.mkdir(parents=True, exist_ok=True)
+    
+    try:
+        for type in ['json', 'yaml', 'xml']:
+            for file in config_path.glob(f'*.{type}'):
+                shutil.copy2(file, target_config)
+                print(f"Copied {file.name} to {target_config}")
+
+    finally:
+        # Clean up the temporary source directory
+        shutil.rmtree(source_path)
+
+    print(f"✓ ROS2 interfaces extracted to {target_path} successfully.")
+    
+def main(interface_package_name, tmp_src_path=None):
+    SELECT_PY_CPP = "cpp"  # oder "py", select based on your needs
+
+    # Workspace setup
+    workspace_root = Path("/workspace")
+    interface_package_path: Path = workspace_root / "src" / interface_package_name
+
+    # Check if package already exists
+    if (
+        not interface_package_path.exists() and 
+        interface_package_name != "vyra_module_interfaces"
+    ):
+        raise FileNotFoundError(
+            f"Interface package '{interface_package_name}' not "
+            f"found in {workspace_root}/src. "
+            "Check your spelling of the package name or create it manually."
+        )
+    
+    interface_package_path.mkdir(exist_ok=True)
+
+    if interface_package_name == "vyra_module_interfaces":
+        load_default_interfaces(interface_package_name, interface_package_path)
     else:
-        print("Invalid selection. Please choose 'py' or 'cpp'.")
-        sys.exit(1)
+        print(f"Update dynamic interface package: {interface_package_name}")
+        if tmp_src_path is None or not tmp_src_path.exists():
+            raise ValueError(
+                "tmp_src_path must be provided for dynamic interface packages."
+            )
+
+        update_dynamic_interfaces(
+            interface_package_name, 
+            tmp_src_path,
+            interface_package_path
+        )
+
+    print(f"\nUpdate package.xml for {interface_package_name}")
+    update_package_xml(interface_package_path)
 
     print(f"\nUpdate CMakefile for {interface_package_name}")
     update_CMakefile(interface_package_path)
@@ -260,15 +335,13 @@ def main():
                 interface_package_name
             )
 
-    print(f"\nUpdate setup.py for {interface_package_name}")
-    update_setup_py(interface_package_path, interface_package_name)
+    if SELECT_PY_CPP == "py":
+        print(f"\nUpdate setup.py for {interface_package_name}")
+        update_setup_py(interface_package_path, interface_package_name)
     
     print(f"✓ Package '{interface_package_name}' updated successfully!")
 
-    package_name = "vyra_module_template"
-    # Workspace setup    
-    
-
 
 if __name__ == "__main__":
-    main()
+    args = parse_args()
+    main(args.interface_pkg, args.dynamic_src_path)
