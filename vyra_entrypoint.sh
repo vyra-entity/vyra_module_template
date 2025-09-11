@@ -81,7 +81,8 @@ fi
 if pip show vyra_base > /dev/null 2>&1; then
     echo "✅ vyra_base is installed"
 else
-    echo "❌ vyra_base is NOT installed. Activate VYRA_STARTUP_ACTIVE=true in your .env file and restart the container."
+    echo "❌ vyra_base is NOT installed. VYRA_STARTUP_ACTIVE=true will be set to base all settings."
+    export VYRA_STARTUP_ACTIVE=true
     exit 1
 fi
 
