@@ -78,6 +78,13 @@ else
     echo "✅ Skipping ros2 build"
 fi
 
+if pip show vyra_base > /dev/null 2>&1; then
+    echo "✅ vyra_base is installed"
+else
+    echo "❌ vyra_base is NOT installed"
+    exit 1
+fi
+
 # Source package setup
 source install/setup.bash
 
