@@ -216,30 +216,30 @@ def update_setup_py(package_path, package_name):
 
     print("✓ setup.py wurde aktualisiert. Originalversion wurde als setup.py.bak gespeichert.")
 
-def run_wheel_install(wheel_dir):
-    for file in os.listdir(wheel_dir):
-        try:
-            if file.endswith('.whl'):
-                subprocess.check_call([
-                    sys.executable, 
-                    '-m', 
-                    'pip', 
-                    'install', 
-                    '--break-system-packages', 
-                    os.path.join(wheel_dir, file)
-                ], stdout=sys.stdout, stderr=sys.stderr)
-        except subprocess.CalledProcessError as e:
-            print(f"Error installing wheel {file}: {e}", file=sys.stderr)
-            sys.exit(1)
+# def run_wheel_install(wheel_dir):
+#     for file in os.listdir(wheel_dir):
+#         try:
+#             if file.endswith('.whl'):
+#                 subprocess.check_call([
+#                     sys.executable, 
+#                     '-m', 
+#                     'pip', 
+#                     'install', 
+#                     '--break-system-packages', 
+#                     os.path.join(wheel_dir, file)
+#                 ], stdout=sys.stdout, stderr=sys.stderr)
+#         except subprocess.CalledProcessError as e:
+#             print(f"Error installing wheel {file}: {e}", file=sys.stderr)
+#             sys.exit(1)
 
 def load_default_interfaces(interface_package_name, interface_package_path):
     print(f"Load default interfaces: {interface_package_name}")
     try:
         import vyra_base
     except ImportError:
-        print("vyra_base not found. Will be installed from wheel.")
-        run_wheel_install(Path(__file__).parent.parent / "wheels")
-        import vyra_base
+        raise ImportError(
+            "vyra_base not found. Please set the startup environment variable " +
+            " in your container (.env) [VYRA_STARTUP_ACTIVE=true] to load all wheels.")
 
     vyra_base.extract_ros_interfaces(interface_package_path)
 

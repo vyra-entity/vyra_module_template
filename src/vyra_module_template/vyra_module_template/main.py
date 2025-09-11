@@ -4,7 +4,7 @@ import rclpy
 import signal
 import sys
 
-from . import _Base_
+from . import _base_
 from .application import application
 from .taskmanager import TaskManager
 
@@ -20,7 +20,16 @@ def handle_sigterm(signum, frame):
 signal.signal(signal.SIGTERM, handle_sigterm)
 signal.signal(signal.SIGINT, handle_sigterm)
 
-async def application_runner(entity, taskmanager):
+async def application_runner(
+        entity: VyraEntity, 
+        taskmanager: TaskManager) -> None:
+    """The application runner starts the main application logic.
+    It is managed as an asyncio task by the TaskManager.
+    :param entity: The VyraEntity containing the ROS 2 node.
+    :type entity: VyraEntity
+    :param taskmanager: The TaskManager instance to manage application tasks.
+    :type taskmanager: TaskManager
+    """
     Logger.log('Starting application runner...')
     try:
         await application.main(entity, taskmanager)
@@ -28,7 +37,12 @@ async def application_runner(entity, taskmanager):
         Logger.log('Application runner finished.')
         ErrorTraceback.check_error_exist()
 
-async def main_communication_spinner(entity):
+async def main_communication_spinner(entity: VyraEntity) -> None:
+    """The main communication spinner handle the rclpy.spin_once loop
+    from ros2
+    :param entity: The VyraEntity containing the ROS 2 node.
+    :type entity: VyraEntity
+    """
     Logger.log('Starting node spinner...')
     try:
         while rclpy.ok():
@@ -41,7 +55,13 @@ async def main_communication_spinner(entity):
         ErrorTraceback.check_error_exist()
 
 async def configure_settings(tm: TaskManager) -> VyraEntity:
-    """Konfiguriert die Einstellungen für die Anwendung."""
+    """Initializing vyra entity and configure base settings. Afterwards start 
+    the application runner and the communication spinner.
+    :param tm: The TaskManager instance to manage application tasks.
+    :type tm: TaskManager
+    :return: The configured VyraEntity instance.
+    :rtype: VyraEntity
+    """
     Logger.log('Configuring settings...')
     # Hier können spezifische Einstellungen für die Anwendung gesetzt werden
     # Zum Beispiel:
@@ -56,13 +76,13 @@ async def configure_settings(tm: TaskManager) -> VyraEntity:
     return entity
 
 @ErrorTraceback.w_check_error_exist
-async def runner():   
+async def runner() -> None:   
     try:
         tm = TaskManager()
         
         rclpy.init()
 
-        entity = await configure_settings(tm)
+        entity: VyraEntity = await configure_settings(tm)
 
         while tm.tasks:
             try:
@@ -116,7 +136,7 @@ async def runner():
             
         tm.cancel_all()
 
-def main():
+def main() -> None:
     try:
         asyncio.run(runner())
         Logger.log('Exit module runner')

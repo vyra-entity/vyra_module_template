@@ -25,7 +25,7 @@ async def auto_register_interfaces(
     contain all functions that are defined in the interface metadata.
     Args:
         entity (VyraEntity): The entity to register interfaces for.
-        callback_list (list[Callable], optional): List of callbacks to register.
+        callback_list (list[Callable], optional): List of functions to register.
         callback_parent (Callable, optional): Parent callback for loading all remote callables. Defaults to None.
 
     Either a callback_list or a callback_parent must be provided.
