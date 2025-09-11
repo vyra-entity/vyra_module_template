@@ -2,7 +2,7 @@
 
 ## 1. Situation
 
-- You have a module repository (`module-A`) based on a template framework (`template-framework`).
+- You have a module repository (`module-A`) based on a template framework (`vyra_module_template`).
 - Your module may contain custom files and modifications.
 - Goal: Easily incorporate future updates from the template without losing your module-specific changes.
 
@@ -24,8 +24,8 @@ git remote -v
 ```text
 origin    git@github.com:vyra-entity/module-A.git (fetch)
 origin    git@github.com:vyra-entity/module-A.git (push)
-upstream  https://github.com/vyra-entity/template-framework.git (fetch)
-upstream  https://github.com/vyra-entity/template-framework.git (push)
+upstream  https://github.com/vyra-entity/vyra_module_template.git (fetch)
+upstream  https://github.com/vyra-entity/vyra_module_template.git (push)
 ```
 
 ## 3. Fetch Changes from the Template
