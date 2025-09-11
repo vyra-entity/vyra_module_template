@@ -87,12 +87,12 @@ else
 fi
 
 # Rename in update_ros.sh
-UPDATE_ROS_FILE="$SCRIPT_DIR/../tools/update_ros.sh"
-if [ -f "$UPDATE_ROS_FILE" ]; then
-    echo "✅ Renaming module in update_ros.sh: $UPDATE_ROS_FILE"
-    sed -i "s/$TEMPLATE_NAME/$NEW_NAME/g" "$UPDATE_ROS_FILE"
+STARTUP_MODULE="$SCRIPT_DIR/../tools/startup_module.sh"
+if [ -f "$STARTUP_MODULE" ]; then
+    echo "✅ Renaming module in startup_module.sh: $STARTUP_MODULE"
+    sed -i "s/$TEMPLATE_NAME/$NEW_NAME/g" "$STARTUP_MODULE"
 else
-    echo "⚠️ Update ROS script $UPDATE_ROS_FILE not found."
+    echo "⚠️ Update ROS script $STARTUP_MODULE not found."
 fi
 
 # Rename in vyra_entrypoint.sh

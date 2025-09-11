@@ -8,7 +8,7 @@ source install/setup.bash
 
 echo "SECURITY ENCLAVE: $ROS_SECURITY_ENCLAVE"
 
-exec ros2 run v2_modulemanager core --ros-args --enclave $ROS_SECURITY_ENCLAVE
+exec ros2 run vyra_module_template core --ros-args --enclave $ROS_SECURITY_ENCLAVE
 
 if [ $? -eq 0 ]; then
     echo "✅ Module run successfully"
