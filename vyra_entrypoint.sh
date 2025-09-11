@@ -30,7 +30,6 @@ if pip show vyra_base > /dev/null 2>&1; then
 else
     echo "❌ vyra_base is NOT installed. VYRA_STARTUP_ACTIVE=true will be set to base all settings."
     export VYRA_STARTUP_ACTIVE=true
-    exit 1
 fi
 
 # Only build on first start or if manually set (VYRA_STARTUP_ACTIVE=false)
