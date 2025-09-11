@@ -352,7 +352,7 @@ class SimpleContainerManagementHandler(BaseHTTPRequestHandler):
                     'condition': 'service_completed_successfully'
                 }
             },
-            'volumes': [f'./{service_name}:/workspace'],
+            'volumes': [f'./modules/{service_name}:/workspace'],
             'working_dir': '/workspace',
             'command': ['/workspace/vyra_entrypoint.sh'],
             'stdin_open': True,
