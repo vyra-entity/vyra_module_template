@@ -225,9 +225,9 @@ class SecureVyraContainerManager:
             bool: True wenn Konfiguration sicher ist
         """
         # Erlaubte Images
-        allowed_images = ['vyra-framework:latest']
-        image = config.get('image', 'vyra-framework:latest')
-        
+        allowed_images = ['vyra_base_image:latest']
+        image = config.get('image', 'vyra_base_image:latest')
+
         if image not in allowed_images:
             logger.warning(f"Nicht erlaubtes Image: {image}")
             return False
@@ -273,8 +273,8 @@ if __name__ == "__main__":
     
     # Beispiel: Neues sicheres Modul
     secure_config = {
-        'image': 'vyra-framework:latest',
-        'volumes': ['./secure_test_module:/workspace'],
+        'image': 'vyra_base_image:latest',
+        'volumes': ['./modules/secure_test_module:/workspace'],
         'environment': [
             'ROS_SECURITY_ENABLE=true',  # Sicherheit aktiviert
             'VYRA_PRODUCTIVE=false'

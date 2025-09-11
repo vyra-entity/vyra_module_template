@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 class SimpleContainerManagementHandler(BaseHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
-        self.compose_file = Path("/host_workspace/docker-compose.yml")
+        self.compose_file = Path("/workspace/docker-compose.yml")
         self.security_token = os.environ.get('VYRA_SECURITY_TOKEN', 'default-token')
         super().__init__(*args, **kwargs)
     
@@ -172,7 +172,7 @@ class SimpleContainerManagementHandler(BaseHTTPRequestHandler):
             result = subprocess.run([
                 "docker-compose", "-f", str(self.compose_file),
                 "up", "-d", "--no-deps", module_name
-            ], capture_output=True, text=True, cwd="/host_workspace")
+            ], capture_output=True, text=True, cwd="/workspace")
             
             logger.info(f"Docker compose up result: returncode={result.returncode}, stdout={result.stdout}, stderr={result.stderr}")
             
@@ -194,12 +194,12 @@ class SimpleContainerManagementHandler(BaseHTTPRequestHandler):
             stop_result = subprocess.run([
                 "docker-compose", "-f", str(self.compose_file),
                 "stop", module_name
-            ], capture_output=True, text=True, cwd="/host_workspace")
+            ], capture_output=True, text=True, cwd="/workspace")
             
             rm_result = subprocess.run([
                 "docker-compose", "-f", str(self.compose_file),
                 "rm", "-f", module_name
-            ], capture_output=True, text=True, cwd="/host_workspace")
+            ], capture_output=True, text=True, cwd="/workspace")
             
             # Entferne aus compose
             self._remove_service_from_compose(module_name)
@@ -241,7 +241,7 @@ class SimpleContainerManagementHandler(BaseHTTPRequestHandler):
             up_result = subprocess.run([
                 "docker-compose", "-f", str(self.compose_file),
                 "up", "-d", "--no-deps", module_name
-            ], capture_output=True, text=True, cwd="/host_workspace")
+            ], capture_output=True, text=True, cwd="/workspace")
             
             logger.info(f"Docker compose up result: returncode={up_result.returncode}, stdout={up_result.stdout}, stderr={up_result.stderr}")
             
@@ -308,7 +308,7 @@ class SimpleContainerManagementHandler(BaseHTTPRequestHandler):
             result = subprocess.run([
                 "docker-compose", "-f", str(self.compose_file),
                 "logs", "--tail", str(tail), module_name
-            ], capture_output=True, text=True, cwd="/host_workspace")
+            ], capture_output=True, text=True, cwd="/workspace")
             
             return result.stdout if result.returncode == 0 else result.stderr
             
