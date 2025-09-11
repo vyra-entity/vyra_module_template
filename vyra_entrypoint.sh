@@ -25,6 +25,14 @@ if ! grep -q '^VYRA_STARTUP_ACTIVE=' .env; then
     echo "VYRA_STARTUP_ACTIVE=true" >> .env
 fi
 
+if pip show vyra_base > /dev/null 2>&1; then
+    echo "✅ vyra_base is installed"
+else
+    echo "❌ vyra_base is NOT installed. VYRA_STARTUP_ACTIVE=true will be set to base all settings."
+    export VYRA_STARTUP_ACTIVE=true
+    exit 1
+fi
+
 # Only build on first start or if manually set (VYRA_STARTUP_ACTIVE=false)
 if [ "$VYRA_STARTUP_ACTIVE" == "true" ]; then
     echo "=== STARTUP ACTIVE: INSTALL DEPS AND BUILDING WORKSPACE ==="
@@ -76,14 +84,6 @@ else
     echo "=== STARTUP NOT ACTIVE ==="
     echo "✅ Skipping interface configuration"
     echo "✅ Skipping ros2 build"
-fi
-
-if pip show vyra_base > /dev/null 2>&1; then
-    echo "✅ vyra_base is installed"
-else
-    echo "❌ vyra_base is NOT installed. VYRA_STARTUP_ACTIVE=true will be set to base all settings."
-    export VYRA_STARTUP_ACTIVE=true
-    exit 1
 fi
 
 # Source package setup
