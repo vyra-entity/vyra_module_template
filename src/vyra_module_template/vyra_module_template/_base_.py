@@ -232,7 +232,6 @@ async def build_entity(project_settings):
             description=project_settings['module_description'],
             version=project_settings['version'],
         )
-        await _write_module_data(me.to_dict())
     elif not all(field in module_data for field in needed_fields):
         missing_field: list[str] = [
             field for field in needed_fields if field not in module_data]
@@ -249,13 +248,22 @@ async def build_entity(project_settings):
             description=module_data.get('description', project_settings['description']),
             version=module_data.get('version', project_settings['version']),
         )
-        await _write_module_data(me.to_dict())
-        Logger.log("Module data recovered from project settings.")
+
+        Logger.pre_log_buffer.append(LogEntry(
+            message="Module data recovered from project settings."
+        ))
     else:
         Logger.pre_log_buffer.append(LogEntry(
             message="Module data complete. "
                     "Using project settings to create a new module entry."
         ))
+
+        if module_data['uuid'] in [None, "", "null"]:
+            Logger.pre_log_buffer.append(LogEntry(
+                message="Module UUID is empty. Generating new UUID."
+            ))
+
+            module_data['uuid'] = ModuleEntry.gen_uuid()
 
         me = ModuleEntry(
             uuid=module_data['uuid'],
@@ -264,6 +272,9 @@ async def build_entity(project_settings):
             description=module_data['description'],
             version=module_data['version'],
         )
+    
+    await _write_module_data(me.to_dict())
+    
     Logger.info(f"Module_data: {me.to_dict()}")
 
     se = StateEntry(
@@ -332,7 +343,6 @@ async def create_db_storage(entity: VyraEntity) -> None:
     """
 
     from vyra_base.storage.db_access import DbAccess
-    from vyra_base.storage.tb_base import Base as DbBase
 
     storage_config: dict[str, Any] = await _load_storage_config()
 

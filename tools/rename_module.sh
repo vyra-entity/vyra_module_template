@@ -124,7 +124,13 @@ fi
 PYPROJECT_FILE="$SCRIPT_DIR/../pyproject.toml"
 if [ -f "$PYPROJECT_FILE" ]; then
     echo "✅ Renaming module in pyproject.toml: $PYPROJECT_FILE"
+    # Update module_name in [tool.vyra] section
     sed -i "s/^module_name\s*=\s*.*/module_name = \"$NEW_MODULE_NAME\"/" "$PYPROJECT_FILE"
+    
+    # Update name in [tool.poetry] section only
+    echo "✅ Updating name in [tool.poetry] section"
+    sed -i '/^\[tool\.poetry\]/,/^\[/{s/^name\s*=\s*.*/name = "'"$NEW_MODULE_NAME"'"/}' "$PYPROJECT_FILE"
+
 else
     echo "⚠️ Pyproject file $PYPROJECT_FILE not found."
 fi
