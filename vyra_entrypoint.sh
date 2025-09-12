@@ -6,6 +6,8 @@ echo "=== VYRA ENTRYPOINT STARTING ==="
 # Warte kurz für vollständige Installation
 # sleep 2
 
+chmod 777 .env
+
 export $(grep -v '^#' .env | xargs)
 
 # Vyra Base installieren
