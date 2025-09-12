@@ -19,13 +19,9 @@ from vyra_module_interfaces.msg import VBASEVolatileSet # pyright: ignore[report
 from vyra_module_interfaces.msg import VBASEVolatileHash # pyright: ignore[reportAttributeAccessIssue]
 from vyra_module_interfaces.msg import VBASEVolatileString # pyright: ignore[reportAttributeAccessIssue]
 # srv
-from vyra_module_interfaces.srv import VBASEGetCapabilities # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.srv import VBASEGetLogs # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.srv import VBASEHealthCheck # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.srv import VBASETriggerTransition # pyright: ignore[reportAttributeAccessIssue]
-
+# add base services here
 # action
-from vyra_module_interfaces.action import VBASEInitiateUpdate # pyright: ignore[reportAttributeAccessIssue]
+# add base actions here
 
 from vyra_base.core.entity import VyraEntity
 from vyra_base.defaults.entries import (
