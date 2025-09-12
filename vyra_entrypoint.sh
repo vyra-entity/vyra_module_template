@@ -1,5 +1,5 @@
 #!/bin/bash
-# filepath: /home/holgder/VOS2_WORKSPACE/v2_modulemanager/vyra_entrypoint.sh
+# filepath: /home/holgder/VOS2_WORKSPACE/$MODULE_NAME/vyra_entrypoint.sh
 
 echo "=== VYRA ENTRYPOINT STARTING ==="
 
@@ -18,6 +18,34 @@ if [ $? -eq 0 ]; then
 else
     echo "❌ Source ROS global setup failed"
     exit 1
+fi
+
+# Try to read the name from .module/module_data.yaml
+MODULE_DATA_FILE=".module/module_data.yaml"
+if [ -f "$MODULE_DATA_FILE" ]; then
+    MODULE_NAME=$(grep "^name:" "$MODULE_DATA_FILE" | sed 's/^name:[[:space:]]*//')
+    if [ -n "$MODULE_NAME" ]; then
+        echo "✅ Using name from module_data.yaml: $MODULE_NAME"
+    else
+        echo "⚠️ Could not read name from $MODULE_DATA_FILE"
+        echo "⚠️ ! Check the structure of the module_data.yaml file !"
+        exit 1
+    fi
+else
+    echo "⚠️ Module data file $MODULE_DATA_FILE not found. Cannot start module"
+    exit 1
+fi
+
+# Add module name to .env
+if [ -f ".env" ]; then
+    echo "✅ Adding MODULE_NAME=$MODULE_NAME to .env file"
+    if ! grep -q '^MODULE_NAME=' ".env"; then
+        echo "MODULE_NAME=$MODULE_NAME" >> ".env"
+    else
+        echo "⚠️ MODULE_NAME already set in .env"
+        # Update the existing line
+        sed -i "s/^MODULE_NAME=.*/MODULE_NAME=$MODULE_NAME/" ".env"
+    fi
 fi
 
 # Create log directory
@@ -102,7 +130,7 @@ echo "=== AVAILABLE PACKAGES ==="
 ros2 pkg list | grep -E "(v2_|vyra_)" || echo "No matching packages"
 
 echo "=== EXECUTABLES ==="
-ros2 pkg executables v2_modulemanager || echo "No executables for v2_modulemanager"
+ros2 pkg executables $MODULE_NAME || echo "No executables for $MODULE_NAME"
 
 # SROS2 Setup
 echo "=== SROS2 SETUP ==="
@@ -118,14 +146,14 @@ if [ ! -d "$ROS_SECURITY_KEYSTORE/enclaves" ]; then
     mkdir -p $ROS_SECURITY_KEYSTORE/enclaves
 fi
 
-# Enclave für v2_modulemanager erzeugen
-echo "[SROS2] Creating enclave for /v2_modulemanager/core"
-ros2 security create_enclave $ROS_SECURITY_KEYSTORE /v2_modulemanager/core
+# Enclave für $MODULE_NAME erzeugen
+echo "[SROS2] Creating enclave for /$MODULE_NAME/core"
+ros2 security create_enclave $ROS_SECURITY_KEYSTORE /$MODULE_NAME/core
 
 # Environment für Security setzen
 # export ROS_SECURITY_ENABLE=false
 # export ROS_SECURITY_STRATEGY=Enforce
-# export ROS_SECURITY_ENCLAVE="/v2_modulemanager/core"
+# export ROS_SECURITY_ENCLAVE="/$MODULE_NAME/core"
 
 echo "=== FINAL ENVIRONMENT ==="
 echo "ROS_SECURITY_ENABLE: $ROS_SECURITY_ENABLE"

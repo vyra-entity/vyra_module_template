@@ -146,7 +146,7 @@ if [ -f "$RESOURCE_FILE" ]; then
     if ! grep -q '^MODULE_NAME=' "$RESOURCE_FILE"; then
         echo "MODULE_NAME=$NEW_MODULE_NAME" >> "$RESOURCE_FILE"
     else
-        echo "⚠️ VYRA_STARTUP_ACTIVE already set in $RESOURCE_FILE"
+        echo "⚠️ MODULE_NAME already set in $RESOURCE_FILE"
         # Update the existing line
-        sed -i "s/^VYRA_STARTUP_ACTIVE=.*/VYRA_STARTUP_ACTIVE=true/" "$RESOURCE_FILE"
+        sed -i "s/^MODULE_NAME=.*/MODULE_NAME=$NEW_MODULE_NAME/" "$RESOURCE_FILE"
     fi
