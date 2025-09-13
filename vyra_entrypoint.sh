@@ -66,6 +66,47 @@ fi
 if [ "$VYRA_STARTUP_ACTIVE" == "true" ]; then
     echo "=== STARTUP ACTIVE: INSTALL DEPS AND BUILDING WORKSPACE ==="
 
+    # 1. Install system packages first
+    # Optional: Run pre-install script for repository setup
+    if [ -f ".module/pre-install.sh" ]; then
+        echo "🔧 Running pre-install script..."
+        chmod +x .module/pre-install.sh
+        ./.module/pre-install.sh
+        echo "✅ Pre-install script completed"
+    fi
+    
+    # 2. Install system packages from .module/system-packages.txt
+    if [ -f ".module/system-packages.txt" ]; then
+        echo "🔧 Installing system packages from .module/system-packages.txt..."
+        apt-get update -qq
+        while read -r package; do
+            if [ -n "$package" ] && [ "${package:0:1}" != "#" ]; then
+                echo "  📦 Installing: $package"
+                if apt-get install -y "$package"; then
+                    echo "  ✅ $package installed successfully"
+                else
+                    echo "  ⚠️ Failed to install $package, continuing..."
+                fi
+            fi
+        done < .module/system-packages.txt
+        echo "✅ System packages installation completed"
+    else
+        echo "⚠️ No .module/system-packages.txt found, skipping system packages"
+    fi
+
+    # 3. Install Python requirements
+    if [ -f ".module/requirements.txt" ]; then
+        echo "🐍 Installing Python requirements from .module/requirements.txt..."
+        if pip install --no-cache-dir -r .module/requirements.txt --break-system-packages; then
+            echo "✅ Python requirements installed successfully"
+        else
+            echo "❌ Python requirements installation failed"
+            exit 1
+        fi
+    else
+        echo "⚠️ No .module/requirements.txt found, skipping Python requirements"
+    fi
+
     # Clear vyra_base
     if pip show vyra_base > /dev/null 2>&1; then
         pip uninstall vyra_base -y --break-system-packages
@@ -74,7 +115,7 @@ if [ "$VYRA_STARTUP_ACTIVE" == "true" ]; then
     fi
 
     # Interfaces setup
-    # Installing all wheels dependencies
+    # 3. Installing all wheels dependencies
     pip install wheels/*.whl --break-system-packages
 
     if [ $? -eq 0 ]; then
@@ -162,10 +203,16 @@ echo "ROS_SECURITY_KEYSTORE: $ROS_SECURITY_KEYSTORE"
 
 # Prüfe ob Supervisor-Konfiguration existiert und starte Supervisor
 if [ -f "/etc/supervisor/conf.d/supervisord.conf" ]; then
+    if [ "$ENABLE_FRONTEND" = "true" ]; then \
+        sed -i 's/autostart=false/autostart=true/' /etc/supervisor/conf.d/supervisord.conf; \
+    fi
     echo "=== STARTING SUPERVISORD ==="
     exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf -n
 elif [ -f "/workspace/supervisord.conf" ]; then
     echo "=== STARTING SUPERVISORD (Workspace) ==="
+    if [ "$ENABLE_FRONTEND" = "true" ]; then \
+        sed -i 's/autostart=false/autostart=true/' /workspace/supervisord.conf; \
+    fi
     exec /usr/bin/supervisord -c /workspace/supervisord.conf -n
 else
     echo "=== NO SUPERVISORD CONFIG - STARTING DEFAULT COMMAND ==="
