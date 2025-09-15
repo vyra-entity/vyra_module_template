@@ -203,16 +203,46 @@ echo "ROS_SECURITY_KEYSTORE: $ROS_SECURITY_KEYSTORE"
 
 # Prüfe ob Supervisor-Konfiguration existiert und starte Supervisor
 if [ -f "/etc/supervisor/conf.d/supervisord.conf" ]; then
-    if [ "$ENABLE_FRONTEND" = "true" ]; then \
-        sed -i 's/autostart=false/autostart=true/' /etc/supervisor/conf.d/supervisord.conf; \
+    echo "=== CONFIGURING SUPERVISORD SERVICES ==="
+    
+    # Configure Nginx (Frontend Webserver)
+    if [ "$ENABLE_FRONTEND_WEBSERVER" = "true" ]; then
+        echo "✅ Enabling Nginx (Frontend Webserver)"
+        sed -i '/\[program:nginx\]/,/^\[/ s/autostart=false/autostart=true/' /etc/supervisor/conf.d/supervisord.conf
+    else
+        echo "⚠️ Nginx (Frontend Webserver) disabled"
     fi
+    
+    # Configure Gunicorn (Backend Webserver)
+    if [ "$ENABLE_BACKEND_WEBSERVER" = "true" ]; then
+        echo "✅ Enabling Gunicorn (Backend Webserver)"
+        sed -i '/\[program:gunicorn\]/,/^\[/ s/autostart=false/autostart=true/' /etc/supervisor/conf.d/supervisord.conf
+    else
+        echo "⚠️ Gunicorn (Backend Webserver) disabled"
+    fi
+    
     echo "=== STARTING SUPERVISORD ==="
     exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf -n
 elif [ -f "/workspace/supervisord.conf" ]; then
-    echo "=== STARTING SUPERVISORD (Workspace) ==="
-    if [ "$ENABLE_FRONTEND" = "true" ]; then \
-        sed -i 's/autostart=false/autostart=true/' /workspace/supervisord.conf; \
+    echo "=== CONFIGURING SUPERVISORD SERVICES (Workspace) ==="
+    
+    # Configure Nginx (Frontend Webserver)
+    if [ "$ENABLE_FRONTEND_WEBSERVER" = "true" ]; then
+        echo "✅ Enabling Nginx (Frontend Webserver)"
+        sed -i '/\[program:nginx\]/,/^\[/ s/autostart=false/autostart=true/' /workspace/supervisord.conf
+    else
+        echo "⚠️ Nginx (Frontend Webserver) disabled"
     fi
+    
+    # Configure Gunicorn (Backend Webserver)
+    if [ "$ENABLE_BACKEND_WEBSERVER" = "true" ]; then
+        echo "✅ Enabling Gunicorn (Backend Webserver)"
+        sed -i '/\[program:gunicorn\]/,/^\[/ s/autostart=false/autostart=true/' /workspace/supervisord.conf
+    else
+        echo "⚠️ Gunicorn (Backend Webserver) disabled"
+    fi
+    
+    echo "=== STARTING SUPERVISORD (Workspace) ==="
     exec /usr/bin/supervisord -c /workspace/supervisord.conf -n
 else
     echo "=== NO SUPERVISORD CONFIG - STARTING DEFAULT COMMAND ==="
