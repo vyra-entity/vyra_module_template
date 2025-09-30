@@ -20,6 +20,11 @@ else
     exit 1
 fi
 
+# Create log directories required by supervisord
+mkdir -p /workspace/log/vyra
+mkdir -p /workspace/log/gunicorn
+mkdir -p /workspace/log/nginx
+
 # Try to read the name from .module/module_data.yaml
 MODULE_DATA_FILE=".module/module_data.yaml"
 if [ -f "$MODULE_DATA_FILE" ]; then
@@ -47,9 +52,6 @@ if [ -f ".env" ]; then
         sed -i "s/^MODULE_NAME=.*/MODULE_NAME=$MODULE_NAME/" ".env"
     fi
 fi
-
-# Create log directory
-mkdir -p /workspace/log/vyra
 
 if ! grep -q '^VYRA_STARTUP_ACTIVE=' .env; then
     echo "VYRA_STARTUP_ACTIVE=true" >> .env
