@@ -1,0 +1,16 @@
+# NPM-Pakete die global installiert werden
+# Ein Paket pro Zeile, Kommentare mit #
+
+# Frontend Build Tools
+#vite
+#@vue/cli
+
+# Development Tools
+#nodemon
+
+# Utility Tools
+#http-server
+
+# Optional: TypeScript
+# typescript
+# @types/node

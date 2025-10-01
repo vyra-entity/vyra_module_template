@@ -203,6 +203,88 @@ echo "ROS_SECURITY_ENABLE: $ROS_SECURITY_ENABLE"
 echo "ROS_SECURITY_STRATEGY: $ROS_SECURITY_STRATEGY"
 echo "ROS_SECURITY_KEYSTORE: $ROS_SECURITY_KEYSTORE"
 
+# =============================================================================
+# SSL Certificate Auto-Generation
+# =============================================================================
+echo "=== SSL CERTIFICATE CHECK ==="
+
+# Function to check and create SSL certificates
+check_and_create_certificates() {
+    local cert_path="/workspace/storage/certificates/webserver.crt"
+    local key_path="/workspace/storage/certificates/webserver.key"
+    local cert_script="/workspace/tools/create_ssl_certificates.sh"
+    
+    echo "🔍 Checking SSL certificates..."
+    echo "   Certificate: $cert_path"
+    echo "   Private Key: $key_path"
+    
+    if [ -f "$cert_path" ] && [ -f "$key_path" ]; then
+        echo "✅ SSL certificates found"
+        
+        # Check if certificates are still valid (not expired)
+        if openssl x509 -checkend 86400 -noout -in "$cert_path" >/dev/null 2>&1; then
+            echo "✅ SSL certificates are valid (>24h remaining)"
+            return 0
+        else
+            echo "⚠️ SSL certificates are expiring soon or expired"
+            echo "🔄 Regenerating certificates..."
+        fi
+    else
+        echo "❌ SSL certificates not found"
+        echo "🔨 Creating new SSL certificates..."
+    fi
+    
+    # Create certificates directory if it doesn't exist
+    mkdir -p "/workspace/storage/certificates"
+    
+    # Check if creation script exists
+    if [ -f "$cert_script" ]; then
+        echo "🛠️ Using certificate creation script..."
+        if "$cert_script" --domain localhost --days 365; then
+            echo "✅ SSL certificates created successfully"
+            return 0
+        else
+            echo "❌ Certificate creation script failed"
+            return 1
+        fi
+    else
+        echo "⚠️ Certificate script not found, creating manually..."
+        
+        # Fallback: Create certificates directly
+        if openssl req -x509 -newkey rsa:4096 \
+            -keyout "$key_path" \
+            -out "$cert_path" \
+            -days 365 \
+            -nodes \
+            -subj "/CN=localhost/O=VYRA Dashboard/C=DE" >/dev/null 2>&1; then
+            
+            # Set secure permissions
+            chmod 600 "$key_path"
+            chmod 644 "$cert_path"
+            
+            echo "✅ SSL certificates created manually"
+            return 0
+        else
+            echo "❌ Manual certificate creation failed"
+            return 1
+        fi
+    fi
+}
+
+# Only check/create certificates if backend webserver is enabled
+if [ "$ENABLE_BACKEND_WEBSERVER" = "true" ]; then
+    echo "🔐 Backend webserver enabled - checking SSL certificates..."
+    
+    if check_and_create_certificates; then
+        echo "✅ SSL certificate check completed successfully"
+    else
+        echo "⚠️ SSL certificate setup failed - continuing without SSL"
+        echo "   Backend will start in HTTP mode"
+    fi
+else
+    echo "⏭️ Backend webserver disabled - skipping SSL certificate check"
+fi
+
 # Prüfe ob Supervisor-Konfiguration existiert und starte Supervisor
 if [ -f "/etc/supervisor/conf.d/supervisord.conf" ]; then
     echo "=== CONFIGURING SUPERVISORD SERVICES ==="
