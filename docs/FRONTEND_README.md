@@ -1,37 +1,47 @@
 # VYRA Dashboard - Vue.js Frontend Integration
 
-## ✅ Problem gelöst: Gunicorn Frontend-Server
+## ✅ Supervisord-basiertes Server-Management
 
-Das Problem mit dem Gunicorn-Start wurde erfolgreich behoben. Der Server läuft jetzt auf **Port 8444** mit dem korrekten Modul-Pfad.
+Das VYRA Dashboard verwendet jetzt **Supervisord** für das gesamte Server-Management. Sowohl Frontend (Nginx) als auch Backend (Gunicorn) werden automatisch über Supervisord gestartet und verwaltet.
 
-## 🚀 Frontend starten
+## 🚀 Server starten
 
-### Einfache Methode:
+### Production-Modus (Standard):
 ```bash
-cd /home/holgder/VOS2_WORKSPACE/modules/v2_dashboard
-python3 start_frontend.py
+# Container starten - Supervisord übernimmt Server-Management
+docker compose up v2_dashboard
+
+# Oder direkt:
+./vyra_entrypoint.sh
 ```
 
-### Im Hintergrund:
+### Development-Modus:
 ```bash
-cd /home/holgder/VOS2_WORKSPACE/modules/v2_dashboard
-nohup python3 start_frontend.py > frontend.log 2>&1 &
+# Environment-Variable setzen
+export VYRA_DEV_MODE=true
+
+# Container starten - Vue Dev Server wird automatisch gestartet
+docker compose up v2_dashboard
 ```
 
 ## 🌐 Zugriff
 
-- **Frontend URL:** http://localhost:8444
-- **API Endpoints:**
-  - `GET /` - Haupt-Dashboard
-  - `GET /api/modules` - Module-Liste
-  - `GET /api/status` - System-Status
+### Production-Modus:
+- **Frontend URL:** http://localhost:3000 (Nginx)
+- **Backend API:** https://localhost:8443 (Gunicorn)
+
+### Development-Modus:
+- **Frontend URL:** http://localhost:3000 (Vue Dev Server mit Hot-Reload)
+- **Backend API:** https://localhost:8443 (Gunicorn über Supervisord)
 
 ## 📁 Datei-Struktur
 
 ```
 v2_dashboard/
-├── minimal_rest.py          # Flask-Backend (kopiert für direkten Zugriff)
-├── start_frontend.py        # Einfaches Start-Skript
+├── supervisord.conf         # Supervisord Konfiguration
+├── gunicorn.conf           # Gunicorn Konfiguration
+├── wsgi.py                 # Dynamische WSGI-App (basiert auf MODULE_NAME)
+├── nginx.conf              # Nginx Konfiguration
 ├── frontend/               # Vue.js Quellcode
 │   ├── src/
 │   │   ├── App.vue
@@ -40,29 +50,56 @@ v2_dashboard/
 │   ├── package.json
 │   └── vite.config.js
 └── src/v2_dashboard/v2_dashboard/application/
-    ├── minimal_rest.py     # Original Flask-Backend
-    ├── gunicorn_manager.py # Gunicorn Manager
-    └── application.py      # Haupt-Anwendung
+    ├── minimal_rest.py     # Flask-Backend
+    ├── vue_dev_manager.py  # Vue Development Server Manager
+    └── application.py      # Haupt-Anwendung (nur Vue Dev Server in DEV_MODE)
 ```
 
-## 🔧 Änderungen
+## 🔧 Architektur-Änderungen
 
-1. **Port geändert:** 8443 → 8444 (Port 8443 war belegt)
-2. **Modul-Pfad:** `v2_dashboard.application.minimal_rest:app` → `minimal_rest:app`
-3. **Workspace-Pfad:** Absoluter Pfad zu `/home/holgder/VOS2_WORKSPACE/modules/v2_dashboard`
-4. **Start-Skript:** Einfaches `start_frontend.py` für direkte Nutzung
+1. **Supervisord-Management:** Alle Server werden über Supervisord verwaltet
+2. **Dynamische WSGI:** `wsgi.py` lädt automatisch die richtige App basierend auf MODULE_NAME
+3. **Environment-basiert:** VYRA_DEV_MODE, ENABLE_FRONTEND_WEBSERVER, ENABLE_BACKEND_WEBSERVER
+4. **Vereinfachte application.py:** Startet nur Vue Dev Server in Development-Modus
 
 ## 🛠️ Technische Details
 
-- **Backend:** Flask mit Gunicorn WSGI-Server
-- **Frontend:** Vue.js 3 mit SPA-Routing
-- **API:** RESTful endpoints für Modul-Management
-- **Build:** Vite für Frontend-Entwicklung und -Build
+- **Process Management:** Supervisord für Nginx, Gunicorn, ROS2
+- **Backend:** Flask mit dynamischem WSGI-Loading
+- **Frontend:** Vue.js 3 mit Development/Production Modi
+- **Development:** Vue Dev Server mit Hot-Reload und API-Proxy
+- **Production:** Nginx + Gunicorn über Supervisord
 
-## 📝 Logs
+## 📋 Service-Konfiguration
 
-Logs werden geschrieben nach:
-- `frontend.log` (wenn im Hintergrund gestartet)
-- `log/gunicorn.log` (Gunicorn-spezifische Logs)
+### Supervisord Services:
+- **nginx:** Frontend Web Server (Port 3000)
+- **gunicorn:** Backend API Server (Port 8443)
+- **ros2_daemon:** ROS2 Daemon für Backend-Kommunikation
 
-Das Frontend ist jetzt vollständig funktionsfähig und kann über den einfachen Start-Befehl gestartet werden!
+### Environment Variables:
+- `VYRA_DEV_MODE=true` → Vue Dev Server statt Nginx
+- `ENABLE_FRONTEND_WEBSERVER=true` → Nginx aktivieren
+- `ENABLE_BACKEND_WEBSERVER=true` → Gunicorn aktivieren
+- `MODULE_NAME=v2_dashboard` → Automatisches WSGI-Loading
+
+## 📝 Logs und Debugging
+
+### Supervisord Logs:
+```bash
+# Alle Services anzeigen
+docker exec v2_dashboard supervisorctl status
+
+# Service-spezifische Logs
+docker exec v2_dashboard supervisorctl tail nginx
+docker exec v2_dashboard supervisorctl tail gunicorn
+
+# Live-Logs verfolgen
+docker exec v2_dashboard supervisorctl tail -f nginx
+```
+
+### Development-Logs:
+- Vue Dev Server: Läuft im Vordergrund mit Hot-Reload-Output
+- Backend API: Über Supervisord (siehe oben)
+
+Das Dashboard ist jetzt vollständig supervisord-basiert und bietet sowohl Development- als auch Production-Modi!

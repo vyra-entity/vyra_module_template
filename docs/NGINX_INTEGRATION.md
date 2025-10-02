@@ -1,19 +1,19 @@
-# v2_dashboard Nginx Integration
+# v2_dashboard Supervisord & Nginx Integration
 
 ## 🌐 Übersicht
 
-Das v2_dashboard nutzt **Nginx als alleinigen Frontend-Server** für optimale Performance und professionelle Architektur.
+Das v2_dashboard nutzt **Supervisord** für das vollständige Server-Management mit **Nginx als Frontend-Server** für optimale Performance und professionelle Architektur.
 
 ## 🎯 Verfügbare Modi
 
 ### 1. **Development Mode** (`VYRA_DEV_MODE=true`)
-- **Frontend**: Vue.js Dev Server (Port 3000)
-- **Backend**: Gunicorn Flask API (Port 8443)
+- **Frontend**: Vue.js Dev Server (Port 3000) - Managed durch application.py
+- **Backend**: Gunicorn Flask API (Port 8443) - Managed durch Supervisord
 - **Für**: Entwicklung mit Hot-Reload und schnellem Feedback
 
 ### 2. **Production Mode** (Default - `VYRA_DEV_MODE=false`)
-- **Frontend**: Nginx Static Files (Port 3000)
-- **Backend**: Gunicorn Flask API (Port 8443)
+- **Frontend**: Nginx Static Files (Port 3000) - Managed durch Supervisord
+- **Backend**: Gunicorn Flask API (Port 8443) - Managed durch Supervisord
 - **Für**: Production-Deployment mit optimaler Performance
 
 ## 🚀 Modi aktivieren
@@ -21,139 +21,194 @@ Das v2_dashboard nutzt **Nginx als alleinigen Frontend-Server** für optimale Pe
 ### Development-Modus:
 ```bash
 export VYRA_DEV_MODE=true
-docker-compose up v2_dashboard
+export ENABLE_BACKEND_WEBSERVER=true
+docker compose up v2_dashboard
 ```
 
 ### Production-Modus (Standard):
 ```bash
-export VYRA_DEV_MODE=false  # oder unset
-docker-compose up v2_dashboard
+export ENABLE_FRONTEND_WEBSERVER=true
+export ENABLE_BACKEND_WEBSERVER=true
+docker compose up v2_dashboard
 ```
 
-## 📁 Neue Dateien
+## 📁 Supervisord-basierte Architektur
 
 ```
 v2_dashboard/
-├── nginx.conf                           # Nginx Konfiguration
+├── supervisord.conf                     # Supervisord Hauptkonfiguration
+├── nginx.conf                          # Nginx Konfiguration
+├── gunicorn.conf                       # Gunicorn Konfiguration
+├── wsgi.py                             # Dynamisches WSGI-Loading
 ├── src/v2_dashboard/application/
-│   ├── nginx_manager.py                 # Nginx Process Manager
-│   ├── supervisor_manager.py            # Supervisord Integration
-│   └── vue_dev_manager.py              # Erweitert für Nginx
+│   ├── vue_dev_manager.py              # Nur Vue Dev Server (Development)
+│   └── application.py                  # Vereinfacht - nur Dev-Mode
 └── frontend/
-    ├── vite.config.js                   # Nginx-optimiert
-    └── package.json                     # Build-Scripts erweitert
+    ├── vite.config.js                  # Vue Build-Konfiguration
+    └── package.json                    # Build-Scripts
 ```
 
-## ⚙️ Nginx-Konfiguration
+## ⚙️ Supervisord-Services
+Die Supervisord-Konfiguration verwaltet:
+
+### Service-Programme:
+- **nginx**: Frontend Web Server (Port 3000) - Conditional via `ENABLE_FRONTEND_WEBSERVER`
+- **gunicorn**: Backend API Server (Port 8443) - Conditional via `ENABLE_BACKEND_WEBSERVER`
+- **ros2_daemon**: ROS2 Backend für Service-Kommunikation
+
+### Features:
+- **Conditional Startup**: Services starten nur bei entsprechenden Environment Variables
+- **Automatic Restart**: Bei Fehlern oder Crashes
+- **Centralized Logging**: Alle Service-Logs über Supervisord
+- **Process Management**: Start/Stop/Restart über supervisorctl
+
+## 🔧 Nginx-Konfiguration Features
 
 Die `nginx.conf` bietet:
-- **Static File Serving**: Optimiert für Vue.js Build
+- **Static File Serving**: Optimiert für Vue.js Build-Output
 - **API Proxy**: `/api/*` → Backend (Port 8443)
-- **SPA Support**: Fallback zu `index.html`
+- **SPA Support**: Fallback zu `index.html` für Vue Router
 - **Gzip Compression**: Für bessere Performance
 - **Security Headers**: Basis-Schutz
 - **Caching**: Für Assets mit Hash-Namen
 
-## 🔧 Frontend Build
+## 🏗️ Frontend Build
 
 ### Für Nginx optimierter Build:
 ```bash
 cd frontend
-npm run build:nginx
+npm run build
 ```
 
 ### Features:
-- **Hash-basierte Asset-Namen** für Caching
+- **Hash-basierte Asset-Namen** für Browser-Caching
 - **Komprimierte Assets** (JS/CSS)
 - **Optimierte Chunk-Aufteilung**
 - **Production-optimierte Builds**
 
-## 🏗️ Architektur
+## 🏗️ Architektur-Diagramm
 
 ### Development-Modus:
 ```
-Browser → Vue Dev Server (3000) ← Hot Reload
-                     ↘ /api/* → Gunicorn (8443) Flask API
+Browser → Vue Dev Server (3000) ← Hot Reload + HMR
+                     ↘ /api/* → Gunicorn (8443) Flask API ← Supervisord
 ```
 
 ### Production-Modus:
 ```
-Browser → Nginx (3000) → Static Files (Vue Build)
-                     ↘ /api/* → Gunicorn (8443) Flask API
+Browser → Nginx (3000) → Static Files (Vue Build) ← Supervisord
+                     ↘ /api/* → Gunicorn (8443) Flask API ← Supervisord
 ```
 
-## 📈 **Nginx-Vorteile gegenüber Flask Static Serving:**
+## 📈 **Supervisord + Nginx Vorteile:**
 
-- **~3x Performance** für statische Dateien
-- **Professional Setup** mit separaten Services  
+- **Process Management**: Zentralisierte Kontrolle aller Services
+- **~3x Performance** für statische Dateien vs. Flask
+- **Professional Setup** mit separaten Services
 - **Besseres Caching** und Compression
-- **Skalierbare Architektur**
+- **Skalierbare Architektur** mit Service-Isolation
 - **Concurrent Connections** ohne Python GIL
+- **Automatic Recovery** bei Service-Fehlern
 
-## 🎛️ Supervisord Integration
+## 🎛️ Supervisord-Steuerung
 
-Das vyra_base_image wurde erweitert:
+### Service-Management über supervisorctl:
+```bash
+# Status aller Services prüfen
+docker exec v2_dashboard supervisorctl status
 
-### Neue Programme:
-- **nginx**: Conditional über `VYRA_ENABLE_NGINX`
-- **gunicorn**: Erweitert für Module-spezifische Konfiguration
+# Einzelne Services steuern
+docker exec v2_dashboard supervisorctl start nginx
+docker exec v2_dashboard supervisorctl stop gunicorn
+docker exec v2_dashboard supervisorctl restart nginx
 
-### Management:
-```python
-from .supervisor_manager import SupervisorServiceManager
+# Live-Logs verfolgen
+docker exec v2_dashboard supervisorctl tail -f nginx
+docker exec v2_dashboard supervisorctl tail -f gunicorn
+```
 
-manager = SupervisorServiceManager()
-manager.enable_nginx("/workspace/nginx.conf")
-manager.enable_gunicorn("my_app:app")
+### Environment-basierte Aktivierung:
+```bash
+# Production: Nginx + Gunicorn
+export ENABLE_FRONTEND_WEBSERVER=true
+export ENABLE_BACKEND_WEBSERVER=true
+
+# Development: Nur Gunicorn (Vue Dev Server läuft außerhalb Supervisord)
+export VYRA_DEV_MODE=true
+export ENABLE_BACKEND_WEBSERVER=true
 ```
 
 ## 🚦 Status & Monitoring
 
 ### Service Status prüfen:
-```python
-status = manager.get_all_services_status()
-print(status["nginx"]["running"])  # True/False
+```bash
+# Supervisord Status
+docker exec v2_dashboard supervisorctl status
+
+# Health Checks
+curl http://localhost:3000/api/status  # Nginx → Backend
+curl https://localhost:8443/api/status # Direkter Backend-Zugriff
 ```
 
-### Health Check:
-- **Nginx**: `GET /nginx-health`
-- **Backend**: `GET /api/health`
+### Log-Monitoring:
+```bash
+# Service-Logs anzeigen
+docker exec v2_dashboard supervisorctl tail nginx stdout
+docker exec v2_dashboard supervisorctl tail gunicorn stderr
+
+# Container-Logs
+docker logs v2_dashboard
+```
 
 ## 🔧 Troubleshooting
 
 ### Nginx startet nicht:
-1. Prüfe `VYRA_ENABLE_NGINX=true`
-2. Prüfe Frontend Build: `npm run build:nginx`
+1. Prüfe `ENABLE_FRONTEND_WEBSERVER=true`
+2. Prüfe Frontend Build: `npm run build` (in frontend/)
 3. Prüfe nginx.conf Syntax: `nginx -t -c /workspace/nginx.conf`
+4. Prüfe supervisorctl Status: `supervisorctl status nginx`
 
 ### Frontend nicht erreichbar:
-1. Prüfe Port-Mapping: `3000:3000`
+1. Prüfe Port-Mapping: `3000:3000` in docker-compose.yml
 2. Prüfe nginx Status: `supervisorctl status nginx`
-3. Prüfe Logs: `/var/log/nginx/v2_dashboard_error.log`
+3. Prüfe Service-Logs: `supervisorctl tail nginx`
 
 ### API Proxy funktioniert nicht:
-1. Prüfe Backend läuft: `curl https://localhost:8443/api/health`
-2. Prüfe SSL-Konfiguration in nginx.conf
-3. Prüfe CORS-Headers
+1. Prüfe Backend läuft: `curl https://localhost:8443/api/status`
+2. Prüfe Gunicorn Status: `supervisorctl status gunicorn`
+3. Prüfe SSL-Konfiguration in nginx.conf
+4. Prüfe CORS-Headers im Backend
 
-## 🔄 Migration von altem Setup
+### Development-Mode startet nicht:
+1. Prüfe `VYRA_DEV_MODE=true`
+2. Prüfe Frontend-Verzeichnis existiert: `/workspace/frontend/`
+3. Prüfe package.json: `npm` ist installiert
+4. Prüfe application.py Logs
 
-### Von Flask-integriertem Frontend zu Nginx:
+## 🔄 Migration & Deployment
 
-Das v2_dashboard nutzt jetzt **standardmäßig Nginx** für das Frontend. Keine Migration nötig - der Production-Modus ist automatisch Nginx.
+### Von direkter Server-Verwaltung zu Supervisord:
+
+Das v2_dashboard nutzt jetzt **vollständig Supervisord** für Server-Management. Alle manuellen Start/Stop-Kommandos wurden durch Environment-basierte Supervisord-Steuerung ersetzt.
 
 ### Environment Variables:
 ```bash
-# Development (Vue Dev Server)
-export VYRA_DEV_MODE=true
+# Vollständiger Stack
+export ENABLE_FRONTEND_WEBSERVER=true
+export ENABLE_BACKEND_WEBSERVER=true
 
-# Production (Nginx) - Standard
-export VYRA_DEV_MODE=false  # oder unset
+# Development-Modus (Vue Dev Server)
+export VYRA_DEV_MODE=true
+export ENABLE_BACKEND_WEBSERVER=true
+
+# Nur Backend (API-Only)
+export ENABLE_FRONTEND_WEBSERVER=false
+export ENABLE_BACKEND_WEBSERVER=true
 ```
 
 ### Container neu starten:
 ```bash
-docker-compose restart v2_dashboard
+docker compose restart v2_dashboard
 ```
 
 ## 📈 Performance-Vorteile

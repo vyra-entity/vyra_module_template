@@ -74,4 +74,28 @@ else:
             application = create_error_app(f"Could not import {module_name}: {e} | Alternative: {e2}")
 
 if __name__ == "__main__":
-    application.run(host='0.0.0.0', port=8443, debug=True)
+    # SSL Configuration for direct development testing
+    # To create self-signed certificates, run:
+    # openssl req -x509 -newkey rsa:4096 -keyout storage/certificates/webserver.key -out storage/certificates/webserver.crt -days 365 -nodes -subj "/CN=localhost"
+    
+    import os
+    cert_path = "/workspace/storage/certificates/webserver.crt"
+    key_path = "/workspace/storage/certificates/webserver.key"
+    
+    if os.path.exists(cert_path) and os.path.exists(key_path):
+        print("🔒 Starting with SSL/TLS encryption")
+        application.run(
+            host='0.0.0.0', 
+            port=8443, 
+            debug=True,
+            ssl_context=(cert_path, key_path)
+        )
+    else:
+        print("⚠️ SSL certificates not found, starting without encryption")
+        print(f"   Expected: {cert_path} and {key_path}")
+        print("   Create with: openssl req -x509 -newkey rsa:4096 -keyout storage/certificates/webserver.key -out storage/certificates/webserver.crt -days 365 -nodes -subj '/CN=localhost'")
+        application.run(
+            host='0.0.0.0', 
+            port=8443, 
+            debug=True
+        )

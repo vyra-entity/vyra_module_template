@@ -7,7 +7,6 @@ module_links = [
     { name = "Vyra-Documentation", url = "https://vyra-entity.github.io/vyra_base_python/" }
 ]
 
-
 [tool.poetry]
 name = "vyra-module-template"
 version = "0.1.0"

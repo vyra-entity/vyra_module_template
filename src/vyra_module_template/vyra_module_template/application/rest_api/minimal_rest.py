@@ -13,7 +13,7 @@ FRONTEND_DIST_PATH = Path(__file__).parent.parent.parent.parent.parent.parent / 
 def root():
     """API Root - zeigt verfügbare Endpoints"""
     return jsonify({
-        "service": "VYRA Dashboard API",
+        "service": "VYRA Module Dashboard API",
         "version": "0.1.0",
         "endpoints": {
             "status": "/api/status",
