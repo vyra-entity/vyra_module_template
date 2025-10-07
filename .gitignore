@@ -1,8 +1,16 @@
 build/*
 log/*
 install/*
+
+frontend/node_modules/*
+
 sros2_keystore/*
 security/*
+
+# SSL Certificates (sensitive data)
+storage/certificates/*.key
+storage/certificates/*.crt
+storage/certificates/*.pem
 
 temp/*
 

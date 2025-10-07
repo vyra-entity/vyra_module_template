@@ -4,12 +4,16 @@ pushd /workspace
 
 export $(grep -v '^#' .env | xargs)
 
+# Set ROS_LOG_DIR for runtime logs
+export ROS_LOG_DIR="/workspace/log/ros2"
+
 source install/setup.bash
 
 echo "SECURITY ENCLAVE: $ROS_SECURITY_ENCLAVE"
 
 # exec ros2 run $MODULE_NAME core --ros-args --enclave $ROS_SECURITY_ENCLAVE
-exec ros2 run $MODULE_NAME core
+# Run with log output to named file
+exec ros2 run $MODULE_NAME core 2>&1 | tee /workspace/log/ros2/${MODULE_NAME}_runtime.log
 
 
 if [ $? -eq 0 ]; then

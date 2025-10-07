@@ -22,8 +22,9 @@ fi
 
 # Create log directories required by supervisord
 mkdir -p /workspace/log/vyra
-mkdir -p /workspace/log/gunicorn
+mkdir -p /workspace/log/uvicorn
 mkdir -p /workspace/log/nginx
+mkdir -p /workspace/log/ros2
 
 # Try to read the name from .module/module_data.yaml
 MODULE_DATA_FILE=".module/module_data.yaml"
@@ -138,8 +139,13 @@ if [ "$VYRA_STARTUP_ACTIVE" == "true" ]; then
     fi
 
     # Clean build
-    rm -rf log/build_* # build/ 
+    rm -rf build/ log/build_* log/latest_build log/latest
     colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+    
+    # Move build logs to ros2 folder
+    if [ -d "log/latest" ] || [ -L "log/latest" ]; then
+        mv log/build_* log/latest_build log/latest log/ros2/ 2>/dev/null || true
+    fi
 
     if [ $? -eq 0 ]; then
         echo "✅ Build completed"
@@ -209,28 +215,30 @@ echo "ROS_SECURITY_KEYSTORE: $ROS_SECURITY_KEYSTORE"
 echo "=== SSL CERTIFICATE CHECK ==="
 
 # Function to check and create SSL certificates
+# Parameters: $1 = cert_name (e.g., "webserver", "frontend")
 check_and_create_certificates() {
-    local cert_path="/workspace/storage/certificates/webserver.crt"
-    local key_path="/workspace/storage/certificates/webserver.key"
+    local cert_name="${1:-webserver}"
+    local cert_path="/workspace/storage/certificates/${cert_name}.crt"
+    local key_path="/workspace/storage/certificates/${cert_name}.key"
     local cert_script="/workspace/tools/create_ssl_certificates.sh"
     
-    echo "🔍 Checking SSL certificates..."
+    echo "🔍 Checking SSL certificates for: $cert_name"
     echo "   Certificate: $cert_path"
     echo "   Private Key: $key_path"
     
     if [ -f "$cert_path" ] && [ -f "$key_path" ]; then
-        echo "✅ SSL certificates found"
+        echo "✅ SSL certificates found for $cert_name"
         
         # Check if certificates are still valid (not expired)
         if openssl x509 -checkend 86400 -noout -in "$cert_path" >/dev/null 2>&1; then
-            echo "✅ SSL certificates are valid (>24h remaining)"
+            echo "✅ SSL certificates for $cert_name are valid (>24h remaining)"
             return 0
         else
-            echo "⚠️ SSL certificates are expiring soon or expired"
+            echo "⚠️ SSL certificates for $cert_name are expiring soon or expired"
             echo "🔄 Regenerating certificates..."
         fi
     else
-        echo "❌ SSL certificates not found"
+        echo "❌ SSL certificates not found for $cert_name"
         echo "🔨 Creating new SSL certificates..."
     fi
     
@@ -239,16 +247,16 @@ check_and_create_certificates() {
     
     # Check if creation script exists
     if [ -f "$cert_script" ]; then
-        echo "🛠️ Using certificate creation script..."
-        if "$cert_script" --domain localhost --days 365; then
-            echo "✅ SSL certificates created successfully"
+        echo "🛠️ Using certificate creation script for $cert_name..."
+        if "$cert_script" --name "$cert_name" --domain localhost --days 365; then
+            echo "✅ SSL certificates for $cert_name created successfully"
             return 0
         else
-            echo "❌ Certificate creation script failed"
+            echo "❌ Certificate creation script failed for $cert_name"
             return 1
         fi
     else
-        echo "⚠️ Certificate script not found, creating manually..."
+        echo "⚠️ Certificate script not found, creating $cert_name manually..."
         
         # Fallback: Create certificates directly
         if openssl req -x509 -newkey rsa:4096 \
@@ -256,76 +264,77 @@ check_and_create_certificates() {
             -out "$cert_path" \
             -days 365 \
             -nodes \
-            -subj "/CN=localhost/O=VYRA Dashboard/C=DE" >/dev/null 2>&1; then
+            -subj "/CN=localhost/O=VYRA Dashboard/OU=${cert_name}/C=DE" >/dev/null 2>&1; then
             
             # Set secure permissions
             chmod 600 "$key_path"
             chmod 644 "$cert_path"
             
-            echo "✅ SSL certificates created manually"
+            echo "✅ SSL certificates for $cert_name created manually"
             return 0
         else
-            echo "❌ Manual certificate creation failed"
+            echo "❌ Manual certificate creation failed for $cert_name"
             return 1
         fi
     fi
 }
 
-# Only check/create certificates if backend webserver is enabled
+# Check/create backend certificates if backend webserver is enabled
 if [ "$ENABLE_BACKEND_WEBSERVER" = "true" ]; then
     echo "🔐 Backend webserver enabled - checking SSL certificates..."
     
-    if check_and_create_certificates; then
-        echo "✅ SSL certificate check completed successfully"
+    if check_and_create_certificates "webserver"; then
+        echo "✅ Backend SSL certificate check completed successfully"
     else
-        echo "⚠️ SSL certificate setup failed - continuing without SSL"
+        echo "⚠️ Backend SSL certificate setup failed - continuing without SSL"
         echo "   Backend will start in HTTP mode"
     fi
 else
-    echo "⏭️ Backend webserver disabled - skipping SSL certificate check"
+    echo "⏭️ Backend webserver disabled - skipping backend SSL certificate check"
+fi
+
+# Check/create frontend certificates if frontend webserver is enabled
+if [ "$ENABLE_FRONTEND_WEBSERVER" = "true" ]; then
+    echo "🔐 Frontend webserver enabled - checking SSL certificates..."
+    
+    if check_and_create_certificates "frontend"; then
+        echo "✅ Frontend SSL certificate check completed successfully"
+    else
+        echo "⚠️ Frontend SSL certificate setup failed - continuing without SSL"
+        echo "   Frontend will start in HTTP mode"
+    fi
+else
+    echo "⏭️ Frontend webserver disabled - skipping frontend SSL certificate check"
+fi
+
+# =============================================================================
+# Supervisord Service Configuration
+# =============================================================================
+echo "=== CONFIGURING SUPERVISORD SERVICES ==="
+
+# Configure Nginx (Frontend Webserver)
+if [ "$ENABLE_FRONTEND_WEBSERVER" = "true" ]; then
+    echo "✅ Enabling Nginx (Frontend Webserver)"
+    sed -i '/\[program:nginx\]/,/^\[/ s/autostart=false/autostart=true/' /etc/supervisor/conf.d/supervisord.conf 2>/dev/null || \
+    sed -i '/\[program:nginx\]/,/^\[/ s/autostart=false/autostart=true/' /workspace/supervisord.conf 2>/dev/null || true
+else
+    echo "⚠️ Nginx (Frontend Webserver) disabled"
+fi
+
+# Configure Uvicorn (Backend ASGI Server)
+if [ "$ENABLE_BACKEND_WEBSERVER" = "true" ]; then
+    echo "✅ Enabling Uvicorn (Backend ASGI Server)"
+    sed -i '/\[program:uvicorn\]/,/^\[/ s/autostart=false/autostart=true/' /etc/supervisor/conf.d/supervisord.conf 2>/dev/null || \
+    sed -i '/\[program:uvicorn\]/,/^\[/ s/autostart=false/autostart=true/' /workspace/supervisord.conf 2>/dev/null || true
+else
+    echo "⚠️ Uvicorn (Backend ASGI Server) disabled"
 fi
 
 # Prüfe ob Supervisor-Konfiguration existiert und starte Supervisor
 if [ -f "/etc/supervisor/conf.d/supervisord.conf" ]; then
-    echo "=== CONFIGURING SUPERVISORD SERVICES ==="
-    
-    # Configure Nginx (Frontend Webserver)
-    if [ "$ENABLE_FRONTEND_WEBSERVER" = "true" ]; then
-        echo "✅ Enabling Nginx (Frontend Webserver)"
-        sed -i '/\[program:nginx\]/,/^\[/ s/autostart=false/autostart=true/' /etc/supervisor/conf.d/supervisord.conf
-    else
-        echo "⚠️ Nginx (Frontend Webserver) disabled"
-    fi
-    
-    # Configure Gunicorn (Backend Webserver)
-    if [ "$ENABLE_BACKEND_WEBSERVER" = "true" ]; then
-        echo "✅ Enabling Gunicorn (Backend Webserver)"
-        sed -i '/\[program:gunicorn\]/,/^\[/ s/autostart=false/autostart=true/' /etc/supervisor/conf.d/supervisord.conf
-    else
-        echo "⚠️ Gunicorn (Backend Webserver) disabled"
-    fi
-    
     echo "=== STARTING SUPERVISORD ==="
     exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf -n
 elif [ -f "/workspace/supervisord.conf" ]; then
-    echo "=== CONFIGURING SUPERVISORD SERVICES (Workspace) ==="
-    
-    # Configure Nginx (Frontend Webserver)
-    if [ "$ENABLE_FRONTEND_WEBSERVER" = "true" ]; then
-        echo "✅ Enabling Nginx (Frontend Webserver)"
-        sed -i '/\[program:nginx\]/,/^\[/ s/autostart=false/autostart=true/' /workspace/supervisord.conf
-    else
-        echo "⚠️ Nginx (Frontend Webserver) disabled"
-    fi
-    
-    # Configure Gunicorn (Backend Webserver)
-    if [ "$ENABLE_BACKEND_WEBSERVER" = "true" ]; then
-        echo "✅ Enabling Gunicorn (Backend Webserver)"
-        sed -i '/\[program:gunicorn\]/,/^\[/ s/autostart=false/autostart=true/' /workspace/supervisord.conf
-    else
-        echo "⚠️ Gunicorn (Backend Webserver) disabled"
-    fi
-    
     echo "=== STARTING SUPERVISORD (Workspace) ==="
     exec /usr/bin/supervisord -c /workspace/supervisord.conf -n
 else

@@ -1,2 +1,6 @@
-flask==3.0.0
-gunicorn==23.0.0
+fastapi==0.115.0
+redis==5.0.1
+# --- Optional dependencies ---
+# If ENABLE_FRONTEND_WEBSERVER and ENABLE_BACKEND_WEBSERVER are set to true
+# in the .env file, the following packages are required:
+# uvicorn[standard]==0.30.6
