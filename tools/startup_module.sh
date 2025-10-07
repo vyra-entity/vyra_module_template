@@ -2,7 +2,8 @@
 
 pushd /workspace
 
-export $(grep -v '^#' .env | xargs)
+# Load environment variables from .env (filter comments and empty lines)
+export $(grep -v '^#' .env | sed 's/#.*$//' | grep -v '^$' | xargs)
 
 # Set ROS_LOG_DIR for runtime logs
 export ROS_LOG_DIR="/workspace/log/ros2"

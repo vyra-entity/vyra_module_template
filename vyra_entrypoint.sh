@@ -8,7 +8,13 @@ echo "=== VYRA ENTRYPOINT STARTING ==="
 
 chmod 777 .env
 
-export $(grep -v '^#' .env | xargs)
+# Load environment variables from .env (filter comments and empty lines)
+export $(grep -v '^#' .env | sed 's/#.*$//' | grep -v '^$' | xargs)
+
+# Debug: Show loaded environment variables
+echo "=== Loaded Environment Variables ==="
+env | grep -E "ENABLE_|VYRA_DEV_MODE|MODULE_NAME" || echo "No ENABLE_/VYRA variables found"
+echo "===================================="
 
 # Vyra Base installieren
 source /workspace/tools/setup_ros_global.sh
@@ -139,7 +145,7 @@ if [ "$VYRA_STARTUP_ACTIVE" == "true" ]; then
     fi
 
     # Clean build
-    rm -rf build/ log/ros2/*
+    rm -rf build/ log/build_* log/latest_build log/latest
     colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
     
     # Move build logs to ros2 folder
