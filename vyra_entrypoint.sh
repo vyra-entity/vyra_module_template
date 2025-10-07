@@ -139,7 +139,7 @@ if [ "$VYRA_STARTUP_ACTIVE" == "true" ]; then
     fi
 
     # Clean build
-    rm -rf build/ log/build_* log/latest_build log/latest
+    rm -rf build/ log/ros2/*
     colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
     
     # Move build logs to ros2 folder

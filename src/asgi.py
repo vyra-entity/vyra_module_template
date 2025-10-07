@@ -65,7 +65,7 @@ if not module_name:
 else:
     try:
         # Try to import the REST API module
-        module_path = f"src.{module_name}.{module_name}.application.rest_api.minimal_rest"
+        module_path = f"src.{module_name}.{module_name}.application.rest_api.main_rest"
         print(f"Attempting to import: {module_path}")
         
         module = importlib.import_module(module_path)
@@ -94,7 +94,7 @@ else:
         
         # Try alternative path without rest_api
         try:
-            alt_module_path = f"src.{module_name}.{module_name}.application.minimal_rest"
+            alt_module_path = f"src.{module_name}.{module_name}.application.main_rest"
             print(f"Trying alternative import: {alt_module_path}")
             
             module = importlib.import_module(alt_module_path)

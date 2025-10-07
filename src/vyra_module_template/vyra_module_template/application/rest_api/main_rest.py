@@ -44,7 +44,7 @@ async def root():
 @app.get("/health")
 async def health_check():
     """Health check endpoint for monitoring"""
-    return {"status": "healthy", "service": "v2_dashboard"}
+    return {"status": "healthy", "service": "v2_module_template"}
 
 
 # Note: App is now served via asgi.py + uvicorn + supervisord (FastAPI native ASGI)
