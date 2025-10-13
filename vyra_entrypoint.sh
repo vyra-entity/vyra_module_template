@@ -145,7 +145,7 @@ if [ "$VYRA_STARTUP_ACTIVE" == "true" ]; then
     fi
 
     # Clean build
-    rm -rf build/ log/build_* log/latest_build log/latest
+    rm -rf build/ log/ros2/*
     colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
     
     # Move build logs to ros2 folder
@@ -318,7 +318,36 @@ fi
 # =============================================================================
 echo "=== CONFIGURING SUPERVISORD SERVICES ==="
 
-# Configure Nginx (Frontend Webserver)
+# Check Development Mode
+if [ "$VYRA_DEV_MODE" = "true" ]; then
+    echo "🚀 DEVELOPMENT MODE ENABLED"
+    echo "   Starting Vite Dev Server instead of Nginx..."
+    
+    # Disable Nginx in dev mode
+    ENABLE_FRONTEND_WEBSERVER=false
+    
+    # Install npm dependencies if needed
+    if [ ! -d "/workspace/frontend/node_modules" ]; then
+        echo "📦 Installing npm dependencies..."
+        cd /workspace/frontend
+        npm install
+        cd /workspace
+    fi
+    
+    # Start Vite Dev Server in background
+    echo "🔥 Starting Vite Dev Server on port 3000..."
+    cd /workspace/frontend
+    nohup npm run dev -- --host 0.0.0.0 --port 3000 > /workspace/log/vite.log 2>&1 &
+    VITE_PID=$!
+    echo "✅ Vite Dev Server started (PID: $VITE_PID)"
+    echo "   Frontend URL: http://localhost:3000"
+    echo "   Log: /workspace/log/vite.log"
+    cd /workspace
+else
+    echo "🏭 PRODUCTION MODE - Using Nginx"
+fi
+
+# Configure Nginx (Frontend Webserver) - only in production mode
 if [ "$ENABLE_FRONTEND_WEBSERVER" = "true" ]; then
     echo "✅ Enabling Nginx (Frontend Webserver)"
     sed -i '/\[program:nginx\]/,/^\[/ s/autostart=false/autostart=true/' /etc/supervisor/conf.d/supervisord.conf 2>/dev/null || \

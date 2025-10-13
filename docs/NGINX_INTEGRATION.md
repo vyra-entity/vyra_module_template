@@ -165,7 +165,7 @@ docker logs v2_dashboard
 ### Nginx startet nicht:
 1. Prüfe `ENABLE_FRONTEND_WEBSERVER=true`
 2. Prüfe Frontend Build: `npm run build` (in frontend/)
-3. Prüfe nginx.conf Syntax: `nginx -t -c /workspace/nginx.conf`
+3. Prüfe nginx.conf Syntax: `nginx -t -c /workspace/config/nginx.conf`
 4. Prüfe supervisorctl Status: `supervisorctl status nginx`
 
 ### Frontend nicht erreichbar:

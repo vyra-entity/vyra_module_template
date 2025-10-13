@@ -64,8 +64,8 @@ if not module_name:
     application = create_error_app("MODULE_NAME not found in .env file")
 else:
     try:
-        # Try to import the REST API module
-        module_path = f"src.{module_name}.{module_name}.application.rest_api.main_rest"
+        # Try to import the REST API module (new location: src/rest_api/)
+        module_path = "src.rest_api.main_rest"
         print(f"Attempting to import: {module_path}")
         
         module = importlib.import_module(module_path)
@@ -92,10 +92,10 @@ else:
     except (ImportError, AttributeError) as e:
         print(f"❌ Error importing {module_name} application: {e}")
         
-        # Try alternative path without rest_api
+        # Try legacy path (old location inside v2_modulemanager)
         try:
-            alt_module_path = f"src.{module_name}.{module_name}.application.main_rest"
-            print(f"Trying alternative import: {alt_module_path}")
+            alt_module_path = f"src.{module_name}.{module_name}.application.rest_api.main_rest"
+            print(f"Trying legacy import: {alt_module_path}")
             
             module = importlib.import_module(alt_module_path)
             
@@ -122,7 +122,7 @@ else:
 
 if __name__ == "__main__":
     # Direct development testing with Uvicorn
-    import uvicorn
+    import config.uvicorn as uvicorn
     
     cert_path = "/workspace/storage/certificates/webserver.crt"
     key_path = "/workspace/storage/certificates/webserver.key"
