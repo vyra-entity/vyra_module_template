@@ -1,5 +1,6 @@
 #!/bin/bash
 # filepath: /home/holgder/VOS2_WORKSPACE/$MODULE_NAME/vyra_entrypoint.sh
+set -euo pipefail
 
 echo "=== VYRA ENTRYPOINT STARTING ==="
 
