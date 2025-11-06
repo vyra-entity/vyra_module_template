@@ -126,6 +126,17 @@ def update_CMakefile(package_path: Path):
 
     cmake_path = os.path.join(package_path, "CMakeLists.txt")
 
+    # Check if CMakeLists.txt exists otherwise load from CMakeLists.template.txt
+    if not os.path.isfile(cmake_path):
+        template_path = os.path.join(
+            os.path.dirname(__file__), "CMakeLists.template.txt")
+        if os.path.isfile(template_path):
+            shutil.copyfile(template_path, cmake_path)
+            print(f"✓ CMakeLists.txt erstellt aus Vorlage.")
+        else:
+            print("⚠️ CMakeLists.txt und Vorlage nicht gefunden.")
+            return
+
     # 1. Alle .msg .srv .action Dateien finden
     # msg_files: list[str] = [f for f in os.listdir(msg_dir) if f.endswith(".msg")]
     # srv_files: list[str] = [f for f in os.listdir(srv_dir) if f.endswith(".srv")]
