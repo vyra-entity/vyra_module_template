@@ -118,20 +118,19 @@ def collect_interface_files(package_path):
     return interface_files
 
 
-def update_CMakefile(package_path: Path):
-    interace_files = collect_interface_files(package_path)
+def update_CMakefile(interface_package_path: Path):
+    interace_files = collect_interface_files(interface_package_path)
     msg_files = interace_files["msg"]
     srv_files = interace_files["srv"]
     action_files = interace_files["action"]
 
-    cmake_path = os.path.join(package_path, "CMakeLists.txt")
+    cmake_path = os.path.join(interface_package_path, "CMakeLists.txt")
+    cmake_tmp_path = os.path.join(interface_package_path, "CMakeLists.template.txt")
 
     # Check if CMakeLists.txt exists otherwise load from CMakeLists.template.txt
     if not os.path.isfile(cmake_path):
-        template_path = os.path.join(
-            os.path.dirname(__file__), "CMakeLists.template.txt")
-        if os.path.isfile(template_path):
-            shutil.copyfile(template_path, cmake_path)
+        if os.path.isfile(cmake_tmp_path):
+            shutil.copyfile(cmake_tmp_path, cmake_path)
             print(f"✓ CMakeLists.txt erstellt aus Vorlage.")
         else:
             print("⚠️ CMakeLists.txt und Vorlage nicht gefunden.")
@@ -193,7 +192,7 @@ def update_setup_py(package_path, package_name):
     
     if not match:
         print("⚠️ Keine data_files-Struktur in setup.py gefunden.")
-        return
+        raise ValueError("CMakeLists.txt and CMakeLists.template.txt not found.")
     
     data_files_str = match.group(0)
 
