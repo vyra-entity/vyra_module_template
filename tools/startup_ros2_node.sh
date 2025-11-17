@@ -10,6 +10,8 @@ export ROS_LOG_DIR="/workspace/log/ros2"
 
 source install/setup.bash
 
+echo "----------------------------------------------------------------------------------"
+
 echo "SECURITY ENCLAVE: $ROS_SECURITY_ENCLAVE"
 
 # exec ros2 run $MODULE_NAME core --ros-args --enclave $ROS_SECURITY_ENCLAVE
