@@ -2,17 +2,21 @@
 build/*
 log/*
 install/*
-sros2_keystore/*
-security/*
 
 # Frontend (build artifacts)
 frontend/node_modules/*
 frontend/dist/*
 
+sros2_keystore/*
+security/*
+
 # SSL Certificates (sensitive data)
 storage/certificates/*.key
 storage/certificates/*.crt
 storage/certificates/*.pem
+
+# Dynamically changing files
+CMakeLists.txt
 
 # Temporary files
 temp/*

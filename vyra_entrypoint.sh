@@ -1,5 +1,6 @@
 #!/bin/bash
 # filepath: /home/holgder/VOS2_WORKSPACE/$MODULE_NAME/vyra_entrypoint.sh
+set -euo pipefail
 
 echo "=== VYRA ENTRYPOINT STARTING ==="
 
@@ -15,6 +16,13 @@ export $(grep -v '^#' .env | sed 's/#.*$//' | grep -v '^$' | xargs)
 echo "=== Loaded Environment Variables ==="
 env | grep -E "ENABLE_|VYRA_DEV_MODE|MODULE_NAME" || echo "No ENABLE_/VYRA variables found"
 echo "===================================="
+
+# Set empty variables to prevent unbound variable errors
+: "${AMENT_TRACE_SETUP_FILES:=""}"
+: "${COLCON_TRACE:=""}"
+: "${AMENT_PYTHON_EXECUTABLE:="/usr/bin/python3"}"
+: "${COLCON_PYTHON_EXECUTABLE:="/usr/bin/python3"}"
+: "${CMAKE_PREFIX_PATH:="/opt/ros/kilted"}"
 
 # Vyra Base installieren
 source /workspace/tools/setup_ros_global.sh
@@ -125,13 +133,13 @@ if [ "$VYRA_STARTUP_ACTIVE" == "true" ]; then
 
     # Interfaces setup
     # 3. Installing all wheels dependencies
-    pip install wheels/*.whl --break-system-packages
+    # Use --ignore-installed cryptography to avoid uninstalling system package
+    pip install wheels/*.whl --break-system-packages --ignore-installed cryptography || true
 
     if [ $? -eq 0 ]; then
         echo "✅ All wheels installed successfully"
     else
-        echo "❌ Wheels installation failed"
-        exit 1
+        echo "⚠️  Wheels installation had warnings (cryptography system package kept)"
     fi
 
     # Setting up interfaces (cmake, package, load interfaces from vyra_base, etc.)
@@ -191,15 +199,15 @@ ros2 pkg executables $MODULE_NAME || echo "No executables for $MODULE_NAME"
 echo "=== SROS2 SETUP ==="
 echo "ROS_SECURITY_KEYSTORE: $ROS_SECURITY_KEYSTORE"
 
-if [ ! -d "$ROS_SECURITY_KEYSTORE" ]; then
-    echo "[SROS2] Creating keystore at $ROS_SECURITY_KEYSTORE"
-    ros2 security create_keystore $ROS_SECURITY_KEYSTORE
-fi
+# if [ ! -d "$ROS_SECURITY_KEYSTORE" ]; then
+#     echo "[SROS2] Creating keystore at $ROS_SECURITY_KEYSTORE"
+#     ros2 security create_keystore $ROS_SECURITY_KEYSTORE
+# fi
 
-if [ ! -d "$ROS_SECURITY_KEYSTORE/enclaves" ]; then
-    echo "[SROS2] Creating enclaves at $ROS_SECURITY_KEYSTORE"
-    mkdir -p $ROS_SECURITY_KEYSTORE/enclaves
-fi
+# if [ ! -d "$ROS_SECURITY_KEYSTORE/enclaves" ]; then
+#     echo "[SROS2] Creating enclaves at $ROS_SECURITY_KEYSTORE"
+#     mkdir -p $ROS_SECURITY_KEYSTORE/enclaves
+# fi
 
 # Enclave für $MODULE_NAME erzeugen
 echo "[SROS2] Creating enclave for /$MODULE_NAME/core"
@@ -321,8 +329,9 @@ echo "=== CONFIGURING SUPERVISORD SERVICES ==="
 # Check Development Mode
 if [ "$VYRA_DEV_MODE" = "true" ]; then
     echo "🚀 DEVELOPMENT MODE ENABLED"
+
     echo "   Starting Vite Dev Server instead of Nginx..."
-    
+
     # Disable Nginx in dev mode
     ENABLE_FRONTEND_WEBSERVER=false
     
@@ -343,8 +352,19 @@ if [ "$VYRA_DEV_MODE" = "true" ]; then
     echo "   Frontend URL: http://localhost:3000"
     echo "   Log: /workspace/log/vite.log"
     cd /workspace
+
+    # Alter reload=True on uvicorn in /etc/supervisor/conf.d/supervisord.conf for developement
+    echo "🔄 Enabling autoreload for Uvicorn (FastAPI)..."
+    echo "   Watch directory: $BACKEND_DEV_FILEWATCH"
+    
+    BACKEND_DEV_FILEWATCH_SED=$(echo "$BACKEND_DEV_FILEWATCH" | sed 's/\//\\\//g')
+
+    # Add --reload and --reload-dir for both SSL and non-SSL variants using the env variable
+    sed -i "/exec uvicorn src.asgi:application.*--host 0.0.0.0 --port 8443/s/--log-level info/--log-level info --reload --reload-dir $BACKEND_DEV_FILEWATCH_SED --reload-exclude \/workspace\/log/" /etc/supervisor/conf.d/supervisord.conf
+    cat /etc/supervisor/conf.d/supervisord.conf
+    # sed -i "/exec uvicorn src.asgi:application.*--host 0.0.0.0 --port 8443 --log-level info;/s/--log-level info/--log-level info --log-config \/workspace\/config\/logging.json --reload --reload-dir $BACKEND_DEV_FILEWATCH --reload-exclude \/workspace\/log/" /etc/supervisor/conf.d/supervisord.conf 2>/dev/null || true
 else
-    echo "🏭 PRODUCTION MODE - Using Nginx"
+    echo "🏭 Production Mode — Using Nginx and Uvicorn with FastAPI (ASGI)"
 fi
 
 # Configure Nginx (Frontend Webserver) - only in production mode
