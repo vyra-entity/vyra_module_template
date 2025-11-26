@@ -9,7 +9,53 @@ echo "=== VYRA ENTRYPOINT STARTING ==="
 
 chmod 777 .env
 
+# Read MODULE_NAME from module_data.yaml BEFORE loading .env
+# This allows module name to be available for ENV variable setup
+MODULE_DATA_FILE=".module/module_data.yaml"
+if [ -f "$MODULE_DATA_FILE" ]; then
+    MODULE_NAME=$(grep "^name:" "$MODULE_DATA_FILE" | sed 's/^name:[[:space:]]*//')
+    if [ -n "$MODULE_NAME" ]; then
+        echo "✅ Using name from module_data.yaml: $MODULE_NAME"
+        export MODULE_NAME  # Export as environment variable for ROS2 processes
+        
+        # Set ROS2 rcl_logging filename based on module name
+        export RCL_LOGGING_LOG_FILE_NAME="${MODULE_NAME}_ros2_core.log"
+        echo "✅ RCL logging configured: ${MODULE_NAME}_ros2_core.log"
+    else
+        echo "⚠️ Could not read name from $MODULE_DATA_FILE"
+        echo "⚠️ ! Check the structure of the module_data.yaml file !"
+        exit 1
+    fi
+else
+    echo "⚠️ Module data file $MODULE_DATA_FILE not found. Cannot start module"
+    exit 1
+fi
+
+# Add module name to .env before loading
+if [ -f ".env" ]; then
+    if ! grep -q '^MODULE_NAME=' ".env"; then
+        echo "MODULE_NAME=$MODULE_NAME" >> ".env"
+    else
+        # Update the existing line
+        sed -i "s/^MODULE_NAME=.*/MODULE_NAME=$MODULE_NAME/" ".env"
+    fi
+    
+    # Also add/update RCL_LOGGING_LOG_FILE_NAME in .env
+
+    # -> Not working yet, ignore for now. Could be regarded as a TODO. <-
+
+    # RCL_LOG_FILENAME="${MODULE_NAME}_ros2_core.log"
+    # if ! grep -q '^RCL_LOGGING_LOG_FILE_NAME=' ".env"; then
+    #     echo "RCL_LOGGING_LOG_FILE_NAME=$RCL_LOG_FILENAME" >> ".env"
+    #     echo "✅ Added RCL_LOGGING_LOG_FILE_NAME=$RCL_LOG_FILENAME to .env"
+    # else
+    #     sed -i "s/^RCL_LOGGING_LOG_FILE_NAME=.*/RCL_LOGGING_LOG_FILE_NAME=$RCL_LOG_FILENAME/" ".env"
+    #     echo "✅ Updated RCL_LOGGING_LOG_FILE_NAME=$RCL_LOG_FILENAME in .env"
+    # fi
+fi
+
 # Load environment variables from .env (filter comments and empty lines)
+# MODULE_NAME is now already exported, but this will reload it from .env
 export $(grep -v '^#' .env | sed 's/#.*$//' | grep -v '^$' | xargs)
 
 # Debug: Show loaded environment variables
@@ -25,7 +71,8 @@ echo "===================================="
 : "${CMAKE_PREFIX_PATH:="/opt/ros/kilted"}"
 
 # Vyra Base installieren
-source /workspace/tools/setup_ros_global.sh
+# source /workspace/tools/setup_ros_global.sh
+source /opt/ros/kilted/setup.bash
 
 if [ $? -eq 0 ]; then
     echo "✅ Source ROS global setup successful"
@@ -40,34 +87,7 @@ mkdir -p /workspace/log/uvicorn
 mkdir -p /workspace/log/nginx
 mkdir -p /workspace/log/ros2
 
-# Try to read the name from .module/module_data.yaml
-MODULE_DATA_FILE=".module/module_data.yaml"
-if [ -f "$MODULE_DATA_FILE" ]; then
-    MODULE_NAME=$(grep "^name:" "$MODULE_DATA_FILE" | sed 's/^name:[[:space:]]*//')
-    if [ -n "$MODULE_NAME" ]; then
-        echo "✅ Using name from module_data.yaml: $MODULE_NAME"
-    else
-        echo "⚠️ Could not read name from $MODULE_DATA_FILE"
-        echo "⚠️ ! Check the structure of the module_data.yaml file !"
-        exit 1
-    fi
-else
-    echo "⚠️ Module data file $MODULE_DATA_FILE not found. Cannot start module"
-    exit 1
-fi
-
-# Add module name to .env
-if [ -f ".env" ]; then
-    echo "✅ Adding MODULE_NAME=$MODULE_NAME to .env file"
-    if ! grep -q '^MODULE_NAME=' ".env"; then
-        echo "MODULE_NAME=$MODULE_NAME" >> ".env"
-    else
-        echo "⚠️ MODULE_NAME already set in .env"
-        # Update the existing line
-        sed -i "s/^MODULE_NAME=.*/MODULE_NAME=$MODULE_NAME/" ".env"
-    fi
-fi
-
+# VYRA_STARTUP_ACTIVE check
 if ! grep -q '^VYRA_STARTUP_ACTIVE=' .env; then
     echo "VYRA_STARTUP_ACTIVE=true" >> .env
 fi
@@ -124,7 +144,7 @@ if [ "$VYRA_STARTUP_ACTIVE" == "true" ]; then
         echo "⚠️ No .module/requirements.txt found, skipping Python requirements"
     fi
 
-    # Clear vyra_base
+    # Clear vyra_base 
     if pip show vyra_base > /dev/null 2>&1; then
         pip uninstall vyra_base -y --break-system-packages
     else
@@ -152,10 +172,17 @@ if [ "$VYRA_STARTUP_ACTIVE" == "true" ]; then
         exit 1
     fi
 
-    # Clean build
-    rm -rf build/ log/ros2/*
-    colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+    # Clean logs
+    # rm -rf build/ log/ros2/*
+    rm -rf log/ros2/build*/
+    rm -rf log/ros2/latest*/
+    rm -f log/ros2/python3_*.log
+
+    # Clean install and build folder
+    rm -rf install/ build/
     
+    colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+
     # Move build logs to ros2 folder
     if [ -d "log/latest" ] || [ -L "log/latest" ]; then
         mv log/build_* log/latest_build log/latest log/ros2/ 2>/dev/null || true
@@ -204,14 +231,18 @@ echo "ROS_SECURITY_KEYSTORE: $ROS_SECURITY_KEYSTORE"
 #     ros2 security create_keystore $ROS_SECURITY_KEYSTORE
 # fi
 
-# if [ ! -d "$ROS_SECURITY_KEYSTORE/enclaves" ]; then
-#     echo "[SROS2] Creating enclaves at $ROS_SECURITY_KEYSTORE"
-#     mkdir -p $ROS_SECURITY_KEYSTORE/enclaves
-# fi
+echo "[SROS2] Creating keystore at $ROS_SECURITY_KEYSTORE if not exists"
+ros2 security create_keystore $ROS_SECURITY_KEYSTORE || true
+ros2 security generate_policy sros2_keystore/ || true
+
+if [ ! -d "$ROS_SECURITY_KEYSTORE/enclaves" ]; then
+    echo "[SROS2] Creating enclaves at $ROS_SECURITY_KEYSTORE"
+    mkdir -p $ROS_SECURITY_KEYSTORE/enclaves
+fi
 
 # Enclave für $MODULE_NAME erzeugen
 echo "[SROS2] Creating enclave for /$MODULE_NAME/core"
-ros2 security create_enclave $ROS_SECURITY_KEYSTORE /$MODULE_NAME/core
+ros2 security create_enclave $ROS_SECURITY_KEYSTORE /$MODULE_NAME/core || true
 
 # Environment für Security setzen
 # export ROS_SECURITY_ENABLE=false
@@ -330,6 +361,27 @@ echo "=== CONFIGURING SUPERVISORD SERVICES ==="
 if [ "$VYRA_DEV_MODE" = "true" ]; then
     echo "🚀 DEVELOPMENT MODE ENABLED"
 
+    # Enable ROS2 Hot Reload if configured
+    if [ "$ENABLE_ROS2_HOT_RELOAD" = "true" ]; then
+        echo "🔥 Enabling ROS2 Hot Reload..."
+        
+        # Install watchdog if not present
+        if ! pip show watchdog > /dev/null 2>&1; then
+            echo "📦 Installing watchdog for hot reload..."
+            pip install watchdog --break-system-packages
+        fi
+        
+        # Start hot reload watcher in background
+        # Note: ros2_main is the supervisord program name for the ROS2 node
+        nohup python3 /workspace/tools/ros2_hot_reload.py "$MODULE_NAME" core ros2_main \
+            > /workspace/log/ros2/hot_reload.log 2>&1 &
+        
+        HOT_RELOAD_PID=$!
+        echo "✅ ROS2 Hot Reload started (PID: $HOT_RELOAD_PID)"
+        echo "   Watching: /workspace/src"
+        echo "   Logs: /workspace/log/ros2/hot_reload.log"
+    fi
+
     echo "   Starting Vite Dev Server instead of Nginx..."
 
     # Disable Nginx in dev mode
@@ -361,10 +413,52 @@ if [ "$VYRA_DEV_MODE" = "true" ]; then
 
     # Add --reload and --reload-dir for both SSL and non-SSL variants using the env variable
     sed -i "/exec uvicorn src.asgi:application.*--host 0.0.0.0 --port 8443/s/--log-level info/--log-level info --reload --reload-dir $BACKEND_DEV_FILEWATCH_SED --reload-exclude \/workspace\/log/" /etc/supervisor/conf.d/supervisord.conf
-    cat /etc/supervisor/conf.d/supervisord.conf
+    # cat /etc/supervisor/conf.d/supervisord.conf
     # sed -i "/exec uvicorn src.asgi:application.*--host 0.0.0.0 --port 8443 --log-level info;/s/--log-level info/--log-level info --log-config \/workspace\/config\/logging.json --reload --reload-dir $BACKEND_DEV_FILEWATCH --reload-exclude \/workspace\/log/" /etc/supervisor/conf.d/supervisord.conf 2>/dev/null || true
 else
-    echo "🏭 Production Mode — Using Nginx and Uvicorn with FastAPI (ASGI)"
+    echo "🏭 PRODUCTION MODE — Using Nginx with pre-built frontend"
+    
+    # Check if frontend is built (dist folder should have JS/CSS files, not just index.html)
+    if [ -d "/workspace/frontend/dist" ]; then
+        ASSET_COUNT=$(find /workspace/frontend/dist -type f \( -name "*.js" -o -name "*.css" \) 2>/dev/null | wc -l)
+        
+        if [ "$ASSET_COUNT" -eq 0 ]; then
+            echo "⚠️  Frontend dist/ folder exists but is empty (no JS/CSS assets)"
+            
+            # Check if we have Node.js available (dev image)
+            if command -v npm >/dev/null 2>&1; then
+                echo "🔨 Building frontend with Vite (npm run build)..."
+                cd /workspace/frontend
+                
+                # Install dependencies if node_modules missing
+                if [ ! -d "node_modules" ]; then
+                    echo "📦 Installing npm dependencies first..."
+                    npm install
+                fi
+                
+                # Build the frontend
+                if npm run build; then
+                    echo "✅ Frontend build completed successfully"
+                else
+                    echo "❌ Frontend build failed"
+                    exit 1
+                fi
+                
+                cd /workspace
+            else
+                echo "❌ ERROR: Node.js not available in production image"
+                echo "💡 Solution: Build frontend before deployment or use dev image"
+                echo "   Run locally: cd modules/$MODULE_NAME/frontend && npm run build"
+                exit 1
+            fi
+        else
+            echo "✅ Frontend already built ($ASSET_COUNT JS/CSS assets found)"
+        fi
+    else
+        echo "❌ ERROR: /workspace/frontend/dist directory not found"
+        echo "💡 Frontend must be built before starting in production mode"
+        exit 1
+    fi
 fi
 
 # Configure Nginx (Frontend Webserver) - only in production mode

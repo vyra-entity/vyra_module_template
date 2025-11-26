@@ -21,6 +21,8 @@ CMakeLists.txt
 # Temporary files
 temp/*
 
+.vscode/*
+
 # OS generated files
 *.log
 *.tmp
@@ -29,3 +31,4 @@ temp/*
 # Dynamically generated files
 *.env
 *.pyc
+*.sqlite
