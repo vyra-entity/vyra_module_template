@@ -73,7 +73,8 @@ RUN python3 tools/generate_sros2_policy.py \
         npm install && \
         npm run build && \
         cd ..; \
-    fi# Extract SROS2 CA for sharing with other modules
+    fi
+# Extract SROS2 CA for sharing with other modules
 # SROS2 v2 uses different file names - try both old and new naming conventions
 RUN if [ -f "./sros2_keystore/ca.cert.pem" ]; then \
         cp ./sros2_keystore/ca.cert.pem ./sros2_ca_public.pem; \
