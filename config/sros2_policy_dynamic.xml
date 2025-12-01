@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<policy version="0.2.0">
+  <enclaves>
+    <enclave path="/vyra_module_template/core">
+      <profiles>
+        <profile ns="/" node="*">
+          <!-- Dynamic: Allow subscribing to ANY topic -->
+          <topics subscribe="ALLOW" publish="DENY">
+            <topic>/*</topic>
+            <!-- ROS2 internal topics -->
+            <topic>rt/*</topic>
+            <topic>rq/*</topic>
+            <topic>rr/*</topic>
+            <topic>ros_discovery_info</topic>
+          </topics>
+          
+          <!-- Dynamic: Allow calling ANY service -->
+          <services request="ALLOW" reply="DENY">
+            <service>/*</service>
+            <!-- ROS2 action internal services -->
+            <service>/*/_action/cancel_goal</service>
+            <service>/*/_action/get_result</service>
+            <service>/*/_action/send_goal</service>
+          </services>
+          
+          <!-- Dynamic: Allow calling ANY action -->
+          <actions call="ALLOW" execute="DENY">
+            <action>/*</action>
+          </actions>
+        </profile>
+      </profiles>
+    </enclave>
+  </enclaves>
+</policy>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<policy version="0.2.0">
+  <enclaves>
+    <enclave path="/vyra_module_template/core">
+      <profiles>
+        <profile ns="/vyra_module_template" node="core">
+          <!-- Static: Topics this module PUBLISHES -->
+          <topics publish="ALLOW" subscribe="DENY">
+            <topic>state_feed</topic>
+            <topic>news_feed</topic>
+            <topic>error_feed</topic>
+            <topic>logger_stream</topic>
+          </topics>
+          
+          <!-- Static: Services this module PROVIDES (reply=ALLOW) -->
+          <services reply="ALLOW" request="DENY">
+            <service>register_module</service>
+            <service>get_interfaces</service>
+            <service>request_module_link</service>
+            <service>health_check</service>
+          </services>
+          
+          <!-- Static: Actions this module PROVIDES (execute=ALLOW) -->
+          <actions execute="ALLOW" call="DENY">
+            <action>initiate_update</action>
+          </actions>
+        </profile>
+      </profiles>
+    </enclave>
+  </enclaves>
+</policy>
