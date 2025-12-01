@@ -29,6 +29,7 @@ temp/*
 *.bak
 
 # Dynamically generated files
-*.env
+.env
+!.env.example
 *.pyc
 *.sqlite

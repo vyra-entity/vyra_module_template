@@ -7,6 +7,8 @@
 # =============================================================================
 FROM vyra_base_image:dev AS builder
 
+# Accept MODULE_NAME as build argument (provided by GitHub Actions or docker-compose)
+ARG MODULE_NAME
 ENV MODULE_NAME=${MODULE_NAME}
 
 WORKDIR /build
