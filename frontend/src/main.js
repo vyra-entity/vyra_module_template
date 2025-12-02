@@ -5,14 +5,10 @@ import App from './App.vue'
 
 // Import Views
 import Home from './views/Home.vue'
-import Modules from './views/Modules.vue'
-import Monitoring from './views/Monitoring.vue'
 
 // Router Setup
 const routes = [
-  { path: '/', name: 'Home', component: Home },
-  { path: '/modules', name: 'Modules', component: Modules },
-  { path: '/monitoring', name: 'Monitoring', component: Monitoring }
+  { path: '/', name: 'Home', component: Home }
 ]
 
 const router = createRouter({

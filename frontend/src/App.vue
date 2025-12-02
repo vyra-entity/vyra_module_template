@@ -6,8 +6,6 @@
       </div>
       <div class="nav-links">
         <router-link to="/" class="nav-link">Home</router-link>
-        <router-link to="/modules" class="nav-link">Module</router-link>
-        <router-link to="/monitoring" class="nav-link">Monitoring</router-link>
       </div>
     </nav>
 

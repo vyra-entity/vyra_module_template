@@ -65,14 +65,18 @@ RUN python3 tools/generate_sros2_policy.py \
     --dynamic config/sros2_policy_dynamic.xml \
     --output sros2_keystore/enclaves/${MODULE_NAME}/core
 
-# Build Frontend (if exists)
+# Build Frontend (if exists and has required files)
 # Note: Using 'npm install' for template flexibility (generates package-lock.json)
 # Production modules should use 'npm ci' with committed package-lock.json
-RUN if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then \
+RUN if [ -d "frontend" ] && [ -f "frontend/package.json" ] && [ -d "frontend/src/views" ] && [ "$(ls -A frontend/src/views)" ]; then \
         cd frontend && \
         npm install && \
         npm run build && \
         cd ..; \
+    else \
+        echo "⚠️  Skipping frontend build (template or incomplete frontend structure)"; \
+        mkdir -p frontend/dist && \
+        echo '<!DOCTYPE html><html><body><h1>Frontend Template</h1></body></html>' > frontend/dist/index.html; \
     fi
 
 # Extract SROS2 CA for sharing with other modules
