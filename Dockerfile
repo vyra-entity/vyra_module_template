@@ -1,17 +1,19 @@
 # ==============================================================================
 # VYRA Module Dockerfile - Optimized Multi-Stage Build
-# Module: ${MODULE_NAME}"
-# Base Image: vyra_base_image:dev (builder), vyra_base_image:prod (runtime)
+# Module: ${MODULE_NAME}
 # ==============================================================================
-# This Dockerfile builds ONLY the module layer on top of the shared base image
-# Savings: ~2.3GB per module (99% base image redundancy eliminated)
+# Local Development: Uses vyra_base_image:development/production (built locally)
+# CI/CD Production: Uses ghcr.io/vyra-entity/vyra_framework:development/slim
 # ==============================================================================
+
+# Base image configuration (override with --build-arg)
+ARG BUILDER_BASE_IMAGE=vyra_base_image:development
+ARG RUNTIME_BASE_IMAGE=vyra_base_image:production
 
 # =============================================================================
 # Stage 1: Builder - Build ROS2 packages, frontend, and SROS2 keys
 # =============================================================================
-FROM ghcr.io/vyra-entity/vyra_framework:dev AS builder
-# FROM vyra_base_image:dev AS builder
+FROM ${BUILDER_BASE_IMAGE} AS builder
 
 # Module name from build argument
 ARG MODULE_NAME
@@ -94,8 +96,7 @@ RUN if [ -f "./sros2_keystore/ca.cert.pem" ]; then \
 # =============================================================================
 # Stage 2: Runtime - Minimal module layer (~150MB)
 # =============================================================================
-FROM ghcr.io/vyra-entity/vyra_framework:prod AS runtime
-# FROM vyra_base_image:prod AS runtime
+FROM ${RUNTIME_BASE_IMAGE} AS runtime
 
 ARG MODULE_NAME
 ENV MODULE_NAME=${MODULE_NAME}
