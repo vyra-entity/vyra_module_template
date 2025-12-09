@@ -39,19 +39,6 @@ if [ -f ".env" ]; then
         # Update the existing line
         sed -i "s/^MODULE_NAME=.*/MODULE_NAME=$MODULE_NAME/" ".env"
     fi
-    
-    # Also add/update RCL_LOGGING_LOG_FILE_NAME in .env
-
-    # -> Not working yet, ignore for now. Could be regarded as a TODO. <-
-
-    # RCL_LOG_FILENAME="${MODULE_NAME}_ros2_core.log"
-    # if ! grep -q '^RCL_LOGGING_LOG_FILE_NAME=' ".env"; then
-    #     echo "RCL_LOGGING_LOG_FILE_NAME=$RCL_LOG_FILENAME" >> ".env"
-    #     echo "✅ Added RCL_LOGGING_LOG_FILE_NAME=$RCL_LOG_FILENAME to .env"
-    # else
-    #     sed -i "s/^RCL_LOGGING_LOG_FILE_NAME=.*/RCL_LOGGING_LOG_FILE_NAME=$RCL_LOG_FILENAME/" ".env"
-    #     echo "✅ Updated RCL_LOGGING_LOG_FILE_NAME=$RCL_LOG_FILENAME in .env"
-    # fi
 fi
 
 # Load environment variables from .env (filter comments and empty lines)
@@ -87,125 +74,26 @@ mkdir -p /workspace/log/uvicorn
 mkdir -p /workspace/log/nginx
 mkdir -p /workspace/log/ros2
 
-# VYRA_STARTUP_ACTIVE check
-if ! grep -q '^VYRA_STARTUP_ACTIVE=' .env; then
-    echo "VYRA_STARTUP_ACTIVE=true" >> .env
-fi
-
-if pip show vyra_base > /dev/null 2>&1; then
-    echo "✅ vyra_base is installed"
+# Copy install/ directory from image if not present or incomplete (volume mount overrides image)
+# This happens when using full workspace mount for development
+if [ -d "/opt/vyra/install_backup" ]; then
+    if [ ! -f "/workspace/install/setup.bash" ]; then
+        echo "📦 Copying install/ directory from image backup..."
+        rm -rf /workspace/install  # Remove incomplete directory if exists
+        cp -r /opt/vyra/install_backup /workspace/install
+        echo "✅ install/ directory restored"
+    else
+        echo "✅ install/ directory already complete (setup.bash found)"
+    fi
 else
-    echo "❌ vyra_base is NOT installed. VYRA_STARTUP_ACTIVE=true will be set to base all settings."
-    export VYRA_STARTUP_ACTIVE=true
-fi
-
-# Only build on first start or if manually set (VYRA_STARTUP_ACTIVE=false)
-if [ "$VYRA_STARTUP_ACTIVE" == "true" ]; then
-    echo "=== STARTUP ACTIVE: INSTALL DEPS AND BUILDING WORKSPACE ==="
-
-    # 1. Install system packages first
-    # Optional: Run pre-install script for repository setup
-    if [ -f ".module/pre-install.sh" ]; then
-        echo "🔧 Running pre-install script..."
-        chmod +x .module/pre-install.sh
-        ./.module/pre-install.sh
-        echo "✅ Pre-install script completed"
-    fi
-    
-    # 2. Install system packages from .module/system-packages.txt
-    if [ -f ".module/system-packages.txt" ]; then
-        echo "🔧 Installing system packages from .module/system-packages.txt..."
-        apt-get update -qq
-        while read -r package; do
-            if [ -n "$package" ] && [ "${package:0:1}" != "#" ]; then
-                echo "  📦 Installing: $package"
-                if apt-get install -y "$package"; then
-                    echo "  ✅ $package installed successfully"
-                else
-                    echo "  ⚠️ Failed to install $package, continuing..."
-                fi
-            fi
-        done < .module/system-packages.txt
-        echo "✅ System packages installation completed"
-    else
-        echo "⚠️ No .module/system-packages.txt found, skipping system packages"
-    fi
-
-    # 3. Install Python requirements
-    if [ -f ".module/requirements.txt" ]; then
-        echo "🐍 Installing Python requirements from .module/requirements.txt..."
-        if pip install --no-cache-dir -r .module/requirements.txt --break-system-packages; then
-            echo "✅ Python requirements installed successfully"
-        else
-            echo "❌ Python requirements installation failed"
-            exit 1
-        fi
-    else
-        echo "⚠️ No .module/requirements.txt found, skipping Python requirements"
-    fi
-
-    # Clear vyra_base 
-    if pip show vyra_base > /dev/null 2>&1; then
-        pip uninstall vyra_base -y --break-system-packages
-    else
-        echo "vyra_base ist nicht installiert, überspringe Uninstall."
-    fi
-
-    # Interfaces setup
-    # 3. Installing all wheels dependencies
-    # Use --ignore-installed cryptography to avoid uninstalling system package
-    pip install wheels/*.whl --break-system-packages --ignore-installed cryptography || true
-
-    if [ $? -eq 0 ]; then
-        echo "✅ All wheels installed successfully"
-    else
-        echo "⚠️  Wheels installation had warnings (cryptography system package kept)"
-    fi
-
-    # Setting up interfaces (cmake, package, load interfaces from vyra_base, etc.)
-    python3 tools/setup_interfaces.py
-
-    if [ $? -eq 0 ]; then
-        echo "✅ Interface setup completed"
-    else
-        echo "❌ Interface setup failed"
+    if [ ! -f "/workspace/install/setup.bash" ]; then
+        echo "❌ ERROR: install/setup.bash not found and no backup available"
+        echo "💡 Image may not have been built correctly"
         exit 1
     fi
-
-    # Clean logs
-    # rm -rf build/ log/ros2/*
-    rm -rf log/ros2/build*/
-    rm -rf log/ros2/latest*/
-    rm -f log/ros2/python3_*.log
-
-    # Clean install and build folder
-    rm -rf install/ build/
-    
-    colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
-
-    # Move build logs to ros2 folder
-    if [ -d "log/latest" ] || [ -L "log/latest" ]; then
-        mv log/build_* log/latest_build log/latest log/ros2/ 2>/dev/null || true
-    fi
-
-    if [ $? -eq 0 ]; then
-        echo "✅ Build completed"
-    else
-        echo "❌ Build failed"
-        exit 1
-    fi
-
-    rm -rf build/
-
-    # Deactivate startup flag to avoid repeated builds
-    sed -i 's/^VYRA_STARTUP_ACTIVE=.*/VYRA_STARTUP_ACTIVE=false/' .env    
-else
-    echo "=== STARTUP NOT ACTIVE ==="
-    echo "✅ Skipping interface configuration"
-    echo "✅ Skipping ros2 build"
 fi
 
-# Source package setup
+# Source package setup (install folder already built in image or restored)
 source install/setup.bash
 
 if [ $? -eq 0 ]; then

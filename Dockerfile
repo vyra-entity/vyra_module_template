@@ -34,6 +34,12 @@ RUN if [ -f ".module/requirements.txt" ]; then \
         pip install --no-cache-dir -r .module/requirements.txt --break-system-packages; \
     fi
 
+# Run pre-install script if exists (for custom repository setup, etc.)
+RUN if [ -f ".module/pre-install.sh" ]; then \
+        chmod +x .module/pre-install.sh && \
+        ./.module/pre-install.sh; \
+    fi
+
 # Install module-specific system packages
 RUN if [ -f ".module/system-packages.txt" ]; then \
         apt-get update -qq && \
@@ -43,7 +49,7 @@ RUN if [ -f ".module/system-packages.txt" ]; then \
         apt-get clean && rm -rf /var/lib/apt/lists/*; \
     fi
 
-# Install wheel dependencies
+# Install wheel dependencies (vyra_base and module-specific wheels)
 RUN if [ -d "wheels" ]; then \
         pip install wheels/*.whl --break-system-packages --ignore-installed cryptography || true; \
     fi
@@ -112,6 +118,10 @@ COPY --from=builder /build/tools/ ./tools/
 COPY --from=builder /build/.module/ ./.module/
 COPY --from=builder /build/frontend/dist ./frontend/dist
 COPY --from=builder /build/src/rest_api ./src/rest_api
+
+# Backup install/ directory for volume mount scenarios
+# When workspace is mounted as volume, install/ from image is hidden
+RUN cp -r ./install /opt/vyra/install_backup
 
 # Create runtime directories
 RUN mkdir -p log/ros2 log/nginx log/uvicorn log/vyra storage
