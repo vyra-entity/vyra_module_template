@@ -1,3 +1,4 @@
+import logging
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -35,13 +36,14 @@ from vyra_base.defaults.entries import (
 )
 from vyra_base.helper.file_reader import FileReader
 from vyra_base.helper.file_writer import FileWriter
-from vyra_base.helper.logger import Logger, LogEntry
 
 if __package__:
     PACKAGE_NAME = __package__.split('.')[0]
 else:
     sys.exit("Package name not found. Please run this script as part of a package.")
 
+
+logger = logging.getLogger(__name__)
 
 async def load_resource(package_name: str, resource_name: Path) -> Any:
     package_path = get_package_share_directory(package_name)
@@ -51,7 +53,7 @@ async def load_resource(package_name: str, resource_name: Path) -> Any:
         raise FileNotFoundError(
             f"Resource {resource_name} not found in package {package_name}")
     
-    Logger.log(f"Loading resource from {resource_path}")
+    logger.debug(f"Loading resource from {resource_path}")
 
 
     match resource_name.suffix:
@@ -66,7 +68,7 @@ async def load_resource(package_name: str, resource_name: Path) -> Any:
                 f"Unsupported file type: {resource_name.suffix}. "
                 "Supported types are .ini, .json, .yaml/.yml"
             )
-            Logger.error(fail_msg)
+            logger.error(fail_msg)
             raise ValueError(fail_msg)
 
 async def _create_base_interfaces() -> list[FunctionConfigEntry]:
@@ -118,12 +120,12 @@ async def _create_base_interfaces() -> list[FunctionConfigEntry]:
                     )
                 )
         except KeyError as e:
-            Logger.error(
+            logger.error(
                 f"Missing key <{e}> in interface data <{metadata}>."
                 "Interface will not be created.")
             raise
         except TypeError as e:
-            Logger.error(
+            logger.error(
                 f"Type error in interface data <{metadata}>: {e}."
                 "Interface will not be created.")
             raise
@@ -177,7 +179,7 @@ async def _load_module_data() -> Optional[dict[str, Any]]:
         module_data: Optional[dict[str, Any]] = await FileReader.open_yaml_file(data_path)
     except (FileNotFoundError) as e:
         # Create .module directory if it does not exist
-        Logger.error(f"Module data file not found: {e}. Creating new module_data.yaml.")
+        logger.error(f"Module data file not found: {e}. Creating new module_data.yaml.")
         if not data_path.parent.exists():
             data_path.parent.mkdir(parents=True)
         return None
@@ -220,10 +222,10 @@ async def build_entity(project_settings):
     needed_fields: list[str] = ['uuid', 'name', 'template', 'description', 'version']
 
     if not module_data or module_data == {}:
-        Logger.pre_log_buffer.append(LogEntry(
+        logger.info(
             "Creating new module entry from project settings. "
             "Module data is empty."
-        ))
+        )
 
         me = ModuleEntry(
             uuid= ModuleEntry.gen_uuid(),
@@ -236,11 +238,12 @@ async def build_entity(project_settings):
         missing_field: list[str] = [
             field for field in needed_fields if field not in module_data]
         
-        Logger.pre_log_buffer.append(LogEntry(
-            message="Module data is incomplete. "
-                    f"Missing fields: {missing_field}. Will be recovered "
-                    f"from project settings."
-        ))
+        logger.info(
+            "Module data is incomplete. "
+            f"Missing fields: {missing_field}. Will be recovered "
+            f"from project settings."
+        )
+
         me = ModuleEntry(
             uuid=module_data.get('uuid', ModuleEntry.gen_uuid()),
             name=module_data.get('name', project_settings['name']),
@@ -249,19 +252,19 @@ async def build_entity(project_settings):
             version=module_data.get('version', project_settings['version']),
         )
 
-        Logger.pre_log_buffer.append(LogEntry(
-            message="Module data recovered from project settings."
-        ))
+        logger.info(
+            "Module data recovered from project settings."
+        )
     else:
-        Logger.pre_log_buffer.append(LogEntry(
-            message="Module data complete. "
-                    "Using project settings to create a new module entry."
-        ))
+        logger.info(
+            "Module data complete. "
+            "Using project settings to create a new module entry."
+        )
 
         if module_data['uuid'] in [None, "", "null"]:
-            Logger.pre_log_buffer.append(LogEntry(
-                message="Module UUID is empty. Generating new UUID."
-            ))
+            logger.info(
+                "Module UUID is empty. Generating new UUID."
+            )
 
             module_data['uuid'] = ModuleEntry.gen_uuid()
 
@@ -275,7 +278,7 @@ async def build_entity(project_settings):
     
     await _write_module_data(me.to_dict())
     
-    Logger.info(f"Module_data: {me.to_dict()}")
+    logger.info(f"Module_data: {me.to_dict()}")
 
     se = StateEntry(
         previous='initial',
@@ -354,7 +357,7 @@ async def create_db_storage(entity: VyraEntity) -> None:
     await db_access.create_all_tables()
 
     entity.register_storage(db_access)
-    Logger.log("Storage access created and set in entity")
+    logger.debug("Storage access created and set in entity")
 
 async def build_base():
     project_settings: dict[str, Any] = await _load_project_settings()
@@ -363,6 +366,6 @@ async def build_base():
     
     await create_db_storage(entity)
 
-    Logger.log("Created V.Y.R.A. Entity with state entry and module config")
+    logger.debug("Created V.Y.R.A. Entity with state entry and module config")
 
     return entity

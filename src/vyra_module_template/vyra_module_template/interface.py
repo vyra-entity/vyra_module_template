@@ -1,7 +1,13 @@
 import json
+import logging
 import sys
 from pathlib import Path
+
+from lark import logger
+
 from typing import Any
+from typing import Callable
+
 
 from ament_index_python.packages import get_package_share_directory
 
@@ -12,16 +18,16 @@ from vyra_base.defaults.entries import FunctionConfigBaseTypes
 from vyra_base.helper.error_handler import ErrorTraceback
 
 
-from vyra_base.helper.logger import Logger
-from typing import Callable
+logger = logging.getLogger(__name__)
 
 
 @ErrorTraceback.w_check_error_exist
-async def auto_register_interfaces(
+async def auto_register_callable_interfaces(
     entity: VyraEntity, 
     callback_list: list[Callable]=[], 
-    callback_parent: object=None) -> None:
-    """Automatically registers interfaces for the entity. The list of callbacks must
+    callback_parent: object=None,
+    speaker_list: list=[]) -> None:
+    """Automatically registers callable interfaces for the entity. The list of callbacks must
     contain all functions that are defined in the interface metadata.
     Args:
         entity (VyraEntity): The entity to register interfaces for.
@@ -33,12 +39,12 @@ async def auto_register_interfaces(
     if not callback_list and not callback_parent:
         raise ValueError("Either callback_list or callback_parent must be provided.")
     
-    if not callback_list and callback_parent:
-        Logger.debug(
+    if not callback_list:
+        logger.debug(
             "No callback_list provided, loading all remote callables from parent."
         )
         callback_list = _autoload_all_remote_callable_from_parent(callback_parent)
-        Logger.debug(
+        logger.debug(
             f"Loaded {len(callback_list)} remote callables from parent."
         )
 
@@ -46,7 +52,18 @@ async def auto_register_interfaces(
 
     interface_functions: list[FunctionConfigEntry] = []
 
-    for metadata in interface_metadata:
+    for callback in callback_list:
+        metadata = [m for m in interface_metadata 
+                    if m['functionname'] == callback.__name__]
+        
+        if not metadata:
+            logger.warning(
+                f"No metadata found for callback {callback.__name__}, skipping."
+            )
+            continue
+        else:
+            metadata = metadata[0]
+
         ros2_type: str = metadata['filetype'].split('/')[-1]
         ros2_type = ros2_type.split('.')[0]
         
@@ -54,29 +71,10 @@ async def auto_register_interfaces(
             case FunctionConfigBaseTypes.callable.value:
                 metadata['ros2type'] = getattr(
                     sys.modules['vyra_module_interfaces.srv'], ros2_type)
-                callback = next(
-                    (c for c in callback_list if c.__name__ == metadata['functionname']), None
-                )
-                if callback is None:
-                    Logger.debug(
-                        f"Callback for function {metadata['functionname']} not found. "
-                        "Interface will not be created. Please check the configuration files" \
-                        "in vyra_module_interfaces/config."
-                    )
-                    continue
-
                 interface_functions.append(_register_callable_interface(
                     callback=callback,
                     metadata=metadata
-                ))
-
-            case FunctionConfigBaseTypes.speaker.value:
-                metadata['ros2type'] = getattr(
-                    sys.modules['vyra_module_interfaces.msg'], ros2_type)
-                
-                interface_functions.append(_register_speaker_interface(
-                    metadata=metadata
-                ))
+                )) 
 
             case FunctionConfigBaseTypes.job.value:
                 metadata['ros2type'] = getattr(
@@ -87,7 +85,7 @@ async def auto_register_interfaces(
                     callbacks={}
                 ))
 
-    Logger.info(f"Registering {len(interface_functions)} interfaces for entity")
+    logger.info(f"Registering {len(interface_functions)} interfaces for entity")
     await entity.set_interfaces(interface_functions)
     return 
 
@@ -107,10 +105,10 @@ def _load_metadata(package_name: str, resource_folder: Path) -> list[dict]:
 
     metadata: list[dict] = []
 
-    Logger.log(f"Meta paths: {meta_paths}")
+    logger.debug(f"Meta paths: {meta_paths}")
 
     for meta_path in meta_paths:
-        Logger.log(f"Loading custom interface resource from {meta_path}")
+        logger.debug(f"Loading custom interface resource from {meta_path}")
 
         with open(meta_path, 'r', encoding='utf-8') as f:
             metadata.extend(json.load(f))

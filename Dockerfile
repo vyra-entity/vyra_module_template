@@ -19,7 +19,7 @@ FROM ${BUILDER_BASE_IMAGE} AS builder
 ARG MODULE_NAME
 ENV MODULE_NAME=${MODULE_NAME}
 
-WORKDIR /build
+WORKDIR /workspace
 
 # Copy module sources
 COPY src/ ./src/
@@ -54,14 +54,8 @@ RUN if [ -d "wheels" ]; then \
         pip install wheels/*.whl --break-system-packages --ignore-installed cryptography || true; \
     fi
 
-# Setup ROS2 interfaces
-RUN mkdir -p /workspace && \
-    cp -r src /workspace/ && \
-    cp -r tools /workspace/ && \
-    cd /workspace && \
-    python3 tools/setup_interfaces.py && \
-    cp -r /workspace/src/* /build/src/ && \
-    rm -rf /workspace
+# Setup ROS2 interfaces (already in /workspace)
+RUN python3 tools/setup_interfaces.py
 
 # Build ROS2 packages
 RUN source /opt/ros/kilted/setup.bash && \
@@ -110,14 +104,15 @@ ENV MODULE_NAME=${MODULE_NAME}
 WORKDIR /workspace
 
 # Copy ONLY module artifacts (base image already has everything else)
-COPY --from=builder /build/install/ ./install/
-COPY --from=builder /build/sros2_keystore/ ./sros2_keystore/
-COPY --from=builder /build/sros2_ca_public.pem ./sros2_ca_public.pem
-COPY --from=builder /build/config/ ./config/
-COPY --from=builder /build/tools/ ./tools/
-COPY --from=builder /build/.module/ ./.module/
-COPY --from=builder /build/frontend/dist ./frontend/dist
-COPY --from=builder /build/src/rest_api ./src/rest_api
+COPY --from=builder /workspace/install/ ./install/
+COPY --from=builder /workspace/build/ ./build/
+COPY --from=builder /workspace/sros2_keystore/ ./sros2_keystore/
+COPY --from=builder /workspace/sros2_ca_public.pem ./sros2_ca_public.pem
+COPY --from=builder /workspace/config/ ./config/
+COPY --from=builder /workspace/tools/ ./tools/
+COPY --from=builder /workspace/.module/ ./.module/
+COPY --from=builder /workspace/frontend/dist ./frontend/dist
+COPY --from=builder /workspace/src/rest_api ./src/rest_api
 
 # Backup install/ directory for volume mount scenarios
 # When workspace is mounted as volume, install/ from image is hidden
