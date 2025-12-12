@@ -2,6 +2,7 @@
 build/*
 log/*
 install/*
+wheels/*
 
 # Frontend (build artifacts)
 frontend/node_modules/*
