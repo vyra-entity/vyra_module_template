@@ -32,10 +32,10 @@ When creating a new module from this template:
 ### Development Mode
 ```env
 VYRA_DEV_MODE=true
-MODULE_IMAGE=vyra_base_image:dev
+MODULE_IMAGE=vyra_base_image:development
 ENABLE_ROS2_HOT_RELOAD=true
 ```
-- Uses `vyra_base_image:dev` with full dev tools
+- Uses `vyra_base_image:development` with full dev tools
 - Mounts source code for hot-reload
 - Automatic ROS2 rebuild on changes
 - Vue.js dev server with HMR
@@ -81,12 +81,12 @@ your_module_service:
 2. **Module-specific config** stays in module's `.env`
 3. **Global config** stays in workspace root `.env`
 4. **Production images** should use specific version tags, not `latest`
-5. **Development** always uses `vyra_base_image:dev` with source mounts
+5. **Development** always uses `vyra_base_image:development` with source mounts
 
 ## Example: Transitioning from Dev to Production
 
 ### Step 1: Develop locally
-- Use `VYRA_DEV_MODE=true` and `MODULE_IMAGE=vyra_base_image:dev`
+- Use `VYRA_DEV_MODE=true` and `MODULE_IMAGE=vyra_base_image:development`
 - Code changes reflect immediately with hot-reload
 
 ### Step 2: Build production image

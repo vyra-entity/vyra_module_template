@@ -3,7 +3,7 @@
 # Build Development: docker build --target development -t vyra_base_image:dev .
 
 # ============================================================================
-# BASE STAGE - Minimal dependencies for both dev and prod
+# BASE STAGE - Minimal dependencies for both development and production
 # ============================================================================
 FROM ros:kilted-ros-core AS base
 
