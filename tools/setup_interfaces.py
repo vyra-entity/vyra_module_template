@@ -297,8 +297,15 @@ def update_dynamic_interfaces(
 def main(interface_package_name, tmp_src_path=None):
     SELECT_PY_CPP = "cpp"  # oder "py", select based on your needs
 
-    # Workspace setup
-    workspace_root = Path("/workspace")
+    # Workspace setup - detect if we're in container or local development
+    script_dir = Path(__file__).parent.parent  # Go up from tools/ to module root
+    if script_dir.name.startswith("v2_") or script_dir.name == "vyra_module_template":
+        # Local development - we're in the module directory
+        workspace_root = script_dir
+    else:
+        # Container - use /workspace
+        workspace_root = Path("/workspace")
+    
     interface_package_path: Path = workspace_root / "src" / interface_package_name
 
     # Check if package already exists

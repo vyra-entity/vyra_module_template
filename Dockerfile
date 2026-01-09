@@ -61,8 +61,16 @@ RUN python3 tools/setup_interfaces.py
 RUN source /opt/ros/kilted/setup.bash && \
     colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 
+# Extract MODULE_NAME from module_data.yaml if not provided
+RUN if [ -z "$MODULE_NAME" ] && [ -f ".module/module_data.yaml" ]; then \
+        export MODULE_NAME=$(grep "^name:" .module/module_data.yaml | cut -d: -f2 | tr -d ' ' | tr -d "'" | tr -d '"'); \
+        echo "MODULE_NAME extracted from module_data.yaml: $MODULE_NAME"; \
+    fi && \
+    echo "MODULE_NAME=${MODULE_NAME}" > /tmp/module_name.env
+
 # Generate SROS2 keystore
-RUN source /opt/ros/kilted/setup.bash && \
+RUN source /tmp/module_name.env && \
+    source /opt/ros/kilted/setup.bash && \
     ros2 security create_keystore ./sros2_keystore && \
     ros2 security create_enclave ./sros2_keystore /${MODULE_NAME}/core
 
@@ -100,7 +108,11 @@ FROM ${RUNTIME_BASE_IMAGE} AS runtime
 
 ARG MODULE_NAME
 ENV MODULE_NAME=${MODULE_NAME}
-
+# Copy module name from builder stage if not set
+COPY --from=builder /tmp/module_name.env /tmp/module_name.env
+RUN if [ -z "$MODULE_NAME" ]; then \
+        . /tmp/module_name.env; \
+    fi
 WORKDIR /workspace
 
 # Copy ONLY module artifacts (base image already has everything else)
