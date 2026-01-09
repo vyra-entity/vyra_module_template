@@ -104,6 +104,13 @@ class TaskManager:
         :param kwargs: Keyword arguments to be passed to the coroutine.
         :type kwargs: dict[str, Any]
         """
+        # Cancel old task if it exists and is still running
+        if coro.__name__ in self.tasks:
+            _, old_task, _, _ = self.tasks[coro.__name__]
+            if not old_task.done():
+                Logger.info(f"Cancelling old task <{coro.__name__}> before creating new one")
+                old_task.cancel()
+        
         self.tasks[coro.__name__] = (
             coro, 
             asyncio.create_task(coro(*args, **kwargs), name=coro.__name__), 

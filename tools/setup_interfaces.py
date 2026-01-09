@@ -118,7 +118,7 @@ def collect_interface_files(package_path):
     return interface_files
 
 
-def update_CMakefile(interface_package_path: Path):
+def update_CMakefile(interface_package_path: Path, package_name: str):
     interace_files = collect_interface_files(interface_package_path)
     msg_files = interace_files["msg"]
     srv_files = interace_files["srv"]
@@ -148,6 +148,14 @@ def update_CMakefile(interface_package_path: Path):
     # 2. CMakeLists.txt anpassen
     with open(cmake_path, "r") as f:
         cmake_content = f.read()
+
+    # Fix project name to match package.xml
+    cmake_content = re.sub(
+        r'project\([^)]*\)',
+        f'project({package_name})',
+        cmake_content
+    )
+    print(f"✓ CMakeLists.txt: project() set to '{package_name}'.")
 
     # Ersetze oder ergänze rosidl_generate_interfaces(...)
     rosidl_line = f'rosidl_generate_interfaces(${{PROJECT_NAME}}\n'
@@ -340,7 +348,7 @@ def main(interface_package_name, tmp_src_path=None):
     update_package_xml(interface_package_path)
 
     print(f"\nUpdate CMakefile for {interface_package_name}")
-    update_CMakefile(interface_package_path)
+    update_CMakefile(interface_package_path, interface_package_name)
 
     interface_files = collect_interface_files(interface_package_path)
     for file_collection in interface_files.values():
