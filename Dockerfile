@@ -112,7 +112,7 @@ COPY --from=builder /workspace/config/ ./config/
 COPY --from=builder /workspace/tools/ ./tools/
 COPY --from=builder /workspace/.module/ ./.module/
 COPY --from=builder /workspace/frontend/dist ./frontend/dist
-COPY --from=builder /workspace/src/rest_api ./src/rest_api
+COPY --from=builder /workspace/src/ ./src/
 
 # Backup install/ directory for volume mount scenarios
 # When workspace is mounted as volume, install/ from image is hidden
