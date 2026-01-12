@@ -123,6 +123,19 @@ else
     print_warning "ROS2-Package-Verzeichnis nicht gefunden: $ROS2_PACKAGE_DIR"
 fi
 
+# Interface Package-Verzeichnis (vyra_module_interfaces → <module>_interfaces)
+OLD_INTERFACE_DIR="src/vyra_module_interfaces"
+NEW_INTERFACE_DIR="src/${NEW_MODULE_NAME}_interfaces"
+if [ -d "$OLD_INTERFACE_DIR" ]; then
+    print_success "Benenne Interface-Package um: $OLD_INTERFACE_DIR → $NEW_INTERFACE_DIR"
+    mv "$OLD_INTERFACE_DIR" "$NEW_INTERFACE_DIR"
+elif [ -d "src/${OLD_MODULE_NAME}_interfaces" ]; then
+    print_success "Benenne Interface-Package um: src/${OLD_MODULE_NAME}_interfaces → $NEW_INTERFACE_DIR"
+    mv "src/${OLD_MODULE_NAME}_interfaces" "$NEW_INTERFACE_DIR"
+else
+    print_warning "Interface-Package-Verzeichnis nicht gefunden: $OLD_INTERFACE_DIR"
+fi
+
 # ============================================================================
 # 2. Konfigurationsdateien aktualisieren
 # ============================================================================
@@ -335,6 +348,62 @@ for dc_file in docker-compose.yml docker-compose.yaml docker-compose.*.yml docke
         sed -i "s/$OLD_MODULE_NAME/$NEW_MODULE_NAME/g" "$dc_file"
     fi
 done
+
+# ============================================================================
+# 5.5. Interface Package References aktualisieren
+# ============================================================================
+
+print_info "Schritt 5.5: Interface Package Referenzen aktualisieren..."
+
+# Update vyra_module_interfaces → <module>_interfaces references
+OLD_INTERFACE_NAME="vyra_module_interfaces"
+if [ "$OLD_MODULE_NAME" != "vyra_module_template" ]; then
+    OLD_INTERFACE_NAME="${OLD_MODULE_NAME}_interfaces"
+fi
+NEW_INTERFACE_NAME="${NEW_MODULE_NAME}_interfaces"
+
+if [ "$OLD_INTERFACE_NAME" != "$NEW_INTERFACE_NAME" ]; then
+    print_info "Ersetze $OLD_INTERFACE_NAME → $NEW_INTERFACE_NAME"
+    
+    # Python files
+    PY_FILES=$(find src tools -name "*.py" 2>/dev/null | grep -v ".git" | grep -v "build/" || true)
+    if [ -n "$PY_FILES" ]; then
+        for file in $PY_FILES; do
+            if grep -q "$OLD_INTERFACE_NAME" "$file" 2>/dev/null; then
+                print_success "Aktualisiere Interface-Referenz in: $file"
+                sed -i "s/$OLD_INTERFACE_NAME/$NEW_INTERFACE_NAME/g" "$file"
+            fi
+        done
+    fi
+    
+    # XML files (package.xml, CMakeLists.txt)
+    INTERFACE_XML_FILES=$(find src -name "package.xml" -o -name "CMakeLists.txt" -o -name "*.cmake" 2>/dev/null | grep -v "build/" || true)
+    if [ -n "$INTERFACE_XML_FILES" ]; then
+        for file in $INTERFACE_XML_FILES; do
+            if grep -q "$OLD_INTERFACE_NAME" "$file" 2>/dev/null; then
+                print_success "Aktualisiere Interface-Referenz in: $file"
+                sed -i "s/$OLD_INTERFACE_NAME/$NEW_INTERFACE_NAME/g" "$file"
+            fi
+        done
+    fi
+    
+    # setup.cfg
+    if [ -f "src/$NEW_MODULE_NAME/setup.cfg" ] && grep -q "$OLD_INTERFACE_NAME" "src/$NEW_MODULE_NAME/setup.cfg" 2>/dev/null; then
+        print_success "Aktualisiere Interface-Referenz in setup.cfg"
+        sed -i "s/$OLD_INTERFACE_NAME/$NEW_INTERFACE_NAME/g" "src/$NEW_MODULE_NAME/setup.cfg"
+    fi
+    
+    # ROS service/action definition files
+    INTERFACE_DEF_FILES=$(find src -name "*.srv" -o -name "*.msg" -o -name "*.action" 2>/dev/null | grep -v "build/" || true)
+    if [ -n "$INTERFACE_DEF_FILES" ]; then
+        for file in $INTERFACE_DEF_FILES; do
+            if grep -q "$OLD_INTERFACE_NAME" "$file" 2>/dev/null; then
+                print_success "Aktualisiere Interface-Referenz in: $file"
+                sed -i "s/$OLD_INTERFACE_NAME/$NEW_INTERFACE_NAME/g" "$file"
+            fi
+        done
+    fi
+fi
 
 # ============================================================================
 # 6. Frontend aktualisieren (falls vorhanden)

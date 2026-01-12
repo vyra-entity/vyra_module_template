@@ -68,6 +68,18 @@ RUN if [ -z "$MODULE_NAME" ] && [ -f ".module/module_data.yaml" ]; then \
     fi && \
     echo "MODULE_NAME=${MODULE_NAME}" > /tmp/module_name.env
 
+# Copy module-specific interfaces to staging area for NFS volume
+# This will be copied to NFS volume at runtime via entrypoint
+RUN source /tmp/module_name.env && \
+    mkdir -p /tmp/module_interfaces_staging/${MODULE_NAME}_interfaces && \
+    if [ -d "install/${MODULE_NAME}_interfaces" ]; then \
+        echo "📦 Staging ${MODULE_NAME}_interfaces for NFS volume..."; \
+        cp -r install/${MODULE_NAME}_interfaces/* /tmp/module_interfaces_staging/${MODULE_NAME}_interfaces/; \
+        echo "✓ Interfaces staged at /tmp/module_interfaces_staging/${MODULE_NAME}_interfaces"; \
+    else \
+        echo "⚠️  No ${MODULE_NAME}_interfaces found in install directory"; \
+    fi
+
 # Generate SROS2 keystore
 RUN source /tmp/module_name.env && \
     source /opt/ros/kilted/setup.bash && \
@@ -125,6 +137,9 @@ COPY --from=builder /workspace/tools/ ./tools/
 COPY --from=builder /workspace/.module/ ./.module/
 COPY --from=builder /workspace/frontend/dist ./frontend/dist
 COPY --from=builder /workspace/src/ ./src/
+
+# Copy staged interfaces for NFS volume initialization
+COPY --from=builder /tmp/module_interfaces_staging/ /tmp/module_interfaces_staging/
 
 # Backup install/ directory for volume mount scenarios
 # When workspace is mounted as volume, install/ from image is hidden

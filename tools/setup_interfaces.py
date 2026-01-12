@@ -9,8 +9,40 @@ import subprocess
 import shutil
 from pathlib import Path
 import xml.etree.ElementTree as ET
+import yaml
     
+def get_module_name():
+    """Auto-detect module name from .module/module_data.yaml or directory name."""
+    script_dir = Path(__file__).parent.parent
+    
+    # Try to read from .module/module_data.yaml
+    module_data_file = script_dir / ".module" / "module_data.yaml"
+    if module_data_file.exists():
+        try:
+            import yaml
+            with open(module_data_file, 'r') as f:
+                data = yaml.safe_load(f)
+                if 'name' in data:
+                    return data['name']
+        except Exception as e:
+            print(f"⚠️ Could not read module name from {module_data_file}: {e}")
+    
+    # Fallback: use directory name (strip hash suffix if present)
+    dir_name = script_dir.name
+    # Remove hash suffix like _733256b82d6b48a48bc52b5ec73ebfff
+    if '_' in dir_name:
+        parts = dir_name.split('_')
+        # Check if last part looks like a hash (32+ hex chars)
+        if len(parts[-1]) >= 32 and all(c in '0123456789abcdef' for c in parts[-1]):
+            dir_name = '_'.join(parts[:-1])
+    
+    return dir_name
+
+
 def parse_args():
+    module_name = get_module_name()
+    default_interface_pkg = f"{module_name}_interfaces"
+    
     parser = argparse.ArgumentParser(
         description="Script to set up ROS2 interfaces for V.Y.R.A. modules."
     )
@@ -18,10 +50,10 @@ def parse_args():
     parser.add_argument(
         "--interface_pkg",
         type=str,
-        default="vyra_module_interfaces",
+        default=default_interface_pkg,
         help=(
-            "Name of the interface package to create or update "
-            "(default: vyra_module_interfaces)"
+            f"Name of the interface package to create or update "
+            f"(default: {default_interface_pkg})"
         )
     )
     parser.add_argument(
@@ -317,32 +349,30 @@ def main(interface_package_name, tmp_src_path=None):
     interface_package_path: Path = workspace_root / "src" / interface_package_name
 
     # Check if package already exists
-    if (
-        not interface_package_path.exists() and 
-        interface_package_name != "vyra_module_interfaces"
-    ):
-        raise FileNotFoundError(
-            f"Interface package '{interface_package_name}' not "
-            f"found in {workspace_root}/src. "
-            "Check your spelling of the package name or create it manually."
-        )
+    # Allow any module-specific interface package name (e.g., v2_modulemanager_interfaces, v2_dashboard_interfaces)
+    if not interface_package_path.exists():
+        # Check if this looks like a module-specific interface package
+        if not interface_package_name.endswith("_interfaces"):
+            raise FileNotFoundError(
+                f"Interface package '{interface_package_name}' not "
+                f"found in {workspace_root}/src. "
+                "Check your spelling of the package name or create it manually."
+            )
     
     interface_package_path.mkdir(exist_ok=True)
 
-    if interface_package_name == "vyra_module_interfaces":
+    # Load default interfaces for any new module interface package
+    if not interface_package_path.exists() or not (interface_package_path / "CMakeLists.txt").exists():
         load_default_interfaces(interface_package_name, interface_package_path)
     else:
-        print(f"Update dynamic interface package: {interface_package_name}")
-        if tmp_src_path is None or not tmp_src_path.exists():
-            raise ValueError(
-                "tmp_src_path must be provided for dynamic interface packages."
+        print(f"Update existing interface package: {interface_package_name}")
+        # For existing packages, check if there are dynamic interfaces to update
+        if tmp_src_path and tmp_src_path.exists():
+            update_dynamic_interfaces(
+                interface_package_name, 
+                tmp_src_path,
+                interface_package_path
             )
-
-        update_dynamic_interfaces(
-            interface_package_name, 
-            tmp_src_path,
-            interface_package_path
-        )
 
     print(f"\nUpdate package.xml for {interface_package_name}")
     update_package_xml(interface_package_path)

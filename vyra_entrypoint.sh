@@ -4,6 +4,17 @@ set -euo pipefail
 
 echo "=== VYRA ENTRYPOINT STARTING ==="
 
+# Wait for Redis to be ready (Docker Swarm compatible)
+if [ -f "/workspace/tools/wait-for-redis.sh" ]; then
+    echo "🔄 Checking Redis availability..."
+    /workspace/tools/wait-for-redis.sh
+elif [ -f "/host/tools/wait-for-redis.sh" ]; then
+    echo "🔄 Checking Redis availability..."
+    /host/tools/wait-for-redis.sh
+else
+    echo "⚠️ wait-for-redis.sh not found, skipping Redis check"
+fi
+
 # Warte kurz für vollständige Installation
 # sleep 2
 
@@ -20,7 +31,15 @@ if [ -f "$MODULE_DATA_FILE" ]; then
         
         # Set ROS2 rcl_logging filename based on module name
         export RCL_LOGGING_LOG_FILE_NAME="${MODULE_NAME}_ros2_core.log"
-        echo "✅ RCL logging configured: ${MODULE_NAME}_ros2_core.log"
+        
+        # Disable RCL/RCUTILS file logging to prevent per-thread log files
+        # Log to console instead (stdout/stderr which supervisord captures)
+        export RCUTILS_CONSOLE_OUTPUT_FORMAT="[{severity}] [{name}]: {message}"
+        export RCUTILS_COLORIZED_OUTPUT=0
+        export RCL_LOGGING_USE_CONSOLE=1
+        export RCL_LOGGING_TO_FILES=0
+        
+        echo "✅ RCL logging configured to console only (no per-thread files)"
     else
         echo "⚠️ Could not read name from $MODULE_DATA_FILE"
         echo "⚠️ ! Check the structure of the module_data.yaml file !"
@@ -39,6 +58,19 @@ if [ -f ".env" ]; then
         # Update the existing line
         sed -i "s/^MODULE_NAME=.*/MODULE_NAME=$MODULE_NAME/" ".env"
     fi
+    
+    # Also add/update RCL_LOGGING_LOG_FILE_NAME in .env
+
+    # -> Not working yet, ignore for now. Could be regarded as a TODO. <-
+
+    # RCL_LOG_FILENAME="${MODULE_NAME}_ros2_core.log"
+    # if ! grep -q '^RCL_LOGGING_LOG_FILE_NAME=' ".env"; then
+    #     echo "RCL_LOGGING_LOG_FILE_NAME=$RCL_LOG_FILENAME" >> ".env"
+    #     echo "✅ Added RCL_LOGGING_LOG_FILE_NAME=$RCL_LOG_FILENAME to .env"
+    # else
+    #     sed -i "s/^RCL_LOGGING_LOG_FILE_NAME=.*/RCL_LOGGING_LOG_FILE_NAME=$RCL_LOG_FILENAME/" ".env"
+    #     echo "✅ Updated RCL_LOGGING_LOG_FILE_NAME=$RCL_LOG_FILENAME in .env"
+    # fi
 fi
 
 # Load environment variables from .env (filter comments and empty lines)
@@ -74,6 +106,13 @@ mkdir -p /workspace/log/uvicorn
 mkdir -p /workspace/log/nginx
 mkdir -p /workspace/log/ros2
 
+# Clean up old thread log files if cleanup script exists
+if [ -f "/workspace/tools/cleanup_thread_logs.sh" ]; then
+    /workspace/tools/cleanup_thread_logs.sh
+fi
+
+rm -rf /workspace/log/ros2/*.log
+
 # Copy install/ directory from image if not present or incomplete (volume mount overrides image)
 # This happens when using full workspace mount for development
 if [ -d "/opt/vyra/install_backup" ]; then
@@ -101,6 +140,74 @@ if [ $? -eq 0 ]; then
 else
     echo "❌ Source package setup failed"
     exit 1
+fi
+
+# =============================================================================
+# NFS Interface Management
+# =============================================================================
+echo "=== NFS INTERFACE MANAGEMENT ==="
+
+# Extract instance_id from container name (format: <module_name>_<instance_id>)
+# HOSTNAME is the container name in Docker
+INSTANCE_ID="${HOSTNAME#${MODULE_NAME}_}"  # Remove module name prefix
+if [ "$INSTANCE_ID" = "$HOSTNAME" ]; then
+    # Fallback: If HOSTNAME doesn't start with MODULE_NAME, use full HOSTNAME
+    INSTANCE_ID="$HOSTNAME"
+fi
+echo "ℹ️  Module: $MODULE_NAME, Instance: $INSTANCE_ID"
+
+NFS_VOLUME_PATH="${NFS_VOLUME_PATH:-/nfs/ros_interfaces}"
+INTERFACE_DIR="${MODULE_NAME}_${INSTANCE_ID}_interfaces"
+INTERFACE_STAGING="/tmp/module_interfaces_staging/${MODULE_NAME}_interfaces"
+
+# Check if NFS volume is mounted
+if [ -d "$NFS_VOLUME_PATH" ]; then
+    echo "✅ NFS volume found at $NFS_VOLUME_PATH"
+    
+    # Copy module's own interfaces to NFS (read-write)
+    if [ -d "$INTERFACE_STAGING" ]; then
+        NFS_MODULE_DIR="$NFS_VOLUME_PATH/$INTERFACE_DIR"
+        echo "📦 Copying interfaces to NFS as $INTERFACE_DIR..."
+        mkdir -p "$NFS_MODULE_DIR"
+        
+        if command -v rsync >/dev/null 2>&1; then
+            rsync -av --delete "$INTERFACE_STAGING/" "$NFS_MODULE_DIR/" || echo "⚠️  rsync failed, falling back to cp"
+        fi
+        
+        if [ ! -f "$NFS_MODULE_DIR/setup.bash" ]; then
+            rm -rf "$NFS_MODULE_DIR"
+            cp -r "$INTERFACE_STAGING" "$NFS_MODULE_DIR"
+        fi
+        
+        if [ -f "$NFS_MODULE_DIR/setup.bash" ]; then
+            echo "✅ Interfaces copied to NFS successfully"
+        else
+            echo "⚠️  Interface copy incomplete, but continuing..."
+        fi
+    else
+        echo "⚠️  No staged interfaces found at $INTERFACE_STAGING"
+    fi
+    
+    # Source all interfaces from NFS (read-only for other modules)
+    echo "🔗 Sourcing ROS2 interfaces from NFS..."
+    INTERFACES_SOURCED=0
+    for interface_dir in "$NFS_VOLUME_PATH"/*_interfaces; do
+        if [ -d "$interface_dir" ] && [ -f "$interface_dir/setup.bash" ]; then
+            interface_name=$(basename "$interface_dir")
+            echo "   Sourcing $interface_name..."
+            source "$interface_dir/setup.bash" || echo "⚠️  Failed to source $interface_name"
+            INTERFACES_SOURCED=$((INTERFACES_SOURCED + 1))
+        fi
+    done
+    
+    if [ $INTERFACES_SOURCED -gt 0 ]; then
+        echo "✅ Sourced $INTERFACES_SOURCED interface packages from NFS"
+    else
+        echo "ℹ️  No interface packages found in NFS (first module?)"
+    fi
+else
+    echo "⚠️  NFS volume not found at $NFS_VOLUME_PATH"
+    echo "   Modules will only see their own interfaces"
 fi
 
 # Debug: Show available packages
@@ -260,8 +367,8 @@ if [ "$VYRA_DEV_MODE" = "true" ]; then
         fi
         
         # Start hot reload watcher in background
-        # Note: ros2_main is the supervisord program name for the ROS2 node
-        nohup python3 /workspace/tools/ros2_hot_reload.py "$MODULE_NAME" core ros2_main \
+        # Note: ros2_core is the supervisord program name for the ROS2 core node
+        nohup python3 /workspace/tools/ros2_hot_reload.py "$MODULE_NAME" core ros2_core \
             > /workspace/log/ros2/hot_reload.log 2>&1 &
         
         HOT_RELOAD_PID=$!
