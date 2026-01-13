@@ -292,6 +292,20 @@ def load_default_interfaces(interface_package_name, interface_package_path):
             " in your container (.env) [VYRA_STARTUP_ACTIVE=true] to load all wheels.")
 
     vyra_base.extract_ros_interfaces(interface_package_path)
+    
+    # Fix resource marker file: remove old vyra_module_interfaces and create correct one
+    resource_dir = interface_package_path / "resource"
+    if resource_dir.exists():
+        old_marker = resource_dir / "vyra_module_interfaces"
+        if old_marker.exists():
+            old_marker.unlink()
+            print(f"✓ Removed old marker file: {old_marker}")
+        
+        # Create correct marker file
+        correct_marker = resource_dir / interface_package_name
+        if not correct_marker.exists():
+            correct_marker.touch()
+            print(f"✓ Created marker file: {correct_marker}")
 
 def update_dynamic_interfaces(
     interface_package_name, 
@@ -331,6 +345,20 @@ def update_dynamic_interfaces(
     finally:
         # Clean up the temporary source directory
         shutil.rmtree(source_path)
+    
+    # Fix resource marker file: remove old vyra_module_interfaces and create correct one
+    resource_dir = target_path / "resource"
+    if resource_dir.exists():
+        old_marker = resource_dir / "vyra_module_interfaces"
+        if old_marker.exists():
+            old_marker.unlink()
+            print(f"✓ Removed old marker file: {old_marker}")
+        
+        # Create correct marker file
+        correct_marker = resource_dir / interface_package_name
+        if not correct_marker.exists():
+            correct_marker.touch()
+            print(f"✓ Created marker file: {correct_marker}")
 
     print(f"✓ ROS2 interfaces extracted to {target_path} successfully.")
     
