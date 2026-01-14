@@ -1,0 +1,49 @@
+# Module Parameters Configuration
+# This file defines module-specific permissions, visibility, and configuration parameters
+# Location: .module/module_params.yaml
+
+# Permission Flags
+permissions:
+  # Visibility in UI/API listings
+  visible: true  # Visible in dashboard
+  
+  # Can this module be removed via API/UI?
+  removable: true  # Core service - can be removed
+  
+  # Can this module be updated?
+  updatable: true
+  
+  # Can additional instances be created?
+  multi_instance: true  # true: Multiple instances allowed
+  
+  # Requires elevated permissions for operations
+  protected: true
+
+# Module Behavior Configuration
+behavior:
+  # Automatically start on system boot
+  auto_start: true
+    
+  # Health check configuration
+  health_check:
+    enabled: true
+    interval_seconds: 10
+    timeout_seconds: 5
+    retries: 3
+    start_period_seconds: 30
+
+# Resource Limits (optional)
+resources:
+  cpu_limit: null  # Unlimited
+  memory_limit: null  # Unlimited
+  cpu_reservation: null
+  memory_reservation: null
+
+# Custom Docker Labels (optional)
+# These labels will be added to the service's deploy.labels section
+# Labels will be prefixed with the module name to avoid conflicts
+labels:
+  # Example custom labels
+  # com.example.team: "frontend"
+  # com.example.version: "1.0.0"
+  # monitoring.prometheus.scrape: "true"
