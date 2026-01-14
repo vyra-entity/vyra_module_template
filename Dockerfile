@@ -21,6 +21,9 @@ ENV MODULE_NAME=${MODULE_NAME}
 
 WORKDIR /workspace
 
+# Clean workspace from base image to prevent stale packages
+RUN rm -rf /workspace/src /workspace/build /workspace/install
+
 # Copy module sources
 COPY src/ ./src/
 COPY config/ ./config/
@@ -28,6 +31,7 @@ COPY tools/ ./tools/
 COPY .module/ ./.module/
 COPY frontend/ ./frontend/
 COPY wheels/ ./wheels/
+COPY storage/ ./storage/
 
 # Install module-specific Python dependencies
 RUN if [ -f ".module/requirements.txt" ]; then \
@@ -49,13 +53,42 @@ RUN if [ -f ".module/system-packages.txt" ]; then \
         apt-get clean && rm -rf /var/lib/apt/lists/*; \
     fi
 
-# Install wheel dependencies (vyra_base and module-specific wheels)
+# Install wheel dependencies (vyra_base and module-specific wheels) [only latest versions]
 RUN if [ -d "wheels" ]; then \
-        pip install wheels/*.whl --break-system-packages --ignore-installed cryptography || true; \
+        set -e; \
+        tmpdir=$(mktemp -d); \
+        \
+        for pkg in $(ls wheels/*.whl | sed -E 's#.*/([^/-]+)-.*#\1#' | sort -u); do \
+            latest=$(ls wheels/"$pkg"-*.whl | sort -V | tail -n 1); \
+            cp "$latest" "$tmpdir/"; \
+        done; \
+        \
+        pip install "$tmpdir"/*.whl \
+            --break-system-packages \
+            --force-reinstall \
+            --no-deps \
+            --ignore-installed cryptography; \
+        \
+        rm -rf "$tmpdir"; \
+        # pip install wheels/*.whl --break-system-packages --ignore-installed cryptography || true; \
     fi
 
 # Setup ROS2 interfaces (already in /workspace)
 RUN python3 tools/setup_interfaces.py
+
+# Generate gRPC proto files from .proto definitions
+RUN if [ -d "storage/interfaces" ] && [ "$(ls -A storage/interfaces/*.proto 2>/dev/null)" ]; then \
+        echo "🔧 Generating gRPC proto files..."; \
+        python3 tools/generate_grpc_protos.py \
+            --proto-dir /workspace/storage/interfaces \
+            --output-dir /workspace/src/rest_api/grpc_generated \
+            --create-helpers; \
+    else \
+        echo "⚠️  No .proto files found in storage/interfaces, skipping gRPC generation"; \
+    fi
+
+# Clean any existing build artifacts for fresh build (prevents package name conflicts)
+RUN rm -rf /workspace/install /workspace/build
 
 # Build ROS2 packages
 RUN source /opt/ros/kilted/setup.bash && \
@@ -120,11 +153,13 @@ FROM ${RUNTIME_BASE_IMAGE} AS runtime
 
 ARG MODULE_NAME
 ENV MODULE_NAME=${MODULE_NAME}
+
 # Copy module name from builder stage if not set
 COPY --from=builder /tmp/module_name.env /tmp/module_name.env
 RUN if [ -z "$MODULE_NAME" ]; then \
         . /tmp/module_name.env; \
     fi
+
 WORKDIR /workspace
 
 # Copy ONLY module artifacts (base image already has everything else)
@@ -137,6 +172,7 @@ COPY --from=builder /workspace/tools/ ./tools/
 COPY --from=builder /workspace/.module/ ./.module/
 COPY --from=builder /workspace/frontend/dist ./frontend/dist
 COPY --from=builder /workspace/src/ ./src/
+COPY --from=builder /workspace/storage/ ./storage/
 
 # Copy staged interfaces for NFS volume initialization
 COPY --from=builder /tmp/module_interfaces_staging/ /tmp/module_interfaces_staging/
