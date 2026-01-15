@@ -165,18 +165,54 @@ if [ -d "$NFS_VOLUME_PATH" ]; then
     echo "✅ NFS volume found at $NFS_VOLUME_PATH"
     
     # Copy module's own interfaces to NFS (read-write)
+    # We need to create a complete ROS2 install structure with setup.bash in root
     if [ -d "$INTERFACE_STAGING" ]; then
         NFS_MODULE_DIR="$NFS_VOLUME_PATH/$INTERFACE_DIR"
         echo "📦 Copying interfaces to NFS as $INTERFACE_DIR..."
         mkdir -p "$NFS_MODULE_DIR"
         
-        if command -v rsync >/dev/null 2>&1; then
-            rsync -av --delete "$INTERFACE_STAGING/" "$NFS_MODULE_DIR/" || echo "⚠️  rsync failed, falling back to cp"
-        fi
-        
+        # Check if interfaces were already copied successfully
         if [ ! -f "$NFS_MODULE_DIR/setup.bash" ]; then
-            rm -rf "$NFS_MODULE_DIR"
-            cp -r "$INTERFACE_STAGING" "$NFS_MODULE_DIR"
+            # Copy the package artifacts (include, lib, share)
+            if command -v rsync >/dev/null 2>&1; then
+                rsync -av --delete "$INTERFACE_STAGING/" "$NFS_MODULE_DIR/" 2>/dev/null || cp -r "$INTERFACE_STAGING"/* "$NFS_MODULE_DIR"/
+            else
+                cp -r "$INTERFACE_STAGING"/* "$NFS_MODULE_DIR"/
+            fi
+            
+            # Copy minimal ROS2 setup infrastructure from workspace install
+            # We need: setup.bash, local_setup.bash, _local_setup_util_sh.py
+            if [ -f "/workspace/install/setup.bash" ]; then
+                cp /workspace/install/setup.bash "$NFS_MODULE_DIR/"
+                cp /workspace/install/local_setup.bash "$NFS_MODULE_DIR/" 2>/dev/null || true
+                cp /workspace/install/_local_setup_util_sh.py "$NFS_MODULE_DIR/" 2>/dev/null || true
+                cp /workspace/install/.colcon_install_layout "$NFS_MODULE_DIR/" 2>/dev/null || true
+                
+                # Modify setup.bash to only source this overlay's packages
+                # Replace the prefix chain logic with simple local setup
+                cat > "$NFS_MODULE_DIR/setup.bash" <<'EOF'
+#!/usr/bin/env bash
+# Simplified setup.bash for NFS interface sharing
+COLCON_CURRENT_PREFIX="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
+export COLCON_CURRENT_PREFIX
+
+# Add this prefix to AMENT_PREFIX_PATH
+if [ -z "$AMENT_PREFIX_PATH" ]; then
+    export AMENT_PREFIX_PATH="$COLCON_CURRENT_PREFIX"
+else
+    # Prepend if not already present
+    if [[ ":$AMENT_PREFIX_PATH:" != *":$COLCON_CURRENT_PREFIX:"* ]]; then
+        export AMENT_PREFIX_PATH="$COLCON_CURRENT_PREFIX:$AMENT_PREFIX_PATH"
+    fi
+fi
+
+# Source local setup if available
+if [ -f "$COLCON_CURRENT_PREFIX/local_setup.bash" ]; then
+    . "$COLCON_CURRENT_PREFIX/local_setup.bash"
+fi
+EOF
+                chmod +x "$NFS_MODULE_DIR/setup.bash"
+            fi
         fi
         
         if [ -f "$NFS_MODULE_DIR/setup.bash" ]; then
