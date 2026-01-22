@@ -4,6 +4,11 @@ set -euo pipefail
 
 echo "=== VYRA ENTRYPOINT STARTING ==="
 
+# =============================================================================
+# Redis Availability Check
+# =============================================================================
+echo "=== CHECKING REDIS AVAILABILITY ==="
+
 # Wait for Redis to be ready (Docker Swarm compatible)
 if [ -f "/workspace/tools/wait-for-redis.sh" ]; then
     echo "🔄 Checking Redis availability..."
@@ -19,6 +24,11 @@ fi
 # sleep 2
 
 chmod 777 .env
+
+# =============================================================================
+# Environment Variable Setup
+# =============================================================================
+echo "=== SETTING UP ENVIRONMENT VARIABLES ==="
 
 # Read MODULE_NAME from module_data.yaml BEFORE loading .env
 # This allows module name to be available for ENV variable setup
@@ -59,7 +69,7 @@ if [ -f ".env" ]; then
         sed -i "s/^MODULE_NAME=.*/MODULE_NAME=$MODULE_NAME/" ".env"
     fi
     
-    # Also add/update RCL_LOGGING_LOG_FILE_NAME in .env
+    echo "=== UPDATING RCL_LOGGING_LOG_FILE_NAME IN .env ==="
 
     # -> Not working yet, ignore for now. Could be regarded as a TODO. <-
 
@@ -89,7 +99,11 @@ echo "===================================="
 : "${COLCON_PYTHON_EXECUTABLE:="/usr/bin/python3"}"
 : "${CMAKE_PREFIX_PATH:="/opt/ros/kilted"}"
 
-# Vyra Base installieren
+# =============================================================================
+# Source Vyra Base and Package Setup
+# =============================================================================
+echo "=== SOURCING VYRA BASE SETUP ==="
+
 # source /workspace/tools/setup_ros_global.sh
 source /opt/ros/kilted/setup.bash
 
@@ -100,7 +114,11 @@ else
     exit 1
 fi
 
-# Create log directories required by supervisord
+# =============================================================================
+# Log Directory Setup
+# =============================================================================
+echo "=== SETTING UP LOG DIRECTORIES ==="
+
 mkdir -p /workspace/log/vyra
 mkdir -p /workspace/log/uvicorn
 mkdir -p /workspace/log/nginx
@@ -113,7 +131,11 @@ fi
 
 rm -rf /workspace/log/ros2/*.log
 
-# Copy install/ directory from image if not present or incomplete (volume mount overrides image)
+# =============================================================================
+# Install Directory Restoration
+# =============================================================================
+echo "=== CHECKING install/ DIRECTORY ==="
+
 # This happens when using full workspace mount for development
 if [ -d "/opt/vyra/install_backup" ]; then
     if [ ! -f "/workspace/install/setup.bash" ]; then
@@ -132,6 +154,11 @@ else
     fi
 fi
 
+# =============================================================================
+# Source Package Setup
+# =============================================================================
+echo "=== SOURCING PACKAGE SETUP ==="
+
 # Source package setup (install folder already built in image or restored)
 source install/setup.bash
 
@@ -143,18 +170,62 @@ else
 fi
 
 # =============================================================================
+# Dynamic Wheel Installation
+# =============================================================================
+echo "=== CHECKING FOR NEW/UPDATED WHEELS ==="
+
+if [ -d "wheels" ] && [ "$(ls -A wheels/*.whl 2>/dev/null)" ]; then
+    echo "📦 Found wheels directory with .whl files"
+    
+    # Create temporary directory for latest wheels
+    tmpdir=$(mktemp -d)
+    
+    # For each unique package, find the latest version
+    for pkg in $(ls wheels/*.whl | sed -E 's#.*/([^/-]+)-.*#\1#' | sort -u); do
+        latest=$(ls wheels/"$pkg"-*.whl | sort -V | tail -n 1)
+        cp "$latest" "$tmpdir/"
+        echo "  📦 Selected: $(basename "$latest")"
+    done
+    
+    # Install all latest wheels
+    echo "🔧 Installing/updating wheels..."
+    if pip install "$tmpdir"/*.whl \
+        --break-system-packages \
+        --force-reinstall \
+        --no-deps \
+        --ignore-installed cryptography 2>&1 | grep -v "WARNING.*pip"; then
+        echo "✅ Wheels installed successfully"
+    else
+        echo "⚠️  Some wheels may have failed to install (check logs)"
+    fi
+    
+    # Cleanup
+    rm -rf "$tmpdir"
+else
+    echo "ℹ️  No wheels directory or .whl files found - skipping wheel installation"
+fi
+
+echo "===================================="
+
+# =============================================================================
 # NFS Interface Management
 # =============================================================================
 echo "=== NFS INTERFACE MANAGEMENT ==="
 
-# Extract instance_id from container name (format: <module_name>_<instance_id>)
-# HOSTNAME is the container name in Docker
-INSTANCE_ID="${HOSTNAME#${MODULE_NAME}_}"  # Remove module name prefix
-if [ "$INSTANCE_ID" = "$HOSTNAME" ]; then
-    # Fallback: If HOSTNAME doesn't start with MODULE_NAME, use full HOSTNAME
-    INSTANCE_ID="$HOSTNAME"
+# Read UUID from .module/module_data.yaml
+MODULE_DATA_FILE="/workspace/.module/module_data.yaml"
+if [ -f "$MODULE_DATA_FILE" ]; then
+    INSTANCE_ID=$(grep '^uuid:' "$MODULE_DATA_FILE" | awk '{print $2}')
+    echo "ℹ️  Module: $MODULE_NAME, Instance: $INSTANCE_ID (from module_data.yaml)"
+else
+    # Fallback: Extract instance_id from container name (format: <module_name>_<instance_id>)
+    INSTANCE_ID="${HOSTNAME#${MODULE_NAME}_}"  # Remove module name prefix
+    if [ "$INSTANCE_ID" = "$HOSTNAME" ]; then
+        # Fallback: If HOSTNAME doesn't start with MODULE_NAME, use full HOSTNAME
+        INSTANCE_ID="$HOSTNAME"
+    fi
+    echo "⚠️  Warning: module_data.yaml not found, Instance: $INSTANCE_ID (from HOSTNAME)"
 fi
-echo "ℹ️  Module: $MODULE_NAME, Instance: $INSTANCE_ID"
 
 NFS_VOLUME_PATH="${NFS_VOLUME_PATH:-/nfs/ros_interfaces}"
 INTERFACE_DIR="${MODULE_NAME}_${INSTANCE_ID}_interfaces"
@@ -171,8 +242,42 @@ if [ -d "$NFS_VOLUME_PATH" ]; then
         echo "📦 Copying interfaces to NFS as $INTERFACE_DIR..."
         mkdir -p "$NFS_MODULE_DIR"
         
-        # Check if interfaces were already copied successfully
+        # Check if interfaces need to be copied or updated
+        FORCE_UPDATE=false
+        
+        # Check if setup.bash exists (first-time setup)
         if [ ! -f "$NFS_MODULE_DIR/setup.bash" ]; then
+            echo "ℹ️  First-time setup: Copying interfaces to NFS..."
+            FORCE_UPDATE=true
+        else
+            # Check if config files differ (interface updates from vyra_base)
+            # Compare checksums of critical config files
+            for config_file in *.json; do
+                STAGING_CONFIG="$INTERFACE_STAGING/share/${MODULE_NAME}_interfaces/config/$config_file"
+                NFS_CONFIG="$NFS_MODULE_DIR/share/${MODULE_NAME}_interfaces/config/$config_file"
+                
+                if [ -f "$STAGING_CONFIG" ] && [ -f "$NFS_CONFIG" ]; then
+                    STAGING_MD5=$(md5sum "$STAGING_CONFIG" | awk '{print $1}')
+                    NFS_MD5=$(md5sum "$NFS_CONFIG" | awk '{print $1}')
+                    
+                    if [ "$STAGING_MD5" != "$NFS_MD5" ]; then
+                        echo "⚠️  Config update detected: $config_file differs"
+                        echo "   Staging: $STAGING_MD5"
+                        echo "   NFS:     $NFS_MD5"
+                        FORCE_UPDATE=true
+                        break
+                    fi
+                fi
+            done
+            
+            if [ "$FORCE_UPDATE" = false ]; then
+                echo "✅ NFS interfaces up-to-date (checksums match)"
+            fi
+        fi
+        
+        # Copy/update interfaces if needed
+        if [ "$FORCE_UPDATE" = true ]; then
+            echo "🔄 Updating NFS interfaces..."
             # Copy the package artifacts (include, lib, share)
             if command -v rsync >/dev/null 2>&1; then
                 rsync -av --delete "$INTERFACE_STAGING/" "$NFS_MODULE_DIR/" 2>/dev/null || cp -r "$INTERFACE_STAGING"/* "$NFS_MODULE_DIR"/
@@ -213,12 +318,12 @@ fi
 EOF
                 chmod +x "$NFS_MODULE_DIR/setup.bash"
             fi
+            
+            echo "✅ Interfaces updated on NFS successfully"
         fi
         
-        if [ -f "$NFS_MODULE_DIR/setup.bash" ]; then
-            echo "✅ Interfaces copied to NFS successfully"
-        else
-            echo "⚠️  Interface copy incomplete, but continuing..."
+        if [ ! -f "$NFS_MODULE_DIR/setup.bash" ]; then
+            echo "❌ Error: setup.bash not found after interface copy"
         fi
     else
         echo "⚠️  No staged interfaces found at $INTERFACE_STAGING"

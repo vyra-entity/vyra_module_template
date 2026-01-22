@@ -17,8 +17,15 @@ fi
 : "${MODULE_NAME:=v2_modulemanager}"
 : "${RMW_IMPLEMENTATION:=rmw_cyclonedds_cpp}"
 : "${ROS_DOMAIN_ID:=42}"
+: "${SECURE_BY_SROS2:=false}"
 : "${ROS_SECURITY_ENABLE:=true}"
 : "${VYRA_DEV_MODE:=false}"
+
+# Override ROS_SECURITY_ENABLE based on SECURE_BY_SROS2
+if [ "$SECURE_BY_SROS2" = "false" ]; then
+    export ROS_SECURITY_ENABLE=false
+    echo "⚠️  SROS2 disabled via SECURE_BY_SROS2=false"
+fi
 
 echo "=== Configuration ==="
 echo "  MODULE_NAME: $MODULE_NAME"
@@ -103,8 +110,8 @@ ros2 pkg list | grep -E "(v2_|vyra_)" || echo "No matching packages"
 echo "=== EXECUTABLES ==="
 ros2 pkg executables $MODULE_NAME || echo "No executables for $MODULE_NAME"
 
-# SROS2 Setup
-if [ "$ROS_SECURITY_ENABLE" = "true" ]; then
+# SROS2 Setup (only if SECURE_BY_SROS2=true)
+if [ "$SECURE_BY_SROS2" = "true" ] && [ "$ROS_SECURITY_ENABLE" = "true" ]; then
     echo "=== SROS2 SECURITY SETUP ==="
     echo "ROS_SECURITY_KEYSTORE: $ROS_SECURITY_KEYSTORE"
     
