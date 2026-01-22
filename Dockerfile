@@ -19,6 +19,10 @@ FROM ${BUILDER_BASE_IMAGE} AS builder
 ARG MODULE_NAME
 ENV MODULE_NAME=${MODULE_NAME}
 
+# SROS2 security feature flag (default: false for backward compatibility)
+ARG SECURE_BY_SROS2=false
+ENV SECURE_BY_SROS2=${SECURE_BY_SROS2}
+
 WORKDIR /workspace
 
 # Clean workspace from base image to prevent stale packages
@@ -114,7 +118,6 @@ RUN source /tmp/module_name.env && \
     fi
 
 # Generate SROS2 keystore (only if SECURE_BY_SROS2=true)
-ARG SECURE_BY_SROS2=false
 RUN if [ "$SECURE_BY_SROS2" = "true" ]; then \
         echo "🔐 SROS2 Security enabled - generating keystore..."; \
         source /tmp/module_name.env && \
@@ -148,14 +151,18 @@ RUN if [ -d "frontend" ] && [ -f "frontend/package.json" ] && [ -d "frontend/src
         echo '<!DOCTYPE html><html><body><h1>Frontend Template</h1></body></html>' > frontend/dist/index.html; \
     fi
 
-# Extract SROS2 CA certificate
-RUN if [ -f "./sros2_keystore/ca.cert.pem" ]; then \
-        cp ./sros2_keystore/ca.cert.pem ./sros2_ca_public.pem; \
-    elif [ -f "./sros2_keystore/public/ca.cert.pem" ]; then \
-        cp ./sros2_keystore/public/ca.cert.pem ./sros2_ca_public.pem; \
+# Extract SROS2 CA certificate (only if SROS2 is enabled)
+RUN if [ "${SECURE_BY_SROS2}" = "true" ]; then \
+        if [ -f "./sros2_keystore/ca.cert.pem" ]; then \
+            cp ./sros2_keystore/ca.cert.pem ./sros2_ca_public.pem; \
+        elif [ -f "./sros2_keystore/public/ca.cert.pem" ]; then \
+            cp ./sros2_keystore/public/ca.cert.pem ./sros2_ca_public.pem; \
+        else \
+            echo "ERROR: SECURE_BY_SROS2=true but CA certificate not found" && exit 1; \
+        fi; \
     else \
-        find ./sros2_keystore -name "*.pem" -o -name "ca.*" && \
-        echo "ERROR: Could not find SROS2 CA certificate" && exit 1; \
+        echo "⚠️  SROS2 disabled - creating dummy certificate"; \
+        echo "dummy-certificate" > ./sros2_ca_public.pem; \
     fi
 
 # =============================================================================
