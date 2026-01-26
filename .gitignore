@@ -1,8 +1,10 @@
-# ROS2
+# build artifacts
 build/*
-log/*
 install/*
-wheels/*
+
+# Log files
+log/*
+*.log
 
 # Frontend (build artifacts)
 frontend/node_modules/*
@@ -15,6 +17,7 @@ security/*
 storage/certificates/*.key
 storage/certificates/*.crt
 storage/certificates/*.pem
+storage/interfaces/grpc_*/*
 
 # Dynamically changing files
 CMakeLists.txt
@@ -22,10 +25,11 @@ CMakeLists.txt
 # Temporary files
 temp/*
 
+# IDE specific files
+.idea/*
 .vscode/*
 
 # OS generated files
-*.log
 *.tmp
 *.bak
 
