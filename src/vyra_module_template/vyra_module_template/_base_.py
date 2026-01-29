@@ -1,12 +1,13 @@
 import logging
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_share_directory  # pyright: ignore[reportMissingImports]
 
-from std_msgs.msg import String # pyright: ignore[reportMissingImports]
+from std_msgs.msg import String  # pyright: ignore[reportMissingImports]
 
 # msg
 from vyra_module_interfaces.msg import VBASEErrorFeed # pyright: ignore[reportAttributeAccessIssue]
@@ -80,10 +81,12 @@ async def _create_base_interfaces() -> list[FunctionConfigEntry]:
         'vyra_security_meta.json'
     ]
 
+    module_name = os.getenv("MODULE_NAME", "")
+
     for interface_file in base_interfaces:
         if isinstance(interface_file, str):
             interface_metadata.extend(await load_resource(
-                'vyra_module_interfaces',
+                f'{module_name}_interfaces',
                 Path('config', interface_file))
             )
 
@@ -96,7 +99,7 @@ async def _create_base_interfaces() -> list[FunctionConfigEntry]:
                 ros2_type = ros2_type.split('.')[0]
 
                 metadata['ros2type'] = getattr(
-                    sys.modules['vyra_module_interfaces.srv'], ros2_type)
+                    sys.modules[f'{module_name}_interfaces.srv'], ros2_type)
 
                 displaystyle = FunctionConfigDisplaystyle(
                     visible=metadata.get('displaystyle', {}).get('visible', False),
@@ -217,7 +220,7 @@ async def _load_project_settings() -> dict[str, Any]:
     
     return project_settings
 
-async def build_entity(project_settings):
+async def build_entity(project_settings) -> VyraEntity:
     module_data: Optional[dict] = await _load_module_data()
     needed_fields: list[str] = ['uuid', 'name', 'template', 'description', 'version']
 
@@ -359,10 +362,21 @@ async def create_db_storage(entity: VyraEntity) -> None:
     entity.register_storage(db_access)
     logger.debug("Storage access created and set in entity")
 
-async def build_base():
+async def build_base(): 
     project_settings: dict[str, Any] = await _load_project_settings()
-    entity = await build_entity(project_settings)
-    await entity.set_interfaces(await _create_base_interfaces())
+    entity: VyraEntity = await build_entity(project_settings)
+    
+    # VyraEntity.__init__() calls register_callables_callbacks(self) which adds 
+    # entity methods to DataSpace but doesn't create ROS2 services.
+    # We need to create the actual ROS2 services by loading interfaces with callbacks.
+    
+    # Load base interface metadata
+    base_interfaces: list = await _create_base_interfaces()
+    
+    logger.debug(f"Create base interfaces: {[i.functionname for i in base_interfaces] }")
+
+    # Now create the ROS2 services 
+    await entity.set_interfaces(base_interfaces)
     
     await create_db_storage(entity)
 

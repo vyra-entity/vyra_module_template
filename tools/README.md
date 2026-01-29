@@ -444,25 +444,69 @@ docker network ls | grep vyra
 
 ## 🚀 Runtime Scripts
 
-### \`vyra_entrypoint_runtime.sh\`
+### `vyra_entrypoint.sh` (Module Root)
 
-Container-Entrypoint für das Modul (wird von Docker verwendet).
+**Primary container entrypoint** used by Docker Compose (located at `/workspace/vyra_entrypoint.sh`).
 
 **Funktionen:**
-- Initialisiert ROS2-Umgebung
-- Startet Backend-Services (FastAPI/Uvicorn)
-- Startet Frontend-Server (Dev/Prod)
-- Handled Container-Lifecycle
+- Redis availability check
+- Environment variable setup from `.env`
+- ROS2 environment sourcing (`/opt/ros/kilted/setup.bash`)
+- **Automatic gRPC code generation** from proto files
+- SSL certificate auto-generation (backend & frontend)
+- Log directory setup
+- Install directory restoration (from `/opt/vyra/install_backup`)
+- Dynamic wheel installation from `wheels/`
+- NFS interface management (copy & source)
+- SROS2 security setup (keystore & enclaves)
+- Supervisord service configuration (Nginx, Uvicorn)
+- Development mode with Vite hot reload
 
 **Modi:**
-\`\`\`bash
+```bash
 # Production Mode
-VYRA_DEV_MODE=false ./tools/vyra_entrypoint_runtime.sh
+VYRA_DEV_MODE=false
 
-# Development Mode (mit HMR)
-VYRA_DEV_MODE=true ./tools/vyra_entrypoint_runtime.sh
-\`\`\`
+# Development Mode (with Vite HMR + Uvicorn autoreload)
+VYRA_DEV_MODE=true
+```
 
+**gRPC Generation:**
+The entrypoint automatically detects `.proto` files in `storage/interfaces/` and generates Python gRPC code:
+```bash
+# Detection
+if [ -d "/workspace/storage/interfaces" ] && [ *.proto files exist ]; then
+  # Option 1: Use setup_interfaces.py if available
+  python3 /workspace/tools/setup_interfaces.py --generate-grpc
+  
+  # Option 2: Direct generation
+  python3 -m grpc_tools.protoc \
+    --proto_path=storage/interfaces \
+    --python_out=storage/interfaces/grpc_generated \
+    --grpc_python_out=storage/interfaces/grpc_generated \
+    storage/interfaces/*.proto
+fi
+```
+
+**Output:** `storage/interfaces/grpc_generated/` with `*_pb2.py` and `*_pb2_grpc.py`
+
+**Environment Variables:**
+- `ENABLE_BACKEND_WEBSERVER` - Enable/disable Uvicorn (FastAPI)
+- `ENABLE_FRONTEND_WEBSERVER` - Enable/disable Nginx
+- `ENABLE_ROS2_HOT_RELOAD` - Enable/disable ROS2 code hot reload
+- `VYRA_DEV_MODE` - Switch between dev/production mode
+- `BACKEND_DEV_FILEWATCH` - Directory for Uvicorn autoreload
+- `MODULE_NAME` - Automatically set from `.module/module_data.yaml`
+
+### `vyra_entrypoint_runtime.sh` ⚠️ **DEPRECATED**
+
+**Status:** This file is **NO LONGER USED** by Docker Compose.
+
+**Migration:** All functionality has been moved to `/workspace/vyra_entrypoint.sh` (module root).
+
+**Will be removed in a future version.**
+
+### `setup_ros_global.sh`
 ### \`setup_ros_global.sh\`
 
 Richtet globale ROS2-Umgebung im Container ein (nur v2_dashboard).

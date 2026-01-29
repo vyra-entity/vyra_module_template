@@ -4,13 +4,20 @@ import logging
 import logging.config
 import os
 from pathlib import Path
-import rclpy
+import rclpy  # pyright: ignore[reportMissingImports]
 import signal
 import sys
 
+# Add /workspace to Python path for storage.interfaces.grpc_generated imports
+if '/workspace' not in sys.path:
+    sys.path.insert(0, '/workspace')
+
 from . import _base_
 from .application import application
-from .taskmanager import TaskManager
+from .application.application import Component
+from .taskmanager import TaskManager, task_supervisor_looper
+from .status.status_manager import StatusManager
+from .user.usermanager import usermanager_runner
 
 from vyra_base.core.entity import VyraEntity
 from vyra_base.helper.error_handler import ErrorTraceback 
@@ -50,29 +57,60 @@ logger = logging.getLogger(__name__)
 def handle_sigterm(signum, frame):
     logger.warning("SIGTERM empfangen, ROS2 wird heruntergefahren...")
     rclpy.shutdown()
-    sys.exit(0)
+    # Exit with SIGTERM code (143 = 128+15) so Docker Swarm knows this was forced shutdown
+    sys.exit(143)
 
 signal.signal(signal.SIGTERM, handle_sigterm)
 signal.signal(signal.SIGINT, handle_sigterm)
 
 async def application_runner(
-        entity: VyraEntity, 
-        taskmanager: TaskManager) -> None:
+        taskmanager: TaskManager,
+        statusmanager: StatusManager,
+        component) -> None:
     """The application runner starts the main application logic.
     It is managed as an asyncio task by the TaskManager.
     :param entity: The VyraEntity containing the ROS 2 node.
     :type entity: VyraEntity
     :param taskmanager: The TaskManager instance to manage application tasks.
     :type taskmanager: TaskManager
+    :param component: The Component instance to reuse across recoveries.
     """
     logger.info('Starting application runner...')
     try:
-        await application.main(entity, taskmanager)
+        await application.main(taskmanager, statusmanager, component)
     finally:
         logger.info('Application runner finished.')
         ErrorTraceback.check_error_exist()
 
-async def main_communication_spinner(entity: VyraEntity) -> None:
+async def setup_statusmanager(entity: VyraEntity) -> StatusManager:
+    """
+    Status manager runner as async task.
+    
+    Initializes StatusManager and runs periodic status broadcasting.
+    
+    Args:
+        entity: VyraEntity instance from core application
+    """
+    logger.info('Starting status manager...')
+    try:
+        # Initialize status manager
+        status_manager = StatusManager(entity)
+        
+        await status_manager.setup_interfaces()
+
+        return status_manager
+            
+    except asyncio.CancelledError:
+        logger.info('Status manager task cancelled.')
+        raise
+    except Exception as e:
+        logger.exception(f'Status manager error: {e}')
+        raise
+    finally:
+        logger.info('Status manager finished.')
+
+
+async def ros_spinner_runner(entity: VyraEntity) -> None:
     """The main communication spinner handle the rclpy.spin_once loop
     from ros2
     :param entity: The VyraEntity containing the ROS 2 node.
@@ -91,69 +129,95 @@ async def main_communication_spinner(entity: VyraEntity) -> None:
         logger.info('Node spinner finished.')
         ErrorTraceback.check_error_exist()
 
-async def configure_settings(tm: TaskManager) -> VyraEntity:
+async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, StatusManager]:
     """Initializing vyra entity and configure base settings. Afterwards start 
-    the application runner and the communication spinner.
-    :param tm: The TaskManager instance to manage application tasks.
-    :type tm: TaskManager
-    :return: The configured VyraEntity instance.
-    :rtype: VyraEntity
+    the application runner, communication spinner, and status manager.
+    :param taskmanager: The TaskManager instance to manage application tasks.
+    :type taskmanager: TaskManager
+    :return: The configured VyraEntity instance and StatusManager.
+    :rtype: tuple[VyraEntity, StatusManager]
     """
     logger.info('Configuring settings...')
     # Hier können spezifische Einstellungen für die Anwendung gesetzt werden
     # Zum Beispiel:
     # entity.set_parameter('parameter_name', 'value')
     entity: VyraEntity = await _base_.build_base()
+    statusmanager: StatusManager = await setup_statusmanager(entity)
 
-    tm.add_task(application_runner, entity, tm)
-    tm.add_task(main_communication_spinner, entity)
+    # Create Component ONCE here, outside of application_runner
+    # This ensures the same Component instance is reused across task recoveries
+    unified_state_machine = statusmanager.state_machine
+    component = Component(unified_state_machine, entity, taskmanager)
+    
+    # Register remote callable interfaces
+    await component.set_interfaces()
+    logger.info("✅ Component created and interfaces registered")
+
+    logger.info('Starting application runner and ROS spinner...')
+    # Pass component to application_runner so it can be reused across recoveries
+    taskmanager.add_task(application_runner, taskmanager, statusmanager, component)
+    taskmanager.add_task(ros_spinner_runner, entity)
+    taskmanager.add_task(usermanager_runner, entity)
+    
     if entity.node is None:
         logger.info('No ROS 2 node created, exiting...')
         raise RuntimeError("No ROS 2 node created, exiting...")
-    return entity
+    
+    return entity, statusmanager
 
 @ErrorTraceback.w_check_error_exist
 async def runner() -> None:   
+    logger.info('🏁 Runner function started!')
     try:
-        tm = TaskManager()
+        logger.info('📦 Creating TaskManager...')
+        taskmanager = TaskManager()
+        logger.info('✅ TaskManager created')
         
+        logger.info('🔧 Initializing rclpy...')
         rclpy.init()
+        logger.info('✅ rclpy initialized')
 
-        entity: VyraEntity = await configure_settings(tm)
+        logger.info('⚙️  Initializing module')
+        entity, statusmanager = await initialize_module(taskmanager)
+        logger.info(f'📊 Number of tasks: {len(taskmanager.tasks)}')
+        logger.info(f'📋 Tasks: {list(taskmanager.tasks.keys())}')
 
-        while tm.tasks:
-            try:
-                done, pending = await asyncio.wait(
-                    [task_tuple[1] for task_tuple in tm.tasks.values()],
-                    return_when=asyncio.FIRST_COMPLETED
-                )
-                logger.debug("Tasks completed")
-                for task in done:
-                    if task.exception():
-                        logger.error(
-                            f"Task {task.get_name()} raised an exception: {task.exception()}")
+        await task_supervisor_looper(taskmanager, statusmanager)
+
+        # while tm.tasks:
+        #     logger.info(f'🔄 Loop iteration - {len(tm.tasks)} tasks running')
+        #     try:
+        #         done, pending = await asyncio.wait(
+        #             [task_tuple[1] for task_tuple in tm.tasks.values()],
+        #             return_when=asyncio.FIRST_COMPLETED
+        #         )
+        #         logger.debug("Tasks completed")
+        #         for task in done:
+        #             if task.exception():
+        #                 logger.error(
+        #                     f"Task {task.get_name()} raised an exception: {task.exception()}")
                         
-                        await asyncio.sleep(0.5)
-                    else:
-                        logger.info(f"Task {task.get_name()} completed successfully.")
-                    tm.tasks.pop(task.get_name())
+        #                 await asyncio.sleep(0.5)
+        #             else:
+        #                 logger.info(f"Task {task.get_name()} completed successfully.")
+        #             tm.tasks.pop(task.get_name())
 
-                for task in pending:
-                    logger.info(f"Task {task.get_name()} is still running.")
+        #         for task in pending:
+        #             logger.info(f"Task {task.get_name()} is still running.")
 
-                await asyncio.sleep(0.01)
-            except asyncio.TimeoutError:
-                if entity.node and entity.node.reload_event.is_set():
-                    entity.node.reload_event.clear()  # Event zurücksetzen
-                    logger.info("Node reload event received")
-                    tm.cancel_all()
-                    entity = await configure_settings(tm)
-                elif entity.node == None:
-                    raise RuntimeError("Node is None, cannot proceed with tasks.")
+        #         await asyncio.sleep(0.01)
+        #     except asyncio.TimeoutError:
+        #         if entity.node and entity.node.reload_event.is_set():
+        #             entity.node.reload_event.clear()  # Event zurücksetzen
+        #             logger.info("Node reload event received")
+        #             await taskmanager.cancel_all()
+        #             entity = await initialize_module(taskmanager)
+        #         elif entity.node == None:
+        #             raise RuntimeError("Node is None, cannot proceed with tasks.")
 
     except SystemExit as e:
         logger.info(f'SystemExit: {e}. Exiting gracefully...')
-        tm.cancel_all()
+        await taskmanager.cancel_all()
     except KeyboardInterrupt:
         logger.warning('KeyboardInterrupt received, closing event loop')
     except Exception as e:
@@ -174,10 +238,12 @@ async def runner() -> None:
         else:
             logger.info('ROS 2 node was not running, nothing to destroy.')
             
-        tm.cancel_all()
+        await taskmanager.cancel_all()
 
 def main() -> None:
+    logger.info('🎬 Main function called!')
     try:
+        logger.info('🚀 Starting asyncio.run(runner())...')
         asyncio.run(runner())
         logger.info('Exit module runner')
     except KeyboardInterrupt:
@@ -188,4 +254,5 @@ def main() -> None:
         logger.info('Finally exit entry point')
 
 if __name__ == '__main__':
+    logger.info('🔴 __main__ block - calling main()')
     main()

@@ -240,13 +240,6 @@ if [ -f "$ENTRYPOINT" ]; then
     sed -i "s/$OLD_MODULE_NAME/$NEW_MODULE_NAME/g" "$ENTRYPOINT"
 fi
 
-# vyra_entrypoint_runtime.sh
-ENTRYPOINT_RUNTIME="tools/vyra_entrypoint_runtime.sh"
-if [ -f "$ENTRYPOINT_RUNTIME" ]; then
-    print_success "Aktualisiere $ENTRYPOINT_RUNTIME"
-    sed -i "s/$OLD_MODULE_NAME/$NEW_MODULE_NAME/g" "$ENTRYPOINT_RUNTIME"
-fi
-
 # startup_module.sh (falls vorhanden)
 STARTUP_MODULE="tools/startup_module.sh"
 if [ -f "$STARTUP_MODULE" ]; then

@@ -32,6 +32,7 @@ RUN rm -rf /workspace/src /workspace/build /workspace/install
 COPY src/ ./src/
 COPY config/ ./config/
 COPY tools/ ./tools/
+COPY vyra_entrypoint.sh ./vyra_entrypoint.sh
 COPY .module/ ./.module/
 COPY frontend/ ./frontend/
 COPY wheels/ ./wheels/
@@ -94,9 +95,9 @@ RUN if [ -d "storage/interfaces" ] && [ "$(ls -A storage/interfaces/*.proto 2>/d
 # Clean any existing build artifacts for fresh build (prevents package name conflicts)
 RUN rm -rf /workspace/install /workspace/build
 
-# Build ROS2 packages
+# Build ROS2 packages (skip vyra_module_interfaces template from base image)
 RUN source /opt/ros/kilted/setup.bash && \
-    colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+    colcon build --packages-skip vyra_module_interfaces --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 # Extract MODULE_NAME from module_data.yaml if not provided
 RUN if [ -z "$MODULE_NAME" ] && [ -f ".module/module_data.yaml" ]; then \
@@ -144,6 +145,7 @@ RUN if [ -d "frontend" ] && [ -f "frontend/package.json" ] && [ -d "frontend/src
         cd frontend && \
         npm install && \
         npm run build && \
+        rm -rf node_modules && \
         cd ..; \
     else \
         echo "⚠️  Skipping frontend build (template or incomplete structure)"; \
@@ -183,11 +185,12 @@ WORKDIR /workspace
 
 # Copy ONLY module artifacts (base image already has everything else)
 COPY --from=builder /workspace/install/ ./install/
-COPY --from=builder /workspace/build/ ./build/
+# Note: build/ directory not needed in runtime (only for compilation)
 COPY --from=builder /workspace/sros2_keystore/ ./sros2_keystore/
 COPY --from=builder /workspace/sros2_ca_public.pem ./sros2_ca_public.pem
 COPY --from=builder /workspace/config/ ./config/
 COPY --from=builder /workspace/tools/ ./tools/
+COPY --from=builder /workspace/vyra_entrypoint.sh ./vyra_entrypoint.sh
 COPY --from=builder /workspace/.module/ ./.module/
 COPY --from=builder /workspace/frontend/dist ./frontend/dist
 COPY --from=builder /workspace/src/ ./src/
@@ -203,7 +206,7 @@ RUN cp -r ./install /opt/vyra/install_backup
 # Create runtime directories
 RUN mkdir -p log/ros2 log/nginx log/uvicorn log/vyra storage
 
-# Install runtime dependencies
+# Install Python dependencies for runtime (uvicorn, fastapi, etc.)
 RUN if [ -f ".module/requirements.txt" ]; then \
         pip install --no-cache-dir -r .module/requirements.txt --break-system-packages; \
     fi
@@ -219,5 +222,5 @@ LABEL maintainer="VYRA Development Team" \
       module="${MODULE_NAME}" \
       stage="runtime"
 
-CMD ["/workspace/tools/vyra_entrypoint_runtime.sh"]
+CMD ["/workspace/vyra_entrypoint.sh"]
 

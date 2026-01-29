@@ -115,6 +115,41 @@ else
 fi
 
 # =============================================================================
+# gRPC Interface Generation
+# =============================================================================
+echo "=== GRPC INTERFACE GENERATION CHECK ==="
+
+if [ -d "/workspace/storage/interfaces" ] && [ -n "$(find /workspace/storage/interfaces -maxdepth 1 -name '*.proto' 2>/dev/null)" ]; then
+    PROTO_COUNT=$(find /workspace/storage/interfaces -maxdepth 1 -name '*.proto' 2>/dev/null | wc -l)
+    echo "📦 Found $PROTO_COUNT proto file(s), generating gRPC code..."
+    
+    # Create grpc_generated directory
+    mkdir -p /workspace/storage/interfaces/grpc_generated
+    
+    # Always use grpc_tools.protoc directly (setup_interfaces.py doesn't support --generate-grpc)
+    echo "🛠️ Generating gRPC code directly with grpc_tools.protoc..."
+    
+    # Generate Python code from proto files
+    cd /workspace/storage/interfaces
+    for proto_file in *.proto; do
+        echo "   Generating from: $proto_file"
+        python3 -m grpc_tools.protoc \
+            --proto_path=. \
+            --python_out=grpc_generated \
+            --grpc_python_out=grpc_generated \
+            "$proto_file"
+    done
+    cd /workspace
+    
+    # Create __init__.py for the grpc_generated package
+    touch /workspace/storage/interfaces/grpc_generated/__init__.py
+    
+    echo "✅ gRPC code generated successfully"
+else
+    echo "ℹ️  No proto files found in storage/interfaces/, skipping gRPC generation"
+fi
+
+# =============================================================================
 # Log Directory Setup
 # =============================================================================
 echo "=== SETTING UP LOG DIRECTORIES ==="
@@ -229,7 +264,7 @@ fi
 
 NFS_VOLUME_PATH="${NFS_VOLUME_PATH:-/nfs/ros_interfaces}"
 INTERFACE_DIR="${MODULE_NAME}_${INSTANCE_ID}_interfaces"
-INTERFACE_STAGING="/tmp/module_interfaces_staging/${MODULE_NAME}_interfaces"
+INTERFACE_SOURCE="/workspace/install/${MODULE_NAME}_interfaces"
 
 # Check if NFS volume is mounted
 if [ -d "$NFS_VOLUME_PATH" ]; then
@@ -237,7 +272,7 @@ if [ -d "$NFS_VOLUME_PATH" ]; then
     
     # Copy module's own interfaces to NFS (read-write)
     # We need to create a complete ROS2 install structure with setup.bash in root
-    if [ -d "$INTERFACE_STAGING" ]; then
+    if [ -d "$INTERFACE_SOURCE" ]; then
         NFS_MODULE_DIR="$NFS_VOLUME_PATH/$INTERFACE_DIR"
         echo "📦 Copying interfaces to NFS as $INTERFACE_DIR..."
         mkdir -p "$NFS_MODULE_DIR"
@@ -252,17 +287,17 @@ if [ -d "$NFS_VOLUME_PATH" ]; then
         else
             # Check if config files differ (interface updates from vyra_base)
             # Compare checksums of critical config files
-            for config_file in *.json; do
-                STAGING_CONFIG="$INTERFACE_STAGING/share/${MODULE_NAME}_interfaces/config/$config_file"
+            for config_file in vyra_core_meta.json vyra_com_meta.json vyra_security_meta.json; do
+                SOURCE_CONFIG="$INTERFACE_SOURCE/share/${MODULE_NAME}_interfaces/config/$config_file"
                 NFS_CONFIG="$NFS_MODULE_DIR/share/${MODULE_NAME}_interfaces/config/$config_file"
                 
-                if [ -f "$STAGING_CONFIG" ] && [ -f "$NFS_CONFIG" ]; then
-                    STAGING_MD5=$(md5sum "$STAGING_CONFIG" | awk '{print $1}')
+                if [ -f "$SOURCE_CONFIG" ] && [ -f "$NFS_CONFIG" ]; then
+                    SOURCE_MD5=$(md5sum "$SOURCE_CONFIG" | awk '{print $1}')
                     NFS_MD5=$(md5sum "$NFS_CONFIG" | awk '{print $1}')
                     
-                    if [ "$STAGING_MD5" != "$NFS_MD5" ]; then
+                    if [ "$SOURCE_MD5" != "$NFS_MD5" ]; then
                         echo "⚠️  Config update detected: $config_file differs"
-                        echo "   Staging: $STAGING_MD5"
+                        echo "   Source:  $SOURCE_MD5"
                         echo "   NFS:     $NFS_MD5"
                         FORCE_UPDATE=true
                         break
@@ -280,9 +315,9 @@ if [ -d "$NFS_VOLUME_PATH" ]; then
             echo "🔄 Updating NFS interfaces..."
             # Copy the package artifacts (include, lib, share)
             if command -v rsync >/dev/null 2>&1; then
-                rsync -av --delete "$INTERFACE_STAGING/" "$NFS_MODULE_DIR/" 2>/dev/null || cp -r "$INTERFACE_STAGING"/* "$NFS_MODULE_DIR"/
+                rsync -av --delete "$INTERFACE_SOURCE/" "$NFS_MODULE_DIR/" 2>/dev/null || cp -r "$INTERFACE_SOURCE"/* "$NFS_MODULE_DIR"/
             else
-                cp -r "$INTERFACE_STAGING"/* "$NFS_MODULE_DIR"/
+                cp -r "$INTERFACE_SOURCE"/* "$NFS_MODULE_DIR"/
             fi
             
             # Copy minimal ROS2 setup infrastructure from workspace install
@@ -326,7 +361,7 @@ EOF
             echo "❌ Error: setup.bash not found after interface copy"
         fi
     else
-        echo "⚠️  No staged interfaces found at $INTERFACE_STAGING"
+        echo "⚠️  No interface source found at $INTERFACE_SOURCE"
     fi
     
     # Source all interfaces from NFS (read-only for other modules)
