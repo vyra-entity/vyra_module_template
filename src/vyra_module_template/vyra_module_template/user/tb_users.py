@@ -23,11 +23,11 @@ class UserRole(Enum):
 
 class UserLevel(Enum):
     """User access levels"""
-    LEVEL_0 = 0  # Full system access (admin)
-    LEVEL_1 = 1  # Module management
+    LEVEL_0 = 0  # Limited read-only
+    LEVEL_1 = 1  # Read-only
     LEVEL_2 = 2  # Module operations
-    LEVEL_3 = 3  # Read-only
-    LEVEL_4 = 4  # Limited read-only
+    LEVEL_3 = 3  # Module management
+    LEVEL_4 = 4  # Full system access (admin)
 
 
 class User(Base):
@@ -50,9 +50,9 @@ class User(Base):
         last_password_change (datetime): Last password change
         login_attempts (int): Failed login attempt counter
         locked_until (datetime): Account lock timestamp if locked
-        metadata (dict): Additional user metadata
+        user_metadata (dict): Additional user metadata
     """
-    __tablename__ = "users"
+    __tablename__ = "user"
 
     # Primary identification
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -93,8 +93,8 @@ class User(Base):
     login_attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     locked_until: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     
-    # Additional metadata
-    metadata: Mapped[dict] = mapped_column(JSON, nullable=True, default=dict)
+    # Additional user data
+    user_metadata: Mapped[dict] = mapped_column(JSON, nullable=True, default=dict)
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, username={self.username}, role={self.role.value}, level={self.level.value})>"

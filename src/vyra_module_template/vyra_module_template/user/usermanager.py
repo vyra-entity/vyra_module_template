@@ -62,7 +62,7 @@ class UserManager:
             )
             
             # Initialize gRPC server
-            socket_path = Path('/workspace/storage/usermanager_service.sock')
+            socket_path = Path('/tmp/vyra_sockets/vyra_usermanager_service.sock')
             self.grpc_server = UserManagerGrpcServer(
                 self.internal_usermanager,
                 socket_path

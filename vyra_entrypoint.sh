@@ -139,12 +139,23 @@ if [ -d "/workspace/storage/interfaces" ] && [ -n "$(find /workspace/storage/int
             --grpc_python_out=grpc_generated \
             "$proto_file"
     done
+    
+    # Fix imports in generated gRPC files (convert absolute to relative imports)
+    echo "🔧 Fixing gRPC imports to use relative imports..."
+    for grpc_file in grpc_generated/*_pb2_grpc.py; do
+        if [ -f "$grpc_file" ]; then
+            # Replace "import X_pb2 as" with "from . import X_pb2 as"
+            sed -i 's/^import \(.*_pb2\) as /from . import \1 as /g' "$grpc_file"
+            echo "   ✓ Fixed imports in $(basename $grpc_file)"
+        fi
+    done
+    
     cd /workspace
     
     # Create __init__.py for the grpc_generated package
     touch /workspace/storage/interfaces/grpc_generated/__init__.py
     
-    echo "✅ gRPC code generated successfully"
+    echo "✅ gRPC code generated successfully with relative imports"
 else
     echo "ℹ️  No proto files found in storage/interfaces/, skipping gRPC generation"
 fi
@@ -171,15 +182,34 @@ rm -rf /workspace/log/ros2/*.log
 # =============================================================================
 echo "=== CHECKING install/ DIRECTORY ==="
 
+# Get module name for checking install integrity
+if [ -f ".module/module_data.yaml" ]; then
+    MODULE_NAME=$(grep "^name:" .module/module_data.yaml | cut -d: -f2 | tr -d ' ' | tr -d "'" | tr -d '"')
+else
+    echo "⚠️  Warning: module_data.yaml not found, cannot verify module package installation"
+    MODULE_NAME=""
+fi
+
 # This happens when using full workspace mount for development
 if [ -d "/opt/vyra/install_backup" ]; then
+    # Check if install directory is complete (has setup.bash AND module package)
+    INSTALL_COMPLETE=true
+    
     if [ ! -f "/workspace/install/setup.bash" ]; then
-        echo "📦 Copying install/ directory from image backup..."
-        rm -rf /workspace/install  # Remove incomplete directory if exists
+        echo "❌ install/setup.bash missing"
+        INSTALL_COMPLETE=false
+    elif [ -n "$MODULE_NAME" ] && [ ! -d "/workspace/install/$MODULE_NAME" ]; then
+        echo "❌ install/$MODULE_NAME package missing"
+        INSTALL_COMPLETE=false
+    fi
+    
+    if [ "$INSTALL_COMPLETE" = false ]; then
+        echo "📦 Restoring complete install/ directory from image backup..."
+        rm -rf /workspace/install
         cp -r /opt/vyra/install_backup /workspace/install
-        echo "✅ install/ directory restored"
+        echo "✅ install/ directory restored (including $MODULE_NAME package)"
     else
-        echo "✅ install/ directory already complete (setup.bash found)"
+        echo "✅ install/ directory complete (setup.bash + $MODULE_NAME found)"
     fi
 else
     if [ ! -f "/workspace/install/setup.bash" ]; then
@@ -553,28 +583,35 @@ if [ "$VYRA_DEV_MODE" = "true" ]; then
         echo "   Logs: /workspace/log/ros2/hot_reload.log"
     fi
 
-    echo "   Starting Vite Dev Server instead of Nginx..."
+    # Check if npm is available for Vite dev server
+    if command -v npm >/dev/null 2>&1; then
+        echo "   Starting Vite Dev Server instead of Nginx..."
 
-    # Disable Nginx in dev mode
-    ENABLE_FRONTEND_WEBSERVER=false
-    
-    # Install npm dependencies if needed
-    if [ ! -d "/workspace/frontend/node_modules" ]; then
-        echo "📦 Installing npm dependencies..."
+        # Disable Nginx in dev mode
+        ENABLE_FRONTEND_WEBSERVER=false
+        
+        # Install npm dependencies if needed
+        if [ ! -d "/workspace/frontend/node_modules" ]; then
+            echo "📦 Installing npm dependencies..."
+            cd /workspace/frontend
+            npm install
+            cd /workspace
+        fi
+        
+        # Start Vite Dev Server in background
+        echo "🔥 Starting Vite Dev Server on port 3000..."
         cd /workspace/frontend
-        npm install
+        nohup npm run dev -- --host 0.0.0.0 --port 3000 > /workspace/log/vite.log 2>&1 &
+        VITE_PID=$!
+        echo "✅ Vite Dev Server started (PID: $VITE_PID)"
+        echo "   Frontend URL: http://localhost:3000"
+        echo "   Log: /workspace/log/vite.log"
         cd /workspace
+    else
+        echo "⚠️  npm not available - falling back to Nginx with pre-built frontend"
+        echo "   (Set VYRA_DEV_MODE=false or use development base image for Vite hot reload)"
+        # Keep ENABLE_FRONTEND_WEBSERVER=true to use nginx with dist/
     fi
-    
-    # Start Vite Dev Server in background
-    echo "🔥 Starting Vite Dev Server on port 3000..."
-    cd /workspace/frontend
-    nohup npm run dev -- --host 0.0.0.0 --port 3000 > /workspace/log/vite.log 2>&1 &
-    VITE_PID=$!
-    echo "✅ Vite Dev Server started (PID: $VITE_PID)"
-    echo "   Frontend URL: http://localhost:3000"
-    echo "   Log: /workspace/log/vite.log"
-    cd /workspace
 
     # Alter reload=True on uvicorn in /etc/supervisor/conf.d/supervisord.conf for developement
     echo "🔄 Enabling autoreload for Uvicorn (FastAPI)..."
