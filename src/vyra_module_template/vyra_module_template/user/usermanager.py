@@ -63,6 +63,11 @@ class UserManager:
             
             # Initialize gRPC server
             socket_path = Path('/tmp/vyra_sockets/vyra_usermanager_service.sock')
+            
+            # Ensure socket directory exists
+            socket_path.parent.mkdir(parents=True, exist_ok=True)
+            logger.info(f"📁 Socket directory ready: {socket_path.parent}")
+            
             self.grpc_server = UserManagerGrpcServer(
                 self.internal_usermanager,
                 socket_path
