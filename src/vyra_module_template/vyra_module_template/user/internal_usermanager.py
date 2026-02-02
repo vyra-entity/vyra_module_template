@@ -13,7 +13,7 @@ from typing import Optional, Dict, Any, List
 from vyra_base.core.entity import VyraEntity
 from vyra_base.storage.db_manipulator import DbManipulator, DBReturnValue
 from vyra_base.storage.db_access import DBSTATUS
-from vyra_base.com.datalayer.interface_factory import remote_callable
+from vyra_base.com import remote_callable
 
 from .tb_users import User, UserRole, UserLevel
 from ..interface import auto_register_callable_interfaces

@@ -13,9 +13,7 @@ from vyra_base.state import (
     OperationalStateMachine
 )
 from vyra_base.core.entity import VyraEntity
-from vyra_base.com.datalayer.interface_factory import (
-    remote_callable
-)
+from vyra_base.com import remote_callable
 
 from ..taskmanager import TaskManager
 from ..interface import auto_register_callable_interfaces

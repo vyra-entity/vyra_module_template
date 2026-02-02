@@ -27,7 +27,7 @@ from vyra_base.state.state_types import (
     OperationalState,
     HealthState,
 )
-from vyra_base.com.datalayer.interface_factory import remote_callable
+from vyra_base.com import remote_callable
 from vyra_base.core.entity import VyraEntity
 
 from .status_types import (
