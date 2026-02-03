@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Optional
 from datetime import datetime
 
-from vyra_base.com.handler.ipc import GrpcUdsServer
+from vyra_base.com.external.grpc import GrpcServer
 
 # Import generated protobuf files (will be generated from usermanager_service.proto)
 # from storage.interfaces import usermanager_service_pb2
@@ -235,7 +235,7 @@ class UserManagerGrpcServer:
         self.internal_usermanager = internal_usermanager
         self.socket_path = socket_path
         
-        self._server: Optional[GrpcUdsServer] = None
+        self._server: Optional[GrpcServer] = None
         self._servicer: Optional[UserManagerServicer] = None
         
         logger.info(f"🔧 UserManagerGrpcServer created (socket: {socket_path})")
@@ -249,7 +249,7 @@ class UserManagerGrpcServer:
             self._servicer = UserManagerServicer(self.internal_usermanager)
             
             # Create server
-            self._server = GrpcUdsServer(socket_path=self.socket_path)
+            self._server = GrpcServer(socket_path=self.socket_path)
             
             if self._server:
                 # Register servicer (will be available after proto compilation)

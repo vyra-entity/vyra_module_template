@@ -10,7 +10,7 @@ import os
 from pathlib import Path
 
 from vyra_base.core.entity import VyraEntity
-from vyra_base.com.handler.ipc import GrpcUdsServer
+from vyra_base.com.external.grpc import GrpcServer
 
 from .internal_usermanager import InternalUserManager
 from .usermanager_grpc_server import UserManagerServicer, UserManagerGrpcServer
