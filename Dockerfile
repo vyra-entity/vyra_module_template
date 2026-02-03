@@ -38,6 +38,11 @@ COPY frontend/ ./frontend/
 COPY wheels/ ./wheels/
 COPY storage/ ./storage/
 
+# Fix ownership and permissions (files copied as root, need vyrauser access)
+RUN chown -R vyrauser:vyrauser /workspace && \
+    chmod +x vyra_entrypoint.sh && \
+    if [ -f ".module/pre-install.sh" ]; then chmod +x .module/pre-install.sh; fi
+
 # Install module-specific Python dependencies
 RUN if [ -f ".module/requirements.txt" ]; then \
         pip install --no-cache-dir -r .module/requirements.txt --break-system-packages; \
@@ -45,8 +50,7 @@ RUN if [ -f ".module/requirements.txt" ]; then \
 
 # Run pre-install script if exists (for custom repository setup, etc.)
 RUN if [ -f ".module/pre-install.sh" ]; then \
-        chmod +x .module/pre-install.sh && \
-        ./.module/pre-install.sh; \
+        bash .module/pre-install.sh; \
     fi
 
 # Install module-specific system packages
@@ -143,6 +147,7 @@ RUN if [ "$SECURE_BY_SROS2" = "true" ]; then \
 
 RUN if [ -d "frontend" ] && [ -f "frontend/package.json" ] && [ -d "frontend/src/views" ] && [ "$(ls -A frontend/src/views)" ]; then \
         cd frontend && \
+        # npm install @vue/eslint-config-typescript@latest eslint@latest --save-dev && \
         npm install && \
         npm run build && \
         rm -rf node_modules && \
