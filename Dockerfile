@@ -23,24 +23,26 @@ ENV MODULE_NAME=${MODULE_NAME}
 ARG SECURE_BY_SROS2=false
 ENV SECURE_BY_SROS2=${SECURE_BY_SROS2}
 
+# Switch to root for build operations (base image may end with USER vyrauser)
+USER root
+
 WORKDIR /workspace
 
 # Clean workspace from base image to prevent stale packages
 RUN rm -rf /workspace/src /workspace/build /workspace/install
 
-# Copy module sources
-COPY src/ ./src/
-COPY config/ ./config/
-COPY tools/ ./tools/
-COPY vyra_entrypoint.sh ./vyra_entrypoint.sh
-COPY .module/ ./.module/
-COPY frontend/ ./frontend/
-COPY wheels/ ./wheels/
-COPY storage/ ./storage/
+# Copy module sources with correct ownership
+COPY --chown=vyrauser:vyrauser src/ ./src/
+COPY --chown=vyrauser:vyrauser config/ ./config/
+COPY --chown=vyrauser:vyrauser tools/ ./tools/
+COPY --chown=vyrauser:vyrauser vyra_entrypoint.sh ./vyra_entrypoint.sh
+COPY --chown=vyrauser:vyrauser .module/ ./.module/
+COPY --chown=vyrauser:vyrauser frontend/ ./frontend/
+COPY --chown=vyrauser:vyrauser wheels/ ./wheels/
+COPY --chown=vyrauser:vyrauser storage/ ./storage/
 
-# Fix ownership and permissions (files copied as root, need vyrauser access)
-RUN chown -R vyrauser:vyrauser /workspace && \
-    chmod +x vyra_entrypoint.sh && \
+# Fix permissions (ownership already set via --chown)
+RUN chmod +x vyra_entrypoint.sh && \
     if [ -f ".module/pre-install.sh" ]; then chmod +x .module/pre-install.sh; fi
 
 # Install module-specific Python dependencies
@@ -180,6 +182,9 @@ FROM ${RUNTIME_BASE_IMAGE} AS runtime
 ARG MODULE_NAME
 ENV MODULE_NAME=${MODULE_NAME}
 
+# Switch to root for system operations (base image ends with vyrauser)
+USER root
+
 # Copy module name from builder stage if not set
 COPY --from=builder /tmp/module_name.env /tmp/module_name.env
 RUN if [ -z "$MODULE_NAME" ]; then \
@@ -226,6 +231,9 @@ LABEL maintainer="VYRA Development Team" \
       org.opencontainers.image.source="https://github.com/variobotic-gmbh/${MODULE_NAME}" \
       module="${MODULE_NAME}" \
       stage="runtime"
+
+# Note: Container runs as root to allow supervisord to manage processes
+# Individual programs run as vyrauser (configured in supervisord.conf)
 
 CMD ["/workspace/vyra_entrypoint.sh"]
 

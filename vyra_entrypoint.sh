@@ -620,7 +620,7 @@ if [ "$VYRA_DEV_MODE" = "true" ]; then
     BACKEND_DEV_FILEWATCH_SED=$(echo "$BACKEND_DEV_FILEWATCH" | sed 's/\//\\\//g')
 
     # Add --reload and --reload-dir for both SSL and non-SSL variants using the env variable
-    sed -i "/exec uvicorn src.asgi:application.*--host 0.0.0.0 --port 8443/s/--log-level info/--log-level info --reload --reload-dir $BACKEND_DEV_FILEWATCH_SED --reload-exclude \/workspace\/log/" /etc/supervisor/conf.d/supervisord.conf
+    sudo sed -i "/exec uvicorn src.asgi:application.*--host 0.0.0.0 --port 8443/s/--log-level info/--log-level info --reload --reload-dir $BACKEND_DEV_FILEWATCH_SED --reload-exclude \/workspace\/log/" /etc/supervisor/conf.d/supervisord.conf
     # cat /etc/supervisor/conf.d/supervisord.conf
     # sed -i "/exec uvicorn src.asgi:application.*--host 0.0.0.0 --port 8443 --log-level info;/s/--log-level info/--log-level info --log-config \/workspace\/config\/logging.json --reload --reload-dir $BACKEND_DEV_FILEWATCH --reload-exclude \/workspace\/log/" /etc/supervisor/conf.d/supervisord.conf 2>/dev/null || true
 else
@@ -672,7 +672,7 @@ fi
 # Configure Nginx (Frontend Webserver) - only in production mode
 if [ "$ENABLE_FRONTEND_WEBSERVER" = "true" ]; then
     echo "✅ Enabling Nginx (Frontend Webserver)"
-    sed -i '/\[program:nginx\]/,/^\[/ s/autostart=false/autostart=true/' /etc/supervisor/conf.d/supervisord.conf 2>/dev/null || \
+    sudo sed -i '/\[program:nginx\]/,/^\[/ s/autostart=false/autostart=true/' /etc/supervisor/conf.d/supervisord.conf 2>/dev/null || \
     sed -i '/\[program:nginx\]/,/^\[/ s/autostart=false/autostart=true/' /workspace/supervisord.conf 2>/dev/null || true
 else
     echo "⚠️ Nginx (Frontend Webserver) disabled"
@@ -681,7 +681,7 @@ fi
 # Configure Uvicorn (Backend ASGI Server)
 if [ "$ENABLE_BACKEND_WEBSERVER" = "true" ]; then
     echo "✅ Enabling Uvicorn (Backend ASGI Server)"
-    sed -i '/\[program:uvicorn\]/,/^\[/ s/autostart=false/autostart=true/' /etc/supervisor/conf.d/supervisord.conf 2>/dev/null || \
+    sudo sed -i '/\[program:uvicorn\]/,/^\[/ s/autostart=false/autostart=true/' /etc/supervisor/conf.d/supervisord.conf 2>/dev/null || \
     sed -i '/\[program:uvicorn\]/,/^\[/ s/autostart=false/autostart=true/' /workspace/supervisord.conf 2>/dev/null || true
 else
     echo "⚠️ Uvicorn (Backend ASGI Server) disabled"

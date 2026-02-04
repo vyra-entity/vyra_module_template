@@ -9,7 +9,7 @@ import logging
 from pathlib import Path
 from typing import Optional, Dict, TypeVar, Generic
 from abc import ABC
-from vyra_base.com.handler.ipc import GrpcUdsClient
+from vyra_base.com.external.grpc import GrpcClient
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +68,7 @@ class BaseGrpcClient(ABC, Generic[TStub]):
         self.timeout = timeout
         self.auto_reconnect = auto_reconnect
         
-        self._client: Optional[GrpcUdsClient] = None
+        self._client: Optional[GrpcClient] = None
         self._stub: Optional[TStub] = None
         self._connected = False
         self._initialized = True
@@ -112,9 +112,9 @@ class BaseGrpcClient(ABC, Generic[TStub]):
                 return False
             
             # Create gRPC client
-            self._client = GrpcUdsClient(socket_path=self.socket_path)
+            self._client = GrpcClient(socket_path=self.socket_path)
 
-            if self._client != None:
+            if self._client is not None:
                 await self._client.connect()
             
                 # Create stub from channel
@@ -124,7 +124,7 @@ class BaseGrpcClient(ABC, Generic[TStub]):
                 logger.info(f"✅ Connected to gRPC service: {self.socket_path}")
                 return True
             else:
-                logger.warning("Failed to create GrpcUdsClient")
+                logger.warning("Failed to create GrpcClient")
                 return False
             
         except Exception as e:
