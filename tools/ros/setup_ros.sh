@@ -21,7 +21,7 @@ else
 fi
 
 # Source all NFS interface overlays
-NFS_VOLUME_PATH="${NFS_VOLUME_PATH:-/nfs/ros_interfaces}"
+NFS_VOLUME_PATH="${NFS_VOLUME_PATH:-/nfs/vyra_interfaces}"
 
 if [ -d "$NFS_VOLUME_PATH" ]; then
     for interface_dir in "$NFS_VOLUME_PATH"/*_interfaces; do
