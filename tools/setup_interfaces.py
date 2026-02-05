@@ -55,7 +55,22 @@ def parse_args():
     default_interface_pkg = f"{module_name}_interfaces"
     
     parser = argparse.ArgumentParser(
-        description="Script to set up ROS2 interfaces for V.Y.R.A. modules."
+        description="Script to set up ROS2 and Proto interfaces for V.Y.R.A. modules.",
+        epilog="""
+Examples:
+  # Build all interfaces (ROS2 + Proto with Python + C++)
+  python setup_interfaces.py --all
+  
+  # Build only ROS2 interfaces
+  python setup_interfaces.py --ros2-only
+  
+  # Build only Proto interfaces (Python + C++)
+  python setup_interfaces.py --proto-only
+  
+  # Build specific interface package
+  python setup_interfaces.py --interface_pkg my_custom_interfaces
+        """,
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
     parser.add_argument(
@@ -63,9 +78,28 @@ def parse_args():
         type=str,
         default=default_interface_pkg,
         help=(
-            f"Name of the interface package to create or update "
+            f"Name of the ROS2 interface package to create or update "
             f"(default: {default_interface_pkg})"
         )
+    )
+    
+    # Build mode arguments
+    mode_group = parser.add_mutually_exclusive_group()
+    mode_group.add_argument(
+        "--all",
+        action="store_true",
+        default=False,
+        help="Build both ROS2 and Proto interfaces (default if no mode specified)"
+    )
+    mode_group.add_argument(
+        "--ros2-only",
+        action="store_true",
+        help="Build only ROS2 interfaces (.msg, .srv, .action)"
+    )
+    mode_group.add_argument(
+        "--proto-only",
+        action="store_true",
+        help="Build only Proto interfaces (.proto) - Python and C++"
     )
 
     return parser.parse_args()
@@ -392,7 +426,7 @@ def load_default_interfaces(interface_package_name, interface_package_path):
             "vyra_base not found. Please set the startup environment variable " +
             " in your container (.env) [VYRA_STARTUP_ACTIVE=true] to load all wheels.")
 
-    vyra_base.extract_ros_interfaces(interface_package_path)
+    vyra_base.extract_interfaces(interface_package_path)
     
     # Fix resource marker file: remove old vyra_module_interfaces and create correct one
     resource_dir = interface_package_path / "resource"
@@ -420,14 +454,16 @@ def update_dynamic_interfaces(
     target_path = interface_target_path
     
     # Copy interface files from source to target
-    print(f"Extracting ROS2 interfaces from {source_path} to {target_path}")
-    for interface_type in ['msg', 'srv', 'action']:
+    print(f"Extracting interfaces from {source_path} to {target_path}")
+    for interface_type in ['msg', 'srv', 'action', 'proto']:
         source_dir: Path = source_path / interface_type
         target_dir: Path = target_path / interface_type
         
         if source_dir.exists():
             target_dir.mkdir(exist_ok=True)
-            for file in source_dir.rglob(f'*.{interface_type}'):
+            # Proto files use .proto extension, others use directory name
+            file_ext = 'proto' if interface_type == 'proto' else interface_type
+            for file in source_dir.rglob(f'*.{file_ext}'):
                 shutil.copy2(file, target_dir / file.name)
                 print(f"Copied {file.name} to {target_dir}")
 
@@ -547,4 +583,98 @@ def main(interface_package_name, tmp_src_path=None):
 
 if __name__ == "__main__":
     args = parse_args()
-    main(args.interface_pkg)
+    
+    # Determine build mode
+    build_ros2 = True
+    build_proto = True
+    
+    if args.ros2_only:
+        build_ros2 = True
+        build_proto = False
+        logging.info("🔧 Mode: ROS2 interfaces only")
+    elif args.proto_only:
+        build_ros2 = False
+        build_proto = True
+        logging.info("🔧 Mode: Proto interfaces only")
+    elif args.all:
+        build_ros2 = True
+        build_proto = True
+        logging.info("🔧 Mode: All interfaces (ROS2 + Proto)")
+    else:
+        # Default: build all
+        build_ros2 = True
+        build_proto = True
+        logging.info("🔧 Mode: All interfaces (ROS2 + Proto) [default]")
+    
+    # Build ROS2 interfaces
+    if build_ros2:
+        logging.info("\n" + "="*70)
+        logging.info("📦 Building ROS2 Interfaces")
+        logging.info("="*70)
+        main(args.interface_pkg)
+        logging.info("✅ ROS2 interfaces built successfully")
+    
+    # Build Proto interfaces
+    if build_proto:
+        logging.info("\n" + "="*70)
+        logging.info("📦 Building Proto Interfaces")
+        logging.info("="*70)
+        
+        # Import and run setup_proto_interfaces
+        try:
+            from pathlib import Path
+            import sys
+            
+            # Get module name
+            module_name = get_module_name()
+            script_dir = Path(__file__).parent.parent
+            
+            # Paths
+            proto_interface_dir = script_dir / "storage" / "interfaces" / "proto"
+            output_dir = script_dir / "install"
+            interface_pkg = f"{module_name}_proto_interfaces"
+            
+            if not proto_interface_dir.exists():
+                logging.warning(f"⚠️  Proto interface directory not found: {proto_interface_dir}")
+                logging.info("ℹ️  Skipping proto interface generation")
+            else:
+                # Call setup_proto_interfaces programmatically
+                logging.info(f"📁 Proto source: {proto_interface_dir}")
+                logging.info(f"📁 Output: {output_dir / interface_pkg}")
+                
+                # Run as subprocess to avoid import conflicts
+                setup_proto_script = Path(__file__).parent / "setup_proto_interfaces.py"
+                if setup_proto_script.exists():
+                    result = subprocess.run(
+                        [
+                            sys.executable,
+                            str(setup_proto_script),
+                            "--proto-interface-dir", str(proto_interface_dir),
+                            "--output-dir", str(output_dir),
+                            "--interface-pkg", interface_pkg
+                        ],
+                        capture_output=False,
+                        text=True
+                    )
+                    
+                    if result.returncode != 0:
+                        logging.warning("⚠️  Proto interface generation had issues (non-critical)")
+                    else:
+                        logging.info("✅ Proto interfaces built successfully")
+                else:
+                    logging.warning(f"⚠️  setup_proto_interfaces.py not found: {setup_proto_script}")
+                    logging.info("ℹ️  Skipping proto interface generation")
+                    
+        except Exception as e:
+            logging.error(f"❌ Failed to build proto interfaces: {e}")
+            logging.info("ℹ️  Continuing without proto interfaces (non-critical)")
+    
+    logging.info("\n" + "="*70)
+    logging.info("✅ Interface setup complete!")
+    logging.info("="*70)
+    if build_ros2:
+        logging.info(f"   ROS2: {args.interface_pkg}")
+    if build_proto:
+        module_name = get_module_name()
+        logging.info(f"   Proto: {module_name}_proto_interfaces (Python + C++)")
+    logging.info("="*70)

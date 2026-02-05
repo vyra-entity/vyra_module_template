@@ -1,0 +1,19 @@
+[
+    {
+        "name": "get_data",
+        "type": "callable",
+        "protocol": "redis",
+        "proto_file": "example_service.proto",
+        "service": "ExampleService",
+        "method": "GetData",
+        "request_type": "GetDataRequest",
+        "response_type": "GetDataResponse",
+        "description": "Example VyraCallable using Redis transport",
+        "timeout": 5.0,
+        "displaystyle": {
+            "visible": true,
+            "category": "Examples",
+            "icon": "data"
+        }
+    }
+]

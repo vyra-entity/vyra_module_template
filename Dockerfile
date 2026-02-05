@@ -7,6 +7,8 @@
 # ==============================================================================
 
 # Base image configuration (override with --build-arg)
+# Development (VYRA_DEV_MODE=true):  Uses full-development (includes Node.js for Vite)
+# Production (VYRA_DEV_MODE=false):  Uses full-production (minimal runtime)
 ARG BUILDER_BASE_IMAGE=vyra_base_image:development
 ARG RUNTIME_BASE_IMAGE=vyra_base_image:production
 
@@ -86,6 +88,9 @@ RUN if [ -d "wheels" ]; then \
 
 # Setup ROS2 interfaces (already in /workspace)
 RUN python3 tools/setup_interfaces.py
+
+# Setup Proto interfaces (for vyra_callables via gRPC/Redis transport)
+RUN python3 tools/setup_proto_interfaces.py || echo "⚠️  No Proto interfaces found (optional)"
 
 # Generate gRPC proto files from .proto definitions
 RUN if [ -d "storage/interfaces" ] && [ "$(ls -A storage/interfaces/*.proto 2>/dev/null)" ]; then \

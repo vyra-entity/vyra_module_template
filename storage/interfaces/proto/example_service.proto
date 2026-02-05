@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package example_module;
+
+// Example request message for demonstrating Redis VyraCallable
+message GetDataRequest {
+    string key = 1;
+    bool include_metadata = 2;
+}
+
+// Example response message
+message GetDataResponse {
+    string key = 1;
+    string value = 2;
+    int64 timestamp = 3;
+    map<string, string> metadata = 4;
+}
+
+// Example service definition (used as VyraCallable via Redis)
+// Note: This is not a gRPC service - it's used to define message types
+// The actual communication happens via Redis Pub/Sub or Key-Value
+service ExampleService {
+    rpc GetData (GetDataRequest) returns (GetDataResponse);
+}

@@ -292,7 +292,7 @@ else
     echo "⚠️  Warning: module_data.yaml not found, Instance: $INSTANCE_ID (from HOSTNAME)"
 fi
 
-NFS_VOLUME_PATH="${NFS_VOLUME_PATH:-/nfs/ros_interfaces}"
+NFS_VOLUME_PATH="${NFS_VOLUME_PATH:-/nfs/vyra_interfaces}"
 INTERFACE_DIR="${MODULE_NAME}_${INSTANCE_ID}_interfaces"
 INTERFACE_SOURCE="/workspace/install/${MODULE_NAME}_interfaces"
 
@@ -422,6 +422,65 @@ ros2 pkg list | grep -E "(v2_|vyra_)" || echo "No matching packages"
 
 echo "=== EXECUTABLES ==="
 ros2 pkg executables $MODULE_NAME || echo "No executables for $MODULE_NAME"
+
+# =============================================================================
+# Proto Interface Setup & NFS Sharing (for gRPC/Redis communication)
+# =============================================================================
+echo "=== PROTO INTERFACE SETUP ==="
+
+NFS_PROTO_PATH="${NFS_PROTO_PATH:-/nfs/proto_interfaces}"
+PROTO_INTERFACE_DIR="${MODULE_NAME}_${INSTANCE_ID}_proto_interfaces"
+PROTO_INTERFACE_SOURCE="/workspace/install/${MODULE_NAME}_proto_interfaces"
+
+# Check if NFS Proto volume is mounted
+if [ -d "$NFS_PROTO_PATH" ]; then
+    echo "✅ Proto NFS volume found at $NFS_PROTO_PATH"
+    
+    # Copy module's own Proto interfaces to NFS
+    if [ -d "$PROTO_INTERFACE_SOURCE" ]; then
+        NFS_PROTO_MODULE_DIR="$NFS_PROTO_PATH/$PROTO_INTERFACE_DIR"
+        echo "📦 Copying Proto interfaces to NFS as $PROTO_INTERFACE_DIR..."
+        mkdir -p "$NFS_PROTO_MODULE_DIR"
+        
+        # Copy all files to NFS
+        cp -r "$PROTO_INTERFACE_SOURCE"/* "$NFS_PROTO_MODULE_DIR"/ 2>/dev/null || echo "⚠️  No Proto interfaces to copy"
+        
+        if [ -f "$NFS_PROTO_MODULE_DIR/__init__.py" ]; then
+            echo "✅ Proto interfaces deployed to NFS"
+        else
+            echo "⚠️  Warning: __init__.py not found after Proto interface copy"
+        fi
+    else
+        echo "ℹ️  No Proto interfaces found at $PROTO_INTERFACE_SOURCE (optional)"
+    fi
+    
+    # Add all Proto interfaces from NFS to PYTHONPATH
+    echo "🔗 Loading Proto interfaces from NFS..."
+    PROTO_INTERFACES_LOADED=0
+    for proto_if_dir in "$NFS_PROTO_PATH"/*_proto_interfaces; do
+        if [ -d "$proto_if_dir" ] && [ -f "$proto_if_dir/__init__.py" ]; then
+            proto_if_name=$(basename "$proto_if_dir")
+            echo "   Loading $proto_if_name..."
+            export PYTHONPATH="$proto_if_dir:$PYTHONPATH"
+            PROTO_INTERFACES_LOADED=$((PROTO_INTERFACES_LOADED + 1))
+        fi
+    done
+    
+    if [ $PROTO_INTERFACES_LOADED -gt 0 ]; then
+        echo "✅ Loaded $PROTO_INTERFACES_LOADED Proto interface package(s) from NFS"
+    else
+        echo "ℹ️  No Proto interface packages found in NFS (first module?)"
+    fi
+else
+    echo "⚠️  Proto NFS volume not found at $NFS_PROTO_PATH"
+    echo "   Modules will only see their own Proto interfaces"
+    
+    # Still add local Proto interfaces to PYTHONPATH if they exist
+    if [ -d "$PROTO_INTERFACE_SOURCE" ]; then
+        export PYTHONPATH="$PROTO_INTERFACE_SOURCE:$PYTHONPATH"
+        echo "✅ Added local Proto interfaces to PYTHONPATH"
+    fi
+fi
 
 # SROS2 Setup
 echo "=== SROS2 SETUP ==="
