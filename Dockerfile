@@ -67,12 +67,17 @@ RUN if [ -f ".module/system-packages.txt" ]; then \
     fi
 
 # Install wheel dependencies (vyra_base and module-specific wheels) [only latest versions]
-RUN if [ -d "wheels" ]; then \
+# Cache-buster: Force fresh installation even if wheel files appear unchanged
+ARG CACHE_BUST
+RUN echo "Cache bust: ${CACHE_BUST:-$(date +%s)}" && \
+    if [ -d "wheels" ]; then \
         set -e; \
         tmpdir=$(mktemp -d); \
         \
+        echo "📦 Installing wheel packages (force-reinstall):"; \
         for pkg in $(ls wheels/*.whl | sed -E 's#.*/([^/-]+)-.*#\1#' | sort -u); do \
             latest=$(ls wheels/"$pkg"-*.whl | sort -V | tail -n 1); \
+            echo "  - $(basename "$latest")"; \
             cp "$latest" "$tmpdir/"; \
         done; \
         \
@@ -82,6 +87,7 @@ RUN if [ -d "wheels" ]; then \
             --no-deps \
             --ignore-installed cryptography; \
         \
+        echo "✅ Wheel installation complete"; \
         rm -rf "$tmpdir"; \
         # pip install wheels/*.whl --break-system-packages --ignore-installed cryptography || true; \
     fi
