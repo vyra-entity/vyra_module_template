@@ -93,7 +93,11 @@ RUN echo "Cache bust: ${CACHE_BUST:-$(date +%s)}" && \
     fi
 
 # Setup ROS2 interfaces (already in /workspace)
-RUN python3 tools/setup_interfaces.py
+# Extract MODULE_NAME first if not provided as build arg
+RUN if [ -z "$MODULE_NAME" ] && [ -f ".module/module_data.yaml" ]; then \
+        export MODULE_NAME=$(grep "^name:" .module/module_data.yaml | cut -d: -f2 | tr -d ' ' | tr -d "'" | tr -d '"'); \
+    fi && \
+    python3 tools/setup_interfaces.py --interface_pkg "${MODULE_NAME}_interfaces"
 
 # Setup Proto interfaces (for vyra_callables via gRPC/Redis transport)
 RUN python3 tools/setup_proto_interfaces.py || echo "⚠️  No Proto interfaces found (optional)"

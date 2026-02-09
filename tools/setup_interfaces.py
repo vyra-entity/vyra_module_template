@@ -104,8 +104,8 @@ Examples:
 
     return parser.parse_args()
 
-def update_package_xml(package_path: Path):
-    """Fügt nötige Dependencies zur package.xml hinzu."""
+def update_package_xml(package_path: Path, package_name: str = None):
+    """Fügt nötige Dependencies zur package.xml hinzu und updated den package name."""
     pkg_xml_path = package_path / "package.xml"
     
     exec_dependencies = [
@@ -131,6 +131,13 @@ def update_package_xml(package_path: Path):
 
     tree: ET.ElementTree[ET.Element[str]] = ET.parse(pkg_xml_path)
     root: ET.Element[str] = tree.getroot()
+
+    # Update package name if provided
+    if package_name:
+        name_elem = root.find("name")
+        if name_elem is not None and name_elem.text != package_name:
+            print(f"📝 Updating package name from '{name_elem.text}' to '{package_name}'")
+            name_elem.text = package_name
 
     # Helper, um Dopplungen zu vermeiden
     build_existing = {
@@ -769,7 +776,7 @@ def main(interface_package_name, tmp_src_path=None):
             )
 
     print(f"\nUpdate package.xml for {interface_package_name}")
-    update_package_xml(interface_package_path)
+    update_package_xml(interface_package_path, interface_package_name)
 
     print(f"\nUpdate CMakefile for {interface_package_name}")
     update_CMakefile(interface_package_path, interface_package_name)

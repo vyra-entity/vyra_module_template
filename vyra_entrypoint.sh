@@ -170,6 +170,9 @@ mkdir -p /workspace/log/uvicorn
 mkdir -p /workspace/log/nginx
 mkdir -p /workspace/log/ros2
 
+# Set write permissions for all users (ROS2 logging needs this)
+chmod -R 777 /workspace/log/
+
 # Clean up old thread log files if cleanup script exists
 if [ -f "/workspace/tools/cleanup_thread_logs.sh" ]; then
     /workspace/tools/cleanup_thread_logs.sh
@@ -192,7 +195,7 @@ fi
 
 # This happens when using full workspace mount for development
 if [ -d "/opt/vyra/install_backup" ]; then
-    # Check if install directory is complete (has setup.bash AND module package)
+    # Check if install directory is complete (has setup.bash AND module package with executable)
     INSTALL_COMPLETE=true
     
     if [ ! -f "/workspace/install/setup.bash" ]; then
@@ -200,6 +203,9 @@ if [ -d "/opt/vyra/install_backup" ]; then
         INSTALL_COMPLETE=false
     elif [ -n "$MODULE_NAME" ] && [ ! -d "/workspace/install/$MODULE_NAME" ]; then
         echo "❌ install/$MODULE_NAME package missing"
+        INSTALL_COMPLETE=false
+    elif [ -n "$MODULE_NAME" ] && [ ! -f "/workspace/install/$MODULE_NAME/lib/$MODULE_NAME/core" ]; then
+        echo "❌ install/$MODULE_NAME/lib/$MODULE_NAME/core executable missing"
         INSTALL_COMPLETE=false
     fi
     
@@ -295,12 +301,21 @@ fi
 NFS_VOLUME_PATH="${NFS_VOLUME_PATH:-/nfs/vyra_interfaces}"
 INTERFACE_DIR="${MODULE_NAME}_${INSTANCE_ID}_interfaces"
 INTERFACE_SOURCE="/workspace/install/${MODULE_NAME}_interfaces"
+INTERFACE_STAGING="/tmp/module_interfaces_staging/${MODULE_NAME}_interfaces"
 
 # Check if NFS volume is mounted
 if [ -d "$NFS_VOLUME_PATH" ]; then
     echo "✅ NFS volume found at $NFS_VOLUME_PATH"
     
     # Copy module's own interfaces to NFS (read-write)
+    # First check if interfaces exist in staging (from docker image build), otherwise use install directory
+    if [ ! -d "$INTERFACE_SOURCE" ] && [ -d "$INTERFACE_STAGING" ]; then
+        echo "📦 Copying interfaces from staging to install..."
+        mkdir -p "/workspace/install"
+        cp -r "$INTERFACE_STAGING" "$INTERFACE_SOURCE"
+        echo "✅ Interfaces copied from staging to install"
+    fi
+    
     # We need to create a complete ROS2 install structure with setup.bash in root
     if [ -d "$INTERFACE_SOURCE" ]; then
         NFS_MODULE_DIR="$NFS_VOLUME_PATH/$INTERFACE_DIR"
