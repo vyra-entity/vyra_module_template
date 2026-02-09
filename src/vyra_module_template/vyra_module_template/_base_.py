@@ -95,12 +95,18 @@ async def _create_base_interfaces() -> list[FunctionConfigEntry]:
     for metadata in interface_metadata:
         try:
             if metadata['type'] == FunctionConfigBaseTypes.callable.value:
-                ros2_type: str = metadata['filetype'].split('/')[-1]
-                ros2_type = ros2_type.split('.')[0]
+                ifaces = []
+                for iface_type in metadata['filetype']:
+                    filename, filetype = iface_type.split('.')
+                
+                    if filetype in ['msg', 'srv', 'action']:
+                        ifaces.append(getattr(
+                            sys.modules[f'{module_name}_interfaces.{filetype}'], filename))
+                    else:
+                        ifaces.append(iface_type)
 
-                metadata['ros2type'] = getattr(
-                    sys.modules[f'{module_name}_interfaces.srv'], ros2_type)
-
+                metadata['interfacetypes'] = ifaces
+                
                 displaystyle = FunctionConfigDisplaystyle(
                     visible=metadata.get('displaystyle', {}).get('visible', False),
                     published=metadata.get('displaystyle', {}).get('published', False)
@@ -110,7 +116,7 @@ async def _create_base_interfaces() -> list[FunctionConfigEntry]:
                     FunctionConfigEntry(
                         tags=metadata['tags'],
                         type=metadata['type'],
-                        ros2type=metadata['ros2type'],
+                        interfacetypes=metadata['interfacetypes'],
                         functionname=metadata['functionname'],
                         displayname=metadata['displayname'],
                         description=metadata['description'],
@@ -326,6 +332,8 @@ async def build_entity(project_settings) -> VyraEntity:
     parameter_types: dict[str, Any] = {
         'UpdateParamEvent': VBASEUpdateParamEvent
     }
+
+    await entity.startup_entity()
 
     await entity.setup_storage(
         storage_config, 
