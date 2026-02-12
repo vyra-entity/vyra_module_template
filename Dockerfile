@@ -33,19 +33,15 @@ WORKDIR /workspace
 # Clean workspace from base image to prevent stale packages
 RUN rm -rf /workspace/src /workspace/build /workspace/install
 
-# Copy module sources with correct ownership
+# Copy module sources with correct ownership and permissions
 COPY --chown=vyrauser:vyrauser src/ ./src/
 COPY --chown=vyrauser:vyrauser config/ ./config/
 COPY --chown=vyrauser:vyrauser tools/ ./tools/
-COPY --chown=vyrauser:vyrauser vyra_entrypoint.sh ./vyra_entrypoint.sh
-COPY --chown=vyrauser:vyrauser .module/ ./.module/
+COPY --chown=vyrauser:vyrauser --chmod=755 vyra_entrypoint.sh ./vyra_entrypoint.sh
+COPY --chown=vyrauser:vyrauser --chmod=755 .module/ ./.module/
 COPY --chown=vyrauser:vyrauser frontend/ ./frontend/
 COPY --chown=vyrauser:vyrauser wheels/ ./wheels/
 COPY --chown=vyrauser:vyrauser storage/ ./storage/
-
-# Fix permissions (ownership already set via --chown)
-RUN chmod +x vyra_entrypoint.sh && \
-    if [ -f ".module/pre-install.sh" ]; then chmod +x .module/pre-install.sh; fi
 
 # Install module-specific Python dependencies
 RUN if [ -f ".module/requirements.txt" ]; then \
