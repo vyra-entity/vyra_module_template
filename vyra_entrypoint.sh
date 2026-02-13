@@ -628,6 +628,26 @@ else
 fi
 
 # =============================================================================
+# Create Log Directories
+# =============================================================================
+echo "=== CREATING LOG DIRECTORIES ==="
+
+mkdir -p /workspace/log/core
+mkdir -p /workspace/log/nginx
+mkdir -p /workspace/log/uvicorn
+mkdir -p /workspace/log/vyra
+
+# Only create ros2 logs directory if not in SLIM mode
+if [ "${VYRA_SLIM:-false}" != "true" ]; then
+    mkdir -p /workspace/log/ros2
+    echo "✅ Created core, nginx, uvicorn, vyra, and ros2 log directories"
+else
+    echo "✅ Created core (slim mode: skipping ros2) log directories"
+fi
+
+echo "===================================="
+
+# =============================================================================
 # Supervisord Service Configuration
 # =============================================================================
 echo "=== CONFIGURING SUPERVISORD SERVICES ==="
@@ -637,7 +657,7 @@ if [ "$VYRA_DEV_MODE" = "true" ]; then
     echo "🚀 DEVELOPMENT MODE ENABLED"
 
     # Enable ROS2 Hot Reload if configured
-    if [ "$ENABLE_ROS2_HOT_RELOAD" = "true" ]; then
+    if [ "$ENABLE_HOT_RELOAD" = "true" ]; then
         echo "🔥 Enabling ROS2 Hot Reload..."
         
         # Install watchdog if not present
@@ -647,9 +667,10 @@ if [ "$VYRA_DEV_MODE" = "true" ]; then
         fi
         
         # Start hot reload watcher in background
-        # Note: ros2_core is the supervisord program name for the ROS2 core node
-        nohup python3 /workspace/tools/ros2_hot_reload.py "$MODULE_NAME" core ros2_core \
-            > /workspace/log/ros2/hot_reload.log 2>&1 &
+        # Note: core is the supervisord program name for the module core
+        # hot_reload.py works for both FULL (ROS2) and SLIM (Python-only) modes
+        nohup python3 /workspace/tools/hot_reload.py "$MODULE_NAME" core core \
+            > /workspace/log/core/hot_reload.log 2>&1 &
         
         HOT_RELOAD_PID=$!
         echo "✅ ROS2 Hot Reload started (PID: $HOT_RELOAD_PID)"
@@ -687,16 +708,7 @@ if [ "$VYRA_DEV_MODE" = "true" ]; then
         # Keep ENABLE_FRONTEND_WEBSERVER=true to use nginx with dist/
     fi
 
-    # Alter reload=True on uvicorn in /etc/supervisor/conf.d/supervisord.conf for developement
-    echo "🔄 Enabling autoreload for Uvicorn (FastAPI)..."
-    echo "   Watch directory: $BACKEND_DEV_FILEWATCH"
-    
-    BACKEND_DEV_FILEWATCH_SED=$(echo "$BACKEND_DEV_FILEWATCH" | sed 's/\//\\\//g')
-
-    # Add --reload and --reload-dir for both SSL and non-SSL variants using the env variable
-    sudo sed -i "/exec uvicorn src.asgi:application.*--host 0.0.0.0 --port 8443/s/--log-level info/--log-level info --reload --reload-dir $BACKEND_DEV_FILEWATCH_SED --reload-exclude \/workspace\/log/" /etc/supervisor/conf.d/supervisord.conf
-    # cat /etc/supervisor/conf.d/supervisord.conf
-    # sed -i "/exec uvicorn src.asgi:application.*--host 0.0.0.0 --port 8443 --log-level info;/s/--log-level info/--log-level info --log-config \/workspace\/config\/logging.json --reload --reload-dir $BACKEND_DEV_FILEWATCH --reload-exclude \/workspace\/log/" /etc/supervisor/conf.d/supervisord.conf 2>/dev/null || true
+    # Hot-reload is handled by tools/hot_reload.py instead
 else
     echo "🏭 PRODUCTION MODE — Using Nginx with pre-built frontend"
     

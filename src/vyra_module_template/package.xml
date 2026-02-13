@@ -10,7 +10,7 @@
 	<test_depend>ament_pep257</test_depend>
 	<test_depend>python3-pytest</test_depend>
 
-	<depend>vyra_module_interfaces</depend>
+	<depend>vyra_module_template_interfaces</depend>
 
 	<export>
 		<build_type>ament_python</build_type>

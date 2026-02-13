@@ -2,7 +2,7 @@
 
 ## Overview
 
-The v2_modulemanager REST API uses a modern, industrial-grade client architecture with the following principles:
+The {module_name} REST API uses a modern, industrial-grade client architecture with the following principles:
 
 1. **Singleton Pattern**: One client instance per endpoint (HTTP) or socket (gRPC)
 2. **Base Classes**: Shared functionality in `BaseHttpClient` and `BaseGrpcClient`

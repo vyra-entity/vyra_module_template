@@ -123,8 +123,8 @@ else
     print_warning "ROS2-Package-Verzeichnis nicht gefunden: $ROS2_PACKAGE_DIR"
 fi
 
-# Interface Package-Verzeichnis (vyra_module_interfaces → <module>_interfaces)
-OLD_INTERFACE_DIR="src/vyra_module_interfaces"
+# Interface Package-Verzeichnis (vyra_module_template_interfaces → <module>_interfaces)
+OLD_INTERFACE_DIR="src/vyra_module_template_interfaces"
 NEW_INTERFACE_DIR="src/${NEW_MODULE_NAME}_interfaces"
 if [ -d "$OLD_INTERFACE_DIR" ]; then
     print_success "Benenne Interface-Package um: $OLD_INTERFACE_DIR → $NEW_INTERFACE_DIR"
@@ -348,8 +348,8 @@ done
 
 print_info "Schritt 5.5: Interface Package Referenzen aktualisieren..."
 
-# Update vyra_module_interfaces → <module>_interfaces references
-OLD_INTERFACE_NAME="vyra_module_interfaces"
+# Update vyra_module_template_interfaces → <module>_interfaces references
+OLD_INTERFACE_NAME="vyra_module_template_interfaces"
 if [ "$OLD_MODULE_NAME" != "vyra_module_template" ]; then
     OLD_INTERFACE_NAME="${OLD_MODULE_NAME}_interfaces"
 fi

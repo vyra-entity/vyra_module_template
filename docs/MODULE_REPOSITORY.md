@@ -12,7 +12,7 @@ Die Module-Liste liegt in:
 
 ### 2. Frontend aufrufen
 ```
-https://localhost/v2_modulemanager/repository
+https://localhost/{module_name}/repository
 ```
 
 ### 3. Module installieren
@@ -23,15 +23,15 @@ https://localhost/v2_modulemanager/repository
 ### 4. API testen
 ```bash
 # Liste Module
-curl -k https://localhost/api/v2_modulemanager/repository/list | jq
+curl -k https://localhost/api/{module_name}/repository/list | jq
 
 # Installiere Modul
-curl -k -X POST https://localhost/api/v2_modulemanager/repository/install \
+curl -k -X POST https://localhost/api/{module_name}/repository/install \
   -H "Content-Type: application/json" \
   -d '{"module_ids": ["v2_dashboard"]}'
 
 # Prüfe Status
-curl -k https://localhost/api/v2_modulemanager/repository/install/status/v2_dashboard
+curl -k https://localhost/api/{module_name}/repository/install/status/v2_dashboard
 ```
 
 ## Architecture

@@ -17,7 +17,7 @@ from .application import application
 from .application.application import Component
 from .taskmanager import TaskManager, task_supervisor_looper
 from .status.status_manager import StatusManager
-from .user.usermanager import usermanager_runner
+from . import container_injection
 
 from vyra_base.core.entity import VyraEntity
 from vyra_base.helper.error_handler import ErrorTraceback 
@@ -54,9 +54,21 @@ setup_module_logging()
 # Configure main logger
 logger = logging.getLogger(__name__)
 
+# Check if operating in SLIM mode (Python-only, no ROS2)
+VYRA_SLIM = os.getenv('VYRA_SLIM', 'false').lower() == 'true'
+if VYRA_SLIM:
+    logger.info('🎯 VYRA_SLIM=true: Python-only mode (no ROS2)')
+else:
+    logger.info('🎯 VYRA_SLIM=false: Full ROS2 mode with gRPC')
+
 def handle_sigterm(signum, frame):
-    logger.warning("SIGTERM empfangen, ROS2 wird heruntergefahren...")
-    rclpy.shutdown()
+    logger.warning("SIGTERM empfangen...")
+    
+    # Only shutdown ROS2 if running in normal mode
+    if not VYRA_SLIM and rclpy.ok():
+        logger.warning("Shutting down ROS2...")
+        rclpy.shutdown()
+    
     # Exit with SIGTERM code (143 = 128+15) so Docker Swarm knows this was forced shutdown
     sys.exit(143)
 
@@ -129,6 +141,52 @@ async def ros_spinner_runner(entity: VyraEntity) -> None:
         logger.info('Node spinner finished.')
         ErrorTraceback.check_error_exist()
 
+
+async def web_backend_runner(entity: VyraEntity, taskmanager: TaskManager, statusmanager: StatusManager, component) -> None:
+    """
+    Runner for the backend webserver (uvicorn).
+    Starts the FastAPI application via uvicorn.Server.
+    """
+    import asyncio
+    import uvicorn
+    
+    logger = logging.getLogger(__name__)
+    logger.info('🌐 Starting backend webserver runner...')
+    
+    try:
+        # Get module name dynamically
+        module_name = entity.module_entry.name if hasattr(entity, 'module_entry') and entity.module_entry else os.getenv('MODULE_NAME', 'vyra_module_template')
+        app_path = f"{module_name}.backend_webserver.asgi:app"
+        
+        logger.info(f'Loading ASGI application from: {app_path}')
+        
+        # Uvicorn server config
+        config = uvicorn.Config(
+            app=app_path,
+            host="0.0.0.0",
+            port=8443,
+            ssl_keyfile="/workspace/storage/certificates/selfsigned/key.pem",
+            ssl_certfile="/workspace/storage/certificates/selfsigned/cert.pem",
+            log_level="info",
+            reload=False,  # Hot reload managed by tools/hot_reload.py
+            workers=1
+        )
+        
+        server = uvicorn.Server(config)
+        logger.info('✅ Uvicorn server configured')
+        
+        # Start server (blocking)
+        logger.info('🚀 Starting uvicorn server...')
+        await server.serve()
+        
+    except asyncio.CancelledError:
+        logger.info('Backend webserver task cancelled')
+        raise
+    except Exception as e:
+        logger.exception(f'Backend webserver error: {e}')
+        raise
+
+
 async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, StatusManager]:
     """Initializing vyra entity and configure base settings. Afterwards start 
     the application runner, communication spinner, and status manager.
@@ -152,16 +210,40 @@ async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, Statu
     # Register remote callable interfaces
     await component.set_interfaces()
     logger.info("✅ Component created and interfaces registered")
+    
+    # Initialize container injection with all dependencies
+    logger.info('Setting up container injection...')
+    container_injection.set_entity(entity)
+    container_injection.set_component(component)
+    container_injection.set_task_manager(taskmanager)
+    container_injection.set_status_manager(statusmanager)
+    logger.info('✅ Container injection configured')
 
-    logger.info('Starting application runner and ROS spinner...')
+    logger.info('Starting tasks...')
     # Pass component to application_runner so it can be reused across recoveries
     taskmanager.add_task(application_runner, taskmanager, statusmanager, component)
-    taskmanager.add_task(ros_spinner_runner, entity)
-    taskmanager.add_task(usermanager_runner, entity)
     
-    if entity.node is None:
-        logger.info('No ROS 2 node created, exiting...')
-        raise RuntimeError("No ROS 2 node created, exiting...")
+    # Note: UserManager is now integrated in Component class via vyra_base
+    # No separate usermanager_runner task needed anymore
+    
+    # ROS2-dependent tasks: only start if NOT in SLIM mode
+    if not VYRA_SLIM:
+        logger.info('Starting ROS2-dependent tasks (ros_spinner)...')
+        taskmanager.add_task(ros_spinner_runner, entity)
+        
+        # Validate ROS2 node was created
+        if entity.node is None:
+            logger.error('No ROS 2 node created, exiting...')
+            raise RuntimeError("No ROS 2 node created, exiting...")
+    else:
+        logger.info('⏭️  SLIM mode: skipping ROS2-dependent tasks')
+    
+    # Backend webserver: optional via environment variable
+    if os.getenv('ENABLE_BACKEND_WEBSERVER', 'false').lower() == 'true':
+        logger.info('Starting backend webserver task...')
+        taskmanager.add_task(web_backend_runner, entity, taskmanager, statusmanager, component)
+    else:
+        logger.info('⏭️  Backend webserver disabled (ENABLE_BACKEND_WEBSERVER not set)')
     
     return entity, statusmanager
 
@@ -173,9 +255,13 @@ async def runner() -> None:
         taskmanager = TaskManager()
         logger.info('✅ TaskManager created')
         
-        logger.info('🔧 Initializing rclpy...')
-        rclpy.init()
-        logger.info('✅ rclpy initialized')
+        # Only initialize ROS2 if NOT in SLIM mode
+        if not VYRA_SLIM:
+            logger.info('🔧 Initializing rclpy (normal mode)...')
+            rclpy.init()
+            logger.info('✅ rclpy initialized')
+        else:
+            logger.info('⏭️  Skipping rclpy init (SLIM mode)...')
 
         logger.info('⚙️  Initializing module')
         entity, statusmanager = await initialize_module(taskmanager)
@@ -183,37 +269,6 @@ async def runner() -> None:
         logger.info(f'📋 Tasks: {list(taskmanager.tasks.keys())}')
 
         await task_supervisor_looper(taskmanager, statusmanager)
-
-        # while tm.tasks:
-        #     logger.info(f'🔄 Loop iteration - {len(tm.tasks)} tasks running')
-        #     try:
-        #         done, pending = await asyncio.wait(
-        #             [task_tuple[1] for task_tuple in tm.tasks.values()],
-        #             return_when=asyncio.FIRST_COMPLETED
-        #         )
-        #         logger.debug("Tasks completed")
-        #         for task in done:
-        #             if task.exception():
-        #                 logger.error(
-        #                     f"Task {task.get_name()} raised an exception: {task.exception()}")
-                        
-        #                 await asyncio.sleep(0.5)
-        #             else:
-        #                 logger.info(f"Task {task.get_name()} completed successfully.")
-        #             tm.tasks.pop(task.get_name())
-
-        #         for task in pending:
-        #             logger.info(f"Task {task.get_name()} is still running.")
-
-        #         await asyncio.sleep(0.01)
-        #     except asyncio.TimeoutError:
-        #         if entity.node and entity.node.reload_event.is_set():
-        #             entity.node.reload_event.clear()  # Event zurücksetzen
-        #             logger.info("Node reload event received")
-        #             await taskmanager.cancel_all()
-        #             entity = await initialize_module(taskmanager)
-        #         elif entity.node == None:
-        #             raise RuntimeError("Node is None, cannot proceed with tasks.")
 
     except SystemExit as e:
         logger.info(f'SystemExit: {e}. Exiting gracefully...')
@@ -223,20 +278,24 @@ async def runner() -> None:
     except Exception as e:
         logger.exception(f'Exception: {e}. Closing event loop')
     finally:
-        if hasattr(locals, 'entity'):
-            logger.info('Shutting down ROS 2 node...')
-            if hasattr(entity, 'node') and entity.node is not None:
-                # Ensure the node is destroyed properly
-                logger.info('Destroying ROS 2 node...')
-                entity.node.destroy_node()
-            else:
-                logger.info('No ROS 2 node to destroy.')
+        # Only cleanup ROS2 if it was initialized
+        if not VYRA_SLIM:
+            if 'entity' in locals():
+                logger.info('Shutting down ROS 2 node...')
+                if hasattr(entity, 'node') and entity.node is not None:
+                    # Ensure the node is destroyed properly
+                    logger.info('Destroying ROS 2 node...')
+                    entity.node.destroy_node()
+                else:
+                    logger.info('No ROS 2 node to destroy.')
 
-        if rclpy.ok():
-            logger.info('ROS 2 node destroyed.')
-            rclpy.shutdown()
+            if rclpy.ok():
+                logger.info('ROS 2 node destroyed.')
+                rclpy.shutdown()
+            else:
+                logger.info('ROS 2 was not running, nothing to destroy.')
         else:
-            logger.info('ROS 2 node was not running, nothing to destroy.')
+            logger.info('⏭️  Skipping ROS2 cleanup (SLIM mode)')
             
         await taskmanager.cancel_all()
 

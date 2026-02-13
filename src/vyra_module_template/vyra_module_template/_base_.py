@@ -10,16 +10,16 @@ from ament_index_python.packages import get_package_share_directory  # pyright: 
 from std_msgs.msg import String  # pyright: ignore[reportMissingImports]
 
 # msg
-from vyra_module_interfaces.msg import VBASEErrorFeed # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.msg import VBASEVolatileList # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.msg import VBASEStateFeed # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.msg import VBASENewsFeed # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.msg import VBASEUpdateParamEvent # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_template_interfaces.msg import VBASEErrorFeed # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_template_interfaces.msg import VBASEVolatileList # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_template_interfaces.msg import VBASEStateFeed # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_template_interfaces.msg import VBASENewsFeed # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_template_interfaces.msg import VBASEUpdateParamEvent # pyright: ignore[reportAttributeAccessIssue]
 
-from vyra_module_interfaces.msg import VBASEVolatileList # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.msg import VBASEVolatileSet # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.msg import VBASEVolatileHash # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_interfaces.msg import VBASEVolatileString # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_template_interfaces.msg import VBASEVolatileList # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_template_interfaces.msg import VBASEVolatileSet # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_template_interfaces.msg import VBASEVolatileHash # pyright: ignore[reportAttributeAccessIssue]
+from vyra_module_template_interfaces.msg import VBASEVolatileString # pyright: ignore[reportAttributeAccessIssue]
 # srv
 # add base services here
 # action

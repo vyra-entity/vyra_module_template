@@ -112,9 +112,9 @@ RUN if [ -d "storage/interfaces" ] && [ "$(ls -A storage/interfaces/*.proto 2>/d
 # Clean any existing build artifacts for fresh build (prevents package name conflicts)
 RUN rm -rf /workspace/install /workspace/build
 
-# Build ROS2 packages (skip vyra_module_interfaces template from base image)
+# Build ROS2 packages (skip vyra_module_template_interfaces template from base image)
 RUN source /opt/ros/kilted/setup.bash && \
-    colcon build --packages-skip vyra_module_interfaces --cmake-args -DCMAKE_BUILD_TYPE=Release
+    colcon build --packages-skip vyra_module_template_interfaces --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 # Extract MODULE_NAME from module_data.yaml if not provided
 RUN if [ -z "$MODULE_NAME" ] && [ -f ".module/module_data.yaml" ]; then \

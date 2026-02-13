@@ -1,11 +1,20 @@
 fastapi==0.115.0
 redis==5.0.1
+aiohttp==3.9.1
+dependency-injector==4.42.0
+pydantic-settings==2.1.0
+
 # --- Optional dependencies ---
 # If ENABLE_FRONTEND_WEBSERVER and ENABLE_BACKEND_WEBSERVER are set to true
 # in the .env file, the following packages are required:
-# uvicorn[standard]==0.30.6
+uvicorn[standard]==0.30.6
+requests==2.32.5
+httpx==0.24.1
 
-# --- Optional multi-protocol communication ---
+# Needed for ros2 hot-reload [activated via ENABLE_HOT_RELOAD in .env]
+watchdog>=3.0.0
+
+# --- Multi-protocol communication (optional) ---
 # MQTT protocol support
 paho-mqtt>=2.0.0
 
@@ -16,3 +25,6 @@ grpcio-tools>=1.60.0
 # Industrial protocols (Modbus, OPC UA)
 pymodbus>=3.6.0
 asyncua>=1.1.0
+
+# WebSocket support (already covered by aiohttp)
+# REST support (already covered by aiohttp)

@@ -453,10 +453,10 @@ def load_default_interfaces(interface_package_name, interface_package_path):
 
     vyra_base.extract_interfaces(interface_package_path)
     
-    # Fix resource marker file: remove old vyra_module_interfaces and create correct one
+    # Fix resource marker file: remove old vyra_module_template_interfaces and create correct one
     resource_dir = interface_package_path / "resource"
     if resource_dir.exists():
-        old_marker = resource_dir / "vyra_module_interfaces"
+        old_marker = resource_dir / "vyra_module_template_interfaces"
         if old_marker.exists():
             old_marker.unlink()
             print(f"✓ Removed old marker file: {old_marker}")
@@ -536,10 +536,10 @@ def update_dynamic_interfaces(
         # Clean up the temporary source directory
         shutil.rmtree(source_path)
     
-    # Fix resource marker file: remove old vyra_module_interfaces and create correct one
+    # Fix resource marker file: remove old vyra_module_template_interfaces and create correct one
     resource_dir = target_path / "resource"
     if resource_dir.exists():
-        old_marker = resource_dir / "vyra_module_interfaces"
+        old_marker = resource_dir / "vyra_module_template_interfaces"
         if old_marker.exists():
             old_marker.unlink()
             print(f"✓ Removed old marker file: {old_marker}")
