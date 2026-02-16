@@ -30,10 +30,31 @@ USER root
 
 WORKDIR /workspace
 
+# =============================================================================
+# Poetry Installation & Dependency Management (Cache-Optimized)
+# =============================================================================
+# Install Poetry for professional dependency management
+RUN pip install --no-cache-dir poetry --break-system-packages
+
+# Configure Poetry to NOT create virtualenvs (use system Python in container)
+RUN poetry config virtualenvs.create false
+
+# THE TRICK: Copy ONLY dependency files first (enables Docker layer caching)
+# If you only change your code, this layer will be CACHED
+COPY --chown=vyrauser:vyrauser pyproject.toml poetry.lock* ./
+
+# Install dependencies WITHOUT the project itself (--no-root)
+# This layer is cached unless pyproject.toml or poetry.lock change
+RUN poetry install --only main -E slim --no-interaction --no-ansi --no-root || \
+    echo "⚠️  Poetry install failed, continuing with fallback pip installation"
+
+# =============================================================================
+# Module Source Code & Configuration
+# =============================================================================
 # Clean workspace from base image to prevent stale packages
 RUN rm -rf /workspace/src /workspace/build /workspace/install
 
-# Copy module sources with correct ownership and permissions
+# NOW copy the actual module sources (changes here don't invalidate dependency cache)
 COPY --chown=vyrauser:vyrauser src/ ./src/
 COPY --chown=vyrauser:vyrauser config/ ./config/
 COPY --chown=vyrauser:vyrauser tools/ ./tools/
@@ -43,7 +64,11 @@ COPY --chown=vyrauser:vyrauser frontend/ ./frontend/
 COPY --chown=vyrauser:vyrauser wheels/ ./wheels/
 COPY --chown=vyrauser:vyrauser storage/ ./storage/
 
-# Install module-specific Python dependencies
+# Install the project itself (now WITH all the heavy dependencies already cached)
+RUN poetry install --only main -E slim --no-interaction --no-ansi || \
+    echo "⚠️  Poetry project install failed, using wheel installation as fallback"
+
+# Fallback: Install module-specific Python dependencies via pip (legacy support)
 RUN if [ -f ".module/requirements.txt" ]; then \
         pip install --no-cache-dir -r .module/requirements.txt --break-system-packages; \
     fi
@@ -115,6 +140,14 @@ RUN rm -rf /workspace/install /workspace/build
 # Build ROS2 packages (skip vyra_module_template_interfaces template from base image)
 RUN source /opt/ros/kilted/setup.bash && \
     colcon build --packages-skip vyra_module_template_interfaces --cmake-args -DCMAKE_BUILD_TYPE=Release
+
+# Make install artifacts accessible to runtime stage (will be copied in runtime stage)
+RUN chown -R vyrauser:vyrauser /workspace/install
+
+# Backup install/ directory for volume mount scenarios
+# When workspace is mounted as volume, install/ from image is hidden
+RUN cp -r /workspace/install /opt/vyra/install_backup && \
+    chown -R vyrauser:vyrauser /opt/vyra/install_backup
 
 # Extract MODULE_NAME from module_data.yaml if not provided
 RUN if [ -z "$MODULE_NAME" ] && [ -f ".module/module_data.yaml" ]; then \
@@ -222,10 +255,14 @@ COPY --from=builder /tmp/module_interfaces_staging/ /tmp/module_interfaces_stagi
 
 # Backup install/ directory for volume mount scenarios
 # When workspace is mounted as volume, install/ from image is hidden
-RUN cp -r ./install /opt/vyra/install_backup
+COPY --from=builder --chown=vyrauser:vyrauser /opt/vyra/install_backup /opt/vyra/install_backup
 
 # Create runtime directories
 RUN mkdir -p log/ros2 log/nginx log/uvicorn log/vyra storage
+
+# Make logs and storage accessable by vyrauser (and writable by all users for ROS2 logging)
+RUN chown -R vyrauser:vyrauser /workspace/log /workspace/storage
+
 
 # Install Python dependencies for runtime (uvicorn, fastapi, etc.)
 RUN if [ -f ".module/requirements.txt" ]; then \

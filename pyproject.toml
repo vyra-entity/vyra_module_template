@@ -1,6 +1,6 @@
 
 [tool.vyra]
-module_name = "vyra_module_template"
+module_name = "v2_modulemanager"
 module_template = "basic"
 module_description = "This template could be used to create a vyra module with basic functionality."
 module_links = [
@@ -8,25 +8,70 @@ module_links = [
 ]
 
 [tool.poetry]
-name = "vyra-module-template"
+name = "vyra_module_template"
 version = "0.1.0"
-description = ""
+description = "VYRA Module Template - Supports both ROS2 and SLIM (Zenoh-based) modes"
 authors = ["HolgDer <vyra.0a1@gmail.com>"]
 license = "LICENSE"
 readme = "README.md"
 requires-python = ">=3.10, <4"
+packages = [
+    { include = "vyra_module_template", from = "src/vyra_module_template" }
+]
+
+[tool.poetry.scripts]
+# Entry points for both modes
+vyra-module-template = "vyra_module_template.main:main"
+vyra-module-template-slim = "vyra_module_template.main:main"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4"
 setuptools = ">=65.5.1"
+
+# Core dependencies (both modes)
+structlog = "^24.1.0"
+python-json-logger = "^2.0.7"
+colorlog = "^6.8.0"
+psutil = "^5.9.0"
+pydantic = "^2.5.0"
+pyyaml = "^6.0"
+
+# Web backend (both modes)
+fastapi = "^0.115.0"
+uvicorn = {extras = ["standard"], version = "^0.30.0"}
+aiohttp = "^3.9.0"
 flask = "^3.0.0"
 gunicorn = "^23.0.0"
-psutil = "^5.9.0"
+
+# SLIM mode: Zenoh communication (optional, installed when VYRA_SLIM=true)
+eclipse-zenoh = {version = "^0.11.0", optional = true}
+zenoh-python = {version = "^0.11.0", optional = true}
+
+# ROS2 mode: ROS2 dependencies (optional, installed when VYRA_SLIM=false)
+# Note: ROS2 packages typically installed via apt, not pip
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.0.0"
-black = "^23.0.0"
-flake8 = "^6.0.0"
+# Testing
+pytest = "^8.0.0"
+pytest-asyncio = "^0.23.0"
+pytest-cov = "^4.1.0"
+pytest-mock = "^3.12.0"
+pytest-timeout = "^2.2.0"
+
+# Code quality
+black = "^24.0.0"
+ruff = "^0.2.0"
+mypy = "^1.8.0"
+flake8 = "^7.0.0"
+isort = "^5.13.0"
+
+# Development tools
+ipython = "^8.20.0"
+ipdb = "^0.13.13"
+
+[tool.poetry.extras]
+slim = ["eclipse-zenoh", "zenoh-python"]
+all = ["eclipse-zenoh", "zenoh-python"]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib
 import inspect
+import logging
 
 from pathlib import Path
 
@@ -10,9 +11,10 @@ from types import ModuleType
 from attr import dataclass
 from flask import config
 from vyra_base.helper.file_reader import FileReader
-from vyra_base.helper.logger import Logger
 from typing import Optional
-    
+
+logger = logging.getLogger(__name__)
+
 
 class PluginBase(ABC):
     @abstractmethod
@@ -54,7 +56,7 @@ class PluginRegistry:
 
     def register_plugin(self, config: dict, plugin_path) -> None:
         if config["name"] in self._plugins:
-            Logger.warn(f"[PluginRegistry] Plugin '{config['name']}' is already registered, skipping.")
+            logger.warning(f"[PluginRegistry] Plugin '{config['name']}' is already registered, skipping.")
             return
 
         try:
@@ -70,7 +72,7 @@ class PluginRegistry:
 
             )
         except Exception as e:
-            Logger.error(f"[PluginRegistry] Error creating plugin config for '{config['name']}': {e}")
+            logger.error(f"[PluginRegistry] Error creating plugin config for '{config['name']}': {e}")
             return
         
         self.import_plugin(plugin)
@@ -82,9 +84,9 @@ class PluginRegistry:
             module_name = f"{self._package_name}.plugin.{plugin.name}"
             module = importlib.import_module(module_name)
             plugin.module = module
-            Logger.info(f"[PluginRegistry] Plugin '{plugin.name}' imported successfully.")
+            logger.info(f"[PluginRegistry] Plugin '{plugin.name}' imported successfully.")
         except ImportError as e:
-            Logger.error(f"[PluginRegistry] Error importing plugin '{plugin.name}': {e}")
+            logger.error(f"[PluginRegistry] Error importing plugin '{plugin.name}': {e}")
             raise e
 
     def get(self, name):
@@ -92,7 +94,7 @@ class PluginRegistry:
 
     def unregister(self, plugin: PLUGIN_CONFIG):
         plugin.module = None  # Clear the module reference
-        Logger.info(f"[PluginRegistry] Unregistering plugin '{plugin.name}'")
+        logger.info(f"[PluginRegistry] Unregistering plugin '{plugin.name}'")
         self._plugins.pop(plugin.name, None)
 
     async def load_plugins(self):
@@ -102,7 +104,7 @@ class PluginRegistry:
 
         for subdir in self.plugin_dir.iterdir():
             if subdir.name.startswith('_'):
-                Logger.info(f"[PluginRegistry] Skipping hidden plugin-directory: {subdir.name}")
+                logger.info(f"[PluginRegistry] Skipping hidden plugin-directory: {subdir.name}")
             
             if subdir.is_dir():
                 plugin_yaml = subdir / "plugin.yaml"
@@ -110,10 +112,10 @@ class PluginRegistry:
                     try:
                         config: dict = await FileReader.open_yaml_file(plugin_yaml)
                         self.register_plugin(config, plugin_path=subdir)
-                        Logger.info(f"[PluginRegistry] Plugin '{config['name']}' successfully loaded.")
+                        logger.info(f"[PluginRegistry] Plugin '{config['name']}' successfully loaded.")
                     except Exception as e:
-                        Logger.error(f"[PluginRegistry] Error loading '{plugin_yaml}': {e}")
+                        logger.error(f"[PluginRegistry] Error loading '{plugin_yaml}': {e}")
                 else:
-                    Logger.warn(f"[PluginRegistry] '{plugin_yaml}' not found – Plugin '{subdir.name}' will be skipped.")
+                    logger.warning(f"[PluginRegistry] '{plugin_yaml}' not found – Plugin '{subdir.name}' will be skipped.")
             else:
-                Logger.warn(f"[PluginRegistry] '{subdir.name}' is not a directory, skipping.")
+                logger.warning(f"[PluginRegistry] '{subdir.name}' is not a directory, skipping.")
