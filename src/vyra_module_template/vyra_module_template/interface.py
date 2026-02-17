@@ -27,7 +27,7 @@ async def auto_register_callable_interfaces(
     entity: VyraEntity, 
     callback_list: list[Callable]=[], 
     callback_parent: object=None,
-    speaker_list: list=[]) -> None:
+    publisher_list: list=[]) -> None:
     """Automatically registers callable interfaces for the entity. The list of callbacks must
     contain all functions that are defined in the interface metadata.
     Args:
@@ -177,7 +177,7 @@ def _load_metadata(package_name: str, resource_folder: Path) -> list[dict[str, A
             metadata.extend(json.load(f))
     return metadata
 
-def _register_speaker_interface(
+def _register_publisher_interface(
         metadata: dict) -> FunctionConfigEntry:
     displaystyle = FunctionConfigDisplaystyle(
         visible=metadata.get('displaystyle', {}).get('visible', False),
