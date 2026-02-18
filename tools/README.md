@@ -369,7 +369,7 @@ Benennt das Modul komplett um - alle Referenzen, Verzeichnisse und Dateien.
 # Aus module_data.yaml lesen
 ./tools/rename_module.sh
 
-# Mit altem Namen (falls nicht vyra_module_template)
+# Mit altem Namen (falls nicht {{ module_name }})
 ./tools/rename_module.sh my_new_name --old_name=old_module_name
 \`\`\`
 
@@ -391,7 +391,7 @@ Benennt das Modul komplett um - alle Referenzen, Verzeichnisse und Dateien.
 **Workflow:**
 \`\`\`bash
 # 1. Template klonen
-git clone <repo>/vyra_module_template my_new_module
+git clone <repo>/{{ module_name }} my_new_module
 
 # 2. In Modul-Verzeichnis wechseln
 cd my_new_module
@@ -400,7 +400,7 @@ cd my_new_module
 ./tools/rename_module.sh my_new_module
 
 # 4. Überprüfen
-grep -r "vyra_module_template" . --exclude-dir=.git
+grep -r "{{ module_name }}" . --exclude-dir=.git
 # Sollte keine Treffer mehr geben (außer in dieser README)
 
 # 5. Container bauen und testen
@@ -409,7 +409,7 @@ docker compose up -d
 \`\`\`
 
 **Ideal beim:**
-- Klonen von vyra_module_template
+- Klonen von {{ module_name }}
 - Erstellen neuer Module aus Template
 - Umbenennen bestehender Module
 

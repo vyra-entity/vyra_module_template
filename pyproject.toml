@@ -1,6 +1,6 @@
 
 [tool.vyra]
-module_name = "v2_modulemanager"
+module_name = "{{ module_name }}"
 module_template = "basic"
 module_description = "This template could be used to create a vyra module with basic functionality."
 module_links = [
@@ -8,7 +8,7 @@ module_links = [
 ]
 
 [tool.poetry]
-name = "vyra_module_template"
+name = "{{ module_name }}"
 version = "0.1.0"
 description = "VYRA Module Template - Supports both ROS2 and SLIM (Zenoh-based) modes"
 authors = ["HolgDer <vyra.0a1@gmail.com>"]
@@ -16,13 +16,13 @@ license = "LICENSE"
 readme = "README.md"
 requires-python = ">=3.10, <4"
 packages = [
-    { include = "vyra_module_template", from = "src/vyra_module_template" }
+    { include = "{{ module_name }}", from = "src/{{ module_name }}" }
 ]
 
 [tool.poetry.scripts]
 # Entry points for both modes
-vyra-module-template = "vyra_module_template.main:main"
-vyra-module-template-slim = "vyra_module_template.main:main"
+{{ module_name | replace("_", "-") }} = "{{ module_name }}.main:main"
+{{ module_name | replace("_", "-") }}-slim = "{{ module_name }}.main:main"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4"

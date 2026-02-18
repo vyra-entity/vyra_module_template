@@ -87,11 +87,11 @@ build: ## Build distribution packages
 
 # Run targets
 run: ## Run module in ROS2 mode
-	@echo "$(BLUE)Starting vyra_module_template (ROS2 mode)...$(NC)"
+	@echo "$(BLUE)Starting {{ module_name }} (ROS2 mode)...$(NC)"
 	VYRA_SLIM=false poetry run vyra-module-template
 
 run-slim: ## Run module in SLIM mode (Zenoh)
-	@echo "$(BLUE)Starting vyra_module_template (SLIM mode with Zenoh)...$(NC)"
+	@echo "$(BLUE)Starting {{ module_name }} (SLIM mode with Zenoh)...$(NC)"
 	VYRA_SLIM=true poetry run vyra-module-template-slim
 
 # Clean targets

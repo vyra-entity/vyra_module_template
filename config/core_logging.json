@@ -43,7 +43,7 @@
             "class": "logging.handlers.RotatingFileHandler",
             "level": "DEBUG",
             "formatter": "json",
-            "filename": "/workspace/log/core/application.log",
+            "filename": "/workspace/log/core/application.jsonl",
             "maxBytes": 10485760,
             "backupCount": 10,
             "encoding": "utf8"
@@ -52,14 +52,14 @@
             "class": "logging.handlers.RotatingFileHandler",
             "level": "ERROR",
             "formatter": "json",
-            "filename": "/workspace/log/core/errors.log",
+            "filename": "/workspace/log/core/errors.jsonl",
             "maxBytes": 10485760,
             "backupCount": 10,
             "encoding": "utf8"
         }
     },
     "loggers": {
-        "v2_modulemanager": {
+        "{{ module_name }}": {
             "level": "DEBUG",
             "handlers": ["console_stdout", "console_stderr", "rotating_file", "error_file"],
             "propagate": false

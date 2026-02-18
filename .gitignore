@@ -38,3 +38,5 @@ temp/*
 !.env.example
 *.pyc
 *.sqlite
+# Copier answers file
+.copier-answers.yml

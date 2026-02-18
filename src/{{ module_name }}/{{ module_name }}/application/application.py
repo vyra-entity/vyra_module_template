@@ -1,7 +1,7 @@
 import asyncio
 import datetime
 import json
-import logging
+from ..logging_config import get_logger, log_exception
 from typing import Any
 import yaml
 
@@ -16,9 +16,9 @@ from vyra_base.core.entity import VyraEntity
 from vyra_base.com import remote_service
 
 from ..taskmanager import TaskManager
-from ..interface import auto_register_callable_interfaces
+from ..interface import auto_register_interfaces
 
-logger: logging.Logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class Component(OperationalStateMachine):
@@ -65,10 +65,10 @@ class Component(OperationalStateMachine):
         Setup @remote_service interfaces in VyraEntity.
         Automatically registers all methods decorated with @remote_service.
         """
-        await auto_register_callable_interfaces(self.entity, callback_parent=self)
+        await auto_register_interfaces(self.entity, callback_parent=self)
     
     @remote_service
-    def initialize(self, request: Any=None, response: Any=None) -> bool:
+    async def initialize(self, request: Any=None, response: Any=None) -> bool:
         """
         Initialize the VYRA Module Manager components.
         
@@ -98,7 +98,7 @@ class Component(OperationalStateMachine):
             return False
     
     @remote_service
-    def pause(self, request: Any=None, response: Any=None) -> bool:
+    async def pause(self, request: Any=None, response: Any=None) -> bool:
         """
         Pause ongoing operations.
         
@@ -117,7 +117,7 @@ class Component(OperationalStateMachine):
         return True  # Placeholder for actual implementation
     
     @remote_service
-    def resume(self, request: Any=None, response: Any=None) -> bool:
+    async def resume(self, request: Any=None, response: Any=None) -> bool:
         """
         Resume from paused state.
         
@@ -136,7 +136,7 @@ class Component(OperationalStateMachine):
         return True
     
     @remote_service
-    def stop(self, request: Any=None, response: Any=None) -> bool:
+    async def stop(self, request: Any=None, response: Any=None) -> bool:
         """
         Stop component operations cleanly.
         
@@ -157,7 +157,7 @@ class Component(OperationalStateMachine):
         return True
     
     @remote_service
-    def reset(self, request: Any=None, response: Any=None) -> bool:
+    async def reset(self, request: Any=None, response: Any=None) -> bool:
         """
         Reset component to initial state.
         

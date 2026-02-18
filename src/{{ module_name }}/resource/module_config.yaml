@@ -1,4 +1,4 @@
-package_name: vyra_module_template
+package_name: {{ module_name }}
 
 module_access:
   level_4:

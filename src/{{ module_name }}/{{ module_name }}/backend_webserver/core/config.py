@@ -12,11 +12,11 @@ class Settings(BaseSettings):
     """Application settings"""
     
     # Module Info
-    module_name: str = os.getenv('MODULE_NAME', 'vyra_module_template')
+    module_name: str = os.getenv('MODULE_NAME', '{{ module_name }}')
     module_version: str = "0.1.0"
     
     # API Settings
-    api_prefix: str = f"/api/{os.getenv('MODULE_NAME', 'vyra_module_template')}"
+    api_prefix: str = f"/api/{os.getenv('MODULE_NAME', '{{ module_name }}')}"
     
     # Development
     debug: bool = os.getenv('VYRA_DEV_MODE', 'false').lower() == 'true'

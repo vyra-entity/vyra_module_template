@@ -452,7 +452,7 @@ def main():
     
     # Get configuration from environment or arguments
     workspace_path = os.getenv("WORKSPACE_PATH", "/workspace")
-    package_name = os.getenv("VYRA_PACKAGE_NAME", "vyra_module_template")
+    package_name = os.getenv("VYRA_PACKAGE_NAME", "{{ module_name }}")
     node_name = os.getenv("VYRA_NODE_NAME", "core")
     watch_path = os.getenv("VYRA_WATCH_PATH", f"{workspace_path}/src")
     supervisord_program = os.getenv("VYRA_SUPERVISORD_PROGRAM", "core")

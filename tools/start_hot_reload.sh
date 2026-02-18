@@ -27,7 +27,7 @@ else
 fi
 
 # Get package and node name
-PACKAGE_NAME=${1:-vyra_module_template}
+PACKAGE_NAME=${1:-{{ module_name }}}
 NODE_NAME=${2:-core}
 SUPERVISORD_PROGRAM=${3:-ros2_core}
 

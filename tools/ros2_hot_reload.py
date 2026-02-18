@@ -447,7 +447,7 @@ def main():
     
     # Get configuration from environment or arguments
     workspace_path = os.getenv("WORKSPACE_PATH", "/workspace")
-    package_name = os.getenv("ROS2_PACKAGE_NAME", "vyra_module_template")
+    package_name = os.getenv("ROS2_PACKAGE_NAME", "{{ module_name }}")
     node_name = os.getenv("ROS2_NODE_NAME", "core")
     watch_path = os.getenv("ROS2_WATCH_PATH", f"{workspace_path}/src")
     supervisord_program = os.getenv("ROS2_SUPERVISORD_PROGRAM", "ros2_core")  # Changed from ros2_node to ros2_main

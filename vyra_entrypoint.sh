@@ -280,6 +280,13 @@ echo "===================================="
 
 # =============================================================================
 # NFS Interface Management
+# New NFS layout per module:
+#   NFS_MODULE_DIR/
+#     config/        ← JSON metadata files (vyra_*_meta.json)
+#     msg/           ← .msg files + _gen/ (pb2 generated files)
+#     srv/           ← .srv files + _gen/ (pb2 generated files)
+#     action/        ← .action files
+#     ros2/          ← colcon install artifacts (setup.bash, share/, ...)
 # =============================================================================
 echo "=== NFS INTERFACE MANAGEMENT ==="
 
@@ -289,10 +296,8 @@ if [ -f "$MODULE_DATA_FILE" ]; then
     INSTANCE_ID=$(grep '^uuid:' "$MODULE_DATA_FILE" | awk '{print $2}')
     echo "ℹ️  Module: $MODULE_NAME, Instance: $INSTANCE_ID (from module_data.yaml)"
 else
-    # Fallback: Extract instance_id from container name (format: <module_name>_<instance_id>)
-    INSTANCE_ID="${HOSTNAME#${MODULE_NAME}_}"  # Remove module name prefix
+    INSTANCE_ID="${HOSTNAME#${MODULE_NAME}_}"
     if [ "$INSTANCE_ID" = "$HOSTNAME" ]; then
-        # Fallback: If HOSTNAME doesn't start with MODULE_NAME, use full HOSTNAME
         INSTANCE_ID="$HOSTNAME"
     fi
     echo "⚠️  Warning: module_data.yaml not found, Instance: $INSTANCE_ID (from HOSTNAME)"
@@ -300,136 +305,196 @@ fi
 
 NFS_VOLUME_PATH="${NFS_VOLUME_PATH:-/nfs/vyra_interfaces}"
 INTERFACE_DIR="${MODULE_NAME}_${INSTANCE_ID}_interfaces"
+# Source of colcon-built artifacts (ROS2 install tree)
 INTERFACE_SOURCE="/workspace/install/${MODULE_NAME}_interfaces"
 INTERFACE_STAGING="/tmp/module_interfaces_staging/${MODULE_NAME}_interfaces"
+# Source of raw interface definition files (src tree)
+INTERFACE_SRC_DIR="/workspace/src/${MODULE_NAME}_interfaces"
 
-# Check if NFS volume is mounted
 if [ -d "$NFS_VOLUME_PATH" ]; then
     echo "✅ NFS volume found at $NFS_VOLUME_PATH"
-    
-    # Copy module's own interfaces to NFS (read-write)
-    # First check if interfaces exist in staging (from docker image build), otherwise use install directory
+
+    # Restore from staging if install dir is missing (image build artefact)
     if [ ! -d "$INTERFACE_SOURCE" ] && [ -d "$INTERFACE_STAGING" ]; then
         echo "📦 Copying interfaces from staging to install..."
         mkdir -p "/workspace/install"
         cp -r "$INTERFACE_STAGING" "$INTERFACE_SOURCE"
         echo "✅ Interfaces copied from staging to install"
     fi
-    
-    # We need to create a complete ROS2 install structure with setup.bash in root
-    if [ -d "$INTERFACE_SOURCE" ]; then
-        NFS_MODULE_DIR="$NFS_VOLUME_PATH/$INTERFACE_DIR"
-        echo "📦 Copying interfaces to NFS as $INTERFACE_DIR..."
-        mkdir -p "$NFS_MODULE_DIR"
-        
-        # Check if interfaces need to be copied or updated
-        FORCE_UPDATE=false
-        
-        # Check if setup.bash exists (first-time setup)
-        if [ ! -f "$NFS_MODULE_DIR/setup.bash" ]; then
-            echo "ℹ️  First-time setup: Copying interfaces to NFS..."
-            FORCE_UPDATE=true
-        else
-            # Check if config files differ (interface updates from vyra_base)
-            # Compare checksums of critical config files
-            for config_file in vyra_core_meta.json vyra_com_meta.json vyra_security_meta.json; do
-                SOURCE_CONFIG="$INTERFACE_SOURCE/share/${MODULE_NAME}_interfaces/config/$config_file"
-                NFS_CONFIG="$NFS_MODULE_DIR/share/${MODULE_NAME}_interfaces/config/$config_file"
-                
-                if [ -f "$SOURCE_CONFIG" ] && [ -f "$NFS_CONFIG" ]; then
-                    SOURCE_MD5=$(md5sum "$SOURCE_CONFIG" | awk '{print $1}')
-                    NFS_MD5=$(md5sum "$NFS_CONFIG" | awk '{print $1}')
-                    
-                    if [ "$SOURCE_MD5" != "$NFS_MD5" ]; then
-                        echo "⚠️  Config update detected: $config_file differs"
-                        echo "   Source:  $SOURCE_MD5"
-                        echo "   NFS:     $NFS_MD5"
-                        FORCE_UPDATE=true
-                        break
-                    fi
+
+    NFS_MODULE_DIR="$NFS_VOLUME_PATH/$INTERFACE_DIR"
+    NFS_ROS_DIR="$NFS_MODULE_DIR/ros2"
+    NFS_CONFIG_DIR="$NFS_MODULE_DIR/config"
+    NFS_MSG_DIR="$NFS_MODULE_DIR/msg"
+    NFS_SRV_DIR="$NFS_MODULE_DIR/srv"
+    NFS_ACTION_DIR="$NFS_MODULE_DIR/action"
+
+    mkdir -p "$NFS_ROS_DIR" "$NFS_CONFIG_DIR" "$NFS_MSG_DIR" "$NFS_SRV_DIR" "$NFS_ACTION_DIR"
+
+    # ------------------------------------------------------------------
+    # Determine whether an update is needed (checksum on config files)
+    # ------------------------------------------------------------------
+    FORCE_UPDATE=false
+    if [ ! -f "$NFS_ROS_DIR/setup.bash" ]; then
+        echo "ℹ️  First-time setup: will copy all interfaces to NFS..."
+        FORCE_UPDATE=true
+    else
+        for config_file in vyra_core_meta.json vyra_com_meta.json vyra_security_meta.json; do
+            SOURCE_CONFIG="$INTERFACE_SOURCE/share/${MODULE_NAME}_interfaces/config/$config_file"
+            NFS_CONFIG_FILE="$NFS_CONFIG_DIR/$config_file"
+            if [ -f "$SOURCE_CONFIG" ] && [ -f "$NFS_CONFIG_FILE" ]; then
+                SOURCE_MD5=$(md5sum "$SOURCE_CONFIG" | awk '{print $1}')
+                NFS_MD5=$(md5sum "$NFS_CONFIG_FILE" | awk '{print $1}')
+                if [ "$SOURCE_MD5" != "$NFS_MD5" ]; then
+                    echo "⚠️  Config update detected: $config_file differs — forcing NFS update"
+                    FORCE_UPDATE=true
+                    break
                 fi
-            done
-            
-            if [ "$FORCE_UPDATE" = false ]; then
-                echo "✅ NFS interfaces up-to-date (checksums match)"
             fi
-        fi
-        
-        # Copy/update interfaces if needed
-        if [ "$FORCE_UPDATE" = true ]; then
-            echo "🔄 Updating NFS interfaces..."
-            # Copy the package artifacts (include, lib, share)
+        done
+        [ "$FORCE_UPDATE" = false ] && echo "✅ NFS interfaces up-to-date (checksums match)"
+    fi
+
+    # ------------------------------------------------------------------
+    # Push interfaces to NFS
+    # ------------------------------------------------------------------
+    if [ "$FORCE_UPDATE" = true ]; then
+        echo "🔄 Updating NFS interfaces..."
+
+        # 1. ROS2 colcon install tree → ros2/
+        if [ -d "$INTERFACE_SOURCE" ]; then
             if command -v rsync >/dev/null 2>&1; then
-                rsync -av --delete "$INTERFACE_SOURCE/" "$NFS_MODULE_DIR/" 2>/dev/null || cp -r "$INTERFACE_SOURCE"/* "$NFS_MODULE_DIR"/
+                rsync -a --delete "$INTERFACE_SOURCE/" "$NFS_ROS_DIR/" 2>/dev/null \
+                    || cp -r "$INTERFACE_SOURCE"/* "$NFS_ROS_DIR"/
             else
-                cp -r "$INTERFACE_SOURCE"/* "$NFS_MODULE_DIR"/
+                cp -r "$INTERFACE_SOURCE"/* "$NFS_ROS_DIR"/
             fi
-            
-            # Copy minimal ROS2 setup infrastructure from workspace install
-            # We need: setup.bash, local_setup.bash, _local_setup_util_sh.py
-            if [ -f "/workspace/install/setup.bash" ]; then
-                cp /workspace/install/setup.bash "$NFS_MODULE_DIR/"
-                cp /workspace/install/local_setup.bash "$NFS_MODULE_DIR/" 2>/dev/null || true
-                cp /workspace/install/_local_setup_util_sh.py "$NFS_MODULE_DIR/" 2>/dev/null || true
-                cp /workspace/install/.colcon_install_layout "$NFS_MODULE_DIR/" 2>/dev/null || true
-                
-                # Modify setup.bash to only source this overlay's packages
-                # Replace the prefix chain logic with simple local setup
-                cat > "$NFS_MODULE_DIR/setup.bash" <<'EOF'
+
+            # Write a self-contained setup.bash that points to this ros2/ overlay
+            cat > "$NFS_ROS_DIR/setup.bash" <<'SETUPEOF'
 #!/usr/bin/env bash
-# Simplified setup.bash for NFS interface sharing
+# Auto-generated by vyra_entrypoint.sh — do not edit manually
 COLCON_CURRENT_PREFIX="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
 export COLCON_CURRENT_PREFIX
-
-# Add this prefix to AMENT_PREFIX_PATH
 if [ -z "$AMENT_PREFIX_PATH" ]; then
     export AMENT_PREFIX_PATH="$COLCON_CURRENT_PREFIX"
-else
-    # Prepend if not already present
-    if [[ ":$AMENT_PREFIX_PATH:" != *":$COLCON_CURRENT_PREFIX:"* ]]; then
-        export AMENT_PREFIX_PATH="$COLCON_CURRENT_PREFIX:$AMENT_PREFIX_PATH"
-    fi
+elif [[ ":$AMENT_PREFIX_PATH:" != *":$COLCON_CURRENT_PREFIX:"* ]]; then
+    export AMENT_PREFIX_PATH="$COLCON_CURRENT_PREFIX:$AMENT_PREFIX_PATH"
 fi
-
-# Source local setup if available
 if [ -f "$COLCON_CURRENT_PREFIX/local_setup.bash" ]; then
     . "$COLCON_CURRENT_PREFIX/local_setup.bash"
 fi
-EOF
-                chmod +x "$NFS_MODULE_DIR/setup.bash"
+SETUPEOF
+            chmod +x "$NFS_ROS_DIR/setup.bash"
+            echo "✅ ros2/ install tree deployed"
+        else
+            echo "⚠️  No install source at $INTERFACE_SOURCE — skipping ros2/ copy"
+        fi
+
+        # 2. JSON config files → config/
+        CONFIG_SRC="$INTERFACE_SOURCE/share/${MODULE_NAME}_interfaces/config"
+        if [ -d "$CONFIG_SRC" ]; then
+            if command -v rsync >/dev/null 2>&1; then
+                rsync -a --delete "$CONFIG_SRC/" "$NFS_CONFIG_DIR/" 2>/dev/null \
+                    || cp -r "$CONFIG_SRC"/* "$NFS_CONFIG_DIR"/
+            else
+                cp -r "$CONFIG_SRC"/* "$NFS_CONFIG_DIR"/
             fi
-            
-            echo "✅ Interfaces updated on NFS successfully"
+            echo "✅ config/ deployed"
         fi
-        
-        if [ ! -f "$NFS_MODULE_DIR/setup.bash" ]; then
-            echo "❌ Error: setup.bash not found after interface copy"
+
+        # 3. Raw interface definitions (.msg / .srv / .action + _gen/) → msg/ srv/ action/
+        if [ -d "$INTERFACE_SRC_DIR" ]; then
+            # msg/
+            if [ -d "$INTERFACE_SRC_DIR/msg" ]; then
+                if command -v rsync >/dev/null 2>&1; then
+                    rsync -a --delete "$INTERFACE_SRC_DIR/msg/" "$NFS_MSG_DIR/" 2>/dev/null \
+                        || cp -r "$INTERFACE_SRC_DIR/msg"/. "$NFS_MSG_DIR"/
+                else
+                    cp -r "$INTERFACE_SRC_DIR/msg"/. "$NFS_MSG_DIR"/
+                fi
+                echo "✅ msg/ deployed (incl. _gen/)"
+            fi
+            # srv/
+            if [ -d "$INTERFACE_SRC_DIR/srv" ]; then
+                if command -v rsync >/dev/null 2>&1; then
+                    rsync -a --delete "$INTERFACE_SRC_DIR/srv/" "$NFS_SRV_DIR/" 2>/dev/null \
+                        || cp -r "$INTERFACE_SRC_DIR/srv"/. "$NFS_SRV_DIR"/
+                else
+                    cp -r "$INTERFACE_SRC_DIR/srv"/. "$NFS_SRV_DIR"/
+                fi
+                echo "✅ srv/ deployed (incl. _gen/)"
+            fi
+            # action/
+            if [ -d "$INTERFACE_SRC_DIR/action" ]; then
+                if command -v rsync >/dev/null 2>&1; then
+                    rsync -a --delete "$INTERFACE_SRC_DIR/action/" "$NFS_ACTION_DIR/" 2>/dev/null \
+                        || cp -r "$INTERFACE_SRC_DIR/action"/. "$NFS_ACTION_DIR"/
+                else
+                    cp -r "$INTERFACE_SRC_DIR/action"/. "$NFS_ACTION_DIR"/
+                fi
+                echo "✅ action/ deployed"
+            fi
+        else
+            echo "ℹ️  No src interface definitions at $INTERFACE_SRC_DIR (optional)"
         fi
-    else
-        echo "⚠️  No interface source found at $INTERFACE_SOURCE"
+
+        echo "✅ NFS interfaces fully updated at $NFS_MODULE_DIR"
     fi
-    
-    # Source all interfaces from NFS (read-only for other modules)
+
+    # ------------------------------------------------------------------
+    # Source ROS2 overlays from all modules on NFS
+    # ------------------------------------------------------------------
     echo "🔗 Sourcing ROS2 interfaces from NFS..."
     INTERFACES_SOURCED=0
     for interface_dir in "$NFS_VOLUME_PATH"/*_interfaces; do
-        if [ -d "$interface_dir" ] && [ -f "$interface_dir/setup.bash" ]; then
+        if [ -d "$interface_dir/ros2" ] && [ -f "$interface_dir/ros2/setup.bash" ]; then
             interface_name=$(basename "$interface_dir")
-            echo "   Sourcing $interface_name..."
-            source "$interface_dir/setup.bash" || echo "⚠️  Failed to source $interface_name"
+            echo "   Sourcing $interface_name/ros2..."
+            source "$interface_dir/ros2/setup.bash" || echo "⚠️  Failed to source $interface_name"
             INTERFACES_SOURCED=$((INTERFACES_SOURCED + 1))
         fi
     done
-    
-    if [ $INTERFACES_SOURCED -gt 0 ]; then
-        echo "✅ Sourced $INTERFACES_SOURCED interface packages from NFS"
-    else
-        echo "ℹ️  No interface packages found in NFS (first module?)"
-    fi
+
+    [ $INTERFACES_SOURCED -gt 0 ] \
+        && echo "✅ Sourced $INTERFACES_SOURCED interface package(s) from NFS" \
+        || echo "ℹ️  No interface packages found in NFS (first module?)"
+
+    # ------------------------------------------------------------------
+    # Add _gen/ (protobuf) dirs from NFS srv/ and msg/ to PYTHONPATH
+    # ------------------------------------------------------------------
+    echo "🔗 Loading Protobuf _gen modules from NFS..."
+    PROTO_LOADED=0
+    for nfs_iface_dir in "$NFS_VOLUME_PATH"/*_interfaces; do
+        for sub in msg srv; do
+            gen_dir="$nfs_iface_dir/$sub/_gen"
+            if [ -d "$gen_dir" ]; then
+                # Add the parent (msg/ or srv/) so imports like `from _gen import X_pb2` work,
+                # and also the _gen dir itself for direct imports.
+                export PYTHONPATH="$nfs_iface_dir/$sub:$gen_dir:$PYTHONPATH"
+                PROTO_LOADED=$((PROTO_LOADED + 1))
+            fi
+        done
+    done
+
+    [ $PROTO_LOADED -gt 0 ] \
+        && echo "✅ Added $PROTO_LOADED _gen Protobuf path(s) to PYTHONPATH" \
+        || echo "ℹ️  No _gen Protobuf directories found in NFS"
+
 else
     echo "⚠️  NFS volume not found at $NFS_VOLUME_PATH"
     echo "   Modules will only see their own interfaces"
+
+    # Fallback: add local src _gen dirs to PYTHONPATH
+    for sub in msg srv; do
+        local_gen="/workspace/src/${MODULE_NAME}_interfaces/$sub/_gen"
+        if [ -d "$local_gen" ]; then
+            export PYTHONPATH="/workspace/src/${MODULE_NAME}_interfaces/$sub:$local_gen:$PYTHONPATH"
+            echo "✅ Added local $sub/_gen to PYTHONPATH"
+        fi
+    done
 fi
+
 
 # Debug: Show available packages
 echo "=== AVAILABLE PACKAGES ==="

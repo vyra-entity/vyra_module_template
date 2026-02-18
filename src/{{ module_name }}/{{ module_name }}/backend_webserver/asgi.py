@@ -16,7 +16,7 @@ import json
 # Configure logging for the application
 def get_module_name() -> str:
     """Get module name from environment or default."""
-    return os.getenv('MODULE_NAME', 'vyra_module_template')
+    return os.getenv('MODULE_NAME', '{{ module_name }}')
 
 
 def setup_logging():
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     key_path = "/workspace/storage/certificates/webserver.key"
     
     # Get module name dynamically
-    module_name = os.getenv('MODULE_NAME', 'vyra_module_template')
+    module_name = os.getenv('MODULE_NAME', '{{ module_name }}')
     app_path = f"{module_name}.{module_name}.backend_webserver.asgi:application"
     
     # Check for SSL certificates

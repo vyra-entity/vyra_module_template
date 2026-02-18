@@ -453,10 +453,10 @@ def load_default_interfaces(interface_package_name, interface_package_path):
 
     vyra_base.extract_interfaces(interface_package_path)
     
-    # Fix resource marker file: remove old vyra_module_template_interfaces and create correct one
+    # Fix resource marker file: remove old {{ module_name }}_interfaces and create correct one
     resource_dir = interface_package_path / "resource"
     if resource_dir.exists():
-        old_marker = resource_dir / "vyra_module_template_interfaces"
+        old_marker = resource_dir / "{{ module_name }}_interfaces"
         if old_marker.exists():
             old_marker.unlink()
             print(f"✓ Removed old marker file: {old_marker}")
@@ -536,10 +536,10 @@ def update_dynamic_interfaces(
         # Clean up the temporary source directory
         shutil.rmtree(source_path)
     
-    # Fix resource marker file: remove old vyra_module_template_interfaces and create correct one
+    # Fix resource marker file: remove old {{ module_name }}_interfaces and create correct one
     resource_dir = target_path / "resource"
     if resource_dir.exists():
-        old_marker = resource_dir / "vyra_module_template_interfaces"
+        old_marker = resource_dir / "{{ module_name }}_interfaces"
         if old_marker.exists():
             old_marker.unlink()
             print(f"✓ Removed old marker file: {old_marker}")
@@ -715,7 +715,7 @@ def main(interface_package_name, tmp_src_path=None):
 
     # Workspace setup - detect if we're in container or local development
     script_dir = Path(__file__).parent.parent  # Go up from tools/ to module root
-    if script_dir.name.startswith("v2_") or script_dir.name == "vyra_module_template":
+    if script_dir.name.startswith("v2_") or script_dir.name == "{{ module_name }}":
         # Local development - we're in the module directory
         workspace_root = script_dir
     else:

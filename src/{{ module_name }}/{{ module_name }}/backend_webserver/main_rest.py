@@ -15,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 logger = logging.getLogger(__name__)
 
 # Get module name from environment
-MODULE_NAME = os.getenv('MODULE_NAME', 'vyra_module_template')
+MODULE_NAME = os.getenv('MODULE_NAME', '{{ module_name }}')
 
 
 @asynccontextmanager

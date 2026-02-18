@@ -1,0 +1,70 @@
+_subdirectory: "."
+_answers_file: ".copier-answers.yml"
+_skip_if_exists: []
+_jinja_extension: jinja2.ext.do
+
+# === Pflichtfelder ===
+
+module_name:
+  type: str
+  help: "Modul-Name (snake_case, z.B. my_detector)"
+  validator: "{% if not (module_name | regex_search('^[a-z][a-z0-9_]*$')) %}Nur Kleinbuchstaben, Zahlen und Unterstriche erlaubt{% endif %}"
+
+module_display_name:
+  type: str
+  help: "Anzeigename (z.B. My Detector Module)"
+  default: "{{ module_name | replace('_', ' ') | title }}"
+
+module_description:
+  type: str
+  help: "Kurze Beschreibung des Moduls (für README und metadata)"
+
+author_name:
+  type: str
+  help: "Dein Name"
+
+author_email:
+  type: str
+  help: "Deine E-Mail-Adresse"
+
+# === Optionale Feature-Flags ===
+
+enable_frontend:
+  type: bool
+  help: "Soll ein Vue.js-Frontend eingebunden werden?"
+  default: true
+
+enable_dev_mode:
+  type: bool
+  help: "Soll VYRA_DEV_MODE=true als Standard gesetzt werden? (Vue Dev Server + Hot-Reload)"
+  default: true
+
+enable_slim_mode:
+  type: bool
+  help: "Soll VYRA_SLIM=true als Standard gesetzt werden? (ohne ROS2, nur Python)"
+  default: false
+
+# === Interne/abgeleitete Variablen (keine Abfrage) ===
+# Nutzung in Templates:
+# {{ module_name }}                           → my_detector
+# {{ module_display_name }}                   → My Detector Module
+# {{ module_name | replace('_', '-') }}       → my-detector  (entrypoint name)
+# {{ module_name | title | replace('_','') }} → MyDetector   (Klassenname)
+
+_exclude:
+  - "{% if not enable_frontend %}frontend/**{% endif %}"
+  - "{% if not enable_frontend %}config/nginx.conf{% endif %}"
+  - "copier.yml"
+  - ".copier-answers.yml"
+  - ".git"
+  - ".git/**"
+  - "build/**"
+  - "install/**"
+  - "log/**"
+  - "*.pyc"
+  - "__pycache__"
+
+_tasks:
+  - "chmod +x tools/*.sh"
+  - "echo '✅ Modul {{ module_name }} wurde erstellt!'"
+  - "echo '📦 Zum Publishen ins Repository: ./tools/publish_to_repo.sh'"

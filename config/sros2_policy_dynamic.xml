@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <policy version="0.2.0">
   <enclaves>
-    <enclave path="/vyra_module_template/core">
+    <enclave path="/{{ module_name }}/core">
       <profiles>
         <profile ns="/" node="*">
           <!-- Dynamic: Allow subscribing to ANY topic -->

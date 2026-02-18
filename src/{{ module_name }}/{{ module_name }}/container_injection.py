@@ -19,10 +19,10 @@ Usage:
     component = container.component()
 """
 
-import logging
+from .logging_config import get_logger
 from dependency_injector import containers, providers
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class ContainerNotInitializedError(Exception):

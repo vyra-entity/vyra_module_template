@@ -1,4 +1,4 @@
-# Ruff configuration for v2_modulemanager
+# Ruff configuration for {{ module_name }}
 # Modern, fast Python linter and code formatter
 
 # Target Python 3.10+
@@ -62,7 +62,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [lint.isort]
 # Import sorting configuration
-known-first-party = ["vyra_module_template", "vyra_base"]
+known-first-party = ["{{ module_name }}", "vyra_base"]
 section-order = [
     "future",
     "standard-library",

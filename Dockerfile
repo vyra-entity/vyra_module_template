@@ -137,6 +137,12 @@ RUN if [ -d "storage/interfaces" ] && [ "$(ls -A storage/interfaces/*.proto 2>/d
 # Clean any existing build artifacts for fresh build (prevents package name conflicts)
 RUN rm -rf /workspace/install /workspace/build
 
+# Install gRPC C++ plugin for proto code generation (optional, used by setup_interfaces.py)
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends protobuf-compiler-grpc 2>/dev/null || \
+    echo "⚠️  grpc_cpp_plugin (protobuf-compiler-grpc) not available - C++ proto generation will be skipped" && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Build ROS2 packages (skip vyra_module_template_interfaces template from base image)
 RUN source /opt/ros/kilted/setup.bash && \
     colcon build --packages-skip vyra_module_template_interfaces --cmake-args -DCMAKE_BUILD_TYPE=Release

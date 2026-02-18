@@ -1,4 +1,3 @@
-import logging
 import os
 import sys
 from datetime import datetime
@@ -10,16 +9,16 @@ from ament_index_python.packages import get_package_share_directory  # pyright: 
 from std_msgs.msg import String  # pyright: ignore[reportMissingImports]
 
 # msg
-from vyra_module_template_interfaces.msg import VBASEErrorFeed # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_template_interfaces.msg import VBASEVolatileList # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_template_interfaces.msg import VBASEStateFeed # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_template_interfaces.msg import VBASENewsFeed # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_template_interfaces.msg import VBASEUpdateParamEvent # pyright: ignore[reportAttributeAccessIssue]
+from {{ module_name }}_interfaces.msg import VBASEErrorFeed # pyright: ignore[reportAttributeAccessIssue]
+from {{ module_name }}_interfaces.msg import VBASEVolatileList # pyright: ignore[reportAttributeAccessIssue]
+from {{ module_name }}_interfaces.msg import VBASEStateFeed # pyright: ignore[reportAttributeAccessIssue]
+from {{ module_name }}_interfaces.msg import VBASENewsFeed # pyright: ignore[reportAttributeAccessIssue]
+from {{ module_name }}_interfaces.msg import VBASEUpdateParamEvent # pyright: ignore[reportAttributeAccessIssue]
 
-from vyra_module_template_interfaces.msg import VBASEVolatileList # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_template_interfaces.msg import VBASEVolatileSet # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_template_interfaces.msg import VBASEVolatileHash # pyright: ignore[reportAttributeAccessIssue]
-from vyra_module_template_interfaces.msg import VBASEVolatileString # pyright: ignore[reportAttributeAccessIssue]
+from {{ module_name }}_interfaces.msg import VBASEVolatileList # pyright: ignore[reportAttributeAccessIssue]
+from {{ module_name }}_interfaces.msg import VBASEVolatileSet # pyright: ignore[reportAttributeAccessIssue]
+from {{ module_name }}_interfaces.msg import VBASEVolatileHash # pyright: ignore[reportAttributeAccessIssue]
+from {{ module_name }}_interfaces.msg import VBASEVolatileString # pyright: ignore[reportAttributeAccessIssue]
 # srv
 # add base services here
 # action
@@ -44,7 +43,8 @@ else:
     sys.exit("Package name not found. Please run this script as part of a package.")
 
 
-logger = logging.getLogger(__name__)
+from .logging_config import get_logger, log_exception, log_function_call, log_function_result
+logger = get_logger(__name__)
 
 async def load_resource(package_name: str, resource_name: Path) -> Any:
     package_path = get_package_share_directory(package_name)
@@ -377,7 +377,22 @@ async def build_base():
     # VyraEntity.__init__() calls register_callables_callbacks(self) which adds 
     # entity methods to DataSpace but doesn't create ROS2 services.
     # We need to create the actual ROS2 services by loading interfaces with callbacks.
-    
+
+    # Register interface package paths so VyraEntity / InterfaceFactory can locate
+    # ROS2 message types and Protobuf schemas at runtime.
+    interfaces_install_path = Path(f"/workspace/src/{entity.module_entry.name}_interfaces")
+    if interfaces_install_path.exists():
+        entity.set_interface_paths([interfaces_install_path])
+        logger.info(
+            "interface_paths_set",
+            paths=[str(interfaces_install_path)]
+        )
+    else:
+        logger.warning(
+            "interface_paths_not_found",
+            path=str(interfaces_install_path)
+        )
+
     # Load base interface metadata
     base_interfaces: list = await _create_base_interfaces()
     

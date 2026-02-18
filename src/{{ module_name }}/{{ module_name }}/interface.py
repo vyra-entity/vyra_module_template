@@ -1,5 +1,5 @@
 import json
-import logging
+from .logging_config import get_logger
 import os
 import sys
 from pathlib import Path
@@ -19,11 +19,11 @@ from vyra_base.defaults.entries import FunctionConfigBaseTypes
 from vyra_base.helper.error_handler import ErrorTraceback
 
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 @ErrorTraceback.w_check_error_exist
-async def auto_register_callable_interfaces(
+async def auto_register_interfaces(
     entity: VyraEntity, 
     callback_list: list[Callable]=[], 
     callback_parent: object=None,
@@ -77,24 +77,37 @@ async def auto_register_callable_interfaces(
         ros2_type = ros2_type.split('.')[0]
         
         match metadata['type']:
-            case FunctionConfigBaseTypes.callable.value:
-                metadata['ros2type'] = getattr(
+            case FunctionConfigBaseTypes.service.value:
+                metadata['interfacetypes'] = getattr(
                     sys.modules[f'{module_name}_interfaces.srv'], ros2_type)
-                interface_functions.append(_register_callable_interface(
+                interface_functions.append(_register_service_interface(
                     callback=callback,
                     metadata=metadata
                 )) 
 
-            case FunctionConfigBaseTypes.job.value:
-                metadata['ros2type'] = getattr(
+            case FunctionConfigBaseTypes.action.value:
+                metadata['interfacetypes'] = getattr(
                     sys.modules[f'{module_name}_interfaces.action'], ros2_type)
                 
-                interface_functions.append(_register_job_interface(
+                interface_functions.append(_register_action_interface(
                     metadata=metadata,
                     callbacks={}
                 ))
 
     logger.info(f"Registering {len(interface_functions)} interfaces for entity")
+    
+    # Bind decorated callbacks from callback_parent (for multi-callback ActionServers)
+    if callback_parent:
+        logger.debug("Binding decorated callbacks from component...")
+        binding_results = entity.bind_interface_callbacks(
+            component=callback_parent,
+            settings=interface_functions
+        )
+        logger.info(
+            f"Callback binding complete: "
+            f"{sum(binding_results.values())}/{len(binding_results)} successful"
+        )
+    
     await entity.set_interfaces(interface_functions)
     return
 
@@ -186,7 +199,7 @@ def _register_publisher_interface(
     return FunctionConfigEntry(
         tags=metadata['tags'],
         type=metadata['type'],
-        ros2type=metadata['ros2type'],
+        interfacetypes=metadata.get('interfacetypes', None),
         functionname=metadata['functionname'],
         displayname=metadata['displayname'],
         description=metadata['description'],
@@ -197,10 +210,10 @@ def _register_publisher_interface(
     )
 
 
-def _register_callable_interface( 
+def _register_service_interface( 
         callback: Callable, 
         metadata: dict) -> FunctionConfigEntry:
-    """Registers a callable interface for the entity."""
+    """Registers a service interface for the entity."""
     displaystyle = FunctionConfigDisplaystyle(
         visible=metadata.get('displaystyle', {}).get('visible', False),
         published=metadata.get('displaystyle', {}).get('published', False)
@@ -208,7 +221,7 @@ def _register_callable_interface(
     return FunctionConfigEntry(
         tags=metadata['tags'],
         type=metadata['type'],
-        ros2type=metadata['ros2type'],
+        interfacetypes=metadata.get('interfacetypes', None),
         functionname=metadata['functionname'],
         displayname=metadata['displayname'],
         description=metadata['description'],
@@ -219,10 +232,10 @@ def _register_callable_interface(
         callback=callback
     )
 
-def _register_job_interface(
+def _register_action_interface(
         metadata: dict,
         callbacks: dict[str, Callable]) -> FunctionConfigEntry:
-    """Registers a job interface for the entity."""
+    """Registers an action interface for the entity."""
     displaystyle = FunctionConfigDisplaystyle(
         visible=metadata.get('displaystyle', {}).get('visible', False),
         published=metadata.get('displaystyle', {}).get('published', False)
@@ -230,7 +243,7 @@ def _register_job_interface(
     return FunctionConfigEntry(
         tags=metadata['tags'],
         type=metadata['type'],
-        ros2type=metadata['ros2type'],
+        interfacetypes=metadata.get('interfacetypes', None),
         functionname=metadata['functionname'],
         displayname=metadata['displayname'],
         description=metadata['description'],

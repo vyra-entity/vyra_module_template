@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <policy version="0.2.0">
   <enclaves>
-    <enclave path="/vyra_module_template/core">
+    <enclave path="/{{ module_name }}/core">
       <profiles>
-        <profile ns="/vyra_module_template" node="core">
+        <profile ns="/{{ module_name }}" node="core">
           <!-- Static: Topics this module PUBLISHES -->
           <topics publish="ALLOW" subscribe="DENY">
             <topic>state_feed</topic>

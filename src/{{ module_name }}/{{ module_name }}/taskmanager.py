@@ -1,6 +1,6 @@
 
 import asyncio
-import logging
+from .logging_config import get_logger
 from collections import deque
 from typing import Callable, Any, Coroutine
 
@@ -8,7 +8,7 @@ from .status.status_manager import StatusManager
 from vyra_base.state import UnifiedStateMachine
 from vyra_base.state.state_types import LifecycleState
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class TaskManager:
