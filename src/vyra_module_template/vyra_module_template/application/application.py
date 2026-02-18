@@ -13,7 +13,7 @@ from vyra_base.state import (
     OperationalStateMachine
 )
 from vyra_base.core.entity import VyraEntity
-from vyra_base.com import remote_callable
+from vyra_base.com import remote_service
 
 from ..taskmanager import TaskManager
 from ..interface import auto_register_callable_interfaces
@@ -62,12 +62,12 @@ class Component(OperationalStateMachine):
     
     async def set_interfaces(self):
         """
-        Setup @remote_callable interfaces in VyraEntity.
-        Automatically registers all methods decorated with @remote_callable.
+        Setup @remote_service interfaces in VyraEntity.
+        Automatically registers all methods decorated with @remote_service.
         """
         await auto_register_callable_interfaces(self.entity, callback_parent=self)
     
-    @remote_callable
+    @remote_service
     def initialize(self, request: Any=None, response: Any=None) -> bool:
         """
         Initialize the VYRA Module Manager components.
@@ -97,7 +97,7 @@ class Component(OperationalStateMachine):
             logger.exception(f"❌ Component initialization failed: {e}")
             return False
     
-    @remote_callable
+    @remote_service
     def pause(self, request: Any=None, response: Any=None) -> bool:
         """
         Pause ongoing operations.
@@ -116,7 +116,7 @@ class Component(OperationalStateMachine):
         logger.info("⏸️  Component pause requested")
         return True  # Placeholder for actual implementation
     
-    @remote_callable
+    @remote_service
     def resume(self, request: Any=None, response: Any=None) -> bool:
         """
         Resume from paused state.
@@ -135,7 +135,7 @@ class Component(OperationalStateMachine):
         logger.info("▶️  Component resume requested")
         return True
     
-    @remote_callable
+    @remote_service
     def stop(self, request: Any=None, response: Any=None) -> bool:
         """
         Stop component operations cleanly.
@@ -156,7 +156,7 @@ class Component(OperationalStateMachine):
         
         return True
     
-    @remote_callable
+    @remote_service
     def reset(self, request: Any=None, response: Any=None) -> bool:
         """
         Reset component to initial state.
@@ -175,14 +175,14 @@ class Component(OperationalStateMachine):
         
         return True
     
-    # @remote_callable
+    # @remote_service
     # @state.operation
     # async def template_test(self, request: Any=None, response: Any=None) -> dict:
     #     """
-    #     Template test function demonstrating @remote_callable + @state.operation.
+    #     Template test function demonstrating @remote_service + @state.operation.
         
     #     This function serves as a template showing how to combine both decorators:
-    #     - @remote_callable: Exposes method as ROS2 service
+    #     - @remote_service: Exposes method as ROS2 service
     #     - @state.operation: Automatic READY <-> RUNNING state management with reference counting
         
     #     State Flow: READY -> RUNNING (counter++) -> execute -> RUNNING (counter--) -> READY (if counter=0)

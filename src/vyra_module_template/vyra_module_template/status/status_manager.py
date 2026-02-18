@@ -6,7 +6,7 @@ provides ROS2 interfaces for status monitoring and control.
 
 Features:
 - Runs as async task integrated in core main.py
-- vyra_base integration with @remote_callable decorator
+- vyra_base integration with @remote_service decorator
 - StateFeeder for periodic status broadcasting via existing VyraEntity
 - Integration with vyra_base UnifiedStateMachine
 """
@@ -27,7 +27,7 @@ from vyra_base.state.state_types import (
     OperationalState,
     HealthState,
 )
-from vyra_base.com import remote_callable
+from vyra_base.com import remote_service
 from vyra_base.core.entity import VyraEntity
 
 from .status_types import (
@@ -47,15 +47,15 @@ class StatusManager:
     Status manager for 3-layer status management.
     
     Runs as async task integrated in core main.py.
-    Uses existing VyraEntity instance for StateFeeder and @remote_callable.
+    Uses existing VyraEntity instance for StateFeeder and @remote_service.
     
     Responsibilities:
     1. Initialize and manage UnifiedStateMachine
     2. Automatically activate module on container startup
-    3. Provide @remote_callable interfaces via vyra_base
+    3. Provide @remote_service interfaces via vyra_base
     4. Publish status via StateFeeder (periodic broadcasting)
     
-    ROS2 Interfaces (via @remote_callable):
+    ROS2 Interfaces (via @remote_service):
         get_status() - Returns current 3-layer status (JSON)
         set_status(action, metadata) - Request state changes
     """
@@ -90,7 +90,7 @@ class StatusManager:
     
     async def setup_interfaces(self):
         """
-        Setup @remote_callable interfaces in VyraEntity.
+        Setup @remote_service interfaces in VyraEntity.
         """
         await auto_register_callable_interfaces(self.entity, callback_parent=self)
         logger.info("✅ StatusManager interfaces registered")
@@ -207,10 +207,10 @@ class StatusManager:
         except Exception as e:
             logger.error(f"Failed to broadcast status: {e}")
     
-    @remote_callable
+    @remote_service
     def get_status(self, request, response):
         """
-        Get current 3-layer status (via @remote_callable).
+        Get current 3-layer status (via @remote_service).
         
         Returns:
             JSON with current lifecycle, operational, and health states
@@ -229,10 +229,10 @@ class StatusManager:
             response.data = json.dumps(error_response)
             return response
     
-    @remote_callable
+    @remote_service
     async def set_status(self, request, response):
         """
-        Set status via state machine action (via @remote_callable).
+        Set status via state machine action (via @remote_service).
         
         Request format (JSON in String message):
         {

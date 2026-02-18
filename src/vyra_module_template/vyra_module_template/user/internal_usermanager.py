@@ -13,7 +13,7 @@ from typing import Optional, Dict, Any, List
 from vyra_base.core.entity import VyraEntity
 from vyra_base.storage.db_manipulator import DbManipulator, DBReturnValue
 from vyra_base.storage.db_access import DBSTATUS
-from vyra_base.com import remote_callable
+from vyra_base.com import remote_service
 
 from .tb_users import User, UserRole, UserLevel
 from ..interface import auto_register_callable_interfaces
@@ -272,7 +272,7 @@ class InternalUserManager:
     # User CRUD Operations
     # =============================================================================
     
-    @remote_callable
+    @remote_service
     async def create_user(self, request: Any, response: Any) -> None:
         """
         Create new user (ROS2 service interface)
@@ -387,7 +387,7 @@ class InternalUserManager:
                 "message": f"Internal error: {str(e)}"
             }
     
-    @remote_callable
+    @remote_service
     async def list_users(self, request: Any, response: Any) -> None:
         """List all users (ROS2 service interface)"""
         result = await self.list_users_impl()

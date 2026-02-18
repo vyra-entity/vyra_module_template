@@ -44,7 +44,7 @@ async def auto_register_callable_interfaces(
         logger.debug(
             "No callback_list provided, loading all remote callables from parent."
         )
-        callback_list = _autoload_all_remote_callable_from_parent(callback_parent)
+        callback_list = _autoload_all_remote_service_from_parent(callback_parent)
         logger.debug(
             f"Loaded {len(callback_list)} remote callables from parent."
         )
@@ -98,7 +98,7 @@ async def auto_register_callable_interfaces(
     await entity.set_interfaces(interface_functions)
     return
 
-def _autoload_all_remote_callable_from_parent(callback_parent: object) -> list:
+def _autoload_all_remote_service_from_parent(callback_parent: object) -> list:
     callable_list = []
     
     logger.debug(f"Scanning {callback_parent.__class__.__name__} for remote callables...")
@@ -121,23 +121,23 @@ def _autoload_all_remote_callable_from_parent(callback_parent: object) -> list:
                 logger.debug(f"    attr: {attr}")
                 logger.debug(f"    type(attr): {type(attr)}")
                 logger.debug(f"    callable: {callable(attr)}")
-                logger.debug(f"    has _remote_callable: {hasattr(attr, '_remote_callable')}")
-                logger.debug(f"    _remote_callable value: {getattr(attr, '_remote_callable', 'NOT FOUND')}")
+                logger.debug(f"    has _remote_service: {hasattr(attr, '_remote_service')}")
+                logger.debug(f"    _remote_service value: {getattr(attr, '_remote_service', 'NOT FOUND')}")
                 
                 # Try __func__ if it's a bound method
                 if hasattr(attr, "__func__"):
-                    logger.debug(f"    __func__._remote_callable: {getattr(attr.__func__, '_remote_callable', 'NOT FOUND')}")
+                    logger.debug(f"    __func__._remote_service: {getattr(attr.__func__, '_remote_service', 'NOT FOUND')}")
                 
                 # Try class method
                 class_method = getattr(callback_parent.__class__, "get_interface_list", None)
                 if class_method:
-                    logger.debug(f"    class method._remote_callable: {getattr(class_method, '_remote_callable', 'NOT FOUND')}")
+                    logger.debug(f"    class method._remote_service: {getattr(class_method, '_remote_service', 'NOT FOUND')}")
             
-            # Check if it's callable and has _remote_callable marker
+            # Check if it's callable and has _remote_service marker
             # Note: We check for attribute existence, not value, because vyra_base 
-            # sets _remote_callable=False after registering to DataSpace
-            if callable(attr) and hasattr(attr, "_remote_callable"):
-                logger.debug(f"  Found remote_callable on instance: {attr_name}")
+            # sets _remote_service=False after registering to DataSpace
+            if callable(attr) and hasattr(attr, "_remote_service"):
+                logger.debug(f"  Found remote_service on instance: {attr_name}")
                 callable_list.append(attr)
                 continue
             
@@ -145,8 +145,8 @@ def _autoload_all_remote_callable_from_parent(callback_parent: object) -> list:
             # This handles cases where decorator is on class method
             if hasattr(callback_parent.__class__, attr_name):
                 class_attr = getattr(callback_parent.__class__, attr_name)
-                if callable(class_attr) and hasattr(class_attr, "_remote_callable"):
-                    logger.debug(f"  Found remote_callable on class: {attr_name}")
+                if callable(class_attr) and hasattr(class_attr, "_remote_service"):
+                    logger.debug(f"  Found remote_service on class: {attr_name}")
                     # Get the bound method from instance
                     callable_list.append(attr)
         except AttributeError as e:
