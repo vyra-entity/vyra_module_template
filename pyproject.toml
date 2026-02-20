@@ -11,7 +11,7 @@ module_links = [
 name = "{{ module_name }}"
 version = "0.1.0"
 description = "VYRA Module Template - Supports both ROS2 and SLIM (Zenoh-based) modes"
-authors = ["HolgDer <vyra.0a1@gmail.com>"]
+authors = ["{{ author_name }} <{{ author_email }}>"]
 license = "LICENSE"
 readme = "README.md"
 requires-python = ">=3.10, <4"

@@ -1,6 +1,10 @@
 # build artifacts
 build/*
 install/*
+package-lock.json
+yarn.lock
+**/VBASE*.{msg, srv, action, proto}
+**/_gen/*.{py,pyi,cpp,h}
 
 # Log files
 log/*
@@ -10,14 +14,12 @@ log/*
 frontend/node_modules/*
 frontend/dist/*
 
-sros2_keystore/*
+*/sros2_keystore/*
 security/*
 
 # SSL Certificates (sensitive data)
-storage/certificates/*.key
-storage/certificates/*.crt
-storage/certificates/*.pem
-storage/interfaces/grpc_*/*
+*/storage/certificates/*.{key, crt, pem}
+*/storage/interfaces/grpc_*/*
 
 # Dynamically changing files
 CMakeLists.txt
@@ -38,5 +40,3 @@ temp/*
 !.env.example
 *.pyc
 *.sqlite
-# Copier answers file
-.copier-answers.yml

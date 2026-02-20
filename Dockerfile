@@ -246,7 +246,7 @@ WORKDIR /workspace
 # Copy ONLY module artifacts (base image already has everything else)
 COPY --from=builder /workspace/install/ ./install/
 # Note: build/ directory not needed in runtime (only for compilation)
-COPY --from=builder /workspace/sros2_keystore/ ./sros2_keystore/
+COPY --from=builder /workspace/storage/sros2_keystore/ ./sros2_keystore/
 COPY --from=builder /workspace/sros2_ca_public.pem ./sros2_ca_public.pem
 COPY --from=builder /workspace/config/ ./config/
 COPY --from=builder /workspace/tools/ ./tools/
@@ -277,8 +277,8 @@ RUN if [ -f ".module/requirements.txt" ]; then \
 
 # ROS2 environment configuration
 ENV ROS_DOMAIN_ID=42
-ENV ROS_SECURITY_KEYSTORE=/workspace/sros2_keystore
-ENV ROS_SECURITY_ROOT_DIRECTORY=/workspace/sros2_keystore
+ENV ROS_SECURITY_KEYSTORE=/workspace/storage/sros2_keystore
+ENV ROS_SECURITY_ROOT_DIRECTORY=/workspace/storage/sros2_keystore
 ENV VYRA_BUILD_MODE=ci
 
 LABEL maintainer="VYRA Development Team" \

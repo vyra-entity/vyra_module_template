@@ -5,7 +5,7 @@
 - Navigate to your template repository:
 
 ```bash
-cd vyra_module_template
+cd {{ module_name }}
 ```
 
 - Create an annotated tag (recommended for releases):
