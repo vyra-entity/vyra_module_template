@@ -43,7 +43,7 @@
             "class": "logging.handlers.RotatingFileHandler",
             "level": "DEBUG",
             "formatter": "json",
-            "filename": "/workspace/log/core/application.jsonl",
+            "filename": "/workspace/log/core/application.log",
             "maxBytes": 10485760,
             "backupCount": 10,
             "encoding": "utf8"
@@ -52,7 +52,7 @@
             "class": "logging.handlers.RotatingFileHandler",
             "level": "ERROR",
             "formatter": "json",
-            "filename": "/workspace/log/core/errors.jsonl",
+            "filename": "/workspace/log/core/errors.log",
             "maxBytes": 10485760,
             "backupCount": 10,
             "encoding": "utf8"
