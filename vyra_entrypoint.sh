@@ -207,15 +207,34 @@ if [ -d "/opt/vyra/install_backup" ]; then
     elif [ -n "$MODULE_NAME" ] && [ ! -f "/workspace/install/$MODULE_NAME/lib/$MODULE_NAME/core" ]; then
         echo "❌ install/$MODULE_NAME/lib/$MODULE_NAME/core executable missing"
         INSTALL_COMPLETE=false
+    elif [ -n "$MODULE_NAME" ] && [ ! -d "/workspace/install/${MODULE_NAME}_interfaces" ]; then
+        echo "❌ install/${MODULE_NAME}_interfaces package missing"
+        INSTALL_COMPLETE=false
     fi
-    
+
+    # Check build ID: detect when image was rebuilt with new interfaces/wheels
+    # /opt/vyra/build_id is written during docker build (from CACHE_BUST)
+    # install/.build_id is stamped into install/ before the backup is created
+    # If they differ, the current install/ is from an old image → force restore
+    if [ "$INSTALL_COMPLETE" = true ] && [ -f "/opt/vyra/build_id" ]; then
+        if [ ! -f "/workspace/install/.build_id" ] || \
+           [ "$(cat /opt/vyra/build_id)" != "$(cat /workspace/install/.build_id)" ]; then
+            echo "🔄 Image has been rebuilt (build ID changed) - forcing install/ restore"
+            echo "   Image build ID : $(cat /opt/vyra/build_id)"
+            echo "   Install build ID: $(cat /workspace/install/.build_id 2>/dev/null || echo 'missing')"
+            INSTALL_COMPLETE=false
+        else
+            echo "✅ Build ID matches - install/ is current ($(cat /opt/vyra/build_id))"
+        fi
+    fi
+
     if [ "$INSTALL_COMPLETE" = false ]; then
         echo "📦 Restoring complete install/ directory from image backup..."
         rm -rf /workspace/install
         cp -r /opt/vyra/install_backup /workspace/install
         echo "✅ install/ directory restored (including $MODULE_NAME package)"
     else
-        echo "✅ install/ directory complete (setup.bash + $MODULE_NAME found)"
+        echo "✅ install/ directory complete (setup.bash + $MODULE_NAME + interfaces + build ID verified)"
     fi
 else
     if [ ! -f "/workspace/install/setup.bash" ]; then

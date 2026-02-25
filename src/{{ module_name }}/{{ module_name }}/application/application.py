@@ -118,7 +118,7 @@ class Component(OperationalStateMachine):
         logger.info("💓 Heartbeat loop started")
         while True:
             try:
-                self.entity.news_feeder.feed("heartbeat")
+                await self.entity.news_feeder.feed("heartbeat")
             except Exception as e:
                 logger.warning(f"Heartbeat publish failed: {e}")
             await asyncio.sleep(1.0)
@@ -142,7 +142,7 @@ class Component(OperationalStateMachine):
                     timestamp=datetime.now(),
                     _type="operational"
                 )
-                self.entity.state_feeder.feed(state_data)
+                await self.entity.state_feeder.feed(state_data)
             except Exception as e:
                 logger.warning(f"StateFeed heartbeat publish failed: {e}")
             await asyncio.sleep(5.0)

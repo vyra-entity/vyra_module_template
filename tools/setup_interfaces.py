@@ -405,8 +405,7 @@ def load_default_interfaces(interface_package_name, interface_package_path):
         import vyra_base
     except ImportError:
         raise ImportError(
-            "vyra_base not found. Please set the startup environment variable " +
-            " in your container (.env) [VYRA_STARTUP_ACTIVE=true] to load all wheels.")
+            "vyra_base not found. Please check your wheels directory")
 
     vyra_base.extract_interfaces(interface_package_path)
     

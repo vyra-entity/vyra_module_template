@@ -3,8 +3,14 @@ build/*
 install/*
 package-lock.json
 yarn.lock
-**/VBASE*.{msg, srv, action, proto}
-**/_gen/*.{py,pyi,cpp,h}
+**/VBASE*.msg
+**/VBASE*.srv
+**/VBASE*.action
+**/VBASE*.proto
+**/_gen/*.py
+**/_gen/*.pyi
+**/_gen/*.h
+**/_gen/*.cpp
 
 # Log files
 log/*
@@ -14,11 +20,14 @@ log/*
 frontend/node_modules/*
 frontend/dist/*
 
-*/sros2_keystore/*
+**/sros2_keystore/*
 security/*
 
 # SSL Certificates (sensitive data)
-*/storage/certificates/*.{key, crt, pem}
+*.key
+*.crt
+*.pem
+*.p7s
 */storage/interfaces/grpc_*/*
 
 # Dynamically changing files
@@ -30,6 +39,10 @@ temp/*
 # IDE specific files
 .idea/*
 .vscode/*
+
+# Wheel files
+dist/*
+*.whl
 
 # OS generated files
 *.tmp

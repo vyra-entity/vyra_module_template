@@ -90,6 +90,10 @@ RUN if [ -f ".module/system-packages.txt" ]; then \
 # Install wheel dependencies (vyra_base and module-specific wheels) [only latest versions]
 # Cache-buster: Force fresh installation even if wheel files appear unchanged
 ARG CACHE_BUST
+# Store build ID so the entrypoint can detect when the image was rebuilt
+# This ensures a stale volume-mounted install/ is discarded on new deployments
+RUN echo "${CACHE_BUST:-$(date +%s)}" > /opt/vyra/build_id && \
+    echo "✅ Build ID stored: $(cat /opt/vyra/build_id)"
 RUN echo "Cache bust: ${CACHE_BUST:-$(date +%s)}" && \
     if [ -d "wheels" ]; then \
         set -e; \
@@ -146,6 +150,9 @@ RUN apt-get update -qq && \
 # Build ROS2 packages (skip vyra_module_template_interfaces template from base image)
 RUN source /opt/ros/kilted/setup.bash && \
     colcon build --packages-skip vyra_module_template_interfaces --cmake-args -DCMAKE_BUILD_TYPE=Release
+
+# Stamp install/ with build ID so the entrypoint can detect stale installs at runtime
+RUN cp /opt/vyra/build_id /workspace/install/.build_id
 
 # Make install artifacts accessible to runtime stage (will be copied in runtime stage)
 RUN chown -R vyrauser:vyrauser /workspace/install
