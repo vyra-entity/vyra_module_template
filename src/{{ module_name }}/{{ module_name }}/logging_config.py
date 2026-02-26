@@ -146,7 +146,7 @@ def _patch_logging_config_for_format(config: Dict[str, Any]) -> Dict[str, Any]:
     - VYRA_USE_JSONL_LOGS=false: file handlers use 'standard' formatter (plain text)
     """
     file_formatter = "json" if VYRA_USE_JSONL_LOGS else "standard"
-    for handler_name in ("rotating_file", "error_file"):
+    for handler_name in ("error_file",):
         if handler_name in config.get("handlers", {}):
             config["handlers"][handler_name]["formatter"] = file_formatter
     return config

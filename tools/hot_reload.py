@@ -73,19 +73,25 @@ class HotReloadHandler(FileSystemEventHandler):
         # Check if it's a ROS2 interface file (.srv, .msg, .action) in any package
         # Only monitor interface files in FULL mode
         is_interface_file = False
+        is_config_file = False
         if not self.slim_mode:
             is_interface_file = (
                 file_path.suffix in ['.srv', '.msg', '.action'] and 
                 '/src/' in path_str and
                 any(iface_dir in path_str for iface_dir in ['/srv/', '/msg/', '/action/'])
             )
+            is_config_file = (
+                file_path.suffix == '.json' and
+                '/src/' in path_str and
+                '/config/' in path_str
+            )
             
-            # Ignore interface file events for 20 seconds after build completes
+            # Ignore interface/config file events for 20 seconds after build completes
             # This prevents loops from setup_interfaces.py modifying interface files
-            if is_interface_file and (time.time() - self.last_build_time < 20.0):
+            if (is_interface_file or is_config_file) and (time.time() - self.last_build_time < 20.0):
                 return
         
-        if is_python_file or is_interface_file:
+        if is_python_file or is_interface_file or is_config_file:
             # Check for duplicate event (same file within 10 seconds)
             # This catches multiple save events from editors (save, auto-save, format-on-save)
             current_time = time.time()
@@ -96,9 +102,9 @@ class HotReloadHandler(FileSystemEventHandler):
             self.last_modified_file = path_str
             self.last_modified_time = current_time
             
-            file_type = "interface" if is_interface_file else "Python"
+            file_type = "interface/config" if (is_interface_file or is_config_file) else "Python"
             logger.info(f"📝 {file_type} file changed: {file_path.name}")
-            if is_interface_file:
+            if is_interface_file or is_config_file:
                 self.interface_files_changed = True
             self._schedule_rebuild()
     
@@ -124,21 +130,27 @@ class HotReloadHandler(FileSystemEventHandler):
         # Check if it's a ROS2 interface file (.srv, .msg, .action) in any package
         # Only monitor interface files in FULL mode
         is_interface_file = False
+        is_config_file = False
         if not self.slim_mode:
             is_interface_file = (
                 file_path.suffix in ['.srv', '.msg', '.action'] and 
                 '/src/' in path_str and
                 any(iface_dir in path_str for iface_dir in ['/srv/', '/msg/', '/action/'])
             )
+            is_config_file = (
+                file_path.suffix == '.json' and
+                '/src/' in path_str and
+                '/config/' in path_str
+            )
             
-            # Ignore interface file events for 20 seconds after build completes
-            if is_interface_file and (time.time() - self.last_build_time < 20.0):
+            # Ignore interface/config file events for 20 seconds after build completes
+            if (is_interface_file or is_config_file) and (time.time() - self.last_build_time < 20.0):
                 return
         
-        if is_python_file or is_interface_file:
-            file_type = "interface" if is_interface_file else "Python"
+        if is_python_file or is_interface_file or is_config_file:
+            file_type = "interface/config" if (is_interface_file or is_config_file) else "Python"
             logger.info(f"➕ {file_type} file created: {file_path.name}")
-            if is_interface_file:
+            if is_interface_file or is_config_file:
                 self.interface_files_changed = True
             
             self._schedule_rebuild()
@@ -251,7 +263,7 @@ class HotReloadHandler(FileSystemEventHandler):
             
             # Step 3: Build all packages to ensure dependencies are up-to-date
             result = subprocess.run(
-                ["colcon", "build", "--cmake-args", "-DCMAKE_BUILD_TYPE=Release"],
+                ["colcon", "--log-base", "log/ros2", "build", "--cmake-args", "-DCMAKE_BUILD_TYPE=Release"],
                 cwd=self.workspace_path,
                 capture_output=True,
                 text=True
