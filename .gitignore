@@ -40,9 +40,9 @@ temp/*
 .idea/*
 .vscode/*
 
-# Wheel files
+# dist files
 dist/*
-*.whl
+
 
 # OS generated files
 *.tmp

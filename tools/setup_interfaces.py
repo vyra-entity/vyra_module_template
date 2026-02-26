@@ -648,9 +648,13 @@ def main(interface_package_name: str):
     """
     Set up or update a ROS2 interface package for a VYRA module.
 
-    Pipeline (new approach):
+    Pipeline:
         1. Copy config + build files from the installed vyra_base library.
         2. Validate module-specific config JSONs against the RESERVED list.
+        2.5 Validate all ``*_meta.json`` files against the JSON schema at
+            ``vyra_base/assets/schemas/interface_config.json``.  Files that
+            fail are excluded from interface generation with a WARNING log
+            entry (non-fatal) and restored to their original name afterwards.
         3. Generate msg / srv / action / .proto files via InterfaceGenerator.
         4. Update CMakeLists.txt and package.xml.
         5. Compile proto → Python / C++ stubs.
@@ -704,10 +708,55 @@ def main(interface_package_name: str):
     else:
         logging.info("✓ No reserved function name violations detected")
 
+    # ── Step 2.5: Validate config JSONs against interface_config schema ──────
+    logging.info("🔍 Validating config JSONs against interface_config schema...")
+    _renamed_invalid: list[tuple[Path, Path]] = []   # [(renamed_path, original_path)]
+    try:
+        import vyra_base as _vyra_base_module
+        _meta_jsons = list(config_path.glob("*_meta.json"))
+        _valid_jsons, _invalid_jsons = _vyra_base_module.validate_config_schema(_meta_jsons)
+        if _invalid_jsons:
+            for _bad_file, _reason in _invalid_jsons:
+                logging.warning(
+                    "⚠️  Schema validation failed – '%s' will be skipped in "
+                    "interface generation.\n    Reason: %s",
+                    _bad_file.name,
+                    _reason,
+                )
+            # Temporarily rename invalid files so InterfaceGenerator skips them
+            for _bad_file, _ in _invalid_jsons:
+                _renamed = _bad_file.with_name(_bad_file.name + ".invalid")
+                _bad_file.rename(_renamed)
+                _renamed_invalid.append((_renamed, _bad_file))
+            logging.warning(
+                "⚠️  %d config file(s) excluded from this build due to schema "
+                "violations (files will be restored after generation).",
+                len(_invalid_jsons),
+            )
+        else:
+            logging.info("✓ All config JSONs are schema-valid")
+    except Exception as _schema_exc:
+        logging.warning(
+            "⚠️  Schema validation step raised an unexpected error: %s – "
+            "continuing without schema validation.",
+            _schema_exc,
+        )
+
     # ── Step 3: Generate msg / srv / action / .proto from config JSONs ───────
-    if not generate_all_interfaces(interface_package_path):
-        logging.error("❌ Interface generation failed – aborting.")
-        sys.exit(1)
+    try:
+        if not generate_all_interfaces(interface_package_path):
+            logging.error("❌ Interface generation failed – aborting.")
+            sys.exit(1)
+    finally:
+        # Always restore files that were temporarily renamed due to schema violations
+        for _renamed_path, _original_path in _renamed_invalid:
+            if _renamed_path.exists():
+                _renamed_path.rename(_original_path)
+        if _renamed_invalid:
+            logging.info(
+                "♻️  Restored %d temporarily renamed file(s) after interface generation.",
+                len(_renamed_invalid),
+            )
 
     # ── Step 4: Update CMakeLists.txt and package.xml ────────────────────────
     print(f"\nUpdate package.xml for {interface_package_name}")

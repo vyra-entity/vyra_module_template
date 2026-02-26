@@ -27,7 +27,7 @@ else
 fi
 
 # Get package and node name
-PACKAGE_NAME=${1:-{{ module_name }}}
+PACKAGE_NAME=${1:-v2_modulemanager}
 NODE_NAME=${2:-core}
 SUPERVISORD_PROGRAM=${3:-ros2_core}
 

@@ -232,9 +232,13 @@ if [ -d "/opt/vyra/install_backup" ]; then
         echo "📦 Restoring complete install/ directory from image backup..."
         rm -rf /workspace/install
         cp -r /opt/vyra/install_backup /workspace/install
+        chown -R vyrauser:vyrauser /workspace/install
         echo "✅ install/ directory restored (including $MODULE_NAME package)"
     else
         echo "✅ install/ directory complete (setup.bash + $MODULE_NAME + interfaces + build ID verified)"
+        echo "🔧 Fixing ownership of install/ directory..."
+        chown -R vyrauser:vyrauser /workspace/install
+        echo "✅ Ownership fixed to vyrauser:vyrauser"
     fi
 else
     if [ ! -f "/workspace/install/setup.bash" ]; then
@@ -296,6 +300,11 @@ else
 fi
 
 echo "===================================="
+
+# =============================================================================
+# Setup interfaces
+# =============================================================================
+python3 tools/setup_interfaces.py
 
 # =============================================================================
 # NFS Interface Management
@@ -514,73 +523,6 @@ else
     done
 fi
 
-
-# Debug: Show available packages
-echo "=== AVAILABLE PACKAGES ==="
-ros2 pkg list | grep -E "(v2_|vyra_)" || echo "No matching packages"
-
-echo "=== EXECUTABLES ==="
-ros2 pkg executables $MODULE_NAME || echo "No executables for $MODULE_NAME"
-
-# =============================================================================
-# Proto Interface Setup & NFS Sharing (for gRPC/Redis communication)
-# =============================================================================
-echo "=== PROTO INTERFACE SETUP ==="
-
-NFS_PROTO_PATH="${NFS_PROTO_PATH:-/nfs/proto_interfaces}"
-PROTO_INTERFACE_DIR="${MODULE_NAME}_${INSTANCE_ID}_proto_interfaces"
-PROTO_INTERFACE_SOURCE="/workspace/install/${MODULE_NAME}_proto_interfaces"
-
-# Check if NFS Proto volume is mounted
-if [ -d "$NFS_PROTO_PATH" ]; then
-    echo "✅ Proto NFS volume found at $NFS_PROTO_PATH"
-    
-    # Copy module's own Proto interfaces to NFS
-    if [ -d "$PROTO_INTERFACE_SOURCE" ]; then
-        NFS_PROTO_MODULE_DIR="$NFS_PROTO_PATH/$PROTO_INTERFACE_DIR"
-        echo "📦 Copying Proto interfaces to NFS as $PROTO_INTERFACE_DIR..."
-        mkdir -p "$NFS_PROTO_MODULE_DIR"
-        
-        # Copy all files to NFS
-        cp -r "$PROTO_INTERFACE_SOURCE"/* "$NFS_PROTO_MODULE_DIR"/ 2>/dev/null || echo "⚠️  No Proto interfaces to copy"
-        
-        if [ -f "$NFS_PROTO_MODULE_DIR/__init__.py" ]; then
-            echo "✅ Proto interfaces deployed to NFS"
-        else
-            echo "⚠️  Warning: __init__.py not found after Proto interface copy"
-        fi
-    else
-        echo "ℹ️  No Proto interfaces found at $PROTO_INTERFACE_SOURCE (optional)"
-    fi
-    
-    # Add all Proto interfaces from NFS to PYTHONPATH
-    echo "🔗 Loading Proto interfaces from NFS..."
-    PROTO_INTERFACES_LOADED=0
-    for proto_if_dir in "$NFS_PROTO_PATH"/*_proto_interfaces; do
-        if [ -d "$proto_if_dir" ] && [ -f "$proto_if_dir/__init__.py" ]; then
-            proto_if_name=$(basename "$proto_if_dir")
-            echo "   Loading $proto_if_name..."
-            export PYTHONPATH="$proto_if_dir:$PYTHONPATH"
-            PROTO_INTERFACES_LOADED=$((PROTO_INTERFACES_LOADED + 1))
-        fi
-    done
-    
-    if [ $PROTO_INTERFACES_LOADED -gt 0 ]; then
-        echo "✅ Loaded $PROTO_INTERFACES_LOADED Proto interface package(s) from NFS"
-    else
-        echo "ℹ️  No Proto interface packages found in NFS (first module?)"
-    fi
-else
-    echo "⚠️  Proto NFS volume not found at $NFS_PROTO_PATH"
-    echo "   Modules will only see their own Proto interfaces"
-    
-    # Still add local Proto interfaces to PYTHONPATH if they exist
-    if [ -d "$PROTO_INTERFACE_SOURCE" ]; then
-        export PYTHONPATH="$PROTO_INTERFACE_SOURCE:$PYTHONPATH"
-        echo "✅ Added local Proto interfaces to PYTHONPATH"
-    fi
-fi
-
 # SROS2 Setup
 echo "=== SROS2 SETUP ==="
 echo "ROS_SECURITY_KEYSTORE: $ROS_SECURITY_KEYSTORE"
@@ -592,7 +534,10 @@ echo "ROS_SECURITY_KEYSTORE: $ROS_SECURITY_KEYSTORE"
 
 echo "[SROS2] Creating keystore at $ROS_SECURITY_KEYSTORE if not exists"
 ros2 security create_keystore $ROS_SECURITY_KEYSTORE || true
-ros2 security generate_policy sros2_keystore/ || true
+# Only generate policy if enclave doesn't exist yet (avoids hanging when ROS graph is active)
+if [ ! -d "$ROS_SECURITY_KEYSTORE/enclaves/$MODULE_NAME/core" ]; then
+    timeout --kill-after=5s 30s ros2 security generate_policy sros2_keystore/ || true
+fi
 
 if [ ! -d "$ROS_SECURITY_KEYSTORE/enclaves" ]; then
     echo "[SROS2] Creating enclaves at $ROS_SECURITY_KEYSTORE"
@@ -740,9 +685,9 @@ echo "=== CONFIGURING SUPERVISORD SERVICES ==="
 if [ "$VYRA_DEV_MODE" = "true" ]; then
     echo "🚀 DEVELOPMENT MODE ENABLED"
 
-    # Enable ROS2 Hot Reload if configured
-    if [ "$ENABLE_HOT_RELOAD" = "true" ]; then
-        echo "🔥 Enabling ROS2 Hot Reload..."
+    # Enable ROS2 Hot Reload if configured (supports both ENABLE_HOT_RELOAD and ENABLE_ROS2_HOT_RELOAD)
+    if [ "${ENABLE_HOT_RELOAD:-false}" = "true" ]; then
+        echo "🔥 Enabling Hot Reload..."
         
         # Install watchdog if not present
         if ! pip show watchdog > /dev/null 2>&1; then
@@ -757,9 +702,9 @@ if [ "$VYRA_DEV_MODE" = "true" ]; then
             > /workspace/log/core/hot_reload.log 2>&1 &
         
         HOT_RELOAD_PID=$!
-        echo "✅ ROS2 Hot Reload started (PID: $HOT_RELOAD_PID)"
+        echo "✅ Hot Reload started (PID: $HOT_RELOAD_PID)"
         echo "   Watching: /workspace/src"
-        echo "   Logs: /workspace/log/ros2/hot_reload.log"
+        echo "   Logs: /workspace/log/hot_reload.log"
     fi
 
     # Check if npm is available for Vite dev server
@@ -790,6 +735,16 @@ if [ "$VYRA_DEV_MODE" = "true" ]; then
         echo "⚠️  npm not available - falling back to Nginx with pre-built frontend"
         echo "   (Set VYRA_DEV_MODE=false or use development base image for Vite hot reload)"
         # Keep ENABLE_FRONTEND_WEBSERVER=true to use nginx with dist/
+        # Force enable Nginx by updating supervisord config
+        echo "🔧 Enabling Nginx in supervisord config..."
+        
+        # Replace the VYRA_DEV_MODE check to allow Nginx startup
+        sudo sed -i 's/if \[ "$VYRA_DEV_MODE" = "false" \]; then/if [ "$VYRA_DEV_MODE" = "false" ] || [ "$ENABLE_FRONTEND_WEBSERVER" = "true" ]; then/' /etc/supervisor/conf.d/supervisord.conf 2>/dev/null || \
+        sed -i 's/if \[ "$VYRA_DEV_MODE" = "false" \]; then/if [ "$VYRA_DEV_MODE" = "false" ] || [ "$ENABLE_FRONTEND_WEBSERVER" = "true" ]; then/' /workspace/supervisord.conf 2>/dev/null || true
+        
+        # Enable autostart
+        sudo sed -i '/\[program:nginx\]/,/^\[/ s/autostart=false/autostart=true/' /etc/supervisor/conf.d/supervisord.conf 2>/dev/null || \
+        sed -i '/\[program:nginx\]/,/^\[/ s/autostart=false/autostart=true/' /workspace/supervisord.conf 2>/dev/null || true
     fi
 
     # Hot-reload is handled by tools/hot_reload.py instead

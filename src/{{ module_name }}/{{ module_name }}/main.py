@@ -1,4 +1,5 @@
 import asyncio
+import functools
 import os
 import uvicorn
 from pathlib import Path
@@ -139,9 +140,16 @@ async def ros_spinner_runner(entity: VyraEntity) -> None:
         logger.error("ros_spinner_called_without_rclpy", slim_mode=VYRA_SLIM)
         return
     
+    loop = asyncio.get_running_loop()
+    spin_fn = functools.partial(rclpy.spin_once, entity.node, timeout_sec=0.001)
+
     while rclpy.ok():
         try:
-            rclpy.spin_once(entity.node, timeout_sec=0.01)
+            # Run spin_once in a thread-pool executor so it never blocks the
+            # asyncio event loop.  Without this, the 10 ms timeout_sec call
+            # prevented uvicorn from accepting TCP connections fast enough,
+            # filling the TCP backlog and causing Traefik 504s.
+            await loop.run_in_executor(None, spin_fn)
             spin_count += 1
             
             # Log periodic heartbeat (every 1000 spins)
@@ -152,7 +160,8 @@ async def ros_spinner_runner(entity: VyraEntity) -> None:
                     error_count=error_count
                 )
             
-            await asyncio.sleep(0.1)
+            # Yield to other coroutines (uvicorn, etc.) between spins
+            await asyncio.sleep(0)
             
         except Exception as spin_error:
             error_count += 1
