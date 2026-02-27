@@ -4,7 +4,7 @@ from .logging_config import get_logger
 from collections import deque
 from typing import Callable, Any, Coroutine
 
-from .status.status_manager import StatusManager
+from .state.state_manager import StateManager
 from vyra_base.state import UnifiedStateMachine
 from vyra_base.state.state_types import LifecycleState
 
@@ -210,7 +210,7 @@ class TaskManager:
     
 async def task_supervisor_looper(
         taskmanager: TaskManager, 
-        statusmanager: StatusManager, 
+        statemanager: StateManager, 
         check_interval: float = 5.0) -> None:
     """A coroutine that supervises tasks in the TaskManager.
     It monitors the application_runner task and implements recovery logic:
@@ -221,16 +221,16 @@ async def task_supervisor_looper(
     
     :param tm: The TaskManager instance to supervise.
     :type tm: TaskManager
-    :param sm: The StatusManager instance to check lifecycle state.
-    :type sm: StatusManager
-    :param check_interval: Time in seconds between status checks.
+    :param sm: The StateManager instance to check lifecycle state.
+    :type sm: StateManager
+    :param check_interval: Time in seconds between state checks.
     :type check_interval: float
     """
     HEALTH_CHECK_DURATION = 5.0  # seconds
     MAX_RECOVERY_ATTEMPTS = 3
     APPLICATION_RUNNER_NAME = "application_runner"
     
-    state_machine: UnifiedStateMachine = statusmanager.state_machine
+    state_machine: UnifiedStateMachine = statemanager.state_machine
 
     async def supervisor_loop():
         logger.info("Task supervisor started")
@@ -271,7 +271,7 @@ async def task_supervisor_looper(
             # Task has stopped - log and handle recovery
             logger.info(f"Task <{APPLICATION_RUNNER_NAME}> has stopped unexpectedly.")
 
-            # Get lifecycle state from StatusManager
+            # Get lifecycle state from StateManager
             lifecycle_state = state_machine.get_lifecycle_state()
             
             if lifecycle_state == LifecycleState.RECOVERING:

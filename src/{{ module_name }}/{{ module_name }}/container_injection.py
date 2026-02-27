@@ -38,7 +38,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
     - VyraEntity: ROS2 node and communication
     - Component: Application logic
     - TaskManager: Task management
-    - StatusManager: Status broadcasting
+    - StateManager: State broadcasting
     - UserManager: User management (internal_usermanager + gRPC server)
     """
     
@@ -49,7 +49,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
     entity = providers.Singleton(lambda: None)
     component = providers.Singleton(lambda: None)
     task_manager = providers.Singleton(lambda: None)
-    status_manager = providers.Singleton(lambda: None)
+    state_manager = providers.Singleton(lambda: None)
     user_manager = providers.Singleton(lambda: None)
 
 
@@ -147,34 +147,34 @@ def get_task_manager():
     return task_manager_instance
 
 
-def set_status_manager(status_manager_instance) -> None:
+def set_state_manager(state_manager_instance) -> None:
     """
-    Set the StatusManager instance in the global container.
+    Set the StateManager instance in the global container.
     
     Args:
-        status_manager_instance: StatusManager instance
+        state_manager_instance: StateManager instance
     """
-    container.status_manager.override(providers.Object(status_manager_instance))
-    logger.info("✅ StatusManager set in container_injection")
+    container.state_manager.override(providers.Object(state_manager_instance))
+    logger.info("✅ StateManager set in container_injection")
 
 
-def get_status_manager():
+def get_state_manager():
     """
-    Get the StatusManager instance from the global container.
+    Get the StateManager instance from the global container.
     
     Returns:
-        StatusManager instance
+        StateManager instance
         
     Raises:
-        ContainerNotInitializedError: If status_manager has not been set yet
+        ContainerNotInitializedError: If state_manager has not been set yet
     """
-    status_manager_instance = container.status_manager()
-    if status_manager_instance is None:
+    state_manager_instance = container.state_manager()
+    if state_manager_instance is None:
         raise ContainerNotInitializedError(
-            "StatusManager not initialized in container. "
+            "StateManager not initialized in container. "
             "Make sure initialize_module() has been called."
         )
-    return status_manager_instance
+    return state_manager_instance
 
 
 def is_initialized() -> bool:
@@ -182,14 +182,14 @@ def is_initialized() -> bool:
     Check if the container has been initialized with all required components.
     
     Returns:
-        True if entity, component, task_manager, status_manager, and user_manager are all set
+        True if entity, component, task_manager, state_manager, and user_manager are all set
     """
     try:
         return all([
             container.entity() is not None,
             container.component() is not None,
             container.task_manager() is not None,
-            container.status_manager() is not None,
+            container.state_manager() is not None,
             container.user_manager() is not None
         ])
     except Exception:
@@ -203,7 +203,7 @@ def reset() -> None:
     container.entity.override(providers.Singleton(lambda: None))
     container.component.override(providers.Singleton(lambda: None))
     container.task_manager.override(providers.Singleton(lambda: None))
-    container.status_manager.override(providers.Singleton(lambda: None))
+    container.state_manager.override(providers.Singleton(lambda: None))
     container.user_manager.override(providers.Singleton(lambda: None))
     logger.info("🔄 Container reset")
 
@@ -251,7 +251,7 @@ def provide_task_manager():
     return get_task_manager()
 
 
-def provide_status_manager():
+def provide_state_manager():
     """
     Provider function for FastAPI Depends().
     
@@ -259,10 +259,10 @@ def provide_status_manager():
         from fastapi import Depends
         
         @router.get("/endpoint")
-        async def endpoint(status_manager = Depends(provide_status_manager)):
+        async def endpoint(state_manager = Depends(provide_state_manager)):
             ...
     """
-    return get_status_manager()
+    return get_state_manager()
 
 
 def set_user_manager(user_manager_instance) -> None:

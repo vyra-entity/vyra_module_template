@@ -16,7 +16,7 @@ try:
         provide_entity,
         provide_component,
         provide_task_manager,
-        provide_status_manager,
+        provide_state_manager,
         ContainerNotInitializedError
     )
     CONTAINER_AVAILABLE = True
@@ -110,7 +110,7 @@ def get_status_manager():
         )
     
     try:
-        return provide_status_manager()
+        return provide_state_manager()
     except ContainerNotInitializedError:
         raise HTTPException(
             status_code=503,

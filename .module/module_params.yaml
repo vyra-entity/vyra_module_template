@@ -32,6 +32,20 @@ behavior:
     retries: 3
     start_period_seconds: 30
 
+# State Manager Configuration
+state_manager:
+  # How often to broadcast the current state via VyraEntity StateFeeder
+  broadcast_interval_hz: 1.0
+
+  # Maximum number of state-change entries kept in the rolling history buffer
+  max_state_history_size: 50
+
+  # Maximum number of error entries kept in the rolling error buffer
+  max_error_history_size: 10
+
+  # Log every state transition at DEBUG level (useful during development)
+  debug_transitions: false
+
 # Resource Limits (optional)
 resources:
   cpu_limit: null  # Unlimited

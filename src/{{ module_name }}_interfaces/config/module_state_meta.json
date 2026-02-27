@@ -1,0 +1,331 @@
+[
+    {
+        "tags": ["zenoh"],
+        "type": "service",
+        "functionname": "get_state",
+        "displayname": "Get State",
+        "description": "Returns the full 3-layer state snapshot (lifecycle, operational, health) with metadata.",
+        "filetype": ["VModuleState.proto"],
+        "params": [],
+        "returns": [
+            {
+                "name": "lifecycle",
+                "datatype": "string",
+                "displayname": "Lifecycle State",
+                "description": "Current lifecycle state value (e.g. OFFLINE, INITIALIZING, ACTIVE)."
+            },
+            {
+                "name": "operational",
+                "datatype": "string",
+                "displayname": "Operational State",
+                "description": "Current operational state value (e.g. IDLE, READY, RUNNING)."
+            },
+            {
+                "name": "health",
+                "datatype": "string",
+                "displayname": "Health State",
+                "description": "Current health state value (e.g. HEALTHY, WARNING, FAULT)."
+            },
+            {
+                "name": "timestamp",
+                "datatype": "string",
+                "displayname": "Timestamp",
+                "description": "ISO 8601 timestamp of the snapshot."
+            },
+            {
+                "name": "metadata",
+                "datatype": "object",
+                "displayname": "Metadata",
+                "description": "Module name, UUID and derived flags (is_operational, is_healthy)."
+            },
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "True on successful call."
+            }
+        ],
+        "access_level": 0,
+        "displaystyle": {
+            "visible": true,
+            "published": true
+        }
+    },
+    {
+        "tags": ["zenoh"],
+        "type": "service",
+        "functionname": "get_lifecycle_state",
+        "displayname": "Get Lifecycle State",
+        "description": "Returns only the current lifecycle layer state.",
+        "filetype": ["VModuleState.proto"],
+        "params": [],
+        "returns": [
+            {
+                "name": "lifecycle",
+                "datatype": "string",
+                "displayname": "Lifecycle State",
+                "description": "Current lifecycle state value."
+            },
+            {
+                "name": "timestamp",
+                "datatype": "string",
+                "displayname": "Timestamp",
+                "description": "ISO 8601 timestamp."
+            },
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "True on successful call."
+            }
+        ],
+        "access_level": 0,
+        "displaystyle": {
+            "visible": true,
+            "published": true
+        }
+    },
+    {
+        "tags": ["zenoh"],
+        "type": "service",
+        "functionname": "get_operational_state",
+        "displayname": "Get Operational State",
+        "description": "Returns only the current operational layer state.",
+        "filetype": ["VModuleState.proto"],
+        "params": [],
+        "returns": [
+            {
+                "name": "operational",
+                "datatype": "string",
+                "displayname": "Operational State",
+                "description": "Current operational state value."
+            },
+            {
+                "name": "timestamp",
+                "datatype": "string",
+                "displayname": "Timestamp",
+                "description": "ISO 8601 timestamp."
+            },
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "True on successful call."
+            }
+        ],
+        "access_level": 0,
+        "displaystyle": {
+            "visible": true,
+            "published": true
+        }
+    },
+    {
+        "tags": ["zenoh"],
+        "type": "service",
+        "functionname": "get_health_state",
+        "displayname": "Get Health State",
+        "description": "Returns only the current health layer state.",
+        "filetype": ["VModuleState.proto"],
+        "params": [],
+        "returns": [
+            {
+                "name": "health",
+                "datatype": "string",
+                "displayname": "Health State",
+                "description": "Current health state value."
+            },
+            {
+                "name": "timestamp",
+                "datatype": "string",
+                "displayname": "Timestamp",
+                "description": "ISO 8601 timestamp."
+            },
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "True on successful call."
+            }
+        ],
+        "access_level": 0,
+        "displaystyle": {
+            "visible": true,
+            "published": true
+        }
+    },
+    {
+        "tags": ["zenoh"],
+        "type": "service",
+        "functionname": "get_last_error_state",
+        "displayname": "Get Last Error State",
+        "description": "Returns the last recorded error context including error history.",
+        "filetype": ["VModuleState.proto"],
+        "params": [],
+        "returns": [
+            {
+                "name": "has_error",
+                "datatype": "bool",
+                "displayname": "Has Error",
+                "description": "False when no error has occurred yet."
+            },
+            {
+                "name": "error_message",
+                "datatype": "string",
+                "displayname": "Error Message",
+                "description": "Last error message (empty string if none)."
+            },
+            {
+                "name": "error_details",
+                "datatype": "object",
+                "displayname": "Error Details",
+                "description": "Traceback and additional error information."
+            },
+            {
+                "name": "timestamp",
+                "datatype": "string",
+                "displayname": "Timestamp",
+                "description": "ISO 8601 timestamp of the error."
+            },
+            {
+                "name": "error_history",
+                "datatype": "object[]",
+                "displayname": "Error History",
+                "description": "Recent error entries (up to max_error_history_size)."
+            },
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "True on successful call."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": true
+        }
+    },
+    {
+        "tags": ["zenoh"],
+        "type": "service",
+        "functionname": "get_state_summary",
+        "displayname": "Get State Summary",
+        "description": "Returns a human-readable one-line status summary with derived flags.",
+        "filetype": ["VModuleState.proto"],
+        "params": [],
+        "returns": [
+            {
+                "name": "summary",
+                "datatype": "string",
+                "displayname": "Summary",
+                "description": "One-line status description (module: lifecycle | operational | health)."
+            },
+            {
+                "name": "is_operational",
+                "datatype": "bool",
+                "displayname": "Is Operational",
+                "description": "True when lifecycle=ACTIVE and operational state is not ERROR."
+            },
+            {
+                "name": "is_healthy",
+                "datatype": "bool",
+                "displayname": "Is Healthy",
+                "description": "True when health=HEALTHY."
+            },
+            {
+                "name": "lifecycle",
+                "datatype": "string",
+                "displayname": "Lifecycle State",
+                "description": "Current lifecycle state value."
+            },
+            {
+                "name": "operational",
+                "datatype": "string",
+                "displayname": "Operational State",
+                "description": "Current operational state value."
+            },
+            {
+                "name": "health",
+                "datatype": "string",
+                "displayname": "Health State",
+                "description": "Current health state value."
+            },
+            {
+                "name": "module_name",
+                "datatype": "string",
+                "displayname": "Module Name",
+                "description": "Module identifier."
+            },
+            {
+                "name": "timestamp",
+                "datatype": "string",
+                "displayname": "Timestamp",
+                "description": "ISO 8601 timestamp."
+            },
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "True on successful call."
+            }
+        ],
+        "access_level": 0,
+        "displaystyle": {
+            "visible": true,
+            "published": true
+        }
+    },
+    {
+        "tags": ["zenoh"],
+        "type": "service",
+        "functionname": "get_state_history",
+        "displayname": "Get State History",
+        "description": "Returns recent state-change history entries, optionally filtered by layer and limited in count.",
+        "filetype": ["VModuleState.proto"],
+        "params": [
+            {
+                "name": "limit",
+                "datatype": "int",
+                "displayname": "Limit",
+                "description": "Maximum number of history entries to return (optional, default: all)."
+            },
+            {
+                "name": "layer",
+                "datatype": "string",
+                "displayname": "Layer Filter",
+                "description": "Filter by layer name: lifecycle, operational or health (optional)."
+            }
+        ],
+        "returns": [
+            {
+                "name": "history",
+                "datatype": "object[]",
+                "displayname": "History",
+                "description": "List of state-change entries (newest last)."
+            },
+            {
+                "name": "count",
+                "datatype": "int",
+                "displayname": "Count",
+                "description": "Number of entries returned."
+            },
+            {
+                "name": "total",
+                "datatype": "int",
+                "displayname": "Total",
+                "description": "Total entries in history buffer."
+            },
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "True on successful call."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": true
+        }
+    }
+]

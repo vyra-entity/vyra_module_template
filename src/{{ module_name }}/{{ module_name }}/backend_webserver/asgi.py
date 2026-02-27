@@ -9,58 +9,11 @@ The backend communicates with core application components via dependency injecti
 
 import sys
 import os
-import logging
-import logging.config
-import json
+from ..logging_config import get_logger
 
-# Configure logging for the application
-def get_module_name() -> str:
-    """Get module name from environment or default."""
-    return os.getenv('MODULE_NAME', '{{ module_name }}')
-
-
-def setup_logging():
-    """Setup logging configuration with ENV variable support"""
-    log_config_path = "/workspace/config/uvicorn_logging.json"
-    
-    # Get logging format from ENV variable
-    logging_format = os.getenv('LOGGING_FORMAT', '%(asctime)s - %(levelname)-8s - %(name)s - %(message)s')
-    log_level = os.getenv("LOG_LEVEL", "INFO").upper()
-
-
-    if os.path.exists(log_config_path):
-        try:
-            with open(log_config_path, 'r') as f:
-                config = json.load(f)
-            
-            # Override format strings with ENV variable
-            for formatter_name, formatter_config in config.get('formatters', {}).items():
-                if 'format' in formatter_config:
-                    formatter_config['format'] = logging_format
-            
-            logging.config.dictConfig(config)
-            logging.getLogger().setLevel(log_level)
-            print(f"✅ Logging configured from {log_config_path} with ENV format")
-        except Exception as e:
-            print(f"⚠️ Failed to load logging config: {e}")
-            logging.basicConfig(
-                level=logging.INFO,
-                format=logging_format
-            )
-    else:
-        print(f"⚠️ Logging config not found at {log_config_path}, using basic config")
-        logging.basicConfig(
-            level=logging.INFO,
-            format=logging_format,
-            handlers=[
-                logging.StreamHandler(),
-                logging.FileHandler('/workspace/log/uvicorn/application.log')
-            ]
-        )
-
-# Setup logging as early as possible
-setup_logging()
-logger = logging.getLogger(__name__)
+# Setup logging via the shared VYRA logging_config (same as v2_modulemanager)
+# logging_config reads core_logging.json and configures the root logger on import
+logger = get_logger(__name__)
 
 # Import FastAPI application from main_rest module
 try:

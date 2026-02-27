@@ -6,10 +6,6 @@ from pathlib import Path
 import signal
 import sys
 
-# Add /workspace to Python path for storage.interfaces.grpc_generated imports
-if '/workspace' not in sys.path:
-    sys.path.insert(0, '/workspace')
-
 # Initialize structured logging FIRST
 from .logging_config import configure_logging, get_logger, log_exception, log_call
 
@@ -34,7 +30,7 @@ from . import _base_
 from .application import application
 from .application.application import Component
 from .taskmanager import TaskManager, task_supervisor_looper
-from .status.status_manager import StatusManager
+from .state.state_manager import StateManager
 from . import container_injection
 
 from vyra_base.core.entity import VyraEntity
@@ -80,7 +76,7 @@ signal.signal(signal.SIGINT, handle_sigterm)
 @log_call
 async def application_runner(
         taskmanager: TaskManager,
-        statusmanager: StatusManager,
+        statemanager: StateManager,
         component) -> None:
     """
     Main application logic runner.
@@ -89,36 +85,36 @@ async def application_runner(
     
     Args:
         taskmanager: TaskManager instance to manage application tasks
-        statusmanager: StatusManager for monitoring application status
+        statemanager: StateManager for monitoring application state
         component: Component instance to reuse across recoveries
     """
-    await application.main(taskmanager, statusmanager, component)
+    await application.main(taskmanager, statemanager, component)
     ErrorTraceback.check_error_exist()
 
 @log_call
-async def setup_statusmanager(entity: VyraEntity) -> StatusManager:
+async def setup_statemanager(entity: VyraEntity) -> StateManager:
     """
-    Initialize and configure the Status Manager.
+    Initialize and configure the State Manager.
     
     Args:
         entity: VyraEntity instance from core application
         
     Returns:
-        Configured StatusManager instance
+        Configured StateManager instance
         
     Raises:
-        Exception: If status manager initialization fails
+        Exception: If state manager initialization fails
     """
-    logger.info("status_manager_initializing")
+    logger.info("state_manager_initializing")
     
-    # Initialize status manager
-    status_manager = StatusManager(entity)
-    logger.debug("status_manager_created", status_manager_type=type(status_manager).__name__)
+    # Initialize state manager
+    state_manager = StateManager(entity)
+    logger.debug("state_manager_created", state_manager_type=type(state_manager).__name__)
     
-    await status_manager.setup_interfaces()
-    logger.info("status_manager_interfaces_setup_complete")
+    await state_manager.setup_interfaces()
+    logger.info("state_manager_interfaces_setup_complete")
 
-    return status_manager
+    return state_manager
 
 
 @log_call
@@ -148,7 +144,7 @@ async def ros_spinner_runner(entity: VyraEntity) -> None:
             # Run spin_once in a thread-pool executor so it never blocks the
             # asyncio event loop.  Without this, the 10 ms timeout_sec call
             # prevented uvicorn from accepting TCP connections fast enough,
-            # filling the TCP backlog and causing Traefik 504s.
+            # filling the TCP backlog (Recv-Q ≈ 334) and causing Traefik 504s.
             await loop.run_in_executor(None, spin_fn)
             spin_count += 1
             
@@ -160,8 +156,12 @@ async def ros_spinner_runner(entity: VyraEntity) -> None:
                     error_count=error_count
                 )
             
-            # Yield to other coroutines (uvicorn, etc.) between spins
-            await asyncio.sleep(0)
+            # Yield to other coroutines (uvicorn, etc.) between spins.
+            # sleep(0) only yields the scheduler but never forces an epoll I/O
+            # check, so we use a small real sleep (5 ms) to ensure uvicorn's
+            # transport callbacks get CPU time and CLOSE-WAIT connections are
+            # properly processed.
+            await asyncio.sleep(0.005)
             
         except Exception as spin_error:
             error_count += 1
@@ -213,10 +213,12 @@ async def web_backend_runner() -> None:
     
     logger.info("container_initialized", wait_count=wait_count)
     
-    # Get module name dynamically from entity
+    # Get module name dynamically from entity.
+    # entity.module_entry.name is the short package name (e.g. "v2_modulemanager"),
+    # which is also the top-level Python package installed by colcon.
     entity = container_injection.get_entity()
     module_name = entity.module_entry.name
-    app_path = f"{module_name}.{module_name}.backend_webserver.asgi:application"
+    app_path = f"{module_name}.backend_webserver.asgi:application"
     
     logger.info(
         "web_backend_config",
@@ -271,13 +273,13 @@ async def web_backend_runner() -> None:
     await server.serve()
 
 @log_call
-async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, StatusManager]:
+async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, StateManager]:
     """
     Initialize VYRA entity and configure base settings.
     
     Sets up the module infrastructure including:
     - VyraEntity creation
-    - StatusManager initialization
+    - StateManager initialization
     - Component creation and interface registration
     - Container dependency injection
     - Task scheduling (application, ROS2 spinner, web backend)
@@ -286,7 +288,7 @@ async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, Statu
         taskmanager: TaskManager instance to manage application tasks
         
     Returns:
-        Tuple of (VyraEntity, StatusManager)
+        Tuple of (VyraEntity, StateManager)
         
     Raises:
         RuntimeError: If ROS2 node creation fails in non-SLIM mode
@@ -300,14 +302,14 @@ async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, Statu
         node_name=entity.node.get_name() if entity.node else "None"
     )
     
-    # Setup status manager
-    logger.debug("setting_up_status_manager")
-    statusmanager: StatusManager = await setup_statusmanager(entity)
-    logger.info("status_manager_ready")
+    # Setup state manager
+    logger.debug("setting_up_state_manager")
+    statemanager: StateManager = await setup_statemanager(entity)
+    logger.info("state_manager_ready")
 
     # Create Component (reused across task recoveries)
     logger.debug("creating_component")
-    unified_state_machine = statusmanager.state_machine
+    unified_state_machine = statemanager.state_machine
     component = Component(unified_state_machine, entity, taskmanager)
     logger.info(
         "component_created",
@@ -325,12 +327,12 @@ async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, Statu
     container_injection.set_entity(entity)
     container_injection.set_component(component)
     container_injection.set_task_manager(taskmanager)
-    container_injection.set_status_manager(statusmanager)
+    container_injection.set_state_manager(statemanager)
     logger.info("container_dependencies_injected")
 
     # Schedule application runner task
     logger.info("scheduling_application_runner_task")
-    taskmanager.add_task(application_runner, taskmanager, statusmanager, component)
+    taskmanager.add_task(application_runner, taskmanager, statemanager, component)
     logger.debug("application_runner_task_scheduled")
     
     # ROS2-dependent tasks: only start if NOT in SLIM mode
@@ -374,7 +376,7 @@ async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, Statu
         webserver_enabled=enable_webserver
     )
     
-    return entity, statusmanager
+    return entity, statemanager
 
 @ErrorTraceback.w_check_error_exist
 async def runner() -> None:
@@ -421,7 +423,7 @@ async def runner() -> None:
 
         # Initialize module
         logger.info("initializing_module")
-        entity, statusmanager = await initialize_module(taskmanager)
+        entity, statemanager = await initialize_module(taskmanager)
         
         task_count = len(taskmanager.tasks)
         task_names = list(taskmanager.tasks.keys())
@@ -434,7 +436,7 @@ async def runner() -> None:
 
         # Start task supervision loop
         logger.info("starting_task_supervisor")
-        await task_supervisor_looper(taskmanager, statusmanager)
+        await task_supervisor_looper(taskmanager, statemanager)
         logger.info("task_supervisor_completed")
 
     except SystemExit as e:

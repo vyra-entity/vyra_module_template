@@ -166,7 +166,6 @@ fi
 echo "=== SETTING UP LOG DIRECTORIES ==="
 
 mkdir -p /workspace/log/vyra
-mkdir -p /workspace/log/uvicorn
 mkdir -p /workspace/log/nginx
 mkdir -p /workspace/log/ros2
 
@@ -663,7 +662,6 @@ echo "=== CREATING LOG DIRECTORIES ==="
 
 mkdir -p /workspace/log/core
 mkdir -p /workspace/log/nginx
-mkdir -p /workspace/log/uvicorn
 mkdir -p /workspace/log/vyra
 
 # Only create ros2 logs directory if not in SLIM mode
