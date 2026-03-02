@@ -71,7 +71,7 @@ class Component(OperationalStateMachine):
         """
         await auto_register_interfaces(self.entity, callback_parent=self)
     
-    @remote_service
+    @remote_service()
     async def initialize(self, request: Any=None, response: Any=None) -> bool:
         """
         Initialize the VYRA Module Manager components.
@@ -148,7 +148,7 @@ class Component(OperationalStateMachine):
                 logger.warning(f"StateFeed heartbeat publish failed: {e}")
             await asyncio.sleep(5.0)
 
-    @remote_service
+    @remote_service()
     async def pause(self, request: Any=None, response: Any=None) -> bool:
         """
         Pause ongoing operations.
@@ -167,7 +167,7 @@ class Component(OperationalStateMachine):
         logger.info("⏸️  Component pause requested")
         return True  # Placeholder for actual implementation
     
-    @remote_service
+    @remote_service()
     async def resume(self, request: Any=None, response: Any=None) -> bool:
         """
         Resume from paused state.
@@ -186,7 +186,7 @@ class Component(OperationalStateMachine):
         logger.info("▶️  Component resume requested")
         return True
     
-    @remote_service
+    @remote_service()
     async def stop(self, request: Any=None, response: Any=None) -> bool:
         """
         Stop component operations cleanly.
@@ -214,7 +214,7 @@ class Component(OperationalStateMachine):
 
         return True
     
-    @remote_service
+    @remote_service()
     async def reset(self, request: Any=None, response: Any=None) -> bool:
         """
         Reset component to initial state.
@@ -233,7 +233,7 @@ class Component(OperationalStateMachine):
         
         return True
     
-    # @remote_service
+    # @remote_service()
     # @state.operation
     # async def template_test(self, request: Any=None, response: Any=None) -> dict:
     #     """

@@ -165,7 +165,6 @@ fi
 # =============================================================================
 echo "=== SETTING UP LOG DIRECTORIES ==="
 
-mkdir -p /workspace/log/vyra
 mkdir -p /workspace/log/nginx
 mkdir -p /workspace/log/ros2
 
@@ -524,33 +523,28 @@ fi
 
 # SROS2 Setup
 echo "=== SROS2 SETUP ==="
+echo "ROS_SECURITY_ENABLE: ${ROS_SECURITY_ENABLE:-false}"
 echo "ROS_SECURITY_KEYSTORE: $ROS_SECURITY_KEYSTORE"
 
-# if [ ! -d "$ROS_SECURITY_KEYSTORE" ]; then
-#     echo "[SROS2] Creating keystore at $ROS_SECURITY_KEYSTORE"
-#     ros2 security create_keystore $ROS_SECURITY_KEYSTORE
-# fi
-
-echo "[SROS2] Creating keystore at $ROS_SECURITY_KEYSTORE if not exists"
-ros2 security create_keystore $ROS_SECURITY_KEYSTORE || true
-# Only generate policy if enclave doesn't exist yet (avoids hanging when ROS graph is active)
-if [ ! -d "$ROS_SECURITY_KEYSTORE/enclaves/$MODULE_NAME/core" ]; then
-    timeout --kill-after=5s 30s ros2 security generate_policy sros2_keystore/ || true
+if [ "${ROS_SECURITY_ENABLE:-false}" = "true" ]; then
+    echo "[SROS2] Security enabled - preparing keystore at $ROS_SECURITY_KEYSTORE"
+    mkdir -p "$ROS_SECURITY_KEYSTORE"
+    ros2 security create_keystore $ROS_SECURITY_KEYSTORE || true
+    # Only generate policy if enclave doesn't exist yet (avoids hanging when ROS graph is active)
+    if [ ! -d "$ROS_SECURITY_KEYSTORE/enclaves/$MODULE_NAME/core" ]; then
+        timeout --kill-after=5s 30s ros2 security generate_policy $ROS_SECURITY_KEYSTORE/ || true
+    fi
+    if [ ! -d "$ROS_SECURITY_KEYSTORE/enclaves" ]; then
+        echo "[SROS2] Creating enclaves at $ROS_SECURITY_KEYSTORE"
+        mkdir -p $ROS_SECURITY_KEYSTORE/enclaves
+    fi
+    echo "[SROS2] Creating enclave for /$MODULE_NAME/core"
+    ros2 security create_enclave $ROS_SECURITY_KEYSTORE /$MODULE_NAME/core || true
+    echo "\u2705 SROS2 keystore ready"
+else
+    echo "[SROS2] Security disabled (ROS_SECURITY_ENABLE != true) - ensuring storage directory exists"
+    mkdir -p "$ROS_SECURITY_KEYSTORE"
 fi
-
-if [ ! -d "$ROS_SECURITY_KEYSTORE/enclaves" ]; then
-    echo "[SROS2] Creating enclaves at $ROS_SECURITY_KEYSTORE"
-    mkdir -p $ROS_SECURITY_KEYSTORE/enclaves
-fi
-
-# Enclave für $MODULE_NAME erzeugen
-echo "[SROS2] Creating enclave for /$MODULE_NAME/core"
-ros2 security create_enclave $ROS_SECURITY_KEYSTORE /$MODULE_NAME/core || true
-
-# Environment für Security setzen
-# export ROS_SECURITY_ENABLE=false
-# export ROS_SECURITY_STRATEGY=Enforce
-# export ROS_SECURITY_ENCLAVE="/$MODULE_NAME/core"
 
 echo "=== FINAL ENVIRONMENT ==="
 echo "ROS_SECURITY_ENABLE: $ROS_SECURITY_ENABLE"
@@ -662,14 +656,13 @@ echo "=== CREATING LOG DIRECTORIES ==="
 
 mkdir -p /workspace/log/core
 mkdir -p /workspace/log/nginx
-mkdir -p /workspace/log/vyra
 
 # Only create ros2 logs directory if not in SLIM mode
 if [ "${VYRA_SLIM:-false}" != "true" ]; then
     mkdir -p /workspace/log/ros2
-    echo "✅ Created core, nginx, uvicorn, vyra, and ros2 log directories"
+    echo "✅ Created core, nginx, and ros2 log directories"
 else
-    echo "✅ Created core (slim mode: skipping ros2) log directories"
+    echo "✅ Created core and nginx log directories (slim mode: skipping ros2)"
 fi
 
 echo "===================================="

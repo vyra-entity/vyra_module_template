@@ -186,11 +186,11 @@ RUN if [ "$SECURE_BY_SROS2" = "true" ]; then \
         echo "🔐 SROS2 Security enabled - generating keystore..."; \
         source /tmp/module_name.env && \
         source /opt/ros/kilted/setup.bash && \
-        ros2 security create_keystore ./sros2_keystore && \
-        ros2 security create_enclave ./sros2_keystore /${MODULE_NAME}/core; \
+        ros2 security create_keystore ./storage/sros2_keystore && \
+        ros2 security create_enclave ./storage/sros2_keystore /${MODULE_NAME}/core; \
     else \
-        echo "⚠️  SROS2 disabled - creating empty keystore directory"; \
-        mkdir -p ./sros2_keystore; \
+        echo "SROS2 disabled - creating empty keystore directory"; \
+        mkdir -p ./storage/sros2_keystore; \
     fi
 
 # Generate merged SROS2 policy (only if SECURE_BY_SROS2=true)
@@ -199,7 +199,7 @@ RUN if [ "$SECURE_BY_SROS2" = "true" ]; then \
         python3 tools/generate_sros2_policy.py \
             --static config/sros2_policy_static.xml \
             --dynamic config/sros2_policy_dynamic.xml \
-            --output sros2_keystore/enclaves/${MODULE_NAME}/core; \
+            --output storage/sros2_keystore/enclaves/${MODULE_NAME}/core; \
     else \
         echo "⚠️  SROS2 disabled - skipping policy generation"; \
     fi
@@ -219,10 +219,10 @@ RUN if [ -d "frontend" ] && [ -f "frontend/package.json" ] && [ -d "frontend/src
 
 # Extract SROS2 CA certificate (only if SROS2 is enabled)
 RUN if [ "${SECURE_BY_SROS2}" = "true" ]; then \
-        if [ -f "./sros2_keystore/ca.cert.pem" ]; then \
-            cp ./sros2_keystore/ca.cert.pem ./sros2_ca_public.pem; \
-        elif [ -f "./sros2_keystore/public/ca.cert.pem" ]; then \
-            cp ./sros2_keystore/public/ca.cert.pem ./sros2_ca_public.pem; \
+        if [ -f "./storage/sros2_keystore/ca.cert.pem" ]; then \
+            cp ./storage/sros2_keystore/ca.cert.pem ./sros2_ca_public.pem; \
+        elif [ -f "./storage/sros2_keystore/public/ca.cert.pem" ]; then \
+            cp ./storage/sros2_keystore/public/ca.cert.pem ./sros2_ca_public.pem; \
         else \
             echo "ERROR: SECURE_BY_SROS2=true but CA certificate not found" && exit 1; \
         fi; \
@@ -253,7 +253,6 @@ WORKDIR /workspace
 # Copy ONLY module artifacts (base image already has everything else)
 COPY --from=builder /workspace/install/ ./install/
 # Note: build/ directory not needed in runtime (only for compilation)
-COPY --from=builder /workspace/storage/sros2_keystore/ ./sros2_keystore/
 COPY --from=builder /workspace/sros2_ca_public.pem ./sros2_ca_public.pem
 COPY --from=builder /workspace/config/ ./config/
 COPY --from=builder /workspace/tools/ ./tools/

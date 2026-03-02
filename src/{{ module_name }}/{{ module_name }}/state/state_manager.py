@@ -1,5 +1,5 @@
 """
-State Manager for v2_modulemanager.
+State Manager
 
 Manages the 3-layer state machine (Lifecycle, Operational, Health) and
 exposes **read-only** Zenoh interfaces so that other modules can query the
@@ -175,11 +175,11 @@ class StateManager:
 
         except Exception as exc:
             logger.error(f"❌ Failed to initialise module: {exc}")
-            error_details: Dict[str, Any] = {}
+            error_details: list[Any] = []
             ErrorTraceback.check_error_exist(error_details=error_details)
-            self._record_error(str(exc), error_details)
+            self._record_error(str(exc), {'error_details': error_details})
             try:
-                self._state_machine.report_fault(error=str(exc))
+                self._state_machine.report_fault(fault_info={'error': str(exc), 'details': error_details})
             except Exception:
                 pass
             return False
@@ -199,12 +199,12 @@ class StateManager:
         
         except Exception as exc:
             logger.error(f"❌ Failed to initialise module: {exc}")
-            error_details: Dict[str, Any] = {}
+            error_details: list[Any] = []
             ErrorTraceback.check_error_exist(error_details=error_details)
-            self._record_error(str(exc), error_details)
+            self._record_error(str(exc), {'error_details': error_details})
         
             try:
-                self._state_machine.report_fault(error=str(exc))
+                self._state_machine.report_fault(fault_info={'error': str(exc), 'details': error_details})
             except Exception:
                 pass
             return False
@@ -296,7 +296,7 @@ class StateManager:
     # Other modules can call these via Zenoh – they never mutate state.
     # ─────────────────────────────────────────────────────────────────────────
 
-    @remote_service
+    @remote_service()
     def get_state(self, request: Dict[str, Any], response: Dict[str, Any]) -> Dict[str, Any]:
         """
         Return the full 3-layer state snapshot.
@@ -319,7 +319,7 @@ class StateManager:
             response["error"] = str(exc)
         return response
 
-    @remote_service
+    @remote_service()
     def get_lifecycle_state(
         self, request: Dict[str, Any], response: Dict[str, Any]
     ) -> Dict[str, Any]:
@@ -342,7 +342,7 @@ class StateManager:
             response["error"] = str(exc)
         return response
 
-    @remote_service
+    @remote_service()
     def get_operational_state(
         self, request: Dict[str, Any], response: Dict[str, Any]
     ) -> Dict[str, Any]:
@@ -365,7 +365,7 @@ class StateManager:
             response["error"] = str(exc)
         return response
 
-    @remote_service
+    @remote_service()
     def get_health_state(
         self, request: Dict[str, Any], response: Dict[str, Any]
     ) -> Dict[str, Any]:
@@ -388,7 +388,7 @@ class StateManager:
             response["error"] = str(exc)
         return response
 
-    @remote_service
+    @remote_service()
     def get_last_error_state(
         self, request: Dict[str, Any], response: Dict[str, Any]
     ) -> Dict[str, Any]:
@@ -423,7 +423,7 @@ class StateManager:
             response["error"] = str(exc)
         return response
 
-    @remote_service
+    @remote_service()
     def get_state_summary(
         self, request: Dict[str, Any], response: Dict[str, Any]
     ) -> Dict[str, Any]:
@@ -472,7 +472,7 @@ class StateManager:
             response["error"] = str(exc)
         return response
 
-    @remote_service
+    @remote_service()
     def get_state_history(
         self, request: Dict[str, Any], response: Dict[str, Any]
     ) -> Dict[str, Any]:
@@ -512,45 +512,47 @@ class StateManager:
         return response
 
     # ─────────────────────────────────────────────────────────────────────────
-    # State broadcasting (called by async task runner)
+    # State broadcasting (called by async task runner) [OBSOLETE]
     # ─────────────────────────────────────────────────────────────────────────
 
-    async def broadcast_state(self) -> None:
-        """
-        Broadcast the current state via the VyraEntity StateFeeder (1 Hz).
+    # async def broadcast_state(self) -> None:
+    #     """
+    #     Broadcast the current state via the VyraEntity StateFeeder (1 Hz).
 
-        Detects changes since the last broadcast and records them in the
-        history buffer.
-        """
-        try:
-            current = self.get_current_state()
-            states = self._state_machine.get_all_states()
+    #     Detects changes since the last broadcast and records them in the
+    #     history buffer.
+    #     """
+    #     try:
+    #         current = self.get_current_state()
+    #         states = self._state_machine.get_all_states()
 
-            self.entity.state_feeder.feed_state(
-                lifecycle_state=states["lifecycle"],
-                operational_state=states["operational"],
-                health_state=states["health"],
-                metadata={
-                    "module_name": self.module_name,
-                    "module_id": self.module_id,
-                    "is_operational": self._state_machine.is_operational(),
-                    "is_healthy": self._state_machine.is_healthy(),
-                    "timestamp": current.timestamp.isoformat(),
-                },
-            )
+    #         feed_element = State
 
-            if self._last_state is not None:
-                self._record_history_diff(self._last_state, current)
+    #         self.entity.state_feeder.feed(
+    #             lifecycle_state=states["lifecycle"],
+    #             operational_state=states["operational"],
+    #             health_state=states["health"],
+    #             metadata={
+    #                 "module_name": self.module_name,
+    #                 "module_id": self.module_id,
+    #                 "is_operational": self._state_machine.is_operational(),
+    #                 "is_healthy": self._state_machine.is_healthy(),
+    #                 "timestamp": current.timestamp.isoformat(),
+    #             },
+    #         )
 
-            self._last_state = current
+    #         if self._last_state is not None:
+    #             self._record_history_diff(self._last_state, current)
 
-        except Exception as exc:
-            logger.error(f"Failed to broadcast state: {exc}")
+    #         self._last_state = current
 
-    # Backward-compatibility alias
-    async def broadcast_status(self) -> None:
-        """Alias for :meth:`broadcast_state` (backward compatibility)."""
-        await self.broadcast_state()
+    #     except Exception as exc:
+    #         logger.error(f"Failed to broadcast state: {exc}")
+
+    # # Backward-compatibility alias
+    # async def broadcast_status(self) -> None:
+    #     """Alias for :meth:`broadcast_state` (backward compatibility)."""
+    #     await self.broadcast_state()
 
     # ─────────────────────────────────────────────────────────────────────────
     # Internal state-mutation helpers (called only by application code)
@@ -636,11 +638,11 @@ class StateManager:
         except Exception as exc:
             logger.warning(f"complete_shutdown transition failed: {exc}")
 
-        try:
-            await self.broadcast_state()
-            logger.info("📡 Offline state broadcasted to all clients")
-        except Exception as exc:
-            logger.warning(f"Failed to broadcast offline state: {exc}")
+        # try:
+        #     await self.broadcast_state()
+        #     logger.info("📡 Offline state broadcasted to all clients")
+        # except Exception as exc:
+        #     logger.warning(f"Failed to broadcast offline state: {exc}")
 
 
     def _dispatch_action(
@@ -650,9 +652,9 @@ class StateManager:
         if layer == "lifecycle":
             if action == "start":
                 self._state_machine.start(metadata)
-            elif action == "complete_init":
+            elif action == "complete_initialization":
                 self._state_machine.complete_initialization(metadata)
-            elif action == "fail_init":
+            elif action == "fail_initialization":
                 self._state_machine.fail_initialization(metadata.get("error"))
             elif action == "shutdown":
                 self._state_machine.shutdown(metadata.get("reason"))
@@ -661,9 +663,9 @@ class StateManager:
             elif action == "suspend":
                 self._state_machine.suspend(metadata.get("reason"))
             elif action == "resume_from_suspend":
-                self._state_machine.resume_from_suspend()
-            elif action == "recover":
-                self._state_machine.start_recovery(metadata.get("error"))
+                self._state_machine.resume_from_suspend(metadata)
+            elif action == "enter_recovery":
+                self._state_machine.enter_recovery(metadata.get("error"))
             elif action == "complete_recovery":
                 self._state_machine.complete_recovery()
             elif action == "fail_recovery":
@@ -677,37 +679,23 @@ class StateManager:
             elif action == "start_task":
                 self._state_machine.start_task(metadata)
             elif action == "pause":
-                self._state_machine.pause_task(metadata.get("reason"))
+                self._state_machine.pause(metadata.get("reason"))
             elif action == "resume":
-                self._state_machine.resume_task()
-            elif action == "block":
-                self._state_machine.block(metadata.get("reason"))
-            elif action == "unblock":
-                self._state_machine.unblock()
-            elif action == "delegate":
-                self._state_machine.delegate(metadata)
-            elif action == "complete":
-                self._state_machine.complete_task(metadata)
+                self._state_machine.resume()
             elif action == "reset":
-                self._state_machine.reset_to_ready()
+                self._state_machine.reset()
             else:
                 raise ValueError(f"Unknown operational action: {action}")
 
         elif layer == "health":
             if action == "report_warning":
                 self._state_machine.report_warning(metadata)
-            elif action == "report_overload":
-                self._state_machine.report_overload(metadata)
             elif action == "report_fault":
                 self._state_machine.report_fault(metadata.get("error"))
-            elif action == "clear_warning":
-                self._state_machine.clear_health()
-            elif action == "reduce_load":
-                self._state_machine.reduce_load()
             elif action == "recover":
-                self._state_machine.recover_from_fault()
-            elif action == "escalate_critical":
-                self._state_machine.escalate_to_critical(metadata)
+                self._state_machine.recover()
+            elif action == "emergency_stop":
+                self._state_machine.emergency_stop(metadata.get("reason", "no reason added"))
             else:
                 raise ValueError(f"Unknown health action: {action}")
 
@@ -772,33 +760,33 @@ class StateManager:
         self._error_history.append(entry)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Async runner (used by main.py / taskmanager)
-# ─────────────────────────────────────────────────────────────────────────────
+# # ─────────────────────────────────────────────────────────────────────────────
+# # Async runner (used by main.py / taskmanager) [OBSOLOETE]
+# # ─────────────────────────────────────────────────────────────────────────────
 
 
-async def state_manager_runner(state_manager: StateManager) -> None:
-    """
-    Async broadcast loop for the StateManager.
+# async def state_manager_runner(state_manager: StateManager) -> None:
+#     """
+#     Async broadcast loop for the StateManager.
 
-    Runs at the interval configured in ``module_state_meta.json``
-    (default 1 Hz).  Should be scheduled as an asyncio Task.
+#     Runs at the interval configured in ``module_state_meta.json``
+#     (default 1 Hz).  Should be scheduled as an asyncio Task.
 
-    Args:
-        state_manager: The :class:`StateManager` instance to run.
-    """
-    interval = state_manager.broadcast_interval
-    logger.info(
-        f"▶️  StateManager broadcast loop started "
-        f"(interval={interval:.2f}s / "
-        f"{state_manager._config.get('broadcast_interval_hz', 1.0):.1f} Hz)"
-    )
-    while True:
-        try:
-            await state_manager.broadcast_state()
-        except asyncio.CancelledError:
-            logger.info("StateManager broadcast loop cancelled")
-            break
-        except Exception as exc:
-            logger.error(f"StateManager loop error: {exc}")
-        await asyncio.sleep(interval)
+#     Args:
+#         state_manager: The :class:`StateManager` instance to run.
+#     """
+#     interval = state_manager.broadcast_interval
+#     logger.info(
+#         f"▶️  StateManager broadcast loop started "
+#         f"(interval={interval:.2f}s / "
+#         f"{state_manager._config.get('broadcast_interval_hz', 1.0):.1f} Hz)"
+#     )
+#     while True:
+#         try:
+#             await state_manager.broadcast_state()
+#         except asyncio.CancelledError:
+#             logger.info("StateManager broadcast loop cancelled")
+#             break
+#         except Exception as exc:
+#             logger.error(f"StateManager loop error: {exc}")
+#         await asyncio.sleep(interval)

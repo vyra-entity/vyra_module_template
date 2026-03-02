@@ -46,9 +46,13 @@ logger.info(
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Graceful shutdown infrastructure
+# Replaces synchronous signal.signal() handlers that could not perform async
+# lifecycle state transitions (ShuttingDown → Offline) before exiting.
 # ─────────────────────────────────────────────────────────────────────────────
 
 class _ShutdownRefs:
+    """Module-level mutable refs so the async signal handler can reach the
+    statemanager and taskmanager after they are created in runner()."""
     statemanager: "StateManager | None" = None
     taskmanager: "TaskManager | None" = None
     exit_code: int = 0
@@ -59,33 +63,58 @@ _shutdown_refs = _ShutdownRefs()
 
 
 async def _graceful_shutdown_async() -> None:
-    """Async graceful shutdown — transitions lifecycle to Offline before exiting."""
+    """
+    Async graceful shutdown — triggered by SIGTERM / SIGINT via asyncio-native
+    signal handler (loop.add_signal_handler).
+
+    Sequence:
+    1. Transition lifecycle → ShuttingDown → Offline and broadcast state so
+       that clients connected via Zenoh still see the final Offline state.
+    2. Cancel all managed tasks → unblocks task_supervisor_looper (shutdown_event).
+    3. Shut down ROS2 node/context.
+    4. Store exit_code=143 so main() can propagate it to Docker Swarm/supervisord.
+    """
     if _shutdown_refs.shutdown_started:
+        logger.debug("graceful_shutdown_already_in_progress")
         return
     _shutdown_refs.shutdown_started = True
     sig_name = _shutdown_refs.sig_name or "unknown"
 
-    logger.warning("graceful_shutdown_started", signal=sig_name, pid=os.getpid())
+    logger.warning(
+        "graceful_shutdown_started",
+        signal=sig_name,
+        slim_mode=VYRA_SLIM,
+        pid=os.getpid(),
+    )
 
+    # 1. Lifecycle → ShuttingDown → Offline + broadcast
     if _shutdown_refs.statemanager:
         try:
-            await _shutdown_refs.statemanager.shutdown_to_offline(reason=f"signal:{sig_name}")
+            await _shutdown_refs.statemanager.shutdown_to_offline(
+                reason=f"signal:{sig_name}"
+            )
             logger.info("lifecycle_offline_broadcasted")
         except Exception as e:
             log_exception(logger, e, context={"operation": "shutdown_to_offline"})
 
+    # 2. Cancel all managed tasks
     if _shutdown_refs.taskmanager:
         try:
             await _shutdown_refs.taskmanager.cancel_all()
+            logger.info("all_tasks_cancelled_via_shutdown")
         except Exception as e:
             log_exception(logger, e, context={"operation": "cancel_all_shutdown"})
 
+    # 3. Shutdown ROS2
     if not VYRA_SLIM and rclpy and rclpy.ok():
         try:
+            logger.info("shutting_down_ros2", reason=sig_name)
             rclpy.shutdown()
+            logger.info("ros2_shutdown_complete")
         except Exception as e:
             log_exception(logger, e, context={"operation": "ros2_shutdown"})
 
+    # 4. Store exit code — main() will call sys.exit() after asyncio.run() returns
     _shutdown_refs.exit_code = 143
     logger.info("graceful_shutdown_complete", exit_code=143)
 
@@ -98,7 +127,7 @@ async def application_runner() -> None:
     All dependencies are resolved via container_injection.
     """
     await application.main()
-    ErrorTraceback.check_error_exist()
+    ErrorTraceback.check_error_exist() 
 
 @log_call
 async def setup_statemanager(entity: VyraEntity) -> StateManager:
@@ -121,6 +150,9 @@ async def setup_statemanager(entity: VyraEntity) -> StateManager:
     logger.debug("state_manager_created", state_manager_type=type(state_manager).__name__)
     
     await state_manager.setup_interfaces()
+
+    await state_manager.initialization_start()
+
     logger.info("state_manager_interfaces_setup_complete")
 
     return state_manager
@@ -164,6 +196,10 @@ async def ros_spinner_runner(entity: VyraEntity) -> None:
     Args:
         entity: VyraEntity containing the ROS2 node
     """
+    if entity.node is None:
+        logger.error("ros_spinner_missing_node", reason="entity_node_none")
+        return
+    
     logger.info("ros_spinner_starting", node_name=entity.node.get_name())
     spin_count = 0
     error_count = 0
@@ -352,6 +388,7 @@ async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, State
     logger.debug("creating_component")
     unified_state_machine = statemanager.state_machine
     component = Component(unified_state_machine, entity, taskmanager)
+
     logger.info(
         "component_created",
         component_type=type(component).__name__,
@@ -371,6 +408,8 @@ async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, State
     container_injection.set_state_manager(statemanager)
     container_injection.set_user_manager(user_manager)
     logger.info("container_dependencies_injected")
+
+    await statemanager.initialization_complete()  # Notify StateManager that initialization is complete (for manual startup)
 
     # Schedule application runner task
     logger.info("scheduling_application_runner_task")
@@ -443,14 +482,19 @@ async def runner() -> None:
     statemanager = None
 
     try:
-        # Create TaskManager
-        logger.debug("creating_task_manager")
+        # ── Create TaskManager ─────────────────────────────────────────────
+        logger.debug("Creating TaskManager")
         taskmanager = TaskManager()
         logger.info("task_manager_created", taskmanager_id=id(taskmanager))
 
-        # Register asyncio-native signal handlers for graceful shutdown
+        # ── Shutdown event shared between signal handler & supervisor loop ─
         shutdown_event = asyncio.Event()
         _shutdown_refs.taskmanager = taskmanager
+
+        # ── Register asyncio-native signal handlers ────────────────────────
+        # Using loop.add_signal_handler() instead of signal.signal() so that
+        # the handler can schedule _graceful_shutdown_async as an asyncio task,
+        # enabling proper lifecycle state transitions before the process exits.
         loop = asyncio.get_running_loop()
         for _sig in (signal.SIGTERM, signal.SIGINT):
             _sig_name = "SIGTERM" if _sig == signal.SIGTERM else "SIGINT"
@@ -462,8 +506,9 @@ async def runner() -> None:
                         loop.create_task(_graceful_shutdown_async())
                 return _handler
             loop.add_signal_handler(_sig, _make_handler(_sig_name))
-        
-        # Only initialize ROS2 if NOT in SLIM mode
+        logger.debug("asyncio_signal_handlers_registered")
+
+        # ── Only initialize ROS2 if NOT in SLIM mode ───────────────────────
         if not VYRA_SLIM:
             if rclpy is None:
                 logger.critical("rclpy_not_imported", mode="full")
@@ -479,11 +524,11 @@ async def runner() -> None:
         else:
             logger.info("skipping_rclpy_init", mode="slim")
 
-        # Initialize module
+        # ── Initialize module ──────────────────────────────────────────────
         logger.info("initializing_module")
         entity, statemanager = await initialize_module(taskmanager)
-        _shutdown_refs.statemanager = statemanager
-        
+        _shutdown_refs.statemanager = statemanager  # expose to shutdown handler
+
         task_count = len(taskmanager.tasks)
         task_names = list(taskmanager.tasks.keys())
         logger.info(
@@ -493,9 +538,11 @@ async def runner() -> None:
             module_name=entity.module_entry.name if entity else "unknown"
         )
 
-        # Start task supervision loop
+        # ── Start task supervision loop ────────────────────────────────────
         logger.info("starting_task_supervisor")
-        await task_supervisor_looper(taskmanager, statemanager, shutdown_event=shutdown_event)
+        await task_supervisor_looper(
+            taskmanager, statemanager, shutdown_event=shutdown_event
+        )
         logger.info("task_supervisor_completed")
 
     except SystemExit as e:
@@ -587,8 +634,12 @@ def main() -> None:
     try:
         logger.debug("starting_asyncio_runner")
         asyncio.run(runner())
+        # Propagate exit code requested by graceful shutdown (e.g. 143 for SIGTERM)
         if _shutdown_refs.exit_code != 0:
-            logger.info("exiting_with_shutdown_code", exit_code=_shutdown_refs.exit_code)
+            logger.info(
+                "exiting_with_shutdown_code",
+                exit_code=_shutdown_refs.exit_code,
+            )
             sys.exit(_shutdown_refs.exit_code)
         logger.info("module_exited_normally")
         

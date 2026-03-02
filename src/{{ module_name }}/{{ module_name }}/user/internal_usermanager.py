@@ -272,7 +272,7 @@ class InternalUserManager:
     # User CRUD Operations
     # =============================================================================
     
-    @remote_service
+    @remote_service()
     async def create_user(self, request: Any, response: Any) -> None:
         """
         Create new user (ROS2 service interface)
@@ -387,7 +387,7 @@ class InternalUserManager:
                 "message": f"Internal error: {str(e)}"
             }
     
-    @remote_service
+    @remote_service()
     async def list_users(self, request: Any, response: Any) -> None:
         """List all users (ROS2 service interface)"""
         result = await self.list_users_impl()
