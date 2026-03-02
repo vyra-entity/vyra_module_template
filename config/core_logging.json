@@ -52,17 +52,17 @@
     "loggers": {
         "{{ module_name }}": {
             "level": "DEBUG",
-            "handlers": ["console_stdout", "console_stderr", "error_file"],
+            "handlers": ["console_stdout", "error_file"],
             "propagate": false
         },
         "vyra_base": {
             "level": "DEBUG",
-            "handlers": ["console_stdout", "console_stderr", "error_file"],
+            "handlers": ["console_stdout", "error_file"],
             "propagate": false
         },
         "rclpy": {
             "level": "INFO",
-            "handlers": ["console_stdout", "console_stderr"],
+            "handlers": ["console_stdout"],
             "propagate": false
         },
         "uvicorn": {
@@ -72,7 +72,7 @@
         },
         "uvicorn.error": {
             "level": "INFO",
-            "handlers": ["console_stdout", "console_stderr", "error_file"],
+            "handlers": ["console_stdout", "error_file"],
             "propagate": false
         },
         "uvicorn.access": {
@@ -88,6 +88,6 @@
     },
     "root": {
         "level": "NOTSET",
-        "handlers": ["console_stdout", "console_stderr", "error_file"]
+        "handlers": ["console_stdout", "error_file"]
     }
 }

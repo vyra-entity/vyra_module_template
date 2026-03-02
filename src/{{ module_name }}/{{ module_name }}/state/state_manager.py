@@ -1,5 +1,5 @@
 """
-State Manager for {{ module_name }}.
+State Manager for v2_modulemanager.
 
 Manages the 3-layer state machine (Lifecycle, Operational, Health) and
 exposes **read-only** Zenoh interfaces so that other modules can query the
@@ -32,7 +32,7 @@ import yaml
 from collections import deque
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Deque, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Deque, Dict, List, Optional
 
 # NOTE: auto_register_interfaces is imported lazily inside setup_interfaces()
 # to avoid pulling in ament_index_python / rclpy at module load time.
@@ -41,14 +41,17 @@ from typing import Any, Deque, Dict, List, Optional
 from ..logging_config import get_logger, log_exception
 
 from vyra_base.com import remote_service
-from vyra_base.core.entity import VyraEntity
-from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.state.state_types import (
     HealthState,
     LifecycleState,
     OperationalState,
 )
 from vyra_base.state.unified import UnifiedStateMachine
+
+# TYPE_CHECKING-only imports – not executed at runtime, so no rclpy/ament chain
+if TYPE_CHECKING:
+    from vyra_base.core.entity import VyraEntity
+    from vyra_base.helper.error_handler import ErrorTraceback
 
 from .state_types import (
     LAYER_ACTIONS,
@@ -142,7 +145,7 @@ class StateManager:
         await auto_register_interfaces(self.entity, callback_parent=self)
         logger.info("✅ StateManager Zenoh interfaces registered")
 
-    async def initialize(self) -> bool:
+    async def initialization_start(self) -> bool:
         """
         Run the startup lifecycle sequence.
 
@@ -164,14 +167,6 @@ class StateManager:
             self._state_machine.start(metadata={"source": "application"})
             logger.info("  ✓ Lifecycle: INITIALIZING")
 
-            self._state_machine.complete_initialization(
-                result={"container_ready": True}
-            )
-            logger.info("  ✓ Lifecycle: ACTIVE")
-
-            self._state_machine.set_ready()
-            logger.info("  ✓ Operational: READY")
-
             current = self.get_current_state()
             self._record_history_diff(prev, current)
 
@@ -183,6 +178,31 @@ class StateManager:
             error_details: Dict[str, Any] = {}
             ErrorTraceback.check_error_exist(error_details=error_details)
             self._record_error(str(exc), error_details)
+            try:
+                self._state_machine.report_fault(error=str(exc))
+            except Exception:
+                pass
+            return False
+
+    async def initialization_complete(self) -> bool:
+        """Complete the startup sequence (for manual startup)."""
+        try:
+            prev = self.get_current_state()
+
+            self._state_machine.complete_initialization(
+                result={"container_ready": True}
+            )
+            
+            current = self.get_current_state()
+            self._record_history_diff(prev, current)
+            return True
+        
+        except Exception as exc:
+            logger.error(f"❌ Failed to initialise module: {exc}")
+            error_details: Dict[str, Any] = {}
+            ErrorTraceback.check_error_exist(error_details=error_details)
+            self._record_error(str(exc), error_details)
+        
             try:
                 self._state_machine.report_fault(error=str(exc))
             except Exception:
@@ -580,6 +600,49 @@ class StateManager:
         """Alias for :meth:`execute_state_action` (backward compatibility)."""
         return self.execute_state_action(request)
 
+    async def shutdown_to_offline(self, reason: str = "shutdown_requested") -> None:
+        """
+        Perform a full lifecycle shutdown transition: Active → ShuttingDown → Offline.
+
+        Transitions the state machine through the shutdown sequence and broadcasts
+        the final Offline state so connected clients are notified before the
+        process exits.
+
+        Args:
+            reason: Human-readable reason for the shutdown (logged + stored in metadata).
+        """
+        logger.info(f"🔴 Initiating shutdown_to_offline (reason={reason})")
+        try:
+            self.execute_state_action(
+                StateRequest(
+                    layer="lifecycle",
+                    action="shutdown",
+                    metadata={"reason": reason},
+                )
+            )
+            logger.info("✅ Lifecycle → ShuttingDown")
+        except Exception as exc:
+            logger.warning(f"shutdown transition failed (may already be in shutdown): {exc}")
+
+        try:
+            self.execute_state_action(
+                StateRequest(
+                    layer="lifecycle",
+                    action="complete_shutdown",
+                    metadata={},
+                )
+            )
+            logger.info("✅ Lifecycle → Offline")
+        except Exception as exc:
+            logger.warning(f"complete_shutdown transition failed: {exc}")
+
+        try:
+            await self.broadcast_state()
+            logger.info("📡 Offline state broadcasted to all clients")
+        except Exception as exc:
+            logger.warning(f"Failed to broadcast offline state: {exc}")
+
+
     def _dispatch_action(
         self, layer: str, action: str, metadata: Dict[str, Any]
     ) -> None:
@@ -593,6 +656,8 @@ class StateManager:
                 self._state_machine.fail_initialization(metadata.get("error"))
             elif action == "shutdown":
                 self._state_machine.shutdown(metadata.get("reason"))
+            elif action == "complete_shutdown":
+                self._state_machine.complete_shutdown()
             elif action == "suspend":
                 self._state_machine.suspend(metadata.get("reason"))
             elif action == "resume_from_suspend":

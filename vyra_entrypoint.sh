@@ -697,7 +697,7 @@ if [ "$VYRA_DEV_MODE" = "true" ]; then
         # Note: core is the supervisord program name for the module core
         # hot_reload.py works for both FULL (ROS2) and SLIM (Python-only) modes
         nohup python3 /workspace/tools/hot_reload.py "$MODULE_NAME" core core \
-            > /workspace/log/core/hot_reload.log 2>&1 &
+            >> /workspace/log/core/hot_reload.log 2>&1 &
         
         HOT_RELOAD_PID=$!
         echo "✅ Hot Reload started (PID: $HOT_RELOAD_PID)"

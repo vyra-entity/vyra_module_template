@@ -530,22 +530,41 @@ class HotReloadHandler(FileSystemEventHandler):
             logger.warning(f"⚠️ Cache clearing failed: {e}")
     
     def _clear_logs(self):
-        """Clear log files in the package log directory"""
+        """Clear ROS2 build log artifacts and append a restart separator to application logs."""
         try:
-            # Use shell=True to allow wildcard expansion
+            # Remove only ROS2/colcon build artifacts — NOT application logs
             result = subprocess.run(
-                f"rm -rf {self.workspace_path}/log/build_* {self.workspace_path}/log/core/build_* {self.workspace_path}/log/core/latest_* {self.workspace_path}/log/core/*.log",
+                f"rm -rf {self.workspace_path}/log/build_* "
+                f"{self.workspace_path}/log/ros2/build_* "
+                f"{self.workspace_path}/log/ros2/latest "
+                f"{self.workspace_path}/log/ros2/latest_build",
                 shell=True,
                 capture_output=True,
                 text=True,
                 timeout=5
             )
-            
+
             if result.returncode == 0:
-                logger.debug("✅ Logs cleared")
+                logger.debug("✅ ROS2 build logs cleared")
             else:
-                logger.warning(f"⚠️ Failed to clear logs: {result.stderr}")
-                
+                logger.warning(f"⚠️ Failed to clear ROS2 build logs: {result.stderr}")
+
+            # Append a restart separator to persistent application log files
+            separator = (
+                f"\n{'='*80}\n"
+                f"=== HOT RELOAD RESTART: {time.strftime('%Y-%m-%d %H:%M:%S')} ===\n"
+                f"{'='*80}\n\n"
+            )
+            for log_file in [
+                self.workspace_path / "log" / "core" / "core_stdout.log",
+                self.workspace_path / "log" / "core" / "errors.log",
+            ]:
+                try:
+                    with open(log_file, 'a') as lf:
+                        lf.write(separator)
+                except Exception as fe:
+                    logger.debug(f"Could not write separator to {log_file}: {fe}")
+
         except Exception as e:
             logger.warning(f"⚠️ Log clearing failed: {e}")
 

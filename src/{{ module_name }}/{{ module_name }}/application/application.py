@@ -18,6 +18,7 @@ from vyra_base.com import remote_service
 
 from ..taskmanager import TaskManager
 from ..interface import auto_register_interfaces
+from .. import container_injection
 
 logger = get_logger(__name__)
 
@@ -261,19 +262,19 @@ class Component(OperationalStateMachine):
     #     return result
 
 
-async def main(task_manager: TaskManager, status_manager, component: Component) -> None:
+async def main() -> None:
     """
     Main application entry point for VYRA Module Manager.
     
     Loads configuration, initializes component, and manages lifecycle based on
     module_params.yaml configuration.
     
-    Args:
-        entity: The VyraEntity containing the ROS 2 node
-        task_manager: The TaskManager instance to manage parallel application tasks
-        status_manager: The StatusManager instance containing the UnifiedStateMachine
-        component: The Component instance (created once, reused across recoveries)
+    All dependencies (task_manager, state_manager, component) are resolved via
+    container_injection.
     """
+    task_manager = container_injection.get_task_manager()
+    status_manager = container_injection.get_state_manager()
+    component = container_injection.get_component()
     logger.info("🚀 Starting VYRA Module Manager...")
     
     # Load module configuration

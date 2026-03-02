@@ -2,7 +2,7 @@
 import asyncio
 from .logging_config import get_logger
 from collections import deque
-from typing import Callable, Any, Coroutine
+from typing import Callable, Any, Coroutine, Optional
 
 from .state.state_manager import StateManager
 from vyra_base.state import UnifiedStateMachine
@@ -209,9 +209,10 @@ class TaskManager:
         return status
     
 async def task_supervisor_looper(
-        taskmanager: TaskManager, 
-        statemanager: StateManager, 
-        check_interval: float = 5.0) -> None:
+        taskmanager: TaskManager,
+        statemanager: StateManager,
+        check_interval: float = 5.0,
+        shutdown_event: Optional[asyncio.Event] = None) -> None:
     """A coroutine that supervises tasks in the TaskManager.
     It monitors the application_runner task and implements recovery logic:
     - Checks if application_runner has been running for at least 5 seconds (health check)
@@ -234,9 +235,21 @@ async def task_supervisor_looper(
 
     async def supervisor_loop():
         logger.info("Task supervisor started")
-        
+
         while True:
-            await asyncio.sleep(check_interval)
+            if shutdown_event is not None:
+                try:
+                    await asyncio.wait_for(
+                        asyncio.shield(shutdown_event.wait()),
+                        timeout=check_interval
+                    )
+                    # shutdown_event was set — exit immediately
+                    logger.info("Task supervisor woken by shutdown_event")
+                    break
+                except asyncio.TimeoutError:
+                    pass  # normal interval elapsed
+            else:
+                await asyncio.sleep(check_interval)
             
             # Check if application_runner exists in tasks
             if APPLICATION_RUNNER_NAME not in taskmanager.tasks:
