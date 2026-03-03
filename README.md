@@ -39,6 +39,10 @@ curl -k https://localhost/api/<module_name>/health
 
 See [docs/README.md](docs/README.md) for complete documentation index.
 
+### Beispiele
+
+- [examples/README.md](examples/README.md) - Kleine, isolierte Feeder-Beispiele (Decorator, Conditions, Custom-Tags, StateFeeder-Hinweis)
+
 ### Key Documentation
 
 - **[Backend API](docs/BACKEND_API.md)** - REST API reference

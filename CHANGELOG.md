@@ -3,6 +3,27 @@
 Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
 ## [Unreleased]
+
+### Changed (2026-03-03)
+- Feeder-Beispiele erweitert auf neue Tracking-Funktionen:
+  - `execution_point` in bestehenden Condition-Beispielen ergänzt,
+  - neue isolierte Beispiele `06` bis `09` für StateFeeder-ohne-Wrapper, News/Custom-Monitor-Wrapper und BEFORE/DURING/AFTER/ALWAYS-Regeln,
+  - `examples/README.md` um Rule-/Tag-Filter und Runtime-Context-Hinweise erweitert.
+- `examples/feeders/07_news_monitor_wrapper.py` und `08_custom_monitor_wrapper.py` korrigiert: Monitoring wrappt jetzt direkt echte `Component`-Methoden statt innerer Rückgabe-Funktionen.
+
+### Added (2026-03-03)
+- Leeres State-Callback-Template im `StateManager` via `UnifiedStateMachine.on_any_change(...)` ergänzt.
+- Beispielhafte Feeder-Tracker-Anbindung im Component-Gerüst:
+  - bool-only News-Condition-Registrierung
+  - optionale Condition-Auswertung im Heartbeat-Kontext
+- Neuer Top-Level Ordner `examples/` mit strukturierten Einzelfall-Beispielen für Feeder und Decorator-Nutzung.
+
+### Fixed (2026-03-03)
+- `pytest.ini`: Doppelten `addopts` Block entfernt, damit `pytest` wieder korrekt startet.
+
+### Changed (2026-03-03)
+- `Component` übergibt für `OperationalStateMachine` konsistent `unified_state_machine.fsm`.
+
 ### Added (2026-02-16)
 - **Professional Structured Logging**: Complete migration from standard Python logging to `structlog`
   - New `logging_config.py` module with centralized configuration

@@ -111,6 +111,7 @@ class StateManager:
 
         # ── 3-layer state machine ────────────────────────────────────────────
         self._state_machine: UnifiedStateMachine = UnifiedStateMachine()
+        self._state_machine.on_any_change(self._on_state_change_template)
 
         # ── History / diagnostics ─────────────────────────────────────────────
         self._state_history: Deque[StateHistoryEntry] = deque(maxlen=_max_hist)
@@ -119,6 +120,10 @@ class StateManager:
         self._last_state: Optional[ThreeLayerState] = None
 
         logger.info(f"StateManager initialised for module: {self.module_name}")
+
+    def _on_state_change_template(self, layer: str, old_state: str, new_state: str) -> None:
+        """Template callback for global state transitions (intentionally no-op)."""
+        return None
 
     # ─────────────────────────────────────────────────────────────────────────
     # Properties

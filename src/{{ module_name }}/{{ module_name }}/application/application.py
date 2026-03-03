@@ -54,7 +54,7 @@ class Component(OperationalStateMachine):
             task_manager: The TaskManager instance to manage parallel application tasks
         """
         # Initialize parent OperationalStateMachine
-        super().__init__(unified_state_machine)
+        super().__init__(unified_state_machine.fsm)
         
         self.entity = entity
         self.task_manager = task_manager
@@ -84,69 +84,14 @@ class Component(OperationalStateMachine):
             bool: True on success, False on failure
         """
         try:
-            logger.info("🚀 Initializing VYRA Module Manager components...")
-            
-            # Initialize user management
-            self.internal_usermanager.set_entity(self.entity)
-            asyncio.create_task(self.internal_usermanager.initialize_default_admin())
-            self.usermanager_detector.set_registry(self.registry if hasattr(self, 'registry') else None)
-            logger.info("✅ User Management initialized")
-            
             # TODO: Implement initialize logic
 
-            # Start periodic NewsFeed heartbeat (1 s interval)
-            self._heartbeat_task = asyncio.create_task(self._heartbeat_loop())
-            logger.info("✅ NewsFeed heartbeat started (1 s interval)")
-
-            # Start periodic StateFeed heartbeat (5 s interval)
-            self._state_heartbeat_task = asyncio.create_task(self._state_heartbeat_loop())
-            logger.info("✅ StateFeed heartbeat started (5 s interval)")
-            
             logger.info("✅ Component initialization complete")
             return True
             
         except Exception as e:
             logger.exception(f"❌ Component initialization failed: {e}")
             return False
-
-    async def _heartbeat_loop(self) -> None:
-        """
-        Publish a NewsFeed heartbeat every second.
-
-        Runs indefinitely as a background asyncio task started in initialize().
-        Cancelled by stop() via self._heartbeat_task.cancel().
-        """
-        logger.info("💓 Heartbeat loop started")
-        while True:
-            try:
-                await self.entity.news_feeder.feed("heartbeat")
-            except Exception as e:
-                logger.warning(f"Heartbeat publish failed: {e}")
-            await asyncio.sleep(1.0)
-
-    async def _state_heartbeat_loop(self) -> None:
-        """
-        Publish a StateFeed heartbeat every 5 seconds.
-
-        Runs indefinitely as a background asyncio task started in initialize().
-        Cancelled by stop() via self._state_heartbeat_task.cancel().
-        """
-        logger.info("💓 StateFeed heartbeat loop started")
-        while True:
-            try:
-                state_data = StateEntry(
-                    previous="N/A",
-                    trigger="heartbeat",
-                    current=str(self._state_machine.get_operational_state().value),
-                    module_id=self.entity.module_entry.uuid,
-                    module_name=self.entity.module_entry.name,
-                    timestamp=datetime.now(),
-                    _type="operational"
-                )
-                await self.entity.state_feeder.feed(state_data)
-            except Exception as e:
-                logger.warning(f"StateFeed heartbeat publish failed: {e}")
-            await asyncio.sleep(5.0)
 
     @remote_service()
     async def pause(self, request: Any=None, response: Any=None) -> bool:
