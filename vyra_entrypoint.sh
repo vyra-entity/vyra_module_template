@@ -26,6 +26,18 @@ fi
 chmod 777 .env
 
 # =============================================================================
+# Sync module_data.yaml from pyproject.toml (name, description, version, etc.)
+# =============================================================================
+echo "=== SYNCING MODULE MANIFEST ==="
+if [ -f "/workspace/tools/update_manifest.py" ]; then
+    python3 /workspace/tools/update_manifest.py \
+        "/workspace/pyproject.toml" \
+        "/workspace/.module/module_data.yaml"
+else
+    echo "⚠️ update_manifest.py not found, skipping manifest sync"
+fi
+
+# =============================================================================
 # Environment Variable Setup
 # =============================================================================
 echo "=== SETTING UP ENVIRONMENT VARIABLES ==="
@@ -365,7 +377,7 @@ if [ -d "$NFS_VOLUME_PATH" ]; then
         echo "ℹ️  First-time setup: will copy all interfaces to NFS..."
         FORCE_UPDATE=true
     else
-        for config_file in vyra_core_meta.json vyra_com_meta.json vyra_security_meta.json; do
+        for config_file in vyra_core.meta.json vyra_com.meta.json vyra_security.meta.json; do
             SOURCE_CONFIG="$INTERFACE_SOURCE/share/${MODULE_NAME}_interfaces/config/$config_file"
             NFS_CONFIG_FILE="$NFS_CONFIG_DIR/$config_file"
             if [ -f "$SOURCE_CONFIG" ] && [ -f "$NFS_CONFIG_FILE" ]; then

@@ -1,0 +1,35 @@
+# module_dependencies.example.yaml
+#
+# This file documents the dependency model for VYRA modules.
+# Copy this file to module_dependencies.yaml and fill in your module's requirements.
+# The Container Manager reads this file to validate dependencies before startup.
+#
+# Rename/copy to: .module/module_dependencies.yaml
+
+# 1. Infrastruktur-Abhängigkeiten (Wird vom Container Manager geprüft)
+runtime:
+  python_version: ">=3.10"
+  arch: "arm64"                # Wichtig für Edge-Hardware (Jetson, Pi)
+  os: "linux"
+  communication:
+    - protocol: "zenoh"
+      version: ">=1.0.0"
+    - protocol: "redis"        # Falls dieses Modul Redis als Cache braucht
+
+# 2. Hardware-Abhängigkeiten (Wird gegen Host-System geprüft)
+hardware:
+  devices:
+    - path: "/dev/ttyUSB0"
+      alias: "shaker_serial"
+  resources:
+    min_ram_mb: 512
+    gpu_required: false
+
+# 3. Modul-Abhängigkeiten (Wird gegen den Modulemanager geprüft)
+services:
+  - module_id: "vyra-user-manager"
+    optional: false
+    min_sl: 2                  # Benötigtes Sicherheitslevel des Managers
+  - module_id: "yaskawa-robot-driver"
+    optional: true             # Modul funktioniert auch ohne Roboter (z.B. im Simulationsmodus)
+    version: "^2.1.0"

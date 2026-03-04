@@ -157,9 +157,9 @@ async def _create_base_interfaces() -> list[FunctionConfigEntry]:
     interface_metadata: list = []
 
     base_interfaces: list[str] = [
-        'vyra_core_meta.json',
-        'vyra_com_meta.json',
-        'vyra_security_meta.json'
+        'vyra_core.meta.json',
+        'vyra_com.meta.json',
+        'vyra_security.meta.json'
     ]
 
     module_name = os.getenv("MODULE_NAME", "")

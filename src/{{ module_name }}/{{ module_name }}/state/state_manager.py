@@ -112,6 +112,9 @@ class StateManager:
         # ── 3-layer state machine ────────────────────────────────────────────
         self._state_machine: UnifiedStateMachine = UnifiedStateMachine()
         self._state_machine.on_any_change(self._on_state_change_template)
+        self._state_machine.on_lifecycle_change(self._on_lifecycle_change)
+        self._state_machine.on_operational_change(self._on_operational_change)
+        self._state_machine.on_health_change(self._on_health_change)
 
         # ── History / diagnostics ─────────────────────────────────────────────
         self._state_history: Deque[StateHistoryEntry] = deque(maxlen=_max_hist)
@@ -121,8 +124,20 @@ class StateManager:
 
         logger.info(f"StateManager initialised for module: {self.module_name}")
 
-    def _on_state_change_template(self, layer: str, old_state: str, new_state: str) -> None:
+    def _on_state_change_template(self, layer: str, old_state: str, new_state: str, *_: Any) -> None:
         """Template callback for global state transitions (intentionally no-op)."""
+        return None
+
+    def _on_lifecycle_change(self, layer: str, old_state: str, new_state: str) -> None:
+        """Callback for lifecycle state changes (intentionally no-op)."""
+        return None
+
+    def _on_operational_change(self, layer: str, old_state: str, new_state: str) -> None:
+        """Callback for operational state changes (intentionally no-op)."""
+        return None
+
+    def _on_health_change(self, layer: str, old_state: str, new_state: str) -> None:
+        """Callback for health state changes (intentionally no-op)."""
         return None
 
     # ─────────────────────────────────────────────────────────────────────────
@@ -302,7 +317,7 @@ class StateManager:
     # ─────────────────────────────────────────────────────────────────────────
 
     @remote_service()
-    def get_state(self, request: Dict[str, Any], response: Dict[str, Any]) -> Dict[str, Any]:
+    async def get_state(self, request: Dict[str, Any], response: Any = None) -> Dict[str, Any]:
         """
         Return the full 3-layer state snapshot.
 
@@ -316,17 +331,16 @@ class StateManager:
         """
         try:
             state = self.get_current_state()
-            response.update(state.to_dict())
-            response["success"] = True
+            result = state.to_dict()
+            result["success"] = True
+            return result
         except Exception as exc:
             logger.error(f"get_state failed: {exc}")
-            response["success"] = False
-            response["error"] = str(exc)
-        return response
+            return {"success": False, "error": str(exc)}
 
     @remote_service()
-    def get_lifecycle_state(
-        self, request: Dict[str, Any], response: Dict[str, Any]
+    async def get_lifecycle_state(
+        self, request: Dict[str, Any], response: Any = None
     ) -> Dict[str, Any]:
         """
         Return only the lifecycle layer state.
@@ -338,18 +352,18 @@ class StateManager:
         """
         try:
             states = self._state_machine.get_all_states()
-            response["lifecycle"] = states["lifecycle"]
-            response["timestamp"] = datetime.now().isoformat()
-            response["success"] = True
+            return {
+                "lifecycle": states["lifecycle"],
+                "timestamp": datetime.now().isoformat(),
+                "success": True,
+            }
         except Exception as exc:
             logger.error(f"get_lifecycle_state failed: {exc}")
-            response["success"] = False
-            response["error"] = str(exc)
-        return response
+            return {"success": False, "error": str(exc)}
 
     @remote_service()
-    def get_operational_state(
-        self, request: Dict[str, Any], response: Dict[str, Any]
+    async def get_operational_state(
+        self, request: Dict[str, Any], response: Any = None
     ) -> Dict[str, Any]:
         """
         Return only the operational layer state.
@@ -361,18 +375,18 @@ class StateManager:
         """
         try:
             states = self._state_machine.get_all_states()
-            response["operational"] = states["operational"]
-            response["timestamp"] = datetime.now().isoformat()
-            response["success"] = True
+            return {
+                "operational": states["operational"],
+                "timestamp": datetime.now().isoformat(),
+                "success": True,
+            }
         except Exception as exc:
             logger.error(f"get_operational_state failed: {exc}")
-            response["success"] = False
-            response["error"] = str(exc)
-        return response
+            return {"success": False, "error": str(exc)}
 
     @remote_service()
-    def get_health_state(
-        self, request: Dict[str, Any], response: Dict[str, Any]
+    async def get_health_state(
+        self, request: Dict[str, Any], response: Any = None
     ) -> Dict[str, Any]:
         """
         Return only the health layer state.
@@ -384,18 +398,18 @@ class StateManager:
         """
         try:
             states = self._state_machine.get_all_states()
-            response["health"] = states["health"]
-            response["timestamp"] = datetime.now().isoformat()
-            response["success"] = True
+            return {
+                "health": states["health"],
+                "timestamp": datetime.now().isoformat(),
+                "success": True,
+            }
         except Exception as exc:
             logger.error(f"get_health_state failed: {exc}")
-            response["success"] = False
-            response["error"] = str(exc)
-        return response
+            return {"success": False, "error": str(exc)}
 
     @remote_service()
-    def get_last_error_state(
-        self, request: Dict[str, Any], response: Dict[str, Any]
+    async def get_last_error_state(
+        self, request: Dict[str, Any], response: Any = None
     ) -> Dict[str, Any]:
         """
         Return the last recorded error context.
@@ -410,27 +424,26 @@ class StateManager:
         """
         try:
             if self._last_error_state is not None:
-                response.update(self._last_error_state)
-                response["has_error"] = True
-                response["error_history"] = [
-                    e for e in list(self._error_history)
-                ]
+                result = dict(self._last_error_state)
+                result["has_error"] = True
+                result["error_history"] = list(self._error_history)
             else:
-                response["has_error"] = False
-                response["error_message"] = ""
-                response["error_details"] = {}
-                response["timestamp"] = datetime.now().isoformat()
-                response["error_history"] = []
-            response["success"] = True
+                result = {
+                    "has_error": False,
+                    "error_message": "",
+                    "error_details": {},
+                    "timestamp": datetime.now().isoformat(),
+                    "error_history": [],
+                }
+            result["success"] = True
+            return result
         except Exception as exc:
             logger.error(f"get_last_error_state failed: {exc}")
-            response["success"] = False
-            response["error"] = str(exc)
-        return response
+            return {"success": False, "error": str(exc)}
 
     @remote_service()
-    def get_state_summary(
-        self, request: Dict[str, Any], response: Dict[str, Any]
+    async def get_state_summary(
+        self, request: Dict[str, Any], response: Any = None
     ) -> Dict[str, Any]:
         """
         Return a human-readable state summary.
@@ -458,28 +471,24 @@ class StateManager:
                 f"health={states['health']}"
             )
 
-            response.update(
-                {
-                    "summary": summary,
-                    "is_operational": is_op,
-                    "is_healthy": is_healthy,
-                    "lifecycle": states["lifecycle"],
-                    "operational": states["operational"],
-                    "health": states["health"],
-                    "module_name": self.module_name,
-                    "timestamp": datetime.now().isoformat(),
-                    "success": True,
-                }
-            )
+            return {
+                "summary": summary,
+                "is_operational": is_op,
+                "is_healthy": is_healthy,
+                "lifecycle": states["lifecycle"],
+                "operational": states["operational"],
+                "health": states["health"],
+                "module_name": self.module_name,
+                "timestamp": datetime.now().isoformat(),
+                "success": True,
+            }
         except Exception as exc:
             logger.error(f"get_state_summary failed: {exc}")
-            response["success"] = False
-            response["error"] = str(exc)
-        return response
+            return {"success": False, "error": str(exc)}
 
     @remote_service()
-    def get_state_history(
-        self, request: Dict[str, Any], response: Dict[str, Any]
+    async def get_state_history(
+        self, request: Dict[str, Any], response: Any = None
     ) -> Dict[str, Any]:
         """
         Return the recent state-change history.
@@ -506,15 +515,15 @@ class StateManager:
             if limit and limit > 0:
                 history = history[-limit:]
 
-            response["history"] = [e.to_dict() for e in history]
-            response["count"] = len(history)
-            response["total"] = len(self._state_history)
-            response["success"] = True
+            return {
+                "history": [e.to_dict() for e in history],
+                "count": len(history),
+                "total": len(self._state_history),
+                "success": True,
+            }
         except Exception as exc:
             logger.error(f"get_state_history failed: {exc}")
-            response["success"] = False
-            response["error"] = str(exc)
-        return response
+            return {"success": False, "error": str(exc)}
 
     # ─────────────────────────────────────────────────────────────────────────
     # State broadcasting (called by async task runner) [OBSOLETE]

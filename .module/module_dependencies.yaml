@@ -1,0 +1,8 @@
+# module_dependencies.yaml
+#
+# This file documents the dependency model for VYRA modules.
+# Copy this file to module_dependencies.yaml and fill in your module's requirements.
+# The Container Manager reads this file to validate dependencies before startup.
+#
+# Add your dependencies in the sections below. Remove sections that are not relevant for your module.
+# Take a look at the example file for reference.
