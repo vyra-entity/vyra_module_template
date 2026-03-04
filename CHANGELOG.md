@@ -4,6 +4,12 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Changed (2026-03-04)
+- Lokalen Usermanager entfernt (`user/usermanager.py`, `internal_usermanager.py`, `tb_users.py`).
+- `user/usermanager_client.py` hinzugefügt: externer Usermanager-Client zur Token-Beschaffung für Zugriffe mit erhöhtem Security-Level.
+- `main.py` von lokalem Usermanager auf `UserManagerClient` migriert und `usermanager_client_runner` als TaskManager-Task integriert.
+- `user/__init__.py` auf Client-Exporte bereinigt.
+
 ### Documentation (2026-03-04)
 - Dokumentation in Querschnittsstruktur übernommen: `docs/architecture`, `docs/api`, `docs/operations`, `docs/migrations`.
 - `docs/README.md` auf Template-Variante mit Platzhaltern (`{{ module_name }}`, `{{ module_display_name }}`) und strukturierter Navigation umgestellt.

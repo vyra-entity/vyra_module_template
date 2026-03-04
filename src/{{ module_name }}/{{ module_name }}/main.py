@@ -31,7 +31,7 @@ from .application import application
 from .application.application import Component
 from .taskmanager import TaskManager, task_supervisor_looper
 from .state.state_manager import StateManager
-from .user.usermanager import UserManager
+from .user.usermanager_client import UserManagerClient, usermanager_client_runner
 from . import container_injection
 
 from vyra_base.core.entity import VyraEntity
@@ -156,33 +156,6 @@ async def setup_statemanager(entity: VyraEntity) -> StateManager:
     logger.info("state_manager_interfaces_setup_complete")
 
     return state_manager
-
-
-@log_call
-async def setup_usermanager(entity: VyraEntity) -> UserManager:
-    """
-    Initialize and configure the User Manager.
-    
-    Args:
-        entity: VyraEntity instance from core application
-        
-    Returns:
-        Configured UserManager instance
-        
-    Raises:
-        Exception: If user manager initialization fails
-    """
-    logger.info("user_manager_initializing")
-    
-    user_manager = UserManager(entity)
-    success = await user_manager.initialize()
-    
-    if not success:
-        logger.error("user_manager_initialization_failed")
-        raise RuntimeError("UserManager initialization failed")
-    
-    logger.info("user_manager_initialized")
-    return user_manager
 
 
 @log_call
@@ -379,11 +352,6 @@ async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, State
     statemanager: StateManager = await setup_statemanager(entity)
     logger.info("state_manager_ready")
 
-    # Setup user manager
-    logger.debug("setting_up_user_manager")
-    user_manager: UserManager = await setup_usermanager(entity)
-    logger.info("user_manager_ready")
-
     # Create Component (reused across task recoveries)
     logger.debug("creating_component")
     unified_state_machine = statemanager.state_machine
@@ -406,7 +374,7 @@ async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, State
     container_injection.set_component(component)
     container_injection.set_task_manager(taskmanager)
     container_injection.set_state_manager(statemanager)
-    container_injection.set_user_manager(user_manager)
+    container_injection.set_user_manager(UserManagerClient(entity))
     logger.info("container_dependencies_injected")
 
     await statemanager.initialization_complete()  # Notify StateManager that initialization is complete (for manual startup)
@@ -415,6 +383,9 @@ async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, State
     logger.info("scheduling_application_runner_task")
     taskmanager.add_task(application_runner)
     logger.debug("application_runner_task_scheduled")
+
+    logger.info("scheduling_usermanager_client_task")
+    taskmanager.add_task(usermanager_client_runner, entity)
     
     # ROS2-dependent tasks: only start if NOT in SLIM mode
     if not VYRA_SLIM:

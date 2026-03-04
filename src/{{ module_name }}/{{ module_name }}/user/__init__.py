@@ -1,18 +1,8 @@
-"""
-User Management Package for v2_modulemanager
+"""External usermanager client package."""
 
-Provides internal user management, authentication, and authorization.
-"""
-
-from .internal_usermanager import InternalUserManager
-from .usermanager_grpc_server import UserManagerServicer, UserManagerGrpcServer
-from .tb_users import User, UserRole, UserLevel
+from .usermanager_client import UserManagerClient, usermanager_client_runner
 
 __all__ = [
-    'InternalUserManager',
-    'UserManagerServicer',
-    'UserManagerGrpcServer',
-    'User',
-    'UserRole',
-    'UserLevel'
+    "UserManagerClient",
+    "usermanager_client_runner",
 ]
