@@ -4,6 +4,20 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Documentation (2026-03-04)
+- Dokumentation in Querschnittsstruktur übernommen: `docs/architecture`, `docs/api`, `docs/operations`, `docs/migrations`.
+- `docs/README.md` auf Template-Variante mit Platzhaltern (`{{ module_name }}`, `{{ module_display_name }}`) und strukturierter Navigation umgestellt.
+- Root-Policy umgesetzt: Im `docs/`-Root liegen nur noch `README.md` und `INDEX.md`.
+- Vorherige Root-Dokumente in passende Unterordner verschoben; nicht eindeutig zuordenbare Datei nach `docs/deprecated/` verlagert.
+
+### Added (2026-03-04)
+- Beispiele über Feeder hinaus erweitert:
+  - `examples/state/01_state_transition_flow.py`
+  - `examples/interfaces/01_remote_service_pattern.py`
+  - `examples/helper/01_file_io_config_pattern.py`
+  - `examples/security/01_access_policy_pattern.py`
+- `examples/README.md` um die neuen Kategorien ergänzt.
+
 ### Changed (2026-03-03)
 - Feeder-Beispiele erweitert auf neue Tracking-Funktionen:
   - `execution_point` in bestehenden Condition-Beispielen ergänzt,
