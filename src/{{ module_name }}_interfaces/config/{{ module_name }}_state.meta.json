@@ -1,11 +1,15 @@
 [
     {
-        "tags": ["zenoh"],
+        "tags": [
+            "zenoh"
+        ],
         "type": "service",
         "functionname": "get_state",
         "displayname": "Get State",
         "description": "Returns the full 3-layer state snapshot (lifecycle, operational, health) with metadata.",
-        "filetype": ["VModuleState.proto"],
+        "filetype": [
+            "VModuleState.proto"
+        ],
         "params": [],
         "returns": [
             {
@@ -52,12 +56,16 @@
         }
     },
     {
-        "tags": ["zenoh"],
+        "tags": [
+            "zenoh"
+        ],
         "type": "service",
         "functionname": "get_lifecycle_state",
         "displayname": "Get Lifecycle State",
         "description": "Returns only the current lifecycle layer state.",
-        "filetype": ["VModuleState.proto"],
+        "filetype": [
+            "VModuleState.proto"
+        ],
         "params": [],
         "returns": [
             {
@@ -86,12 +94,16 @@
         }
     },
     {
-        "tags": ["zenoh"],
+        "tags": [
+            "zenoh"
+        ],
         "type": "service",
         "functionname": "get_operational_state",
         "displayname": "Get Operational State",
         "description": "Returns only the current operational layer state.",
-        "filetype": ["VModuleState.proto"],
+        "filetype": [
+            "VModuleState.proto"
+        ],
         "params": [],
         "returns": [
             {
@@ -120,12 +132,16 @@
         }
     },
     {
-        "tags": ["zenoh"],
+        "tags": [
+            "zenoh"
+        ],
         "type": "service",
         "functionname": "get_health_state",
         "displayname": "Get Health State",
         "description": "Returns only the current health layer state.",
-        "filetype": ["VModuleState.proto"],
+        "filetype": [
+            "VModuleState.proto"
+        ],
         "params": [],
         "returns": [
             {
@@ -154,12 +170,16 @@
         }
     },
     {
-        "tags": ["zenoh"],
+        "tags": [
+            "zenoh"
+        ],
         "type": "service",
         "functionname": "get_last_error_state",
         "displayname": "Get Last Error State",
         "description": "Returns the last recorded error context including error history.",
-        "filetype": ["VModuleState.proto"],
+        "filetype": [
+            "VModuleState.proto"
+        ],
         "params": [],
         "returns": [
             {
@@ -206,12 +226,16 @@
         }
     },
     {
-        "tags": ["zenoh"],
+        "tags": [
+            "zenoh"
+        ],
         "type": "service",
         "functionname": "get_state_summary",
         "displayname": "Get State Summary",
         "description": "Returns a human-readable one-line status summary with derived flags.",
-        "filetype": ["VModuleState.proto"],
+        "filetype": [
+            "VModuleState.proto"
+        ],
         "params": [],
         "returns": [
             {
@@ -276,12 +300,16 @@
         }
     },
     {
-        "tags": ["zenoh"],
+        "tags": [
+            "zenoh"
+        ],
         "type": "service",
         "functionname": "get_state_history",
         "displayname": "Get State History",
         "description": "Returns recent state-change history entries, optionally filtered by layer and limited in count.",
-        "filetype": ["VModuleState.proto"],
+        "filetype": [
+            "VModuleState.proto"
+        ],
         "params": [
             {
                 "name": "limit",
@@ -326,6 +354,45 @@
         "displaystyle": {
             "visible": true,
             "published": true
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "get_log_history",
+        "displayname": "Get Log History",
+        "description": "Return recent log lines from the in-memory ring buffer. Used by the Dashboard Logs tab which polls this service periodically via SSE.",
+        "filetype": [
+            "VModuleState.proto"
+        ],
+        "params": [
+            {
+                "name": "limit",
+                "datatype": "int32",
+                "displayname": "Limit",
+                "description": "Maximum number of log lines to return (default 200, max 1000)."
+            }
+        ],
+        "returns": [
+            {
+                "name": "logs_json",
+                "datatype": "string",
+                "displayname": "Logs JSON",
+                "description": "JSON array of {level, message, logger_name, timestamp, seq} dicts, ordered oldest-to-newest."
+            },
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "True on successful call."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": false,
+            "published": false
         }
     }
 ]

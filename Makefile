@@ -138,3 +138,32 @@ ci: install-dev quality test ## Run CI pipeline locally
 
 .PHONY: pre-commit
 pre-commit: format-check lint type-check test-unit ## Pre-commit checks
+
+# Database migration targets (Alembic)
+ALEMBIC_DIR = src/{{ module_name }}
+
+db-upgrade: ## Apply all pending migrations (alembic upgrade head)
+	@echo "$(BLUE)Applying database migrations...$(NC)"
+	cd $(ALEMBIC_DIR) && alembic upgrade head
+
+db-downgrade: ## Roll back the last migration (alembic downgrade -1)
+	@echo "$(YELLOW)Rolling back last migration...$(NC)"
+	cd $(ALEMBIC_DIR) && alembic downgrade -1
+
+db-current: ## Show current migration revision
+	cd $(ALEMBIC_DIR) && alembic current
+
+db-history: ## List full migration history
+	cd $(ALEMBIC_DIR) && alembic history --verbose
+
+db-revision: ## Generate a new migration (MSG required: make db-revision MSG="your message")
+	@[ -n "$(MSG)" ] || (echo "$(RED)Usage: make db-revision MSG=\"your message\"$(NC)"; exit 1)
+	cd $(ALEMBIC_DIR) && alembic revision -m "$(MSG)"
+
+db-autogenerate: ## Autogenerate migration from model diff (MSG required)
+	@[ -n "$(MSG)" ] || (echo "$(RED)Usage: make db-autogenerate MSG=\"your message\"$(NC)"; exit 1)
+	cd $(ALEMBIC_DIR) && alembic revision --autogenerate -m "$(MSG)"
+
+db-stamp: ## Mark DB at a specific revision without running SQL (REV required)
+	@[ -n "$(REV)" ] || (echo "$(RED)Usage: make db-stamp REV=head|0001|...$(NC)"; exit 1)
+	cd $(ALEMBIC_DIR) && alembic stamp $(REV)
