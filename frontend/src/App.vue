@@ -1,46 +1,139 @@
 <template>
-  <div id="app">
-    <nav class="navbar">
-      <div class="nav-brand">
-        <h1>🚀 VYRA Dashboard</h1>
-      </div>
-      <div class="nav-links">
-        <router-link to="/" class="nav-link">Home</router-link>
-      </div>
-    </nav>
+  <div class="vyra-app">
+    <!-- Sidebar navigation -->
+    <VyraSidebar
+      title="VYRA Dashboard"
+      :backend-status="backendStatus"
+    />
 
-    <main class="main-content">
-      <router-view />
-    </main>
+    <!-- Main content area -->
+    <div
+      class="vyra-main"
+      :class="{ 'sidebar-collapsed': sidebarStore.isCollapsed }"
+    >
+      <!-- Slim topbar -->
+      <header class="vyra-topbar">
+        <span class="page-title">{{ pageTitle }}</span>
+      </header>
 
-    <footer class="footer">
-      <p>&copy; 2025 VYRA Dashboard - Backend: {{ backendStatus }}</p>
-    </footer>
+      <main class="vyra-content">
+        <router-view />
+      </main>
+
+      <footer class="vyra-footer">
+        <p>&copy; 2025 VYRA Industrial Automation</p>
+      </footer>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import axios from 'axios'
+import VyraSidebar from './components/layout/VyraSidebar.vue'
+import { useSidebarStore } from './store/sidebar'
 
-const backendStatus = ref('Verbinde...')
+const route        = useRoute()
+const sidebarStore = useSidebarStore()
 
-const checkBackendStatus = async () => {
+// Page title from route meta or route name
+const pageTitle = computed(() =>
+  (route.meta?.title) ? String(route.meta.title).split(' - ')[0] : (route.name ?? 'Home')
+)
+
+// Backend health check
+const backendStatus = ref('checking')
+
+async function checkBackend() {
   try {
-    const response = await axios.get('/api/status')
-    backendStatus.value = `✅ ${response.data.status}`
-  } catch (error) {
-    backendStatus.value = '❌ Offline'
-    console.error('Backend nicht erreichbar:', error)
+    await axios.get('/api/status')
+    backendStatus.value = 'running'
+  } catch {
+    backendStatus.value = 'stopped'
   }
 }
 
 onMounted(() => {
-  checkBackendStatus()
-  // Status alle 30 Sekunden aktualisieren
-  setInterval(checkBackendStatus, 30000)
+  checkBackend()
+  setInterval(checkBackend, 30000)
 })
 </script>
+
+<style scoped>
+/* ── Root layout: sidebar + scrollable main ── */
+.vyra-app {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+.vyra-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ── Topbar ── */
+.vyra-topbar {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 2rem;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
+  min-height: 52px;
+  flex-shrink: 0;
+}
+
+.page-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #212121;
+}
+
+/* ── Content ── */
+.vyra-content {
+  flex: 1;
+  padding: 2rem;
+  overflow: auto;
+}
+
+/* ── Footer ── */
+.vyra-footer {
+  padding: 1rem 2rem;
+  text-align: center;
+  border-top: 1px solid #e0e0e0;
+  color: #607D8B;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.vyra-footer p {
+  margin: 0;
+}
+
+/* ── Responsive: very small screens ── */
+@media (max-width: 480px) {
+  .vyra-app {
+    flex-direction: column;
+  }
+
+  .vyra-main {
+    padding-top: 52px;
+  }
+
+  .vyra-topbar {
+    padding: 0.75rem 3.5rem;
+  }
+
+  .vyra-content {
+    padding: 1rem;
+  }
+}
+</style>
 
 <style scoped>
 #app {

@@ -5,6 +5,17 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 ## [Unreleased]
 
 ### Added (2026-03-05)
+- **Frontend Sidebar (Basis-Struktur)**: Portierbare, kollabierbare Sidebar-Basisstruktur identisch zu `v2_modulemanager`, jedoch in plain JS (kein TypeScript, kein PrimeVue). Nur Abhängigkeiten: Vue 3, Pinia, Vue Router, PrimeIcons CSS.
+- **`src/store/sidebar.js`**: Plain-JS Pinia-Store mit `groupedItems`, `registerItem`, `unregisterItem`, `updateBadge`.
+- **`src/components/layout/SidebarNavItem.vue`**: Einzelnes Nav-Element (plain JS).
+- **`src/components/layout/SidebarNavGroup.vue`**: Gruppen-Header (plain JS).
+- **`src/components/layout/VyraSidebar.vue`**: Haupt-Sidebar mit Props `title` + `backendStatus`, Slots `#brand` und `#bottom` für Modul-spezifische Anpassungen. Responsive Drawer bei `≤480px`.
+- **`src/composables/useSidebarNavigation.js`**: Plugin-API-Composable für dynamische Sidebar-Einträge.
+
+### Changed (2026-03-05)
+- **`src/App.vue`**: Layout von `flex-column` (Navbar oben) auf `flex-row` (Sidebar links + Main rechts) umgebaut. Slim-Topbar zeigt Seitentitel aus Route-Meta. Backend-Status wird per `axios.get('/api/status')` ermittelt und an Sidebar weitergereicht.
+- **`src/main.js`**: `primeicons/primeicons.css` importiert (Voraussetzung für `pi pi-*` Icon-Klassen in der Sidebar).
+
 - `user/internal_usermanager.py`, `user/tb_users.py`, `user/usermanager.py` als lokaler Fallback-Usermanager aus `v2_modulemanager` übernommen. Kein Cross-Module-Token-Generating — reine lokale Benutzerverwaltung.
 - `user/__init__.py` erweitert: exportiert jetzt `InternalUserManager`, `UserManager`, `usermanager_runner`, `User`, `UserRole`, `UserLevel` zusätzlich zu `UserManagerClient`.
 

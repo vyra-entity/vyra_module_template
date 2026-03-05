@@ -3,6 +3,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 
+// PrimeIcons CSS (used by sidebar icon classes: pi pi-*)
+import 'primeicons/primeicons.css'
+
 // Import Views
 import Home from './views/Home.vue'
 
