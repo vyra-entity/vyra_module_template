@@ -13,6 +13,10 @@
     >
       <!-- Slim topbar -->
       <header class="vyra-topbar">
+        <!-- Mobile hamburger -->
+        <button class="mobile-menu-btn" @click="sidebarStore.toggleCollapse()" aria-label="Menü">
+          <i class="pi pi-bars" />
+        </button>
         <span class="page-title">{{ pageTitle }}</span>
       </header>
 
@@ -126,12 +130,37 @@ onMounted(() => {
   }
 
   .vyra-topbar {
-    padding: 0.75rem 3.5rem;
+    padding: 0.75rem 1rem;
+    gap: 0.75rem;
   }
 
   .vyra-content {
     padding: 1rem;
   }
+
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+}
+
+/* ── Mobile hamburger (hidden on desktop) ── */
+.mobile-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 6px;
+  color: var(--text-color, #212121);
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.mobile-menu-btn:hover {
+  background: var(--surface-hover, #f0f0f0);
 }
 </style>
 

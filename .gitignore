@@ -16,12 +16,15 @@ yarn.lock
 log/*
 *.log
 
+# Automatic loaded interface files
+**/*_interfaces/config/vyra_*.meta.json
+
 # Frontend (build artifacts)
-frontend/node_modules/*
-frontend/dist/*
+**/frontend/node_modules/*
+**/frontend/dist/*
 
 **/sros2_keystore/*
-security/*
+**/security/*
 
 # SSL Certificates (sensitive data)
 *.key
