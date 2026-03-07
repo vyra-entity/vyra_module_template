@@ -1,121 +1,125 @@
+"""
+Plugin-Registry für VYRA-Module — UI-Manifest-Integration.
+
+Dieses Template zeigt, wie ein Modul (z.B. v2_dashboard) das UI-Manifest
+für Plugins anfragt, die im v2_modulemanager installiert sind.
+
+Flow:
+  1. Modul X startet seinen VyraEntity
+  2. PluginRegistry.setup(entity) erstellt einen VyraClient zur Zenoh-Schnittstelle
+     von v2_modulemanager (definiert in modulemanager_plugin.meta.json)
+  3. Frontend lädt PluginRepositoryView → ruft /plugin/ui-manifest ab →
+     das Backend-Proxy delegiert die Anfrage via Zenoh an v2_modulemanager
+
+Zenoh-Service-Definition:
+  ``v2_modulemanager_interfaces/config/modulemanager_plugin.meta.json``
+  → service ``get_plugin_ui_manifest``
+
+Wann HostFunctions benötigt werden:
+  Wenn das Modul X selbst WASM-Plugins ausführt (nicht bei reiner UI-Integration),
+  muss es ``BaseHostFunctions`` mit eigener Zenoh-/Publisher-Implementierung
+  verwenden (siehe host_functions_impl.py in v2_modulemanager als Referenz).
+"""
+
 from __future__ import annotations
 
-import importlib
-import inspect
 import logging
+from typing import TYPE_CHECKING, Any
 
-from pathlib import Path
-
-from abc import ABC, abstractmethod
-from types import ModuleType
-from attr import dataclass
-from flask import config
-from vyra_base.helper.file_reader import FileReader
-from typing import Optional
+if TYPE_CHECKING:
+    from vyra_base.entity import VyraEntity
 
 logger = logging.getLogger(__name__)
 
 
-class PluginBase(ABC):
-    @abstractmethod
-    def name(self) -> str:
-        pass
-
-    @abstractmethod
-    def run(self, *args, **kwargs):
-        pass
-
-
-@dataclass
-class PLUGIN_CONFIG:
-    name: str
-    version: str
-    description: str
-    author: str
-    license: str
-    path: Path
-    module: Optional[ModuleType] = None
-    dependencies: list[str] = []
-    enabled: bool = True
-
-
 class PluginRegistry:
-    """Registry for managing plugins in the Vyra module template.
-    This class allows for registering, retrieving, and unregistering plugins.
-    It also provides functionality to load plugins from a specified directory.
     """
-    def __init__(self, module_name: str):
-        """
-        Initializes the PluginRegistry with an optional plugin path.
-        :param plugin_path: Path to the directory containing plugins.
-        """
-        self._plugins: dict[str, PLUGIN_CONFIG] = {}
-        self._package_name: str = module_name
+    UI-Plugin-Registry — ruft das Slot-Manifest von v2_modulemanager ab.
 
-        self.plugin_dir: Path = Path(__file__).parent / "plugin"
+    Dieses Modul führt KEINE WASM-Plugins selbst aus.
+    Es fragt das Manifest bei v2_modulemanager an und gibt es
+    an das eigene Frontend weiter.
 
-    def register_plugin(self, config: dict, plugin_path) -> None:
-        if config["name"] in self._plugins:
-            logger.warning(f"[PluginRegistry] Plugin '{config['name']}' is already registered, skipping.")
-            return
+    Dafür nutzt es den Zenoh-Service ``plugin/get_plugin_ui_manifest``
+    der in der modulemanager_plugin.meta.json definiert ist.
+
+    Beispiel-Integration in _base_.py::
+
+        from {{ module_name }}.plugin.registry import PluginRegistry
+
+        plugin_registry = PluginRegistry()
+        await plugin_registry.setup(entity)
+        manifest = await plugin_registry.get_ui_manifest(scope_target="{{ module_name }}")
+    """
+
+    def __init__(self) -> None:
+        self._client: Any = None   # VyraClient (nach setup() verfügbar)
+        self._entity: Any = None
+
+    async def setup(self, entity: "VyraEntity") -> None:
+        """
+        Erstellt den Zenoh-Client für den ``get_plugin_ui_manifest``-Service.
+
+        Muss aufgerufen werden, nachdem der VyraEntity gestartet wurde und
+        die Zenoh-Infrastruktur bereit ist.
+
+        :param entity: Initialisierter VyraEntity dieses Moduls
+        """
+        from vyra_base.com.transport import InterfaceFactory
+
+        self._entity = entity
 
         try:
-            plugin = PLUGIN_CONFIG(
-                name=config["name"],
-                version=config["version"],
-                description=config["description"],
-                author=config["author"],
-                license=config["license"],
-                path=plugin_path,
-                dependencies=config["dependencies"],
-                enabled=config["enabled"]
-
+            # Client-Interface für den Zenoh-Service des v2_modulemanager
+            # Die Schnittstelle ist in modulemanager_plugin.meta.json definiert
+            self._client = await InterfaceFactory.create_client(
+                entity=entity,
+                namespace="plugin",
+                function_name="get_plugin_ui_manifest",
+                # topic: {v2_modulemanager_name}/plugin/get_plugin_ui_manifest
+                remote_module="v2_modulemanager",
             )
-        except Exception as e:
-            logger.error(f"[PluginRegistry] Error creating plugin config for '{config['name']}': {e}")
-            return
-        
-        self.import_plugin(plugin)
-        self._plugins[plugin.name] = plugin
+            logger.info("✅ PluginRegistry: Zenoh-Client für get_plugin_ui_manifest bereit")
+        except Exception as exc:
+            logger.warning("⚠️  PluginRegistry: Zenoh-Client konnte nicht initialisiert werden: %s", exc)
+            self._client = None
 
-    def import_plugin(self, plugin: PLUGIN_CONFIG):
-        """Imports the plugin module based on the plugin configuration."""
+    async def get_ui_manifest(
+        self,
+        scope_type:   str = "MODULE",
+        scope_target: str | None = None,
+    ) -> dict:
+        """
+        Fragt das UI-Slot-Manifest vom v2_modulemanager ab.
+
+        Gibt ein Dict zurück mit Schüssel ``slots`` (slot_id → list of components).
+        Leer wenn v2_modulemanager nicht erreichbar oder kein Plugin installiert.
+
+        :param scope_type:   GLOBAL | TEMPLATE | MODULE
+        :param scope_target: z.B. '{{ module_name }}' oder None für GLOBAL
+        """
+        if self._client is None:
+            logger.warning("PluginRegistry.get_ui_manifest: Kein Zenoh-Client verfügbar")
+            return {"scope_type": scope_type, "scope_target": scope_target, "slots": {}}
+
         try:
-            module_name = f"{self._package_name}.plugin.{plugin.name}"
-            module = importlib.import_module(module_name)
-            plugin.module = module
-            logger.info(f"[PluginRegistry] Plugin '{plugin.name}' imported successfully.")
-        except ImportError as e:
-            logger.error(f"[PluginRegistry] Error importing plugin '{plugin.name}': {e}")
-            raise e
+            result = await self._client.call({
+                "scope_type":   scope_type,
+                "scope_target": scope_target,
+            })
+            return result or {}
+        except Exception as exc:
+            logger.error("PluginRegistry.get_ui_manifest Fehler: %s", exc)
+            return {"scope_type": scope_type, "scope_target": scope_target, "slots": {}}
 
-    def get(self, name):
-        return self._plugins.get(name)
+    async def teardown(self) -> None:
+        """Bereinigt Zenoh-Ressourcen."""
+        if self._client is not None:
+            try:
+                await self._client.close()
+            except Exception:
+                pass
+            self._client = None
+        logger.info("PluginRegistry: Zenoh-Client geschlossen")
 
-    def unregister(self, plugin: PLUGIN_CONFIG):
-        plugin.module = None  # Clear the module reference
-        logger.info(f"[PluginRegistry] Unregistering plugin '{plugin.name}'")
-        self._plugins.pop(plugin.name, None)
-
-    async def load_plugins(self):
-
-        if not self.plugin_dir.exists() or not self.plugin_dir.is_dir():
-            raise ValueError(f"Plugin-Directory '{self.plugin_dir}' does not exist or is not a directory.")
-
-        for subdir in self.plugin_dir.iterdir():
-            if subdir.name.startswith('_'):
-                logger.info(f"[PluginRegistry] Skipping hidden plugin-directory: {subdir.name}")
-            
-            if subdir.is_dir():
-                plugin_yaml = subdir / "plugin.yaml"
-                if plugin_yaml.exists():
-                    try:
-                        config: dict = await FileReader.open_yaml_file(plugin_yaml)
-                        self.register_plugin(config, plugin_path=subdir)
-                        logger.info(f"[PluginRegistry] Plugin '{config['name']}' successfully loaded.")
-                    except Exception as e:
-                        logger.error(f"[PluginRegistry] Error loading '{plugin_yaml}': {e}")
-                else:
-                    logger.warning(f"[PluginRegistry] '{plugin_yaml}' not found – Plugin '{subdir.name}' will be skipped.")
-            else:
                 logger.warning(f"[PluginRegistry] '{subdir.name}' is not a directory, skipping.")

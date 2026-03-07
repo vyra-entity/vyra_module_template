@@ -4,6 +4,12 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Changed (Plugin-System Generalisierung)
+- **`plugin/registry.py` komplett überarbeitet**: Alte importlib-basierte Python-Plugin-Registry (`PluginBase`, `PLUGIN_CONFIG`, `load_plugins()`) durch neue WASM-Plugin-UI-Registry ersetzt. `PluginRegistry` fragt jetzt das UI-Manifest bei `v2_modulemanager` via Zenoh-Client an (`get_plugin_ui_manifest`-Service). Kein statischer Plugin-Import mehr.
+
+### Added
+- **`docs/backend/PLUGIN_INTEGRATION.md`**: Neue Dokumentation für die Plugin-UI-Integration in Modulen — erklärt die Rollen, `PluginRegistry.setup()`, Frontend `import()`, HostFunctions-Template.
+
 ### Added (2026-03-05)
 - **Frontend Sidebar (Basis-Struktur)**: Portierbare, kollabierbare Sidebar-Basisstruktur identisch zu `v2_modulemanager`, jedoch in plain JS (kein TypeScript, kein PrimeVue). Nur Abhängigkeiten: Vue 3, Pinia, Vue Router, PrimeIcons CSS.
 - **`src/store/sidebar.js`**: Plain-JS Pinia-Store mit `groupedItems`, `registerItem`, `unregisterItem`, `updateBadge`.
