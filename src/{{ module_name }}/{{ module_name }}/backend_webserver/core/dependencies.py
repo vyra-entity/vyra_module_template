@@ -1,14 +1,16 @@
 """
-FastAPI Dependencies for Backend Webserver
-
-Provides dependency injection for accessing core application components
-via container_injection (VyraEntity, Component, TaskManager, StatusManager).
+Common dependencies for VYRA Module Manager API
 """
+from fastapi import HTTPException, BackgroundTasks, Depends
+from typing import Optional, Dict, Any
+from v2_modulemanager.logging_config import get_logger, log_exception, log_function_call, log_function_result
+import uuid
+from pathlib import Path
 
-import logging
-from fastapi import HTTPException
+from .config import settings
 
-logger = logging.getLogger(__name__)
+# Logger Setup
+logger = get_logger(__name__)
 
 # Import container_injection for accessing VyraEntity and Component
 try:
@@ -25,94 +27,224 @@ except ImportError:
     CONTAINER_AVAILABLE = False
     ContainerNotInitializedError = Exception  # Fallback for type hints
 
+# Global operation tracking
+module_operations: Dict[str, Dict[str, Any]] = {}
 
-# FastAPI dependency functions
+def get_settings():
+    """Dependency to get application settings"""
+    return settings
+
+def get_background_tasks() -> BackgroundTasks:
+    """Get background tasks instance"""
+    return BackgroundTasks()
+
+def create_operation_id() -> str:
+    """Create a unique operation ID"""
+    return str(uuid.uuid4())
+
+def get_operation_status(operation_id: str) -> Optional[Dict[str, Any]]:
+    """Get status of a background operation"""
+    return module_operations.get(operation_id)
+
+def set_operation_status(operation_id: str, status: Dict[str, Any]):
+    """Set status of a background operation"""
+    module_operations[operation_id] = status
+
+def validate_module_name(module_name: str) -> str:
+    """Validate module name format"""
+    if not module_name:
+        raise HTTPException(status_code=400, detail="Module name cannot be empty")
+    
+    if not module_name.replace("_", "").replace("-", "").isalnum():
+        raise HTTPException(
+            status_code=400, 
+            detail="Module name can only contain letters, numbers, underscores and hyphens"
+        )
+    
+    return module_name
+
+def validate_instance_id(instance_id: str) -> str:
+    """Validate instance ID format"""
+    if not instance_id:
+        raise HTTPException(status_code=400, detail="Instance ID cannot be empty")
+    
+    if len(instance_id) != 32 or not all(c in "0123456789abcdef" for c in instance_id):
+        raise HTTPException(
+            status_code=400, 
+            detail="Instance ID must be a 32-character hexadecimal string"
+        )
+    
+    return instance_id
+
+def get_module_path(module_name: str, instance_id: str) -> Path:
+    """Get the file system path for a module instance"""
+    module_dir = f"{module_name}_{instance_id}"
+    return settings.MODULES_PATH / module_dir
+
+def check_module_exists(module_name: str, instance_id: str) -> bool:
+    """Check if a module instance exists on the file system"""
+    module_path = get_module_path(module_name, instance_id)
+    return module_path.exists() and module_path.is_dir()
+
+class ModuleNotFoundError(HTTPException):
+    """Exception raised when a module is not found"""
+    def __init__(self, module_name: str, instance_id: Optional[str] = None):
+        if instance_id:
+            detail = f"Module instance {module_name}/{instance_id} not found"
+        else:
+            detail = f"Module {module_name} not found"
+        super().__init__(status_code=404, detail=detail)
+
+class ModuleOperationError(HTTPException):
+    """Exception raised when a module operation fails"""
+    def __init__(self, operation: str, module_name: str, detail: str):
+        super().__init__(
+            status_code=500, 
+            detail=f"Failed to {operation} module {module_name}: {detail}"
+        )
+
+def validate_operation_status(status: str) -> str:
+    """Validate operation status"""
+    valid_statuses = ["queued", "running", "completed", "failed", "cancelled"]
+    if status not in valid_statuses:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Invalid status. Must be one of: {', '.join(valid_statuses)}"
+        )
+    return status
+
+def get_docker_service_name(module_name: str, instance_id: str) -> str:
+    """Generate Docker service name for a module instance"""
+    return f"{settings.DOCKER_STACK_NAME}_{module_name}_{instance_id}"
+
 def get_vyra_entity():
     """
-    FastAPI dependency: Get VyraEntity from container_injection
+    FastAPI dependency to get VyraEntity from container_injection.
     
-    Usage in routers:
+    This allows REST API endpoints to access the ROS2 node and ROS2 services
+    without requiring gRPC over UDS.
+    
+    Usage:
+        from fastapi import Depends
+        
         @router.get("/endpoint")
         async def endpoint(entity = Depends(get_vyra_entity)):
-            # Access entity.node, entity.call_service(), etc.
-            pass
+            result = await entity.call_service(...)
+            return result
     
+    Returns:
+        VyraEntity instance from container_injection
+        
     Raises:
-        HTTPException: If container not initialized or entity not available
+        HTTPException: If container is not initialized or not available
     """
     if not CONTAINER_AVAILABLE:
         raise HTTPException(
             status_code=503,
-            detail="Container injection not available"
+            detail="Container injection not available - REST API running standalone"
         )
     
     try:
         return provide_entity()
-    except ContainerNotInitializedError:
+    except ContainerNotInitializedError as e:
         raise HTTPException(
             status_code=503,
-            detail="Services not initialized yet, please wait"
+            detail=f"VyraEntity not yet initialized: {str(e)}"
         )
-
 
 def get_component():
     """
-    FastAPI dependency: Get Component from container_injection
+    FastAPI dependency to get Component from container_injection.
     
-    Usage in routers:
+    This allows REST API endpoints to access the application Component
+    and its methods without requiring gRPC over UDS.
+    
+    Usage:
+        from fastapi import Depends
+        
         @router.get("/endpoint")
         async def endpoint(component = Depends(get_component)):
-            # Access component methods
             result = await component.some_method()
-            pass
+            return result
     
+    Returns:
+        Component instance from container_injection
+        
     Raises:
-        HTTPException: If container not initialized or component not available
+        HTTPException: If container is not initialized or not available
     """
     if not CONTAINER_AVAILABLE:
         raise HTTPException(
             status_code=503,
-            detail="Container injection not available"
+            detail="Container injection not available - REST API running standalone"
         )
     
     try:
         return provide_component()
-    except ContainerNotInitializedError:
+    except ContainerNotInitializedError as e:
         raise HTTPException(
             status_code=503,
-            detail="Services not initialized yet, please wait"
+            detail=f"Component not yet initialized: {str(e)}"
         )
 
-
 def get_task_manager():
-    """FastAPI dependency: Get TaskManager from container_injection"""
+    """
+    FastAPI dependency to get TaskManager from container_injection.
+    
+    Usage:
+        from fastapi import Depends
+        
+        @router.get("/tasks")
+        async def tasks(task_manager = Depends(get_task_manager)):
+            return task_manager.get_status()
+    
+    Returns:
+        TaskManager instance from container_injection
+        
+    Raises:
+        HTTPException: If container is not initialized or not available
+    """
     if not CONTAINER_AVAILABLE:
         raise HTTPException(
             status_code=503,
-            detail="Container injection not available"
+            detail="Container injection not available - REST API running standalone"
         )
     
     try:
         return provide_task_manager()
-    except ContainerNotInitializedError:
+    except ContainerNotInitializedError as e:
         raise HTTPException(
             status_code=503,
-            detail="Services not initialized yet, please wait"
+            detail=f"TaskManager not yet initialized: {str(e)}"
         )
 
-
 def get_status_manager():
-    """FastAPI dependency: Get StatusManager from container_injection"""
+    """
+    FastAPI dependency to get StatusManager from container_injection.
+    
+    Usage:
+        from fastapi import Depends
+        
+        @router.get("/status")
+        async def status(status_manager = Depends(get_status_manager)):
+            return status_manager.get_current_state()
+    
+    Returns:
+        StatusManager instance from container_injection
+        
+    Raises:
+        HTTPException: If container is not initialized or not available
+    """
     if not CONTAINER_AVAILABLE:
         raise HTTPException(
             status_code=503,
-            detail="Container injection not available"
+            detail="Container injection not available - REST API running standalone"
         )
     
     try:
         return provide_state_manager()
-    except ContainerNotInitializedError:
+    except ContainerNotInitializedError as e:
         raise HTTPException(
             status_code=503,
-            detail="Services not initialized yet, please wait"
+            detail=f"StatusManager not yet initialized: {str(e)}"
         )

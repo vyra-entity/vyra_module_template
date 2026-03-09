@@ -5,8 +5,8 @@
 Dieses Dokument beschreibt, wie ein Modul (z.B. `v2_dashboard`) die Plugin-Infrastruktur
 des VYRA-Ökosystems nutzt, um WASM-Plugins in seiner UI zu laden.
 
-**Wichtig**: Das Modul führt die Plugins **nicht selbst aus** — das macht `v2_modulemanager`.
-Das Modul fragt nur das UI-Manifest ab und lädt die Vue-Komponenten.
+**Wichtig**: Jedes Modul führt **neu seine eigenen Plugins aus** — Plugins können nur vom `v2_modulemanager` installiert werden.
+Das Modul fragt das UI-Manifest ab und lädt die Vue-Komponenten.
 
 ---
 
@@ -14,16 +14,16 @@ Das Modul fragt nur das UI-Manifest ab und lädt die Vue-Komponenten.
 
 | Komponente | Rolle |
 |-----------|------|
-| `v2_modulemanager` | Führt WASM aus, verwaltet DB, bietet REST + Zenoh API |
-| `container_manager` | Kopiert Plugin-Dateien in NFS-Pool, prüft Checksums |
-| `Dein Modul` | Fragt UI-Manifest ab, lädt Vue-Komponenten aus NFS-Proxy |
+| `v2_modulemanager` | Läd Plugin Daten in DB und verwaltet (Plugin Mainifest API)|
+| `container_manager` | Kopiert Plugin-Dateien in NFS-Pool, prüft Checksums, validiert Plugins aus Repository |
+| `Dein Modul` | Fragt UI-Manifest ab, bietet Plugin Host Functions, lädt Vue-Komponenten aus NFS-Proxy, kommuniziert mit fremden oder eigener Plugin-Logic (Wasm) |
 | `vyra_base.plugin` | Abstrakte Typen: BaseHostFunctions, WasmRuntime etc. |
 
 ---
 
 ## Schritt 1: PluginRegistry einbinden
 
-Die `PluginRegistry` im Modul-Template ist bereits vorbereitet.
+Die `PluginRegistry` im Modul ist bereits vorbereitet.
 
 **Datei**: `src/{{ module_name }}/{{ module_name }}/plugin/registry.py`
 

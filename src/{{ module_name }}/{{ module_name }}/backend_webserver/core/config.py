@@ -1,33 +1,76 @@
 """
-Backend Webserver Configuration
-
-Application settings and configuration management.
+Core configuration for VYRA Module Manager API
 """
-
+from pathlib import Path
+from typing import Optional
 import os
-from pydantic_settings import BaseSettings
 
 
-class Settings(BaseSettings):
-    """Application settings"""
+class Settings:
+    """Application settings and configuration"""
     
-    # Module Info
-    module_name: str = os.getenv('MODULE_NAME', '{{ module_name }}')
-    module_version: str = "0.1.0"
+    # API Configuration
+    API_TITLE: str = "VYRA Module Manager API"
+    API_VERSION: str = "0.1.0"
+    API_DESCRIPTION: str = "Modern async API for VYRA Module Management"
     
-    # API Settings
-    api_prefix: str = f"/api/{os.getenv('MODULE_NAME', '{{ module_name }}')}"
+    # Paths
+    WORKSPACE_ROOT: Path = Path(os.getenv("WORKSPACE_ROOT", "/workspace"))
+    MODULES_PATH: Path = Path(os.getenv("MODULES_PATH", str(WORKSPACE_ROOT / "modules")))
+    STORAGE_PATH: Path = WORKSPACE_ROOT / "storage"
+    LOG_PATH: Path = WORKSPACE_ROOT / "log"
+    CONFIG_PATH: Path = WORKSPACE_ROOT / "config"
     
-    # Development
-    debug: bool = os.getenv('VYRA_DEV_MODE', 'false').lower() == 'true'
+    # Frontend Configuration
+    FRONTEND_PATH: Path = WORKSPACE_ROOT / "frontend"
+    FRONTEND_DIST_PATH: Path = FRONTEND_PATH / "dist"
     
-    # Logging
-    log_level: str = os.getenv('LOG_LEVEL', 'INFO')
+    # Docker Configuration
+    DOCKER_STACK_NAME: str = os.getenv("STACK_NAME", "vos2_ws")
+    DOCKER_NETWORK: str = f"{DOCKER_STACK_NAME}_vyra-network"
     
-    class Config:
-        env_file = "/workspace/.env"
-        case_sensitive = False
-
+    # Redis Configuration
+    REDIS_HOST: str = os.getenv("REDIS_HOST", "redis")
+    REDIS_PORT: int = int(os.getenv("REDIS_PORT", "6379"))
+    
+    # SSL/TLS Configuration
+    CERTIFICATES_PATH: Path = STORAGE_PATH / "certificates"
+    SSL_CERT_FILE: Path = CERTIFICATES_PATH / "webserver.crt"
+    SSL_KEY_FILE: Path = CERTIFICATES_PATH / "webserver.key"
+    
+    # Development Configuration
+    DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
+    DEVELOPMENT_MODE: bool = os.getenv("VYRA_DEV_MODE", "true").lower() == "true"
+    
+    # Logging Configuration
+    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
+    LOG_FORMAT: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    
+    def __init__(self):
+        """Initialize settings and ensure directories exist"""
+        self.ensure_directories()
+    
+    def ensure_directories(self):
+        """Ensure all required directories exist"""
+        directories = [
+            self.MODULES_PATH,
+            self.STORAGE_PATH,
+            self.LOG_PATH,
+            self.CERTIFICATES_PATH
+        ]
+        
+        for directory in directories:
+            directory.mkdir(parents=True, exist_ok=True)
+    
+    @property
+    def has_ssl_certificates(self) -> bool:
+        """Check if SSL certificates exist"""
+        return self.SSL_CERT_FILE.exists() and self.SSL_KEY_FILE.exists()
+    
+    @property
+    def frontend_assets_available(self) -> bool:
+        """Check if frontend assets are available"""
+        return self.FRONTEND_DIST_PATH.exists()
 
 # Global settings instance
 settings = Settings()
