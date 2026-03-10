@@ -149,7 +149,7 @@ copier update --overwrite --data enable_frontend=false
 
 ## 4. Modul ins lokale Repository publizieren
 
-Nachdem das Modul erstellt oder aktualisiert wurde, kann es im `local_module_repository` registriert werden:
+Nachdem das Modul erstellt oder aktualisiert wurde, kann es im `local_repository` registriert werden:
 
 ```bash
 cd /home/holgder-dach/VOS2_WORKSPACE/modules/my_detector_<hash>
@@ -158,13 +158,13 @@ cd /home/holgder-dach/VOS2_WORKSPACE/modules/my_detector_<hash>
 
 Das Skript:
 1. Liest `MODULE_NAME` aus `.module/module_data.yaml`
-2. Ruft `local_module_repository/tools/sync_from_modules.sh` auf
+2. Ruft `local_repository/tools/sync_from_modules.sh` auf
 3. Synchronisiert das Modul ins Repository
 
 Alternativer Repository-Pfad:
 
 ```bash
-REPO_PATH=/custom/path/to/local_module_repository ./tools/publish_to_repo.sh
+REPO_PATH=/custom/path/to/local_repository ./tools/publish_to_repo.sh
 ```
 
 > **Hinweis**: Template-Module (Name enthält `template`) werden vom Sync-Skript automatisch übersprungen.
@@ -277,6 +277,6 @@ cat src/my_detector/my_detector/application/application.py.rej
 ## Weiterführende Dokumentation
 
 - [docs/GIT_TEMPLATE_AS_UPSTREAM_GUIDE.md](GIT_TEMPLATE_AS_UPSTREAM_GUIDE.md) — Alternative: Template als git upstream
-- [docs/MODULE_REPOSITORY.md](MODULE_REPOSITORY.md) — local_module_repository Details
+- [docs/MODULE_REPOSITORY.md](MODULE_REPOSITORY.md) — local_repository Details
 - [docs/BUILD_SYSTEM.md](BUILD_SYSTEM.md) — Colcon Build & Docker
 - [Copier Dokumentation](https://copier.readthedocs.io/)

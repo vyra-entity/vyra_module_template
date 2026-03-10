@@ -1,19 +1,19 @@
 #!/bin/bash
 # ==============================================================================
-# publish_to_repo.sh - Publiziert ein Modul in das local_module_repository
+# publish_to_repo.sh - Publiziert ein Modul in das local_repository
 # ==============================================================================
 # Verwendung: ./tools/publish_to_repo.sh [REPO_PATH]
 # ==============================================================================
 set -e
 
 MODULE_DIR=$(cd "$(dirname "$0")/.." && pwd)
-REPO_PATH=${REPO_PATH:-"$MODULE_DIR/../../local_module_repository"}
+REPO_PATH=${REPO_PATH:-"$MODULE_DIR/../../local_repository"}
 
 # Resolve absolute path
 REPO_PATH=$(cd "$REPO_PATH" 2>/dev/null && pwd) || {
     echo "❌ Repository nicht gefunden: $REPO_PATH"
     echo "   Setze REPO_PATH auf den lokalen Repository-Pfad oder übergib ihn als Argument:"
-    echo "   REPO_PATH=/path/to/local_module_repository ./tools/publish_to_repo.sh"
+    echo "   REPO_PATH=/path/to/local_repository ./tools/publish_to_repo.sh"
     exit 1
 }
 

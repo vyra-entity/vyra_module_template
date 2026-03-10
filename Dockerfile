@@ -117,13 +117,6 @@ RUN echo "Cache bust: ${CACHE_BUST:-$(date +%s)}" && \
         # pip install wheels/*.whl --break-system-packages --ignore-installed cryptography || true; \
     fi
 
-# Setup ROS2 interfaces (already in /workspace)
-# Extract MODULE_NAME first if not provided as build arg
-RUN if [ -z "$MODULE_NAME" ] && [ -f ".module/module_data.yaml" ]; then \
-        export MODULE_NAME=$(grep "^name:" .module/module_data.yaml | cut -d: -f2 | tr -d ' ' | tr -d "'" | tr -d '"'); \
-    fi && \
-    python3 tools/setup_interfaces.py --interface_pkg "${MODULE_NAME}_interfaces"
-
 # Setup Proto interfaces (for vyra_callables via gRPC/Redis transport)
 RUN python3 tools/setup_proto_interfaces.py || echo "⚠️  No Proto interfaces found (optional)"
 
@@ -146,6 +139,15 @@ RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends protobuf-compiler-grpc 2>/dev/null || \
     echo "⚠️  grpc_cpp_plugin (protobuf-compiler-grpc) not available - C++ proto generation will be skipped" && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Setup ROS2 interfaces: runs AFTER wheel installation and AFTER rm -rf install/build
+# so that extract_interfaces() always uses the latest vyra_base wheel.
+# This guarantees VBASE base types (VBASEVolatileList etc.) are present in
+# src/${MODULE_NAME}_interfaces/msg/ before colcon build.
+RUN if [ -z "$MODULE_NAME" ] && [ -f ".module/module_data.yaml" ]; then \
+        export MODULE_NAME=$(grep "^name:" .module/module_data.yaml | cut -d: -f2 | tr -d ' ' | tr -d "'" | tr -d '"'); \
+    fi && \
+    python3 tools/setup_interfaces.py --interface_pkg "${MODULE_NAME}_interfaces"
 
 # Build ROS2 packages (skip vyra_module_template_interfaces template from base image)
 RUN source /opt/ros/kilted/setup.bash && \

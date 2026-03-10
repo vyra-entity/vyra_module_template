@@ -4,6 +4,9 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed
+- **`Dockerfile`** — `setup_interfaces.py` verschoben: Aufruf wurde von vor `rm -rf /workspace/install /workspace/build` auf nach dahinter verlegt, direkt vor `colcon build`. Damit läuft `setup_interfaces.py` immer mit dem zuletzt installierten `vyra_base`-Wheel und garantiert, dass VBASE-Basistypen (`VBASEVolatileList`, `VBASEKeyValue`, etc.) in `src/${MODULE_NAME}_interfaces/msg/` vorhanden sind bevor `colcon build` die Interfaces kompiliert. Verhindert `ImportError: cannot import name 'VBASEVolatileList'` nach Wheel-Updates.
+
 ### Changed (Plugin-System Generalisierung)
 - **`plugin/registry.py` komplett überarbeitet**: Alte importlib-basierte Python-Plugin-Registry (`PluginBase`, `PLUGIN_CONFIG`, `load_plugins()`) durch neue WASM-Plugin-UI-Registry ersetzt. `PluginRegistry` fragt jetzt das UI-Manifest bei `v2_modulemanager` via Zenoh-Client an (`get_plugin_ui_manifest`-Service). Kein statischer Plugin-Import mehr.
 

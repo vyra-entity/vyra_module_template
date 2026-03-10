@@ -363,7 +363,7 @@ List all configured repositories with statistics
       "id": "local-module-repository",
       "name": "Local Repository",
       "type": "local",
-      "path": "/local_module_repository",
+      "path": "/local_repository",
       "enabled": true,
       "stats": {
         "total_modules": 5,
