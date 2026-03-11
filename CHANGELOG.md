@@ -4,6 +4,21 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Added (Phase 7 — Plugin-Bridge & BaseEventBridge)
+- **`backend_webserver/services/base_event_bridge.py`**: Abstrakte ABC-Basisklasse für alle Event-Bridge-Implementierungen.
+- **`backend_webserver/services/feed_streamer.py`**: Ersetzt altes `feed_manager.py`. Erweitert `BaseEventBridge`. `publish_feed(FeedMessage)` sync-API für Application-Caller.
+- **`backend_webserver/services/plugin_bridge.py`**: Bidirektionale Singleton-Bridge für Plugin-Kommunikation via Zenoh-Kanäle. `publish`, `receive`, `register_handler`, `subscribe`, `unsubscribe`.
+- **`backend_webserver/websocket/service.py`**: `ConnectionManager` Singleton mit `active_connections`, `operation_subscriptions`, `notify_operation_update()`, `operation_monitor()`.
+- **`backend_webserver/plugin/__init__.py`**: Plugin-Router-Package.
+- **`backend_webserver/plugin/router.py`**: `GET /ui-manifest` + `POST /{plugin_id}/call` — Zenoh-Proxy via `PluginClient`.
+- **`plugin/plugin_client.py`**: Extended with `call_plugin(plugin_id, function_name, data)` method.
+
+### Changed (Phase 7)
+- **`backend_webserver/services/feed_manager.py`**: Gelöscht — replaced by `feed_streamer.py`.
+- **`backend_webserver/websocket/router.py`**: Komplett überarbeitet. Entfernt inline `ConnectionManager`. Fixe Logging-Imports (`v2_modulemanager` referenz entfernt). `FeedManager` → `FeedStreamer`. Fügt `/plugin/{plugin_id}/{channel}` WebSocket-Endpoint hinzu.
+- **`container_injection.py`**: `plugin_client` und `plugin_bridge` Provider hinzugefügt. `reset()` aktualisiert. `set/get/provide_plugin_client`, `set/get/provide_plugin_bridge` Funktionen hinzugefügt.
+- **`backend_webserver/main_rest.py`**: Gebrochene Imports gefixt (`operation_monitor` jetzt aus `websocket/service`, `plugin_router` aus `plugin/router`). `plugin_manager.shutdown()` entfernt. `PluginBridge.get_instance()` + `set_plugin_bridge()` im Startup-Lifespan.
+
 ### Fixed
 - **`Dockerfile`** — `setup_interfaces.py` verschoben: Aufruf wurde von vor `rm -rf /workspace/install /workspace/build` auf nach dahinter verlegt, direkt vor `colcon build`. Damit läuft `setup_interfaces.py` immer mit dem zuletzt installierten `vyra_base`-Wheel und garantiert, dass VBASE-Basistypen (`VBASEVolatileList`, `VBASEKeyValue`, etc.) in `src/${MODULE_NAME}_interfaces/msg/` vorhanden sind bevor `colcon build` die Interfaces kompiliert. Verhindert `ImportError: cannot import name 'VBASEVolatileList'` nach Wheel-Updates.
 

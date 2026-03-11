@@ -16,15 +16,15 @@ from .core.config import settings
 from ..logging_config import get_logger, log_exception, log_function_call, log_function_result
 
 # Import structured routers
-from .websocket.router import (
-    router as websocket_router,
-    operation_monitor,
-)
+from .websocket.router import router as websocket_router
+from .websocket.service import operation_monitor
 # from .your_route.router import router as your_route_router
 
 
 # Plugin system
-from .plugin import plugin_router, plugin_manager
+from .plugin.router import router as plugin_router
+from .services.plugin_bridge import PluginBridge
+from ..container_injection import set_plugin_bridge
 
 # Import hardware management
 from .services.redis_service import redis_service
@@ -43,6 +43,8 @@ async def lifespan(app: FastAPI):
     """
     # Startup
     asyncio.create_task(operation_monitor())
+    plugin_bridge = PluginBridge.get_instance()
+    set_plugin_bridge(plugin_bridge)
     
     # Connect Redis and initialise authentication service
     try:
@@ -63,7 +65,6 @@ async def lifespan(app: FastAPI):
 
     # Shutdown
     await redis_service.cleanup()
-    await plugin_manager.shutdown()
 
 
 # Create FastAPI application

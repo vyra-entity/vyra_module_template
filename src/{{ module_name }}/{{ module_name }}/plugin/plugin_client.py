@@ -104,6 +104,36 @@ class PluginClient:
             logger.error("PluginClient.get_ui_manifest Fehler: %s", exc)
             return {"scope_type": scope_type, "scope_target": scope_target, "slots": {}}
 
+    async def call_plugin(
+        self,
+        plugin_id: str,
+        function_name: str,
+        data: dict | None = None,
+    ) -> dict:
+        """
+        Ruft eine Plugin-Funktion im v2_modulemanager-WASM-Runtime auf.
+
+        :param plugin_id:     ID des installierten Plugins
+        :param function_name: Name der exportierten WASM-Funktion
+        :param data:          Eingabeparameter-Dict
+        :returns:             Ergebnis-Dict aus dem WASM-Runtime
+        """
+        if self._client is None:
+            logger.warning("PluginClient.call_plugin: Kein Client verfügbar")
+            return {}
+
+        try:
+            result = await self._client.call({
+                "action": "call",
+                "plugin_id": plugin_id,
+                "function_name": function_name,
+                "data": data or {},
+            })
+            return result or {}
+        except Exception as exc:
+            logger.error("PluginClient.call_plugin Fehler [%s.%s]: %s", plugin_id, function_name, exc)
+            raise
+
     async def teardown(self) -> None:
         """Schließt den Vyra-Client."""
         if self._client is not None:

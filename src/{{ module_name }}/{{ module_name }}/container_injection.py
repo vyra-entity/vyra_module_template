@@ -19,8 +19,15 @@ Usage:
     component = container.component()
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from .logging_config import get_logger
 from dependency_injector import containers, providers
+
+if TYPE_CHECKING:
+    from .backend_webserver.services.plugin_bridge import PluginBridge
 
 logger = get_logger(__name__)
 
@@ -51,6 +58,8 @@ class ApplicationContainer(containers.DeclarativeContainer):
     task_manager = providers.Singleton(lambda: None)
     state_manager = providers.Singleton(lambda: None)
     user_manager = providers.Singleton(lambda: None)
+    plugin_client = providers.Singleton(lambda: None)
+    plugin_bridge = providers.Singleton(lambda: None)
 
 
 # Global container instance
@@ -205,6 +214,8 @@ def reset() -> None:
     container.task_manager.override(providers.Singleton(lambda: None))
     container.state_manager.override(providers.Singleton(lambda: None))
     container.user_manager.override(providers.Singleton(lambda: None))
+    container.plugin_client.override(providers.Singleton(lambda: None))
+    container.plugin_bridge.override(providers.Singleton(lambda: None))
     logger.info("🔄 Container reset")
 
 
@@ -307,3 +318,41 @@ def provide_user_manager():
             ...
     """
     return get_user_manager()
+
+
+def set_plugin_client(plugin_client_instance) -> None:
+    container.plugin_client.override(providers.Object(plugin_client_instance))
+    logger.info("✅ PluginClient set in container_injection")
+
+
+def get_plugin_client():
+    instance = container.plugin_client()
+    if instance is None:
+        raise ContainerNotInitializedError(
+            "PluginClient not initialized in container."
+        )
+    return instance
+
+
+def provide_plugin_client():
+    """Provider function for FastAPI Depends()."""
+    return get_plugin_client()
+
+
+def set_plugin_bridge(plugin_bridge_instance: "PluginBridge") -> None:
+    container.plugin_bridge.override(providers.Object(plugin_bridge_instance))
+    logger.info("✅ PluginBridge set in container_injection")
+
+
+def get_plugin_bridge() -> "PluginBridge":
+    instance = container.plugin_bridge()
+    if instance is None:
+        raise ContainerNotInitializedError(
+            "PluginBridge not initialized in container."
+        )
+    return instance
+
+
+def provide_plugin_bridge() -> "PluginBridge":
+    """Provider function for FastAPI Depends()."""
+    return get_plugin_bridge()

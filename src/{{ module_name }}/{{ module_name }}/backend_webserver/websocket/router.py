@@ -1,232 +1,142 @@
 """
-WebSocket router for real-time status updates
+WebSocket router for real-time status updates and plugin communication.
+
+Endpoints:
+  /status/{client_id}           — general status / operation subscriptions
+  /operations/{operation_id}    — specific operation status updates
+  /module_feed                  — live feed from FeedStreamer (Logic → UI)
+  /plugin/{plugin_id}/{channel} — bidirectional plugin event channel (PluginBridge)
 """
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from typing import Dict, Set
-import json
+from __future__ import annotations
+
 import asyncio
+import json
+import logging
 from datetime import datetime
-from v2_modulemanager.logging_config import get_logger
+
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from ..core.dependencies import module_operations
-from ..services.feed_manager import FeedManager, FeedMessage
+from ..services.feed_streamer import FeedStreamer, FeedMessage
+from ..services.plugin_bridge import PluginBridge
+from .service import (
+    connection_manager,
+    notify_operation_update,
+    operation_monitor,
+)
 from ...container_injection import container
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-# Connection manager for WebSocket connections
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: Dict[str, Set[WebSocket]] = {}
-        self.operation_subscriptions: Dict[str, Set[WebSocket]] = {}
-    
-    async def connect(self, websocket: WebSocket, client_id: str):
-        await websocket.accept()
-        if client_id not in self.active_connections:
-            self.active_connections[client_id] = set()
-        self.active_connections[client_id].add(websocket)
-        logger.info(f"Client {client_id} connected via WebSocket")
-    
-    def disconnect(self, websocket: WebSocket, client_id: str):
-        if client_id in self.active_connections:
-            self.active_connections[client_id].discard(websocket)
-            if not self.active_connections[client_id]:
-                del self.active_connections[client_id]
-        
-        # Remove from operation subscriptions
-        for operation_id in list(self.operation_subscriptions.keys()):
-            self.operation_subscriptions[operation_id].discard(websocket)
-            if not self.operation_subscriptions[operation_id]:
-                del self.operation_subscriptions[operation_id]
-        
-        logger.info(f"Client {client_id} disconnected from WebSocket")
-    
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        try:
-            await websocket.send_text(message)
-        except Exception as e:
-            logger.warning(f"Failed to send message to WebSocket: {e}")
-    
-    async def send_to_client(self, message: str, client_id: str):
-        if client_id in self.active_connections:
-            for websocket in self.active_connections[client_id].copy():
-                try:
-                    await websocket.send_text(message)
-                except Exception as e:
-                    logger.warning(f"Failed to send message to client {client_id}: {e}")
-                    self.active_connections[client_id].discard(websocket)
-    
-    async def broadcast(self, message: str):
-        for client_connections in self.active_connections.values():
-            for websocket in client_connections.copy():
-                try:
-                    await websocket.send_text(message)
-                except Exception as e:
-                    logger.warning(f"Failed to broadcast message: {e}")
-    
-    def subscribe_to_operation(self, websocket: WebSocket, operation_id: str):
-        if operation_id not in self.operation_subscriptions:
-            self.operation_subscriptions[operation_id] = set()
-        self.operation_subscriptions[operation_id].add(websocket)
-        logger.info(f"WebSocket subscribed to operation {operation_id}")
-    
-    async def notify_operation_update(self, operation_id: str, operation_data: dict):
-        if operation_id in self.operation_subscriptions:
-            message = json.dumps({
-                "type": "operation_update",
-                "operation_id": operation_id,
-                "data": operation_data
-            })
-            
-            for websocket in self.operation_subscriptions[operation_id].copy():
-                try:
-                    await websocket.send_text(message)
-                except Exception as e:
-                    logger.warning(f"Failed to send operation update: {e}")
-                    self.operation_subscriptions[operation_id].discard(websocket)
 
-# Global connection manager
-connection_manager = ConnectionManager()
+# ---------------------------------------------------------------------------
+# /status/{client_id}
+# ---------------------------------------------------------------------------
 
 @router.websocket("/status/{client_id}")
 async def websocket_status_endpoint(websocket: WebSocket, client_id: str):
-    """WebSocket endpoint for real-time status updates"""
+    """WebSocket endpoint for real-time status updates."""
     await connection_manager.connect(websocket, client_id)
-    
+
     try:
         while True:
-            # Receive messages from client
             data = await websocket.receive_text()
             message_data = json.loads(data)
-            
             message_type = message_data.get("type")
-            
+
             if message_type == "subscribe_operation":
                 operation_id = message_data.get("operation_id")
                 if operation_id:
                     connection_manager.subscribe_to_operation(websocket, operation_id)
-                    
-                    # Send current status if available
                     if operation_id in module_operations:
                         current_status = module_operations[operation_id]
                         await connection_manager.send_personal_message(
                             json.dumps({
                                 "type": "operation_update",
                                 "operation_id": operation_id,
-                                "data": current_status
+                                "data": current_status,
                             }),
-                            websocket
+                            websocket,
                         )
-            
+
             elif message_type == "get_all_operations":
-                # Send all current operations
-                operations_data = {
-                    "type": "all_operations",
-                    "operations": dict(module_operations)
-                }
                 await connection_manager.send_personal_message(
-                    json.dumps(operations_data),
-                    websocket
+                    json.dumps({
+                        "type": "all_operations",
+                        "operations": dict(module_operations),
+                    }),
+                    websocket,
                 )
-            
+
             elif message_type == "ping":
-                # Respond to ping with pong
                 await connection_manager.send_personal_message(
                     json.dumps({"type": "pong"}),
-                    websocket
+                    websocket,
                 )
-    
+
     except WebSocketDisconnect:
         connection_manager.disconnect(websocket, client_id)
-    except Exception as e:
-        logger.error(f"WebSocket error for client {client_id}: {e}")
+    except Exception as exc:
+        logger.error("WebSocket error for client %s: %s", client_id, exc)
         connection_manager.disconnect(websocket, client_id)
+
+
+# ---------------------------------------------------------------------------
+# /operations/{operation_id}
+# ---------------------------------------------------------------------------
 
 @router.websocket("/operations/{operation_id}")
 async def websocket_operation_endpoint(websocket: WebSocket, operation_id: str):
-    """WebSocket endpoint for specific operation status"""
+    """WebSocket endpoint for specific operation status."""
     await websocket.accept()
-    
+
     try:
-        # Send current status immediately if available
         if operation_id in module_operations:
             current_status = module_operations[operation_id]
             await websocket.send_text(json.dumps({
                 "type": "operation_status",
                 "operation_id": operation_id,
-                "data": current_status
+                "data": current_status,
             }))
-        
-        # Subscribe to updates
+
         connection_manager.subscribe_to_operation(websocket, operation_id)
-        
-        # Keep connection alive and handle client messages
+
         while True:
             data = await websocket.receive_text()
             message_data = json.loads(data)
-            
             if message_data.get("type") == "ping":
                 await websocket.send_text(json.dumps({"type": "pong"}))
-    
+
     except WebSocketDisconnect:
         if operation_id in connection_manager.operation_subscriptions:
             connection_manager.operation_subscriptions[operation_id].discard(websocket)
-    except Exception as e:
-        logger.error(f"WebSocket error for operation {operation_id}: {e}")
+    except Exception as exc:
+        logger.error("WebSocket error for operation %s: %s", operation_id, exc)
 
-# Function to notify operation updates (call from services)
-async def notify_operation_update(operation_id: str, operation_data: dict):
-    """Notify all subscribed WebSocket connections about operation updates"""
-    await connection_manager.notify_operation_update(operation_id, operation_data)
 
-# Background task to monitor operation changes
-async def operation_monitor():
-    """Background task that monitors operation changes and sends updates"""
-    last_operations_state = {}
-    
-    while True:
-        try:
-            current_operations = dict(module_operations)
-            
-            # Check for changes
-            for operation_id, operation_data in current_operations.items():
-                if (operation_id not in last_operations_state or 
-                    last_operations_state[operation_id] != operation_data):
-                    
-                    # Operation changed, notify subscribers
-                    await notify_operation_update(operation_id, operation_data)
-            
-            # Update last state
-            last_operations_state = current_operations.copy()
-            
-            # Wait before next check
-            await asyncio.sleep(1)
-            
-        except Exception as e:
-            logger.error(f"Error in operation monitor: {e}")
-            await asyncio.sleep(5)
-
+# ---------------------------------------------------------------------------
+# /module_feed — FeedStreamer live stream
+# ---------------------------------------------------------------------------
 
 @router.websocket("/module_feed")
 async def websocket_module_feed_endpoint(websocket: WebSocket):
     """
     WebSocket endpoint for real-time module feed updates.
 
-    Uses the in-process FeedManager singleton (no Redis).
+    Uses the in-process FeedStreamer singleton (no Redis).
     - Replays history ring-buffer to the new client immediately.
     - Then streams live FeedMessage objects as they arrive.
     - Simultaneously handles client-side ping/pong messages.
     """
     await websocket.accept()
-    fm = FeedManager.get_instance()
+    fm = FeedStreamer.get_instance()
     queue = fm.subscribe()
     logger.info("Client connected to module_feed WebSocket")
 
     async def _send_feeds() -> None:
-        """Relay FeedManager queue → WebSocket (sender side)."""
-        # 1. Send history ring-buffer as a SINGLE bulk message (no per-item WS frame flood)
+        """Relay FeedStreamer queue → WebSocket (sender side)."""
         history = fm.get_history()
         if history:
             await websocket.send_text(json.dumps({
@@ -234,10 +144,8 @@ async def websocket_module_feed_endpoint(websocket: WebSocket):
                 "items": history,
                 "timestamp": datetime.now().isoformat(),
             }))
-            logger.debug(f"📤 Sent history_batch with {len(history)} items to new client")
+            logger.debug("📤 Sent history_batch with %d items to new client", len(history))
 
-        # 2. Send current module state snapshot so the client immediately sees
-        #    the last known state of every installed module (not just what's in history)
         try:
             comp = container.component()
             if comp and getattr(comp, "module_info_reader", None):
@@ -248,18 +156,16 @@ async def websocket_module_feed_endpoint(websocket: WebSocket):
                         "states": last_states,
                         "timestamp": datetime.now().isoformat(),
                     }))
-                    logger.debug(f"📤 Sent state_snapshot for {len(last_states)} modules")
+                    logger.debug("📤 Sent state_snapshot for %d modules", len(last_states))
         except Exception as exc:
-            logger.warning(f"Could not send state_snapshot: {exc}")
+            logger.warning("Could not send state_snapshot: %s", exc)
 
-        # 3. Stream live messages from the queue
         while True:
-            # queue.get() returns already-serialised dict (FeedManager.publish stores to_dict())
             payload: dict = await queue.get()
             await websocket.send_text(json.dumps({"type": "module_feed", "data": payload}))
 
     async def _recv_client() -> None:
-        """Handle client → server messages (ping/pong, receiver side)."""
+        """Handle client → server messages (ping/pong)."""
         while True:
             try:
                 raw = await websocket.receive_text()
@@ -267,7 +173,6 @@ async def websocket_module_feed_endpoint(websocket: WebSocket):
                 if msg.get("type") == "ping":
                     await websocket.send_text(json.dumps({"type": "pong"}))
             except WebSocketDisconnect:
-                # Client closed the connection — stop the receiver loop cleanly
                 break
             except Exception:
                 pass
@@ -288,8 +193,68 @@ async def websocket_module_feed_endpoint(websocket: WebSocket):
                 pass
     except WebSocketDisconnect:
         pass
-    except Exception as e:
-        logger.error(f"WebSocket error in module_feed: {e}")
+    except Exception as exc:
+        logger.error("WebSocket error in module_feed: %s", exc)
     finally:
-        fm.unsubscribe(queue)
+        fm.unsubscribe("", queue)
+
+
+# ---------------------------------------------------------------------------
+# /plugin/{plugin_id}/{channel} — bidirectional plugin event channel
+# ---------------------------------------------------------------------------
+
+@router.websocket("/plugin/{plugin_id}/{channel}")
+async def websocket_plugin_endpoint(
+    websocket: WebSocket,
+    plugin_id: str,
+    channel: str,
+):
+    """
+    Bidirectional WebSocket channel for plugin UI ↔ backend communication.
+
+    Logic → UI: PluginBridge publishes to *channel*; forwarded to frontend.
+    UI → Logic: Frames with ``"type": "client_to_server"`` delivered to handlers.
+    """
+    await websocket.accept()
+    bridge = PluginBridge.get_instance()
+    queue = bridge.subscribe(channel)
+
+    for msg in bridge.get_history(channel):
+        try:
+            await websocket.send_json({"type": "plugin_event", "channel": channel, "data": msg})
+        except Exception:
+            break
+
+    async def _sender() -> None:
+        while True:
+            payload = await queue.get()
+            try:
+                await websocket.send_json({
+                    "type": "plugin_event",
+                    "plugin_id": plugin_id,
+                    "channel": channel,
+                    "data": payload,
+                })
+            except Exception:
+                break
+
+    sender_task = asyncio.ensure_future(_sender())
+
+    try:
+        while True:
+            raw = await websocket.receive_text()
+            frame = json.loads(raw)
+            ftype = frame.get("type")
+            if ftype == "client_to_server":
+                await bridge.receive(channel, frame.get("data", {}))
+            elif ftype == "ping":
+                await websocket.send_json({"type": "pong"})
+    except WebSocketDisconnect:
+        pass
+    except Exception as exc:
+        logger.error("PluginBridge WS error [%s/%s]: %s", plugin_id, channel, exc)
+    finally:
+        sender_task.cancel()
+        bridge.unsubscribe(channel, queue)
+        logger.info("PluginBridge WS closed [%s/%s]", plugin_id, channel)
         logger.info("Client disconnected from module_feed WebSocket")
