@@ -32,6 +32,7 @@ from .application.application import Component
 from .taskmanager import TaskManager, task_supervisor_looper
 from .state.state_manager import StateManager
 from .user.usermanager_client import UserManagerClient, usermanager_client_runner
+from .plugin.plugin_gateway import PluginGateway
 from . import container_injection
 
 from vyra_base.core.entity import VyraEntity
@@ -375,6 +376,9 @@ async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, State
     container_injection.set_task_manager(taskmanager)
     container_injection.set_state_manager(statemanager)
     container_injection.set_user_manager(UserManagerClient(entity))
+    plugin_gateway = PluginGateway()
+    await plugin_gateway.setup(entity)
+    container_injection.set_plugin_gateway(plugin_gateway)
     logger.info("container_dependencies_injected")
 
     await statemanager.initialization_complete()  # Notify StateManager that initialization is complete (for manual startup)

@@ -1,100 +1,172 @@
 """
-Plugin Router — {{ module_name }}
+Plugin Router — Communication endpoints for the plugin system.
 
-Endpunkte:
-  GET  /plugin/ui-manifest              — UI-Slot-Manifest von v2_modulemanager (via PluginClient)
-  POST /plugin/{plugin_id}/call         — Plugin-Funktion via v2_modulemanager ausführen
+These endpoints are registered in v2_modulemanager.
 
-Dieses Modul führt keine WASM-Plugins lokal aus — alle Plugin-Operationen
-werden an v2_modulemanager delegiert.
+Endpoints:
+  GET    /plugin/assets/{plugin_id}/{version}/{path} — Asset proxy (JS/CSS/WASM/SVG)
+  GET    /plugin/resolve_plugins                     — UI slot manifest (scope-based)
+  POST   /plugin/{plugin_id}/call                   — Generic plugin function call (WASM)
+
 """
 
 from __future__ import annotations
 
 import logging
-from typing import Any
+import mimetypes
+import os
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, Field
+from fastapi.responses import Response
 
-from ...container_injection import provide_plugin_client
+from .models import (
+    PluginCallRequest,
+    PluginCallResponse,
+    PluginListEntry,
+    UiManifestEntry,
+    UiManifestResponse,
+)
+from ...container_injection import provide_plugin_gateway
+from vyra_base.plugin.runtime import PluginCallError
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-
-# ---------------------------------------------------------------------------
-# Pydantic models
-# ---------------------------------------------------------------------------
-
-class PluginCallRequest(BaseModel):
-    function_name: str = Field(description="Name der aufzurufenden Plugin-Funktion")
-    data: dict[str, Any] = Field(default_factory=dict, description="Eingabeparameter")
-
-
-class PluginCallResponse(BaseModel):
-    plugin_id: str
-    function_name: str
-    result: dict[str, Any]
-    success: bool = True
+_LOCAL_REPO = Path(os.getenv("LOCAL_REPOSITORY_PATH", "/local_repository"))
+_POOL_PATH = Path(os.getenv("PLUGIN_POOL_PATH", "/plugin_pool"))
 
 
 # ---------------------------------------------------------------------------
-# GET /ui-manifest
+# GET /assets/ — Asset proxy
 # ---------------------------------------------------------------------------
 
 @router.get(
-    "/ui-manifest",
-    summary="UI-Slot-Manifest von v2_modulemanager (scope-basiert)",
+    "/assets/{plugin_id}/{version}/{file_path:path}",
+    summary="Asset proxy: plugin files (JS, CSS, WASM, SVG)",
 )
-async def get_ui_manifest(
-    scope_type: str = Query(default="MODULE", description="GLOBAL, TEMPLATE oder MODULE"),
-    scope_target: str | None = Query(default=None, description="Scope-Ziel"),
-    plugin_client=Depends(provide_plugin_client),
-):
+async def serve_plugin_asset(plugin_id: str, version: str, file_path: str):
     """
-    Gibt das Plugin-Slot-Manifest zurück.
-    Delegiert via VYRA-Transportschicht an v2_modulemanager.
+    Streams plugin assets from the NFS pool (installed plugins) or the local
+    repository (available but not yet installed).  Sets the correct MIME type.
     """
+    pool_asset = _POOL_PATH / plugin_id / version / file_path
+    repo_asset = _LOCAL_REPO / "plugins" / plugin_id / version / file_path
+
+    if pool_asset.exists():
+        asset_path = pool_asset
+        base_for_check = _POOL_PATH
+    elif repo_asset.exists():
+        asset_path = repo_asset
+        base_for_check = _LOCAL_REPO
+    else:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Asset not found: plugins/{plugin_id}/{version}/{file_path}",
+        )
+
+    # Security: prevent path traversal
     try:
-        result = await plugin_client.get_ui_manifest(scope_type=scope_type, scope_target=scope_target)
-        return result
-    except Exception as exc:
-        logger.error("ui-manifest Fehler: %s", exc)
-        raise HTTPException(status_code=502, detail=f"v2_modulemanager nicht erreichbar: {exc}")
+        asset_path.resolve().relative_to(base_for_check.resolve())
+    except ValueError:
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    mime_type, _ = mimetypes.guess_type(str(asset_path))
+    ext = asset_path.suffix.lower()
+    if ext == ".js":
+        mime_type = "application/javascript"
+    elif ext == ".wasm":
+        mime_type = "application/wasm"
+    elif ext == ".css":
+        mime_type = "text/css"
+    elif ext == ".svg":
+        mime_type = "image/svg+xml"
+    elif not mime_type:
+        mime_type = "application/octet-stream"
+
+    content = asset_path.read_bytes()
+    return Response(
+        content=content,
+        media_type=mime_type,
+        headers={
+            "Cache-Control": "public, max-age=3600",
+            "Content-Length": str(len(content)),
+        },
+    )
 
 
 # ---------------------------------------------------------------------------
-# POST /{plugin_id}/call — proxy to v2_modulemanager
+# GET /resolve_plugins — Slot manifest (scope-based, via PluginGateway)
+# ---------------------------------------------------------------------------
+
+@router.get(
+    "/resolve_plugins",
+    response_model=UiManifestResponse,
+    summary="UI slot manifest (scope-based)",
+)
+async def resolve_plugins(
+    scope_type: str = Query(default="MODULE", description="GLOBAL, TEMPLATE, MODULE, or INSTANCE"),
+    scope_target: str | None = Query(default=None, description="Scope target"),
+    module_name: str | None = Query(default=None, description="Requesting module name"),
+    module_id: str | None = Query(default=None, description="Requesting module instance ID"),
+    p_id: str | None = Query(default=None, description="Optional plugin pool ID filter"),
+    gateway=Depends(provide_plugin_gateway),
+):
+    """
+    Return the manifest of all active UI slot components for the given scope.
+    Refreshes the local cache via PluginGateway and returns the result.
+    """
+    try:
+        result = await gateway.resolve_plugins(
+            scope_type=scope_type,
+            scope_target=scope_target,
+            module_name=module_name,
+            module_id=module_id,
+            p_id=p_id,
+        )
+        return result
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        logger.error("resolve_plugins error: %s", exc)
+        raise HTTPException(status_code=500, detail=f"Error: {exc}")
+
+
+# ---------------------------------------------------------------------------
+# POST /{plugin_id}/call — Generic WASM plugin call
 # ---------------------------------------------------------------------------
 
 @router.post(
     "/{plugin_id}/call",
     response_model=PluginCallResponse,
-    summary="Plugin-Funktion via v2_modulemanager aufrufen",
+    summary="Generic plugin function call (WASM runtime via PluginGateway)",
 )
 async def call_plugin_function(
     plugin_id: str,
     body: PluginCallRequest,
-    plugin_client=Depends(provide_plugin_client),
+    gateway=Depends(provide_plugin_gateway),
 ):
     """
-    Führt eine Plugin-Funktion im v2_modulemanager-WASM-Runtime aus.
-    Delegiert den Aufruf per Zenoh RPC.
+    Call any exported function of an installed plugin.
+    The NFS path is looked up internally by PluginGateway; the runtime is
+    lazily initialised on first call.
     """
     try:
-        result = await plugin_client.call_plugin(
+        result = await gateway.call_plugin(
             plugin_id=plugin_id,
             function_name=body.function_name,
             data=body.data,
         )
-        return PluginCallResponse(
-            plugin_id=plugin_id,
-            function_name=body.function_name,
-            result=result,
-            success=True,
-        )
+    except PluginCallError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
     except Exception as exc:
-        logger.error("Plugin-Aufruf Fehler [%s.%s]: %s", plugin_id, body.function_name, exc)
-        raise HTTPException(status_code=502, detail=f"Plugin-Aufruf fehlgeschlagen: {exc}")
+        logger.error("Plugin call failed [%s.%s]: %s", plugin_id, body.function_name, exc)
+        raise HTTPException(status_code=500, detail=f"Plugin error: {exc}")
+
+    return PluginCallResponse(
+        plugin_id=plugin_id,
+        function_name=body.function_name,
+        result=result,
+        success=True,
+    )

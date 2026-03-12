@@ -58,7 +58,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
     task_manager = providers.Singleton(lambda: None)
     state_manager = providers.Singleton(lambda: None)
     user_manager = providers.Singleton(lambda: None)
-    plugin_client = providers.Singleton(lambda: None)
+    plugin_gateway = providers.Singleton(lambda: None)
     plugin_bridge = providers.Singleton(lambda: None)
 
 
@@ -214,7 +214,7 @@ def reset() -> None:
     container.task_manager.override(providers.Singleton(lambda: None))
     container.state_manager.override(providers.Singleton(lambda: None))
     container.user_manager.override(providers.Singleton(lambda: None))
-    container.plugin_client.override(providers.Singleton(lambda: None))
+    container.plugin_gateway.override(providers.Singleton(lambda: None))
     container.plugin_bridge.override(providers.Singleton(lambda: None))
     logger.info("🔄 Container reset")
 
@@ -320,23 +320,25 @@ def provide_user_manager():
     return get_user_manager()
 
 
-def set_plugin_client(plugin_client_instance) -> None:
-    container.plugin_client.override(providers.Object(plugin_client_instance))
-    logger.info("✅ PluginClient set in container_injection")
+def set_plugin_gateway(plugin_gateway_instance) -> None:
+    """Set the PluginGateway instance in the global container."""
+    container.plugin_gateway.override(providers.Object(plugin_gateway_instance))
+    logger.info("✅ PluginGateway set in container_injection")
 
 
-def get_plugin_client():
-    instance = container.plugin_client()
+def get_plugin_gateway():
+    """Get the PluginGateway instance from the global container."""
+    instance = container.plugin_gateway()
     if instance is None:
         raise ContainerNotInitializedError(
-            "PluginClient not initialized in container."
+            "PluginGateway not initialized in container."
         )
     return instance
 
 
-def provide_plugin_client():
+def provide_plugin_gateway():
     """Provider function for FastAPI Depends()."""
-    return get_plugin_client()
+    return get_plugin_gateway()
 
 
 def set_plugin_bridge(plugin_bridge_instance: "PluginBridge") -> None:

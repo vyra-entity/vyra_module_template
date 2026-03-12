@@ -1,0 +1,640 @@
+"""
+PluginGateway — Central hub for WASM plugins.
+
+Provides three tightly coupled components:
+
+PluginEventSystem
+    Asyncio-based in-process pub/sub and request/reply bus.
+    publish() bridges to the PluginBridge so that plugin events
+    are automatically forwarded to connected browser clients via WebSocket.
+
+LinkerFactory
+    Reads ``.module/plugin_interfaces.yaml`` and registers host functions
+    on a wasmtime Linker.  Type inference maps Python signatures to WASM
+    ValType automatically; explicit ``wasm_types`` in the YAML take
+    precedence.
+
+PluginGateway
+    Lifecycle owner: initialised from container_injection (no entity
+    argument), registered as a TaskManager task in main.py.
+    Owns a GatewayWasmRuntimePool and wires everything together.
+
+    Bidirectional:
+    - **Provider** — registers a ``plugin/ui_function_call`` Vyra Transport Remote
+      Service so that other modules (and RemoteRuntimeProxy instances
+      running in other modules) can call local WASM plugins.
+    - **Consumer** — holds a Vyra Transport client to ``plugin/resolve_plugins``
+      (self-call to v2_modulemanager/PluginManager) and writes the result
+      to ``plugin/cache/plugin_manifest.json``.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import inspect
+import json
+import logging
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
+
+import yaml
+
+from vyra_base.com import InterfaceFactory, remote_service
+from .. import container_injection
+from ..interface import auto_register_interfaces
+
+if TYPE_CHECKING:
+    from vyra_base.core import VyraEntity
+
+logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Optional wasmtime dependency
+# ---------------------------------------------------------------------------
+try:
+    from wasmtime import (  # type: ignore[import]
+        Engine,
+        Store,
+        Module as WasmModule,
+        Linker,
+        FuncType,
+        ValType,
+    )
+    _WASMTIME_AVAILABLE = True
+except ImportError:
+    _WASMTIME_AVAILABLE = False
+
+# Path to plugin_interfaces.yaml relative to the installed package root
+_INTERFACES_YAML = Path(__file__).parent.parent.parent.parent / ".module" / "plugin_interfaces.yaml"
+
+
+# ---------------------------------------------------------------------------
+# PluginEventSystem
+# ---------------------------------------------------------------------------
+
+class PluginEventSystem:
+    """
+    Asyncio in-process event bus for plugins.
+
+    publish(topic, payload)
+        Puts the event on all subscriber queues *and* bridges it to the
+        WebSocket FeedManager so browser clients receive it too.
+
+    subscribe(topic) -> asyncio.Queue
+        Returns a queue that will receive every future publish for topic.
+
+    request(topic, payload, timeout) -> dict
+        Sends a request and waits for exactly one reply via a temporary
+        reply queue.  Raises asyncio.TimeoutError on timeout.
+    """
+
+    def __init__(self) -> None:
+        self._subscribers: dict[str, list[asyncio.Queue]] = {}
+
+    async def publish(self, topic: str, payload: Any) -> None:
+        """Publish an event to all local subscribers and to the WS feed."""
+        queues = self._subscribers.get(topic, [])
+        for q in queues:
+            try:
+                q.put_nowait({"topic": topic, "payload": payload})
+            except asyncio.QueueFull:
+                logger.warning("PluginEventSystem: queue full for topic=%s", topic)
+
+        # Bridge to PluginBridge (best-effort) — imports lazily to avoid circular import
+        try:
+            from ..backend_webserver.services.plugin_bridge import PluginBridge
+            PluginBridge.get_instance().publish_sync(topic, {"topic": topic, "payload": payload})
+        except Exception as exc:
+            logger.debug("PluginEventSystem: PluginBridge bridge error: %s", exc)
+
+    def subscribe(self, topic: str, maxsize: int = 100) -> asyncio.Queue:
+        """Subscribe to a topic and return the receive queue."""
+        q: asyncio.Queue = asyncio.Queue(maxsize=maxsize)
+        self._subscribers.setdefault(topic, []).append(q)
+        return q
+
+    def unsubscribe(self, topic: str, queue: asyncio.Queue) -> None:
+        """Remove a previously subscribed queue."""
+        queues = self._subscribers.get(topic, [])
+        if queue in queues:
+            queues.remove(queue)
+
+    async def request(
+        self,
+        topic: str,
+        payload: Any,
+        timeout: float = 5.0,
+    ) -> dict:
+        """
+        Publish a request and wait for a single reply.
+
+        The expected reply topic is ``{topic}.reply``.
+        Raises asyncio.TimeoutError if no reply arrives within *timeout* seconds.
+        """
+        reply_topic = f"{topic}.reply"
+        reply_queue = self.subscribe(reply_topic, maxsize=1)
+        try:
+            await self.publish(topic, payload)
+            return await asyncio.wait_for(reply_queue.get(), timeout=timeout)
+        finally:
+            self.unsubscribe(reply_topic, reply_queue)
+
+
+# ---------------------------------------------------------------------------
+# LinkerFactory
+# ---------------------------------------------------------------------------
+
+def _python_type_to_val_types(annotation: Any) -> list:
+    """Infer a list of wasmtime ValType from a Python type annotation."""
+    if not _WASMTIME_AVAILABLE:
+        return []
+    if annotation is str or annotation is bytes:
+        # strings are passed as (ptr: i32, len: i32) pair
+        return [ValType.i32(), ValType.i32()]
+    if annotation is float:
+        return [ValType.f32()]
+    if annotation is None or annotation is type(None):
+        return []
+    # default: i32
+    return [ValType.i32()]
+
+
+def _yaml_type_to_val_type(name: str) -> Any:
+    """Convert a YAML wasm_types string (e.g. 'i32') to a wasmtime ValType."""
+    _map = {
+        "i32": ValType.i32,
+        "i64": ValType.i64,
+        "f32": ValType.f32,
+        "f64": ValType.f64,
+    }
+    factory = _map.get(name.lower())
+    if factory is None:
+        raise ValueError(f"Unknown WASM type: '{name}'")
+    return factory()
+
+
+class LinkerFactory:
+    """
+    Reads plugin_interfaces.yaml and builds a populated wasmtime Linker.
+
+    Linker map entry format::
+
+        linker_map:
+          - namespace: "vyra"
+            functions:
+              - wasm_name: "log"
+                host_func: "log"
+              - wasm_name: "publish"
+                host_func: "publish_event"
+              - wasm_name: "request"
+                host_func: "send_request"
+                wasm_types:            # explicit override
+                  params: ["i32", "i32", "i32", "i32"]
+                  results: ["i32"]
+
+    If ``wasm_types`` is omitted, the param/result types are inferred from
+    the Python signature of the host function via inspect.
+    """
+
+    def __init__(self, gateway: "PluginGateway", interfaces_yaml: Path = _INTERFACES_YAML) -> None:
+        self._gateway = gateway
+        self._yaml_path = interfaces_yaml
+        self._linker_map: list[dict] = []
+        self._loaded = False
+
+    def _load(self) -> None:
+        if self._loaded:
+            return
+        if not self._yaml_path.exists():
+            logger.warning(
+                "LinkerFactory: plugin_interfaces.yaml not found at %s — no host functions registered",
+                self._yaml_path,
+            )
+            self._linker_map = []
+            self._loaded = True
+            return
+        with self._yaml_path.open() as fh:
+            data = yaml.safe_load(fh)
+        self._linker_map = data.get("linker_map", [])
+        self._loaded = True
+
+    def build_linker(self, engine: Any) -> Any:
+        """
+        Create and populate a wasmtime Linker for the given Engine.
+
+        :param engine: wasmtime.Engine instance
+        :returns:      Populated wasmtime.Linker
+        :raises ImportError: if wasmtime is not installed
+        """
+        if not _WASMTIME_AVAILABLE:
+            raise ImportError("wasmtime is not installed")
+        self._load()
+        linker = Linker(engine)
+        for namespace_block in self._linker_map:
+            ns = namespace_block.get("namespace", "vyra")
+            for func_entry in namespace_block.get("functions", []):
+                self._register_function(linker, ns, func_entry)
+        return linker
+
+    def _register_function(self, linker: Any, namespace: str, entry: dict) -> None:
+        """Register a single host function on the linker."""
+        wasm_name = entry.get("wasm_name", "")
+        host_func_name = entry.get("host_func", wasm_name)
+
+        host_fn = getattr(self._gateway, host_func_name, None)
+        if host_fn is None:
+            logger.warning(
+                "LinkerFactory: PluginGateway has no method '%s' for wasm_name='%s' — skipping",
+                host_func_name, wasm_name,
+            )
+            return
+
+        # Determine WASM types
+        wasm_types_override = entry.get("wasm_types")
+        if wasm_types_override:
+            param_types = [_yaml_type_to_val_type(t) for t in wasm_types_override.get("params", [])]
+            result_types = [_yaml_type_to_val_type(t) for t in wasm_types_override.get("results", [])]
+        else:
+            param_types, result_types = self._infer_types(host_fn)
+
+        func_type = FuncType(param_types, result_types)
+
+        # Build a synchronous wrapper (wasmtime callbacks must be sync)
+        def _make_sync_wrapper(fn):
+            if asyncio.iscoroutinefunction(fn):
+                def _sync_wrapper(*args):
+                    loop = asyncio.get_event_loop()
+                    result = loop.run_until_complete(fn(*args))
+                    return result
+            else:
+                def _sync_wrapper(*args):
+                    return fn(*args)
+            return _sync_wrapper
+
+        sync_fn = _make_sync_wrapper(host_fn)
+
+        try:
+            linker.define_func(namespace, wasm_name, func_type, sync_fn)
+            logger.debug(
+                "LinkerFactory: registered %s::%s → gateway.%s",
+                namespace, wasm_name, host_func_name,
+            )
+        except Exception as exc:
+            logger.error(
+                "LinkerFactory: failed to register %s::%s: %s",
+                namespace, wasm_name, exc,
+            )
+
+    @staticmethod
+    def _infer_types(fn: Any) -> tuple[list, list]:
+        """Infer wasmtime param and result types from a Python function signature."""
+        sig = inspect.signature(fn)
+        param_types: list = []
+        for name, param in sig.parameters.items():
+            if name == "self":
+                continue
+            annotation = param.annotation
+            if annotation is inspect.Parameter.empty:
+                annotation = int  # default to i32
+            param_types.extend(_python_type_to_val_types(annotation))
+
+        ret = sig.return_annotation
+        if ret is inspect.Parameter.empty or ret is None or ret is type(None):
+            result_types: list = []
+        else:
+            result_types = _python_type_to_val_types(ret)
+
+        return param_types, result_types
+
+
+# ---------------------------------------------------------------------------
+# PluginGateway
+# ---------------------------------------------------------------------------
+
+class PluginGateway:
+    """
+    Central WASM-plugin gateway.
+
+    Responsibilities:
+    - Own a PluginEventSystem for internal pub/sub + request/reply
+    - Own a LinkerFactory that maps YAML-configured host functions to wasmtime
+    - Provide host functions: log, publish_event, send_request
+    - Manage WASM runtimes via GatewayWasmRuntimePool (local + RemoteRuntimeProxy)
+    - Expose call_plugin() for use by the REST router
+    - Provide ``plugin/ui_function_call`` Vyra Transport Remote Service (bidirectional provider)
+    - Consume ``plugin/resolve_plugins`` via Vyra Transport self-call; cache result locally
+
+    Lifecycle (main.py)::
+
+        gateway = PluginGateway()
+        gateway.setup()                          # reads entity from container_injection
+        await gateway.set_interfaces()           # registers @remote_service handlers
+        container_injection.set_plugin_gateway(gateway)
+        taskmanager.add_task(plugin_gateway_runner)
+    """
+
+    def __init__(self) -> None:
+        self.entity: "VyraEntity | None" = None
+        self.event_system = PluginEventSystem()
+        self._linker_factory: LinkerFactory | None = None
+        self._runtime_pool: Any = None  # GatewayWasmRuntimePool, injected lazily
+        self._resolve_client: Any = None  # Vyra Transport client → plugin/resolve_plugins
+        self._own_module_name: str = ""
+        self._own_module_id: str = ""
+        self._manifest_cache: dict = {}  # In-memory manifest cache (avoids disk I/O)
+
+    # ------------------------------------------------------------------
+    # Lifecycle
+    # ------------------------------------------------------------------
+
+    def setup(self) -> None:
+        """
+        Bind the gateway to the VyraEntity from container_injection.
+        Creates LinkerFactory and GatewayWasmRuntimePool.
+        """
+        from .gateway_wasm_runtime import GatewayWasmRuntimePool
+        self.entity = container_injection.get_entity()
+        self._own_module_name = getattr(self.entity, "name", "") or ""
+        self._own_module_id = getattr(self.entity, "module_id", "") or ""
+        self._linker_factory = LinkerFactory(gateway=self)
+        self._runtime_pool = GatewayWasmRuntimePool(gateway=self)
+        logger.info("✅ PluginGateway: setup complete (module=%s)", self._own_module_name)
+
+    async def set_interfaces(self) -> None:
+        """Register @remote_service decorated methods on the entity."""
+        if self.entity is None:
+            raise RuntimeError("PluginGateway.setup() must be called before set_interfaces()")
+        await auto_register_interfaces(self.entity, callback_parent=self)
+        logger.info("✅ PluginGateway: interfaces registered")
+
+    async def _setup_resolve_client(self) -> None:
+        """Create the Vyra transport client for the resolve_plugins self-call."""
+        try:
+            self._resolve_client = await InterfaceFactory.create_client(
+                name="resolve_plugins",
+                module_name=self._own_module_name,
+                namespace="plugin",
+            )
+            logger.info("✅ PluginGateway: resolve_plugins client ready (self-call)")
+        except Exception as exc:
+            logger.warning("⚠️  PluginGateway: resolve_plugins client failed: %s", exc)
+            self._resolve_client = None
+
+    async def run(self) -> None:
+        """
+        Long-running task registered with TaskManager.
+        Sets up the resolve client, then keeps the gateway alive.
+        """
+        await self._setup_resolve_client()
+        logger.info("✅ PluginGateway task running")
+        while True:
+            await asyncio.sleep(60)
+
+    async def teardown(self) -> None:
+        """Stop all running WASM runtimes and close Vyra transport clients."""
+        if self._runtime_pool is not None:
+            await self._runtime_pool.shutdown()
+        if self._resolve_client is not None:
+            try:
+                await self._resolve_client.close()
+            except Exception:
+                pass
+            self._resolve_client = None
+        logger.info("PluginGateway: shutdown complete")
+
+    # ------------------------------------------------------------------
+    # Manifest cache (consumer side)
+    # ------------------------------------------------------------------
+
+    async def resolve_plugins(
+        self,
+        scope_type: str = "MODULE",
+        scope_target: str | None = None,
+        module_name: str | None = None,
+        module_id: str | None = None,
+        p_id: str | None = None,
+    ) -> dict:
+        """
+        Call ``plugin/resolve_plugins`` via Vyra transport self-call, update the
+        in-memory manifest cache, and return the result.
+
+        :param scope_type:   GLOBAL | TEMPLATE | MODULE | INSTANCE
+        :param scope_target: Scope target (default: own module name)
+        :param module_name:  Requesting module name for slot-scope filtering.
+        :param module_id:    Requesting module instance ID.
+        :param p_id:         Optional direct filter on plugin pool entry ID.
+        :returns:            The resolve_plugins response dict.
+        """
+        if self._resolve_client is None:
+            await self._setup_resolve_client()
+
+        request: dict[str, Any] = {
+            "scope_type":   scope_type,
+            "scope_target": scope_target or module_name or self._own_module_name,
+            "module_name":  module_name or self._own_module_name,
+            "module_id":    module_id or self._own_module_id,
+            "p_id":         p_id,
+        }
+
+        result: dict = {}
+        if self._resolve_client is not None:
+            try:
+                result = await self._resolve_client.call(request) or {}
+            except Exception as exc:
+                logger.error("PluginGateway.resolve_plugins Vyra transport call failed: %s", exc)
+                return self.get_manifest()
+        else:
+            logger.warning("PluginGateway.resolve_plugins: no resolve_client available")
+            return self.get_manifest()
+
+        # Update in-memory cache
+        self._manifest_cache = result
+        return result
+
+    def get_manifest(self) -> dict:
+        """
+        Return the in-memory cached plugin manifest without making a network call.
+
+        :returns: Cached manifest dict, or empty dict if no cache has been loaded.
+        """
+        return self._manifest_cache
+
+    # ------------------------------------------------------------------
+    # Linker access
+    # ------------------------------------------------------------------
+
+    def get_linker(self, engine: Any) -> Any:
+        """
+        Build and return a populated wasmtime Linker for the given Engine.
+
+        :param engine: wasmtime.Engine instance
+        :returns:      Populated Linker with all host functions from plugin_interfaces.yaml
+        """
+        if self._linker_factory is None:
+            raise RuntimeError("PluginGateway not set up — call setup() first")
+        return self._linker_factory.build_linker(engine)
+
+    # ------------------------------------------------------------------
+    # Vyra transport Remote Service: ui_function_call  (provider side)
+    # ------------------------------------------------------------------
+
+    @remote_service()
+    async def ui_function_call(self, request: dict, response: dict) -> dict:
+        """
+        Vyra transport Remote Service: ``plugin/ui_function_call``
+
+        Allows other modules (and RemoteRuntimeProxy instances) to execute a
+        WASM plugin function hosted in this module.
+
+        Request parameters:
+            plugin_id     (str)   — plugin name ID (e.g. 'counter-widget')
+            function_name (str)   — exported WASM function name
+            data          (dict)  — input parameters
+
+        Response:
+            plugin_id  (str)  — mirrored
+            success    (bool)
+            data       (dict) — result from WASM call
+        """
+        plugin_id: str = request.get("plugin_id", "")
+        function_name: str = request.get("function_name", "")
+        data: dict = request.get("data") or {}
+
+        if not plugin_id or not function_name:
+            return {"plugin_id": plugin_id, "success": False, "data": {}, "error": "plugin_id and function_name are required"}
+
+        try:
+            result = await self.call_plugin(plugin_id=plugin_id, function_name=function_name, data=data)
+            return {"plugin_id": plugin_id, "success": True, "data": result}
+        except Exception as exc:
+            logger.error("PluginGateway.ui_function_call error [%s.%s]: %s", plugin_id, function_name, exc)
+            return {"plugin_id": plugin_id, "success": False, "data": {}, "error": str(exc)}
+
+    # ------------------------------------------------------------------
+    # Host functions (called from WASM modules)
+    # These signatures must match the wasm_types in plugin_interfaces.yaml
+    # or be infer-able from their Python type annotations.
+    # ------------------------------------------------------------------
+
+    def log(self, msg: str, level: int = 20) -> None:
+        """Host function: log a message from a WASM plugin."""
+        log_fn = {
+            10: logger.debug,
+            20: logger.info,
+            30: logger.warning,
+            40: logger.error,
+        }.get(level, logger.info)
+        log_fn("[WASM] %s", msg)
+
+    async def publish_event(self, topic: str, payload: str) -> None:
+        """Host function: publish an event from a WASM plugin."""
+        try:
+            data = json.loads(payload) if payload else {}
+        except json.JSONDecodeError:
+            data = {"raw": payload}
+        await self.event_system.publish(topic, data)
+
+    async def send_request(self, topic: str, payload: str) -> str:
+        """Host function: send a request from a WASM plugin and return the reply."""
+        try:
+            data = json.loads(payload) if payload else {}
+        except json.JSONDecodeError:
+            data = {"raw": payload}
+        try:
+            reply = await self.event_system.request(topic, data)
+            return json.dumps(reply)
+        except asyncio.TimeoutError:
+            return json.dumps({"error": "timeout"})
+
+    # ------------------------------------------------------------------
+    # Plugin invocation (used by REST router and ui_function_call service)
+    # ------------------------------------------------------------------
+
+    async def call_plugin(
+        self,
+        plugin_id: str,
+        function_name: str,
+        data: dict,
+        nfs_path: str | Path | None = None,
+    ) -> dict:
+        """
+        Call a function on an installed WASM plugin.
+
+        If ``nfs_path`` is not provided, the NFS path is looked up from the
+        manifest cache (``get_manifest()``) or directly from the DB via
+        ``PluginPool``.  Routing is transparent: local plugins use
+        ``GatewayWasmRuntime``; remote plugins use ``RemoteRuntimeProxy``.
+
+        :param plugin_id:     Plugin name ID (e.g. 'counter-widget')
+        :param function_name: Exported WASM function name
+        :param data:          Input key/value pairs
+        :param nfs_path:      Optional NFS path override; looked up if omitted
+        :returns:             Result dict from the runtime call
+        """
+        if self._runtime_pool is None:
+            raise RuntimeError("PluginGateway not set up — call setup() first")
+
+        # Check manifest cache for routing information
+        manifest = self.get_manifest()
+        ui_slots: dict = manifest.get("ui_slots", {})
+        hosting_module: str | None = None
+        resolved_nfs_path: Path | None = Path(nfs_path) if nfs_path else None
+
+        # Find the plugin entry in any slot to get hosting_module_name + nfs path
+        for slot_entries in ui_slots.values():
+            for entry in slot_entries:
+                if entry.get("plugin_id") == plugin_id:
+                    hosting_module = entry.get("hosting_module_name")
+                    if resolved_nfs_path is None:
+                        nfs_js = entry.get("nfs_js_path", "")
+                        if nfs_js:
+                            resolved_nfs_path = Path(nfs_js).parent.parent
+                    break
+            if hosting_module:
+                break
+
+        # Route: remote module → RemoteRuntimeProxy
+        if hosting_module and hosting_module != self._own_module_name:
+            return await self._runtime_pool.call(
+                plugin_id=plugin_id,
+                function_name=function_name,
+                data=data,
+                remote_module_name=hosting_module,
+            )
+
+        # Local: resolve NFS path from DB if still unknown
+        if resolved_nfs_path is None:
+            resolved_nfs_path = await self._lookup_nfs_path(plugin_id)
+
+        wasm_path = resolved_nfs_path / "logic.wasm"
+        return await self._runtime_pool.call(
+            plugin_id=plugin_id,
+            function_name=function_name,
+            data=data,
+            nfs_wasm_path=wasm_path,
+        )
+
+    async def _lookup_nfs_path(self, plugin_id: str) -> Path:
+        """
+        Look up the NFS path for a plugin from the local DB (PluginPool).
+
+        :raises RuntimeError: If the plugin is not found in the DB.
+        """
+        from ..application.tb_plugin_pool import PluginPool
+        from vyra_base.storage.db_manipulator import DbManipulator  # type: ignore[import]
+
+        if self.entity is None:
+            raise RuntimeError("PluginGateway entity not set — call setup() first")
+
+        pool_mani: DbManipulator = DbManipulator(self.entity.database_access, PluginPool)  # type: ignore[type-arg]
+        result = await pool_mani.get_all(filters={"plugin_name_id": plugin_id})
+        entries = result.value or []
+        if not entries:
+            raise RuntimeError(f"Plugin '{plugin_id}' not found in plugin_pool DB")
+        # Pick the most recently installed entry
+        entries_sorted = sorted(
+            entries,
+            key=lambda e: e.installed_at if e.installed_at else "",
+            reverse=True,
+        )
+        return Path(entries_sorted[0].nfs_path)

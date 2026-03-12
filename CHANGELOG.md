@@ -4,6 +4,24 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Changed — Plugin Cache RAM Fix & Docs Updated
+- **`PluginGateway._manifest_cache`** *(new)* — Replaced file-based cache (`plugin/cache/plugin_manifest.json`) with in-memory `dict`. Removed `import json`, `from pathlib import Path`, `_CACHE_DIR` module constant, and `_CACHE_DIR.mkdir()` call.
+- **`docs/plugin/PLUGIN_INTEGRATION.md`** — Rewritten: replaces outdated `PluginClient`/`get_ui_manifest` references with current `PluginGateway`/`resolve_plugins` API.
+- **`docs/backend/PLUGIN_BRIDGE.md`** *(new)* — Event-Bridge architecture documentation (BaseEventBridge, FeedStreamer, PluginBridge, WebSocket endpoints).
+- **`docs/architecture/PLUGIN_ARCHITECTURE.md`** *(new)* — Consumer-module view of plugin architecture with `{{ module_name }}` scope examples.
+
+### Added — Bidirectional Plugin Gateway Architecture
+- **`plugin/plugin_gateway.py`** *(new)* — Replaces `plugin_client.py`. `PluginGateway` sets up two Zenoh clients: `_resolve_client` → `resolve_plugins`@v2_modulemanager and `_ui_call_client` → `ui_function_call`@v2_modulemanager. Uses `{{ module_name }}` Copier placeholder for module identity. Methods: `resolve_plugins()`, `get_manifest()`, `call_plugin()`, `teardown()`.
+- **`container_injection.py`**: `plugin_gateway` provider added — `set_plugin_gateway`, `get_plugin_gateway`, `provide_plugin_gateway` (replaces `plugin_client` variants).
+- **`main.py`**: `PluginGateway` instantiation and `await setup(entity)` added during startup; registered via `container_injection.set_plugin_gateway()`.
+
+### Changed — Bidirectional Plugin Gateway Architecture
+- **`plugin/plugin_client.py`** deleted — replaced by `plugin/plugin_gateway.py`.
+- **`plugin/__init__.py`**: exports `PluginGateway` instead of `PluginClient`.
+- **`plugin/registry.py`** shim updated: `PluginRegistry = PluginGateway` (was `PluginClient`).
+- **`/plugin/ui-manifest` → `/plugin/resolve_plugins`** in backend router and frontend `plugin.api.js`; `module_name` / `module_id` query params added.
+- **`backend_webserver/plugin/router.py`**: `provide_plugin_client` → `provide_plugin_gateway`; handler calls `gateway.resolve_plugins()` / `gateway.call_plugin()`.
+
 ### Added (Phase 7 — Plugin-Bridge & BaseEventBridge)
 - **`backend_webserver/services/base_event_bridge.py`**: Abstrakte ABC-Basisklasse für alle Event-Bridge-Implementierungen.
 - **`backend_webserver/services/feed_streamer.py`**: Ersetzt altes `feed_manager.py`. Erweitert `BaseEventBridge`. `publish_feed(FeedMessage)` sync-API für Application-Caller.

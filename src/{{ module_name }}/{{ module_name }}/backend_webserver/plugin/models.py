@@ -1,0 +1,151 @@
+"""
+Plugin API — Pydantic schemas for the plugin REST endpoints.
+
+WASM runtime management has moved to PluginGateway
+(v2_modulemanager.plugin.plugin_gateway).  The legacy WasmRuntimePool
+class is kept here only for reference — it is no longer instantiated
+as a module-level singleton.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import logging
+from pathlib import Path
+from typing import Any
+
+from pydantic import BaseModel, Field
+
+from vyra_base.plugin.runtime import create_plugin_runtime, PluginRuntime, PluginCallError
+from vyra_base.plugin.host_functions import NullHostFunctions
+
+logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Pydantic-Schemas
+# ---------------------------------------------------------------------------
+
+class PluginCallRequest(BaseModel):
+    function_name: str = Field(description="Name of the plugin function to call")
+    data:          dict[str, Any] = Field(default_factory=dict, description="Input parameters")
+
+
+class PluginCallResponse(BaseModel):
+    plugin_id:     str
+    function_name: str
+    result:        dict[str, Any]
+    success:       bool = True
+
+
+class PluginListEntry(BaseModel):
+    id:          str
+    name:        str
+    version:     str
+    description: str
+    status:      str
+    scope:       dict[str, Any]
+    icon:        str | None = None
+
+
+class UiManifestEntry(BaseModel):
+    slot_id:        str
+    component_name: str
+    js_entry_point: str   # URL über den /plugin/assets/-Proxy
+    nfs_js_path:    str   # Absoluter NFS-Pfad (nur Backend-intern)
+    plugin_id:      str
+    version:        str
+
+
+class UiManifestResponse(BaseModel):
+    scope_type:   str
+    scope_target: str | None
+    slots:        dict[str, list[UiManifestEntry]]  # slot_id → list of components
+
+
+# ---------------------------------------------------------------------------
+# WasmRuntimePool — Singleton, hält Runtimes für alle aktiven Plugins
+# ---------------------------------------------------------------------------
+
+class WasmRuntimePool:
+    """
+    Legacy WASM runtime pool — kept for reference only.
+    Active runtime management is now handled by GatewayWasmRuntimePool
+    inside PluginGateway.
+    """
+
+    def __init__(self) -> None:
+        self._runtimes: dict[str, PluginRuntime] = {}
+        self._locks:    dict[str, asyncio.Lock]  = {}
+        self._host_functions: Any = NullHostFunctions()
+
+    def set_host_functions(self, host_functions: Any) -> None:
+        """Set the HostFunctions implementation for all future runtimes."""
+        self._host_functions = host_functions
+        logger.info("✅ WasmRuntimePool: HostFunctions set (%s)", type(host_functions).__name__)
+
+    async def get_or_start_runtime(
+        self,
+        plugin_id: str,
+        nfs_wasm_path: Path,
+        initial_state: dict[str, Any] | None = None,
+    ) -> PluginRuntime:
+        """
+        Return the runtime for a plugin, starting it lazily if needed.
+
+        :param plugin_id:      Plugin ID (e.g. 'counter-widget')
+        :param nfs_wasm_path:  Absolute NFS path to logic.wasm (from plugin_pool DB)
+        :param initial_state:  Optional initial state for the WASM init call
+        """
+        if plugin_id not in self._locks:
+            self._locks[plugin_id] = asyncio.Lock()
+
+        async with self._locks[plugin_id]:
+            if plugin_id not in self._runtimes:
+                rt = create_plugin_runtime(
+                    plugin_id=plugin_id,
+                    wasm_path=nfs_wasm_path,
+                    host=self._host_functions,
+                    initial_state=initial_state,
+                )
+                await rt.start()
+                self._runtimes[plugin_id] = rt
+                logger.info(
+                    "✅ WasmRuntimePool: '%s' started as %s",
+                    plugin_id, type(rt).__name__,
+                )
+
+        return self._runtimes[plugin_id]
+
+    async def call(
+        self,
+        plugin_id:     str,
+        function_name: str,
+        data:          dict[str, Any] | None = None,
+        nfs_wasm_path: Path | None = None,
+        initial_state: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """
+        Call a plugin function.
+
+        If the runtime is not yet running and ``nfs_wasm_path`` is given,
+        it is started lazily.  Otherwise the runtime must already be active.
+        """
+        if plugin_id in self._runtimes:
+            rt = self._runtimes[plugin_id]
+        elif nfs_wasm_path is not None:
+            rt = await self.get_or_start_runtime(plugin_id, nfs_wasm_path, initial_state)
+        else:
+            raise PluginCallError(
+                plugin_id, function_name,
+                f"Plugin '{plugin_id}' not active and no nfs_wasm_path provided"
+            )
+
+        return await rt.call(function_name, data or {})
+
+    async def shutdown(self) -> None:
+        """Stop all running runtimes."""
+        for plugin_id, rt in list(self._runtimes.items()):
+            await rt.stop()
+            logger.info("🕑 WasmRuntimePool: '%s' stopped", plugin_id)
+        self._runtimes.clear()
