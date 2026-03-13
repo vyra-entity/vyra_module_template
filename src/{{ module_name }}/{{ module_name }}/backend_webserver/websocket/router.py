@@ -6,7 +6,7 @@ from typing import Dict, Set
 import json
 import asyncio
 from datetime import datetime
-from v2_modulemanager.logging_config import get_logger
+from {{ module_name }}.logging_config import get_logger
 
 from ..core.dependencies import module_operations
 from ..services.feed_streamer import FeedStreamer, FeedMessage

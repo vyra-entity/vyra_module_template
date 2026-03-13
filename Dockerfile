@@ -118,7 +118,7 @@ RUN echo "Cache bust: ${CACHE_BUST:-$(date +%s)}" && \
     fi
 
 # Setup Proto interfaces (for vyra_callables via gRPC/Redis transport)
-RUN python3 tools/setup_proto_interfaces.py || echo "⚠️  No Proto interfaces found (optional)"
+RUN python3 tools/setup_proto_interfaces.py || echo "No Proto interfaces found (optional)"
 
 # Generate gRPC proto files from .proto definitions
 RUN if [ -d "storage/interfaces" ] && [ "$(ls -A storage/interfaces/*.proto 2>/dev/null)" ]; then \
@@ -128,7 +128,7 @@ RUN if [ -d "storage/interfaces" ] && [ "$(ls -A storage/interfaces/*.proto 2>/d
             --output-dir /workspace/src/rest_api/grpc_generated \
             --create-helpers; \
     else \
-        echo "⚠️  No .proto files found in storage/interfaces, skipping gRPC generation"; \
+        echo "No .proto files found in storage/interfaces, skipping gRPC generation"; \
     fi
 
 # Clean any existing build artifacts for fresh build (prevents package name conflicts)
@@ -151,7 +151,7 @@ RUN if [ -z "$MODULE_NAME" ] && [ -f ".module/module_data.yaml" ]; then \
 
 # Build ROS2 packages (skip vyra_module_template_interfaces template from base image)
 RUN source /opt/ros/kilted/setup.bash && \
-    colcon build --packages-skip vyra_module_template_interfaces --cmake-args -DCMAKE_BUILD_TYPE=Release
+    colcon --log-base log/ros2 build --packages-skip vyra_module_template_interfaces --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 # Stamp install/ with build ID so the entrypoint can detect stale installs at runtime
 RUN cp /opt/vyra/build_id /workspace/install/.build_id
@@ -203,7 +203,7 @@ RUN if [ "$SECURE_BY_SROS2" = "true" ]; then \
             --dynamic config/sros2_policy_dynamic.xml \
             --output storage/sros2_keystore/enclaves/${MODULE_NAME}/core; \
     else \
-        echo "⚠️  SROS2 disabled - skipping policy generation"; \
+        echo "SROS2 disabled - skipping policy generation"; \
     fi
 
 RUN if [ -d "frontend" ] && [ -f "frontend/package.json" ] && [ -d "frontend/src/views" ] && [ "$(ls -A frontend/src/views)" ]; then \
@@ -272,7 +272,7 @@ COPY --from=builder /tmp/module_interfaces_staging/ /tmp/module_interfaces_stagi
 COPY --from=builder --chown=vyrauser:vyrauser /opt/vyra/install_backup /opt/vyra/install_backup
 
 # Create runtime directories
-RUN mkdir -p log/ros2 log/nginx log/uvicorn log/vyra storage
+RUN mkdir -p log/ros2 log/nginx storage
 
 # Make logs and storage accessable by vyrauser (and writable by all users for ROS2 logging)
 RUN chown -R vyrauser:vyrauser /workspace/log /workspace/storage

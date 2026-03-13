@@ -24,7 +24,7 @@ Usage (application layer — sync)
     from ..backend_webserver.services.feed_streamer import FeedStreamer, FeedMessage
 
     FeedStreamer.get_instance().publish_feed(FeedMessage(
-        module_name="v2_modulemanager",
+        module_name="{{ module_name }}",
         module_id="...",
         feed_type="news",
         message="heartbeat",

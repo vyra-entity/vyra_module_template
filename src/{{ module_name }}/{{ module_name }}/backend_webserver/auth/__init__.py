@@ -1,5 +1,5 @@
 """
-Authentication package for v2_modulemanager
+Authentication package for {{ module_name }}
 """
 
 from .auth_service import AuthenticationService

@@ -370,7 +370,7 @@ class RemoteRuntimeProxy(PluginRuntime):
 
     :param plugin_id:    Plugin name ID (e.g. 'counter-widget').
     :param module_name:  Name of the remote module that hosts the WASM runtime
-                         (e.g. 'v2_modulemanager').
+                         (e.g. '{{ module_name }}').
     """
 
     def __init__(self, plugin_id: str, module_name: str) -> None:

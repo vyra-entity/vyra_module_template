@@ -1,5 +1,5 @@
 """
-User Manager Runner for v2_modulemanager
+User Manager Runner for {{ module_name }}
 
 This module provides the main entry point for the user manager task.
 It initializes the internal user manager.

@@ -35,6 +35,9 @@ log/*
 
 # Dynamically changing files
 CMakeLists.txt
+package.xml
+*.launch.py
+*.launch
 
 # Temporary files
 temp/*

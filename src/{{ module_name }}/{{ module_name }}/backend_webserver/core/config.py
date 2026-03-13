@@ -29,9 +29,18 @@ class Settings:
     DOCKER_STACK_NAME: str = os.getenv("STACK_NAME", "vos2_ws")
     DOCKER_NETWORK: str = f"{DOCKER_STACK_NAME}_vyra-network"
     
+    # Container Manager Configuration
+    CONTAINER_MANAGER_URL: str = os.getenv("CONTAINER_MANAGER_URL", "http://container-manager:8080")
+    
     # Redis Configuration
     REDIS_HOST: str = os.getenv("REDIS_HOST", "redis")
     REDIS_PORT: int = int(os.getenv("REDIS_PORT", "6379"))
+    
+    # Repository Configuration
+    LOCAL_REPOSITORY_CONFIG_PATH: Path = Path(
+        os.getenv("LOCAL_REPOSITORY_CONFIG_PATH", str(WORKSPACE_ROOT / "config"))
+    )
+    REPOSITORY_CONFIG_FILE: Path = LOCAL_REPOSITORY_CONFIG_PATH / "repository_config.json"
     
     # SSL/TLS Configuration
     CERTIFICATES_PATH: Path = STORAGE_PATH / "certificates"
@@ -56,7 +65,8 @@ class Settings:
             self.MODULES_PATH,
             self.STORAGE_PATH,
             self.LOG_PATH,
-            self.CERTIFICATES_PATH
+            self.CERTIFICATES_PATH,
+            self.LOCAL_REPOSITORY_CONFIG_PATH
         ]
         
         for directory in directories:

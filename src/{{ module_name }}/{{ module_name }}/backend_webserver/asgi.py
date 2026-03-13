@@ -87,7 +87,7 @@ if __name__ == "__main__":
     key_path = "/workspace/storage/certificates/webserver.key"
     
     # Get module name dynamically
-    module_name = os.getenv('MODULE_NAME', 'v2_modulemanager')
+    module_name = os.getenv('MODULE_NAME', '{{ module_name }}')
     app_path = f"{module_name}.{module_name}.backend_webserver.asgi:application"
     
     # Check for SSL certificates
@@ -98,7 +98,7 @@ if __name__ == "__main__":
             host="0.0.0.0",
             port=8443,
             reload=True,
-            reload_dirs=["/workspace/src/v2_modulemanager/v2_modulemanager/backend_webserver"],
+            reload_dirs=["/workspace/src/{{ module_name }}/{{ module_name }}/backend_webserver"],
             log_level="debug",
             ssl_certfile=cert_path,
             ssl_keyfile=key_path
@@ -111,6 +111,6 @@ if __name__ == "__main__":
             host="0.0.0.0",
             port=8000,
             reload=True,
-            reload_dirs=["/workspace/src/v2_modulemanager/v2_modulemanager/backend_webserver"],
+            reload_dirs=["/workspace/src/{{ module_name }}/{{ module_name }}/backend_webserver"],
             log_level="debug"
         )

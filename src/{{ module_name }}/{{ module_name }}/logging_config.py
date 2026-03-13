@@ -206,7 +206,7 @@ def configure_logging() -> "VyraLogger":
         A VyraLogger instance ready for use
 
     Example:
-        >>> from v2_modulemanager.logging_config import configure_logging
+        >>> from {{ module_name }}.logging_config import configure_logging
         >>> logger = configure_logging()
         >>> logger.info("application_started", version="1.0.0", mode="production")
     """
@@ -255,7 +255,7 @@ def log_function_call(logger: VyraLogger, **kwargs: Any) -> None:
         **kwargs: Additional context to log
 
     Example:
-        >>> log_function_call(logger, function="process_module", module="v2_modulemanager")
+        >>> log_function_call(logger, function="process_module", module="{{ module_name }}")
     """
     logger.debug("function_called", **kwargs)
 

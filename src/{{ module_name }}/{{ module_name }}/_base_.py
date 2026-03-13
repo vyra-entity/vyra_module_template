@@ -20,6 +20,7 @@ from {{ module_name }}_interfaces.msg import VBASEVolatileSet # pyright: ignore[
 from {{ module_name }}_interfaces.msg import VBASEVolatileHash # pyright: ignore[reportAttributeAccessIssue]
 from {{ module_name }}_interfaces.msg import VBASEVolatileString # pyright: ignore[reportAttributeAccessIssue]
 # srv
+import {{ module_name }}_interfaces.srv # pyright: ignore[reportMissingImports]
 # add base services here
 # action
 # add base actions here 
@@ -638,7 +639,7 @@ async def build_entity(project_settings) -> VyraEntity:
         
         # Persist module data
         logger.debug("persisting_module_data")
-        await _write_module_data(me.to_dict())
+        await _write_module_data(module_data)
         
         logger.info(
             "module_entry_ready",

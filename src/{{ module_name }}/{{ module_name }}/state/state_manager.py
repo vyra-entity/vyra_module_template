@@ -67,12 +67,14 @@ from .state_types import (
 
 logger = get_logger(__name__)
 
+
 @dataclass
 class LifecycleCallbackEntry:
     """A registered suspend- or resume-phase callback with priority ordering."""
     priority: int
     name: str
     callback: Callable[[], Awaitable[None]]
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Default configuration (overridden by module_state_meta.json when present)
@@ -132,7 +134,7 @@ class StateManager:
         self._last_error_state: Optional[Dict[str, Any]] = None
         self._last_state: Optional[ThreeLayerState] = None
 
-        # ── Lifecycle phase callbacks ──────────────────────────────────────────────
+        # ── Lifecycle phase callbacks ──────────────────────────────────────────
         self._suspend_callbacks: List[LifecycleCallbackEntry] = []
         self._resume_callbacks: List[LifecycleCallbackEntry] = []
 
@@ -173,7 +175,6 @@ class StateManager:
     # Setup
     # ─────────────────────────────────────────────────────────────────────────
 
-
     def register_suspend_callback(
         self,
         callback: Callable[[], Awaitable[None]],
@@ -196,7 +197,7 @@ class StateManager:
             LifecycleCallbackEntry(priority=priority, name=name or callback.__name__, callback=callback)
         )
         self._suspend_callbacks.sort(key=lambda e: e.priority)
-        logger.debug(f"\U0001f4cc Registered suspend callback '{name}' (prio={priority})")
+        logger.debug(f"📌 Registered suspend callback '{name}' (prio={priority})")
 
     def register_resume_callback(
         self,
@@ -212,7 +213,7 @@ class StateManager:
             LifecycleCallbackEntry(priority=priority, name=name or callback.__name__, callback=callback)
         )
         self._resume_callbacks.sort(key=lambda e: e.priority)
-        logger.debug(f"\U0001f4cc Registered resume callback '{name}' (prio={priority})")
+        logger.debug(f"📌 Registered resume callback '{name}' (prio={priority})")
 
     async def _run_lifecycle_callbacks(
         self,
@@ -238,6 +239,7 @@ class StateManager:
         if not entries:
             return True
 
+        # Group entries by priority
         from itertools import groupby
         groups = [
             (prio, list(grp))
@@ -249,7 +251,7 @@ class StateManager:
 
         for prio, group in groups:
             names = ", ".join(e.name for e in group)
-            logger.debug(f"\u2699\ufe0f  [{phase}] Running priority-{prio} callbacks: {names}")
+            logger.debug(f"⚙️  [{phase}] Running priority-{prio} callbacks: {names}")
 
             async def _run_one(entry: LifecycleCallbackEntry) -> None:
                 await asyncio.wait_for(entry.callback(), timeout=10.0)
@@ -257,13 +259,13 @@ class StateManager:
             try:
                 await asyncio.gather(*[_run_one(e) for e in group])
                 done += len(group)
-                progress = int(done / total * 90)
+                progress = int(done / total * 90)  # reserve last 10% for state transition
                 goal_handle.publish_feedback({
                     "status": f"{phase}_callbacks_prio_{prio}_done",
                     "progress": progress,
                 })
             except asyncio.TimeoutError:
-                logger.error(f"\u274c [{phase}] Timeout in priority-{prio} callbacks ({names})")
+                logger.error(f"❌ [{phase}] Timeout in priority-{prio} callbacks ({names})")
                 try:
                     self.execute_state_action(
                         StateRequest(layer="lifecycle", action="enter_recovery",
@@ -273,7 +275,7 @@ class StateManager:
                     logger.error(f"enter_recovery failed: {exc2}")
                 return False
             except Exception as exc:
-                logger.error(f"\u274c [{phase}] Error in priority-{prio} callbacks ({names}): {exc}")
+                logger.error(f"❌ [{phase}] Error in priority-{prio} callbacks ({names}): {exc}")
                 try:
                     self.execute_state_action(
                         StateRequest(layer="lifecycle", action="enter_recovery",
@@ -284,136 +286,6 @@ class StateManager:
                 return False
 
         return True
-
-    # ─────────────────────────────────────────────────────────────────────────
-    # Lifecycle action-server endpoints (suspend / resume)
-    # ─────────────────────────────────────────────────────────────────────────
-
-    @remote_actionServer.on_goal(name="request_lc_suspend")
-    async def _on_goal_suspend(self, goal_request: Any) -> bool:
-        """Accept suspend goal only if lifecycle is currently ACTIVE."""
-        states = self._state_machine.get_all_states()
-        if states["lifecycle"] != LifecycleState.ACTIVE.value:
-            logger.warning(
-                f"\u26a0\ufe0f  Reject suspend goal \u2013 lifecycle is {states['lifecycle']}, not ACTIVE"
-            )
-            return False
-        logger.info("\u2705 Suspend goal accepted")
-        return True
-
-    @remote_actionServer.execute(name="request_lc_suspend")
-    async def _execute_suspend(self, goal_handle: Any) -> Dict[str, Any]:
-        """Execute the suspend lifecycle transition.
-
-        1. Run all registered suspend callbacks (priority-ordered, 10 s timeout each).
-        2. Transition lifecycle: ACTIVE \u2192 SUSPENDED.
-        3. Publish 100 % feedback and return result.
-        """
-        logger.info("\U0001f535 Suspend action started")
-        goal_handle.publish_feedback({"status": "suspend_started", "progress": 0})
-
-        try:
-            success = await asyncio.wait_for(
-                self._run_lifecycle_callbacks(self._suspend_callbacks, "suspend", goal_handle),
-                timeout=20.0,
-            )
-            if not success:
-                goal_handle.abort()
-                return {"success": False, "message": "Suspend aborted \u2013 callback failure",
-                        "final_state": self._state_machine.get_all_states()["lifecycle"]}
-
-            self.execute_state_action(
-                StateRequest(layer="lifecycle", action="suspend",
-                             metadata={"reason": "remote_request"})
-            )
-
-            goal_handle.publish_feedback({"status": "suspended", "progress": 100})
-            goal_handle.succeed()
-
-            final = self._state_machine.get_all_states()["lifecycle"]
-            logger.info(f"\u2705 Suspend complete \u2013 lifecycle={final}")
-            return {"success": True, "message": "Module suspended", "final_state": final}
-
-        except asyncio.TimeoutError:
-            logger.error("\u274c Suspend action timed out (20 s)")
-            try:
-                self.execute_state_action(
-                    StateRequest(layer="lifecycle", action="enter_recovery",
-                                 metadata={"reason": "suspend_timeout"})
-                )
-            except Exception:
-                pass
-            goal_handle.abort()
-            return {"success": False, "message": "Suspend timed out",
-                    "final_state": self._state_machine.get_all_states()["lifecycle"]}
-        except Exception as exc:
-            logger.error(f"\u274c Suspend action error: {exc}")
-            goal_handle.abort()
-            return {"success": False, "message": str(exc),
-                    "final_state": self._state_machine.get_all_states()["lifecycle"]}
-
-    @remote_actionServer.on_goal(name="request_lc_resume")
-    async def _on_goal_resume(self, goal_request: Any) -> bool:
-        """Accept resume goal only if lifecycle is currently SUSPENDED."""
-        states = self._state_machine.get_all_states()
-        if states["lifecycle"] != LifecycleState.SUSPENDED.value:
-            logger.warning(
-                f"\u26a0\ufe0f  Reject resume goal \u2013 lifecycle is {states['lifecycle']}, not SUSPENDED"
-            )
-            return False
-        logger.info("\u2705 Resume goal accepted")
-        return True
-
-    @remote_actionServer.execute(name="request_lc_resume")
-    async def _execute_resume(self, goal_handle: Any) -> Dict[str, Any]:
-        """Execute the resume lifecycle transition.
-
-        1. Run all registered resume callbacks (priority-ordered, 10 s timeout each).
-        2. Transition lifecycle: SUSPENDED \u2192 ACTIVE.
-        3. Publish 100 % feedback and return result.
-        """
-        logger.info("\U0001f7e2 Resume action started")
-        goal_handle.publish_feedback({"status": "resume_started", "progress": 0})
-
-        try:
-            success = await asyncio.wait_for(
-                self._run_lifecycle_callbacks(self._resume_callbacks, "resume", goal_handle),
-                timeout=20.0,
-            )
-            if not success:
-                goal_handle.abort()
-                return {"success": False, "message": "Resume aborted \u2013 callback failure",
-                        "final_state": self._state_machine.get_all_states()["lifecycle"]}
-
-            self.execute_state_action(
-                StateRequest(layer="lifecycle", action="resume_from_suspend",
-                             metadata={"reason": "remote_request"})
-            )
-
-            goal_handle.publish_feedback({"status": "resumed", "progress": 100})
-            goal_handle.succeed()
-
-            final = self._state_machine.get_all_states()["lifecycle"]
-            logger.info(f"\u2705 Resume complete \u2013 lifecycle={final}")
-            return {"success": True, "message": "Module resumed", "final_state": final}
-
-        except asyncio.TimeoutError:
-            logger.error("\u274c Resume action timed out (20 s)")
-            try:
-                self.execute_state_action(
-                    StateRequest(layer="lifecycle", action="enter_recovery",
-                                 metadata={"reason": "resume_timeout"})
-                )
-            except Exception:
-                pass
-            goal_handle.abort()
-            return {"success": False, "message": "Resume timed out",
-                    "final_state": self._state_machine.get_all_states()["lifecycle"]}
-        except Exception as exc:
-            logger.error(f"\u274c Resume action error: {exc}")
-            goal_handle.abort()
-            return {"success": False, "message": str(exc),
-                    "final_state": self._state_machine.get_all_states()["lifecycle"]}
 
     async def setup_interfaces(self) -> None:
         """Register all Zenoh @remote_service handlers with the VyraEntity."""
@@ -566,6 +438,139 @@ class StateManager:
     def get_current_status(self) -> ThreeLayerState:
         """Alias for :meth:`get_current_state` (backward compatibility)."""
         return self.get_current_state()
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Lifecycle action-server endpoints (suspend / resume)
+    # ─────────────────────────────────────────────────────────────────────────
+
+    @remote_actionServer.on_goal(name="request_lc_suspend")
+    async def _on_goal_suspend(self, goal_request: Any) -> bool:
+        """Accept suspend goal only if lifecycle is currently ACTIVE."""
+        states = self._state_machine.get_all_states()
+        if states["lifecycle"] != LifecycleState.ACTIVE.value:
+            logger.warning(
+                f"⚠️  Reject suspend goal – lifecycle is {states['lifecycle']}, not ACTIVE"
+            )
+            return False
+        logger.info("✅ Suspend goal accepted")
+        return True
+
+    @remote_actionServer.execute(name="request_lc_suspend")
+    async def _execute_suspend(self, goal_handle: Any) -> Dict[str, Any]:
+        """Execute the suspend lifecycle transition.
+
+        1. Run all registered suspend callbacks (priority-ordered, 10 s timeout each).
+        2. Transition lifecycle: ACTIVE → SUSPENDED.
+        3. Publish 100 % feedback and return result.
+        """
+        logger.info("🔵 Suspend action started")
+        goal_handle.publish_feedback({"status": "suspend_started", "progress": 0})
+
+        try:
+            # Run phase callbacks with 20 s total budget
+            success = await asyncio.wait_for(
+                self._run_lifecycle_callbacks(self._suspend_callbacks, "suspend", goal_handle),
+                timeout=20.0,
+            )
+            if not success:
+                goal_handle.abort()
+                return {"success": False, "message": "Suspend aborted – callback failure",
+                        "final_state": self._state_machine.get_all_states()["lifecycle"]}
+
+            # Execute the state transition
+            self.execute_state_action(
+                StateRequest(layer="lifecycle", action="suspend",
+                             metadata={"reason": "remote_request"})
+            )
+
+            goal_handle.publish_feedback({"status": "suspended", "progress": 100})
+            goal_handle.succeed()
+
+            final = self._state_machine.get_all_states()["lifecycle"]
+            logger.info(f"✅ Suspend complete – lifecycle={final}")
+            return {"success": True, "message": "Module suspended", "final_state": final}
+
+        except asyncio.TimeoutError:
+            logger.error("❌ Suspend action timed out (20 s)")
+            try:
+                self.execute_state_action(
+                    StateRequest(layer="lifecycle", action="enter_recovery",
+                                 metadata={"reason": "suspend_timeout"})
+                )
+            except Exception:
+                pass
+            goal_handle.abort()
+            return {"success": False, "message": "Suspend timed out",
+                    "final_state": self._state_machine.get_all_states()["lifecycle"]}
+        except Exception as exc:
+            logger.error(f"❌ Suspend action error: {exc}")
+            goal_handle.abort()
+            return {"success": False, "message": str(exc),
+                    "final_state": self._state_machine.get_all_states()["lifecycle"]}
+
+    @remote_actionServer.on_goal(name="request_lc_resume")
+    async def _on_goal_resume(self, goal_request: Any) -> bool:
+        """Accept resume goal only if lifecycle is currently SUSPENDED."""
+        states = self._state_machine.get_all_states()
+        if states["lifecycle"] != LifecycleState.SUSPENDED.value:
+            logger.warning(
+                f"⚠️  Reject resume goal – lifecycle is {states['lifecycle']}, not SUSPENDED"
+            )
+            return False
+        logger.info("✅ Resume goal accepted")
+        return True
+
+    @remote_actionServer.execute(name="request_lc_resume")
+    async def _execute_resume(self, goal_handle: Any) -> Dict[str, Any]:
+        """Execute the resume lifecycle transition.
+
+        1. Run all registered resume callbacks (priority-ordered, 10 s timeout each).
+        2. Transition lifecycle: SUSPENDED → RECOVERING → ACTIVE.
+        3. Publish 100 % feedback and return result.
+        """
+        logger.info("🟢 Resume action started")
+        goal_handle.publish_feedback({"status": "resume_started", "progress": 0})
+
+        try:
+            success = await asyncio.wait_for(
+                self._run_lifecycle_callbacks(self._resume_callbacks, "resume", goal_handle),
+                timeout=20.0,
+            )
+            if not success:
+                goal_handle.abort()
+                return {"success": False, "message": "Resume aborted – callback failure",
+                        "final_state": self._state_machine.get_all_states()["lifecycle"]}
+
+            # Transition: SUSPENDED → ACTIVE (via resume_from_suspend)
+            self.execute_state_action(
+                StateRequest(layer="lifecycle", action="resume_from_suspend",
+                             metadata={"reason": "remote_request"})
+            )
+
+            goal_handle.publish_feedback({"status": "resumed", "progress": 100})
+            goal_handle.succeed()
+
+            final = self._state_machine.get_all_states()["lifecycle"]
+            logger.info(f"✅ Resume complete – lifecycle={final}")
+            return {"success": True, "message": "Module resumed", "final_state": final}
+
+        except asyncio.TimeoutError:
+            logger.error("❌ Resume action timed out (20 s)")
+            try:
+                self.execute_state_action(
+                    StateRequest(layer="lifecycle", action="enter_recovery",
+                                 metadata={"reason": "resume_timeout"})
+                )
+            except Exception:
+                pass
+            goal_handle.abort()
+            return {"success": False, "message": "Resume timed out",
+                    "final_state": self._state_machine.get_all_states()["lifecycle"]}
+        except Exception as exc:
+            logger.error(f"❌ Resume action error: {exc}")
+            goal_handle.abort()
+            return {"success": False, "message": str(exc),
+                    "final_state": self._state_machine.get_all_states()["lifecycle"]}
 
     # ─────────────────────────────────────────────────────────────────────────
     # Read-only Zenoh interface methods (decorated with @remote_service)

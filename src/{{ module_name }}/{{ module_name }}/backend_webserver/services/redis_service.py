@@ -19,7 +19,7 @@ from typing import Any, Dict, Optional
 
 from vyra_base.com.transport.t_redis.communication import RedisClient
 
-from v2_modulemanager.logging_config import (
+from {{ module_name }}.logging_config import (
     get_logger,
     log_exception,
 )
@@ -60,7 +60,7 @@ class RestApiRedisService:
     def _create_client(self) -> None:
         """Instantiate the vyra_base RedisClient (connection established lazily on first use)."""
         try:
-            self._client = RedisClient(module_name="v2_modulemanager_rest_api")
+            self._client = RedisClient(module_name="{{ module_name }}_rest_api")
             logger.info("🔗 RestApiRedisService: RedisClient created (connection deferred until first use)")
         except Exception as exc:
             log_exception(logger, exc, context={"operation": "RedisClient.__init__"})
@@ -95,7 +95,7 @@ class RestApiRedisService:
                 "service": "RestApiRedisService",
                 "backend": "vyra_base.RedisClient",
                 "connected": healthy,
-                "module_name": "v2_modulemanager_rest_api",
+                "module_name": "{{ module_name }}_rest_api",
             }
         except Exception as exc:
             return {

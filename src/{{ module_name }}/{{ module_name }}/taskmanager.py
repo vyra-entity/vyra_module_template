@@ -209,8 +209,8 @@ class TaskManager:
         return status
     
 async def task_supervisor_looper(
-        taskmanager: TaskManager,
-        statemanager: StateManager,
+        taskmanager: TaskManager, 
+        statemanager: StateManager, 
         check_interval: float = 5.0,
         shutdown_event: Optional[asyncio.Event] = None) -> None:
     """A coroutine that supervises tasks in the TaskManager.
@@ -226,6 +226,9 @@ async def task_supervisor_looper(
     :type sm: StateManager
     :param check_interval: Time in seconds between state checks.
     :type check_interval: float
+    :param shutdown_event: Optional asyncio.Event that, when set, causes the supervisor
+        to exit immediately without waiting for the full check_interval.
+    :type shutdown_event: asyncio.Event, optional
     """
     HEALTH_CHECK_DURATION = 5.0  # seconds
     MAX_RECOVERY_ATTEMPTS = 3
@@ -235,19 +238,20 @@ async def task_supervisor_looper(
 
     async def supervisor_loop():
         logger.info("Task supervisor started")
-
+        
         while True:
+            # Wait for check_interval OR shutdown_event (whichever comes first)
             if shutdown_event is not None:
                 try:
                     await asyncio.wait_for(
                         asyncio.shield(shutdown_event.wait()),
-                        timeout=check_interval
+                        timeout=check_interval,
                     )
-                    # shutdown_event was set — exit immediately
-                    logger.info("Task supervisor woken by shutdown_event")
+                    # Shutdown event was set — exit supervisor immediately
+                    logger.info("Shutdown event received, exiting supervisor loop")
                     break
                 except asyncio.TimeoutError:
-                    pass  # normal interval elapsed
+                    pass  # Normal: check_interval elapsed, continue supervision
             else:
                 await asyncio.sleep(check_interval)
             

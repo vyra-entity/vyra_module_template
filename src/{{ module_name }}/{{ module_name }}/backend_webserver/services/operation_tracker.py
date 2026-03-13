@@ -2,7 +2,7 @@
 Operation tracking service with task-based progress and user prompts
 """
 import asyncio
-from v2_modulemanager.logging_config import get_logger, log_exception, log_function_call, log_function_result
+from {{ module_name }}.logging_config import get_logger, log_exception, log_function_call, log_function_result
 import uuid
 from datetime import datetime
 from typing import Optional, List, Dict, Any, Callable

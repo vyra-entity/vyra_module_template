@@ -6,17 +6,21 @@ from pathlib import Path
 
 from lark import logger
 
-from typing import Any
+from typing import Any, TYPE_CHECKING
 from typing import Callable
 
 
 from ament_index_python.packages import get_package_share_directory  # pyright: ignore[reportMissingImports]
 
-from vyra_base.core.entity import VyraEntity
 from vyra_base.defaults.entries import FunctionConfigEntry
 from vyra_base.defaults.entries import FunctionConfigDisplaystyle
 from vyra_base.defaults.entries import FunctionConfigBaseTypes
 from vyra_base.helper.error_handler import ErrorTraceback
+
+if TYPE_CHECKING:
+    from vyra_base.core.entity import VyraEntity
+else:
+    VyraEntity = Any
 
 
 logger = get_logger(__name__)
@@ -69,26 +73,42 @@ async def auto_register_interfaces(
                 f"Multiple metadata entries found for callback {callback.__name__}, "
                 f"using the first one from config: {config_list}. Please check your configuration!"
             )
-            
+            metadata: dict = config_list[0]
         else:
             metadata: dict = config_list[0]
 
-        ros2_type: str = metadata['filetype'].split('/')[-1]
-        ros2_type = ros2_type.split('.')[0]
-        
+        # Handle filetype as either a string or a list
+        filetype_raw = metadata['filetype']
+        if isinstance(filetype_raw, list):
+            # New format: list of filetypes, e.g. ["VBASEGetInterfaceList.proto"]
+            # Use _base_.py style: load ROS2 types for .srv / .msg / .action, pass through others
+            ifaces = []
+            for iface_type in filetype_raw:
+                filename, ext = iface_type.split('.') if '.' in iface_type else (iface_type, '')
+                if ext in ['msg', 'srv', 'action']:
+                    try:
+                        iface_module = sys.modules[f'{module_name}_interfaces.{ext}']
+                        iface_class = getattr(iface_module, filename)
+                        ifaces.append(iface_class)
+                    except (KeyError, AttributeError) as e:
+                        logger.warning(f"Could not load ROS2 type {iface_type}: {e}")
+                        ifaces.append(iface_type)  # keep as string
+                else:
+                    ifaces.append(iface_type)  # proto / custom type, keep as string
+            metadata['interfacetypes'] = ifaces
+        else:
+            # Old format: single string, e.g. "{{ module_name }}_interfaces/srv/Foo.srv"
+            logger.warning(f"Old format not supported for filetype: {filetype_raw}. Please update to list format in your config.")
+            raise ValueError(f"Old format not supported for filetype: {filetype_raw}. Please update to list format in your config.")
+
         match metadata['type']:
             case FunctionConfigBaseTypes.service.value:
-                metadata['interfacetypes'] = getattr(
-                    sys.modules[f'{module_name}_interfaces.srv'], ros2_type)
                 interface_functions.append(_register_service_interface(
                     callback=callback,
                     metadata=metadata
                 )) 
 
             case FunctionConfigBaseTypes.action.value:
-                metadata['interfacetypes'] = getattr(
-                    sys.modules[f'{module_name}_interfaces.action'], ros2_type)
-                
                 interface_functions.append(_register_action_interface(
                     metadata=metadata,
                     callbacks={}
@@ -96,7 +116,7 @@ async def auto_register_interfaces(
 
     logger.info(f"Registering {len(interface_functions)} interfaces for entity")
     
-    # Bind decorated callbacks from callback_parent (for multi-callback ActionServers)
+    # NEW: Bind decorated callbacks from callback_parent (for multi-callback ActionServers)
     if callback_parent:
         logger.debug("Binding decorated callbacks from component...")
         binding_results = entity.bind_interface_callbacks(
@@ -134,22 +154,20 @@ def _autoload_all_remote_service_from_parent(callback_parent: object) -> list:
                 logger.debug(f"    attr: {attr}")
                 logger.debug(f"    type(attr): {type(attr)}")
                 logger.debug(f"    callable: {callable(attr)}")
-                logger.debug(f"    has _remote_service: {hasattr(attr, '_remote_service')}")
-                logger.debug(f"    _remote_service value: {getattr(attr, '_remote_service', 'NOT FOUND')}")
+                logger.debug(f"    has _vyra_remote_server: {hasattr(attr, '_vyra_remote_server')}")
+                logger.debug(f"    _vyra_remote_server value: {getattr(attr, '_vyra_remote_server', 'NOT FOUND')}")
                 
                 # Try __func__ if it's a bound method
                 if hasattr(attr, "__func__"):
-                    logger.debug(f"    __func__._remote_service: {getattr(attr.__func__, '_remote_service', 'NOT FOUND')}")
+                    logger.debug(f"    __func__._vyra_remote_server: {getattr(attr.__func__, '_vyra_remote_server', 'NOT FOUND')}")
                 
                 # Try class method
                 class_method = getattr(callback_parent.__class__, "get_interface_list", None)
                 if class_method:
-                    logger.debug(f"    class method._remote_service: {getattr(class_method, '_remote_service', 'NOT FOUND')}")
+                    logger.debug(f"    class method._vyra_remote_server: {getattr(class_method, '_vyra_remote_server', 'NOT FOUND')}")
             
-            # Check if it's callable and has _remote_service marker
-            # Note: We check for attribute existence, not value, because vyra_base 
-            # sets _remote_service=False after registering to DataSpace
-            if callable(attr) and hasattr(attr, "_remote_service"):
+            # Check if it's callable and has _vyra_remote_server marker (set by @remote_service decorator)
+            if callable(attr) and hasattr(attr, "_vyra_remote_server"):
                 logger.debug(f"  Found remote_service on instance: {attr_name}")
                 callable_list.append(attr)
                 continue
@@ -158,7 +176,7 @@ def _autoload_all_remote_service_from_parent(callback_parent: object) -> list:
             # This handles cases where decorator is on class method
             if hasattr(callback_parent.__class__, attr_name):
                 class_attr = getattr(callback_parent.__class__, attr_name)
-                if callable(class_attr) and hasattr(class_attr, "_remote_service"):
+                if callable(class_attr) and hasattr(class_attr, "_vyra_remote_server"):
                     logger.debug(f"  Found remote_service on class: {attr_name}")
                     # Get the bound method from instance
                     callable_list.append(attr)
@@ -213,7 +231,7 @@ def _register_publisher_interface(
 def _register_service_interface( 
         callback: Callable, 
         metadata: dict) -> FunctionConfigEntry:
-    """Registers a service interface for the entity."""
+    """Registers a callable interface for the entity."""
     displaystyle = FunctionConfigDisplaystyle(
         visible=metadata.get('displaystyle', {}).get('visible', False),
         published=metadata.get('displaystyle', {}).get('published', False)
@@ -229,13 +247,13 @@ def _register_service_interface(
         params=metadata['params'],
         returns=metadata['returns'],
         qosprofile=metadata.get('qosprofile', 10),
-        callback=callback
+        callbacks={'response': callback} if callback is not None else None
     )
 
 def _register_action_interface(
         metadata: dict,
         callbacks: dict[str, Callable]) -> FunctionConfigEntry:
-    """Registers an action interface for the entity."""
+    """Registers a job interface for the entity."""
     displaystyle = FunctionConfigDisplaystyle(
         visible=metadata.get('displaystyle', {}).get('visible', False),
         published=metadata.get('displaystyle', {}).get('published', False)

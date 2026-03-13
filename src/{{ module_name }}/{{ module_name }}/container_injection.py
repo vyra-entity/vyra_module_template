@@ -7,26 +7,49 @@ without requiring gRPC over UDS communication.
 
 Uses the dependency_injector framework for professional DI management.
 
+Architecture:
+    ApplicationContainer  —  fixe Kernobjekte (entity, component, task_manager, ...)
+    ServiceRegistry       —  dynamische, modulspezifische Dienste (plugin_manager, ...)
+
+    ServiceRegistry ermöglicht das Hinzufügen neuer Dienste zur Laufzeit ohne
+    Änderungen am ApplicationContainer. Geeignet für optionale, swappable Dienste.
+
 Usage:
-    # In main.py after initialization:
+    # In main.py nach Initialisierung:
     from .container_injection import container
     container.entity.set(entity)
     container.component.set(component)
-    
-    # In backend_webserver or other modules (use relative imports):
-    from ...container_injection import container  # From backend_webserver/*/
-    entity = container.entity()
-    component = container.component()
+
+    # ServiceRegistry — dynamische Dienste registrieren/abrufen:
+    from .container_injection import register_service, require_service, get_service
+
+    register_service("plugin_manager", plugin_manager_instance)
+    pm = require_service("plugin_manager")   # wirft ContainerNotInitializedError
+    pm = get_service("plugin_manager")       # gibt None zurück wenn nicht vorhanden
+
+    # In backend_webserver via FastAPI Depends:
+    from .container_injection import provide_service
+    plugin_manager = Depends(provide_service("plugin_manager"))
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional
 
-from .logging_config import get_logger
 from dependency_injector import containers, providers
 
+from .logging_config import get_logger, log_exception, log_function_call, log_function_result
+
 if TYPE_CHECKING:
+    from vyra_base.core import VyraEntity
+    # Only needed for type annotations — kept here to avoid circular imports at runtime.
+    # (application/__init__.py → application.py → container_injection.py → application/)
+    from .application import Component
+    from .taskmanager import TaskManager
+    from .state.state_manager import StateManager
+    from .user.usermanager import UserManager
+    from .application.plugin_manager import PluginManager
+    from .plugin.plugin_gateway import PluginGateway
     from .backend_webserver.services.plugin_bridge import PluginBridge
 
 logger = get_logger(__name__)
@@ -37,29 +60,168 @@ class ContainerNotInitializedError(Exception):
     pass
 
 
+# ---------------------------------------------------------------------------
+# ServiceRegistry — dynamische, modulspezifische Dienste
+# ---------------------------------------------------------------------------
+
+class ServiceRegistry:
+    """
+    Registry für modulspezifische, optionale Dienste.
+
+    Ermöglicht das dynamische Registrieren und Deregistrieren von Diensten die
+    nicht zum fixen Kern (entity, component, task_manager, etc.) gehören, aber
+    dennoch über container_injection erreichbar sein sollen.
+
+    Geeignet für: plugin_manager, custom_manager, experiment_manager, ...
+
+    Neue Dienste hinzufügen (Beispiel in application/application.py)::
+
+        from ..container_injection import register_service, unregister_service
+
+        # In initialize():
+        register_service("plugin_manager", plugin_manager_instance)
+
+        # In stop():
+        unregister_service("plugin_manager")
+
+    Abrufen in Backend-Routern (via FastAPI Depends)::
+
+        from fastapi import Depends
+        from ...container_injection import provide_service
+
+        @router.get("/endpoint")
+        async def my_handler(pm = Depends(provide_service("plugin_manager"))):
+            ...
+
+    Direkter Zugriff::
+
+        pm = require_service("plugin_manager")  # wirft ContainerNotInitializedError
+        pm = get_service("plugin_manager")       # gibt None zurück
+    """
+
+    def __init__(self) -> None:
+        self._services: dict[str, Any] = {}
+
+    def register(self, name: str, instance: Any) -> None:
+        """Registriert einen Dienst unter dem angegebenen Namen."""
+        self._services[name] = instance
+        logger.info("✅ ServiceRegistry: '%s' registered", name)
+
+    def unregister(self, name: str) -> None:
+        """Entfernt einen Dienst aus der Registry."""
+        if name in self._services:
+            del self._services[name]
+            logger.info("⏹️  ServiceRegistry: '%s' unregistered", name)
+
+    def get(self, name: str) -> Any | None:
+        """Gibt den Dienst zurück oder None wenn nicht vorhanden."""
+        return self._services.get(name)
+
+    def require(self, name: str) -> Any:
+        """
+        Gibt den Dienst zurück oder wirft ContainerNotInitializedError.
+
+        Verwende diese Methode in Backend-Routern um einen 503-Fehler
+        (wrong_state) auszulösen wenn der Dienst noch nicht bereit ist.
+        """
+        instance = self._services.get(name)
+        if instance is None:
+            raise ContainerNotInitializedError(
+                f"Service '{name}' not registered. "
+                f"Registered services: {list(self._services.keys())}"
+            )
+        return instance
+
+    def has(self, name: str) -> bool:
+        """Prüft ob ein Dienst registriert ist."""
+        return name in self._services
+
+    def list_services(self) -> list[str]:
+        """Gibt eine Liste aller registrierten Dienstnamen zurück."""
+        return list(self._services.keys())
+
+
+# Global ServiceRegistry instance
+_service_registry = ServiceRegistry()
+
+
+def register_service(name: str, instance: Any) -> None:
+    """Registriert einen modulspezifischen Dienst in der ServiceRegistry."""
+    _service_registry.register(name, instance)
+
+
+def unregister_service(name: str) -> None:
+    """Entfernt einen modulspezifischen Dienst aus der ServiceRegistry."""
+    _service_registry.unregister(name)
+
+
+def get_service(name: str) -> Any | None:
+    """Gibt einen Dienst zurück oder None."""
+    return _service_registry.get(name)
+
+
+def require_service(name: str) -> Any:
+    """Gibt einen Dienst zurück oder wirft ContainerNotInitializedError."""
+    return _service_registry.require(name)
+
+
+def has_service(name: str) -> bool:
+    """Prüft ob ein Dienst registriert ist."""
+    return _service_registry.has(name)
+
+
+def list_registered_services() -> list[str]:
+    """Gibt alle registrierten Dienstnamen zurück."""
+    return _service_registry.list_services()
+
+
+def provide_service(name: str):
+    """
+    Factory für FastAPI Depends() — gibt einen Provider für einen benannten Dienst zurück.
+
+    Beispiel::
+
+        @router.get("/endpoint")
+        async def handler(pm = Depends(provide_service("plugin_manager"))):
+            ...
+    """
+    def _provider():
+        return _service_registry.require(name)
+    _provider.__name__ = f"provide_{name}"
+    return _provider
+
+
+# ---------------------------------------------------------------------------
+# ApplicationContainer — fixe Kernobjekte
+# ---------------------------------------------------------------------------
+
 class ApplicationContainer(containers.DeclarativeContainer):
     """
-    Dependency Injection Container for V2 ModuleManager.
-    
+    Dependency Injection Container für fixe Kernobjekte des V2 ModuleManagers.
+
     Provides singleton instances of core application components:
     - VyraEntity: ROS2 node and communication
     - Component: Application logic
     - TaskManager: Task management
     - StateManager: State broadcasting
-    - UserManager: User management (internal_usermanager + gRPC server)
+    - UserManager: User management
+
+    Modulspezifische, optionale Dienste (z.B. plugin_manager) werden über die
+    ServiceRegistry verwaltet — nicht hier. Dies hält den Container schlank und
+    ermöglicht das dynamische Hinzufügen neuer Dienste ohne Code-Änderungen.
     """
     
     # Configuration
     config = providers.Configuration()
     
     # Core components as Singleton providers
-    entity = providers.Singleton(lambda: None)
-    component = providers.Singleton(lambda: None)
-    task_manager = providers.Singleton(lambda: None)
-    state_manager = providers.Singleton(lambda: None)
-    user_manager = providers.Singleton(lambda: None)
-    plugin_gateway = providers.Singleton(lambda: None)
-    plugin_bridge = providers.Singleton(lambda: None)
+    entity: providers.Singleton[VyraEntity | None] = providers.Singleton(lambda: None)
+    component: providers.Singleton[Component | None] = providers.Singleton(lambda: None)
+    task_manager: providers.Singleton[TaskManager | None] = providers.Singleton(lambda: None)
+    state_manager: providers.Singleton[StateManager | None] = providers.Singleton(lambda: None)
+    user_manager: providers.Singleton[UserManager | None] = providers.Singleton(lambda: None)
+    plugin_gateway: providers.Singleton[PluginGateway | None] = providers.Singleton(lambda: None)
+    plugin_bridge: providers.Singleton[PluginBridge | None] = providers.Singleton(lambda: None)
 
 
 # Global container instance
@@ -107,7 +269,7 @@ def set_component(component_instance) -> None:
     logger.info("✅ Component set in container_injection")
 
 
-def get_component():
+def get_component() -> Component:
     """
     Get the Component instance from the global container.
     
@@ -137,7 +299,7 @@ def set_task_manager(task_manager_instance) -> None:
     logger.info("✅ TaskManager set in container_injection")
 
 
-def get_task_manager():
+def get_task_manager() -> TaskManager:
     """
     Get the TaskManager instance from the global container.
     
@@ -167,7 +329,7 @@ def set_state_manager(state_manager_instance) -> None:
     logger.info("✅ StateManager set in container_injection")
 
 
-def get_state_manager():
+def get_state_manager() -> StateManager:
     """
     Get the StateManager instance from the global container.
     
@@ -194,6 +356,9 @@ def is_initialized() -> bool:
         True if entity, component, task_manager, state_manager, and user_manager are all set
     """
     try:
+        for component_name in ['entity', 'component', 'task_manager', 'state_manager', 'user_manager']:
+            if container.__getattribute__(component_name)() is None:
+                logger.debug(f"Container component not initialized: {component_name}")
         return all([
             container.entity() is not None,
             container.component() is not None,
@@ -216,6 +381,9 @@ def reset() -> None:
     container.user_manager.override(providers.Singleton(lambda: None))
     container.plugin_gateway.override(providers.Singleton(lambda: None))
     container.plugin_bridge.override(providers.Singleton(lambda: None))
+    # Clear all dynamically registered services
+    for name in _service_registry.list_services():
+        _service_registry.unregister(name)
     logger.info("🔄 Container reset")
 
 
@@ -276,7 +444,7 @@ def provide_state_manager():
     return get_state_manager()
 
 
-def set_user_manager(user_manager_instance) -> None:
+def set_user_manager(user_manager_instance: UserManager) -> None:
     """
     Set the UserManager instance in the global container.
     
@@ -287,7 +455,7 @@ def set_user_manager(user_manager_instance) -> None:
     logger.info("✅ UserManager set in container_injection")
 
 
-def get_user_manager():
+def get_user_manager() -> Optional[UserManager]:
     """
     Get the UserManager instance from the global container.
     
@@ -320,14 +488,27 @@ def provide_user_manager():
     return get_user_manager()
 
 
+def set_plugin_manager(plugin_manager_instance) -> None:
+    """Convenience-Wrapper — delegiert an register_service("plugin_manager")."""
+    register_service("plugin_manager", plugin_manager_instance)
+
+
+def get_plugin_manager() -> "PluginManager":
+    """Convenience-Wrapper — delegiert an require_service("plugin_manager")."""
+    return require_service("plugin_manager")
+
+
+def provide_plugin_manager():
+    """Provider function for FastAPI Depends() — delegiert an ServiceRegistry."""
+    return require_service("plugin_manager")
+
+
 def set_plugin_gateway(plugin_gateway_instance) -> None:
-    """Set the PluginGateway instance in the global container."""
     container.plugin_gateway.override(providers.Object(plugin_gateway_instance))
     logger.info("✅ PluginGateway set in container_injection")
 
 
 def get_plugin_gateway():
-    """Get the PluginGateway instance from the global container."""
     instance = container.plugin_gateway()
     if instance is None:
         raise ContainerNotInitializedError(
@@ -341,12 +522,12 @@ def provide_plugin_gateway():
     return get_plugin_gateway()
 
 
-def set_plugin_bridge(plugin_bridge_instance: "PluginBridge") -> None:
+def set_plugin_bridge(plugin_bridge_instance) -> None:
     container.plugin_bridge.override(providers.Object(plugin_bridge_instance))
     logger.info("✅ PluginBridge set in container_injection")
 
 
-def get_plugin_bridge() -> "PluginBridge":
+def get_plugin_bridge():
     instance = container.plugin_bridge()
     if instance is None:
         raise ContainerNotInitializedError(
@@ -355,6 +536,6 @@ def get_plugin_bridge() -> "PluginBridge":
     return instance
 
 
-def provide_plugin_bridge() -> "PluginBridge":
+def provide_plugin_bridge():
     """Provider function for FastAPI Depends()."""
     return get_plugin_bridge()

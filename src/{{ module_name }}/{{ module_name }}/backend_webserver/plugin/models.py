@@ -2,7 +2,7 @@
 Plugin API — Pydantic schemas for the plugin REST endpoints.
 
 WASM runtime management has moved to PluginGateway
-(v2_modulemanager.plugin.plugin_gateway).  The legacy WasmRuntimePool
+({{ module_name }}.plugin.plugin_gateway).  The legacy WasmRuntimePool
 class is kept here only for reference — it is no longer instantiated
 as a module-level singleton.
 """

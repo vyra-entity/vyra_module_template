@@ -31,8 +31,7 @@ from .application import application
 from .application.application import Component
 from .taskmanager import TaskManager, task_supervisor_looper
 from .state.state_manager import StateManager
-from .user.usermanager_client import UserManagerClient, usermanager_client_runner
-from .plugin.plugin_gateway import PluginGateway
+from .user.usermanager import UserManager
 from . import container_injection
 
 from vyra_base.core.entity import VyraEntity
@@ -130,6 +129,13 @@ async def application_runner() -> None:
     await application.main()
     ErrorTraceback.check_error_exist() 
 
+
+async def plugin_gateway_runner() -> None:
+    """Long-running task that keeps the PluginGateway alive."""
+    from .plugin.plugin_gateway import PluginGateway
+    gateway: PluginGateway = container_injection.get_plugin_gateway()
+    await gateway.run()
+
 @log_call
 async def setup_statemanager(entity: VyraEntity) -> StateManager:
     """
@@ -157,6 +163,33 @@ async def setup_statemanager(entity: VyraEntity) -> StateManager:
     logger.info("state_manager_interfaces_setup_complete")
 
     return state_manager
+
+
+@log_call
+async def setup_usermanager(entity: VyraEntity) -> UserManager:
+    """
+    Initialize and configure the User Manager.
+    
+    Args:
+        entity: VyraEntity instance from core application
+        
+    Returns:
+        Configured UserManager instance
+        
+    Raises:
+        Exception: If user manager initialization fails
+    """
+    logger.info("user_manager_initializing")
+    
+    user_manager = UserManager(entity)
+    success = await user_manager.initialize()
+    
+    if not success:
+        logger.error("user_manager_initialization_failed")
+        raise RuntimeError("UserManager initialization failed")
+    
+    logger.info("user_manager_initialized")
+    return user_manager
 
 
 @log_call
@@ -260,7 +293,7 @@ async def web_backend_runner() -> None:
     logger.info("container_initialized", wait_count=wait_count)
     
     # Get module name dynamically from entity.
-    # entity.module_entry.name is the short package name (e.g. "v2_modulemanager"),
+    # entity.module_entry.name is the short package name (e.g. "{{ module_name }}"),
     # which is also the top-level Python package installed by colcon.
     entity = container_injection.get_entity()
     module_name = entity.module_entry.name
@@ -353,6 +386,11 @@ async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, State
     statemanager: StateManager = await setup_statemanager(entity)
     logger.info("state_manager_ready")
 
+    # Setup user manager
+    logger.debug("setting_up_user_manager")
+    user_manager: UserManager = await setup_usermanager(entity)
+    logger.info("user_manager_ready")
+
     # Create Component (reused across task recoveries)
     logger.debug("creating_component")
     unified_state_machine = statemanager.state_machine
@@ -375,21 +413,32 @@ async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, State
     container_injection.set_component(component)
     container_injection.set_task_manager(taskmanager)
     container_injection.set_state_manager(statemanager)
-    container_injection.set_user_manager(UserManagerClient(entity))
-    plugin_gateway = PluginGateway()
-    await plugin_gateway.setup(entity)
-    container_injection.set_plugin_gateway(plugin_gateway)
+    container_injection.set_user_manager(user_manager)
     logger.info("container_dependencies_injected")
+
+    # Setup PluginGateway (WASM runtime hub + event system)
+    logger.debug("setting_up_plugin_gateway")
+    from .plugin.plugin_gateway import PluginGateway
+    plugin_gateway = PluginGateway()
+    plugin_gateway.setup()
+    await plugin_gateway.set_interfaces()
+    container_injection.set_plugin_gateway(plugin_gateway)
+    logger.info("plugin_gateway_ready")
+
+    # Setup PluginBridge (bidirectional Logic↔UI event channel)
+    logger.debug("setting_up_plugin_bridge")
+    from .backend_webserver.services.plugin_bridge import PluginBridge
+    plugin_bridge = PluginBridge.get_instance()
+    container_injection.set_plugin_bridge(plugin_bridge)
+    logger.info("plugin_bridge_ready")
 
     await statemanager.initialization_complete()  # Notify StateManager that initialization is complete (for manual startup)
 
     # Schedule application runner task
     logger.info("scheduling_application_runner_task")
     taskmanager.add_task(application_runner)
+    taskmanager.add_task(plugin_gateway_runner)
     logger.debug("application_runner_task_scheduled")
-
-    logger.info("scheduling_usermanager_client_task")
-    taskmanager.add_task(usermanager_client_runner, entity)
     
     # ROS2-dependent tasks: only start if NOT in SLIM mode
     if not VYRA_SLIM:

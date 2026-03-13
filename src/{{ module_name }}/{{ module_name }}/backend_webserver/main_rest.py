@@ -16,17 +16,20 @@ from .core.config import settings
 from ..logging_config import get_logger, log_exception, log_function_call, log_function_result
 
 # Import structured routers
-from .websocket.router import router as websocket_router
-from .websocket.service import operation_monitor
-# from .your_route.router import router as your_route_router
-
+from .module_repository.router import router as repository_router
+from .module.router import router as modules_router
+from .websocket.router import (
+    router as websocket_router,
+    operation_monitor,
+)
 
 # Plugin system
-from .plugin.router import router as plugin_router
-from .services.plugin_bridge import PluginBridge
-from ..container_injection import set_plugin_bridge
+from .plugin import plugin_router
+from .plugin_admin_service.router import router as plugin_admin_service_router
 
 # Import hardware management
+from .clients.http.hardware import hardware_registry_client
+from .hardware import router as hardware_router
 from .services.redis_service import redis_service
 
 # Import authentication
@@ -43,15 +46,14 @@ async def lifespan(app: FastAPI):
     """
     # Startup
     asyncio.create_task(operation_monitor())
-    plugin_bridge = PluginBridge.get_instance()
-    set_plugin_bridge(plugin_bridge)
+    await hardware_registry_client.start()
     
     # Connect Redis and initialise authentication service
     try:
         redis_client = await redis_service.get_client()
         auth_service = AuthenticationService(
             redis_client=redis_client,
-            module_id="v2_modulemanager"
+            module_id="{{ module_name }}"
         )
         set_auth_service(auth_service)
         logger.info("✅ Authentication service initialized")
@@ -64,6 +66,7 @@ async def lifespan(app: FastAPI):
     yield
 
     # Shutdown
+    await hardware_registry_client.stop()
     await redis_service.cleanup()
 
 
@@ -78,17 +81,28 @@ app = FastAPI(
 )
 
 # Include routers with proper prefixes and tags
+app.include_router(
+    repository_router, 
+    prefix="/repository", 
+    tags=["Repository"]
+)
 
-# app.include_router(
-#     your_route_router, 
-#     prefix="/your_route", 
-#     tags=["YourRoute"]
-# )
+app.include_router(
+    modules_router, 
+    prefix="/modules", 
+    tags=["Modules"]
+)
 
 app.include_router(
     websocket_router,
     prefix="/ws",
     tags=["WebSocket"]
+)
+
+# Include hardware management router
+app.include_router(
+    hardware_router,
+    tags=["Hardware Management"]
 )
 
 # Include authentication router
@@ -102,6 +116,13 @@ app.include_router(
     plugin_router,
     prefix="/plugin",
     tags=["Plugin System"]
+)
+
+# Include plugin admin service router (management: list/install/uninstall/assignments — {{ module_name }} only)
+app.include_router(
+    plugin_admin_service_router,
+    prefix="/plugin_admin_service",
+    tags=["Plugin Admin Service"]
 )
 
 # Mount static files if available
@@ -122,6 +143,8 @@ async def root():
         "endpoints": {
             "status": "/status",
             "health": "/health",
+            "repository": "/repository",
+            "modules": "/modules",
             "hardware": "/api/hardware",
             "docs": "/api/docs",
             "redoc": "/api/redoc"
@@ -139,7 +162,7 @@ async def api_status():
     """Health check und Status-Information"""
     return {
         "status": "running",
-        "service": "v2_modulemanager",
+        "service": "{{ module_name }}",
         "version": settings.API_VERSION,
         "environment": {
             "development_mode": settings.DEVELOPMENT_MODE,
@@ -166,7 +189,7 @@ async def health_check():
         
         return {
             "status": "healthy" if healthy else "degraded",
-            "service": "v2_modulemanager",
+            "service": "{{ module_name }}",
             "version": settings.API_VERSION,
             "checks": checks,
             "timestamp": "2025-10-28T13:30:00Z"  # Would use actual timestamp
@@ -174,7 +197,7 @@ async def health_check():
     except Exception as e:
         return {
             "status": "unhealthy",
-            "service": "v2_modulemanager",
+            "service": "{{ module_name }}",
             "version": settings.API_VERSION,
             "error": str(e),
             "timestamp": "2025-10-28T13:30:00Z"
@@ -186,8 +209,8 @@ async def health_check():
 async def dashboard_fallback(path: str = ""):
     """Frontend-Weiterleitung - sollte nur in Notfällen erreicht werden"""
     return {
-        "message": "Frontend wird durch Nginx oder Uvicorn Server bereitgestellt",
+        "message": "Frontend wird durch Nginx oder Vue Dev Server bereitgestellt",
         "development_mode": settings.DEVELOPMENT_MODE,
         "frontend_path": str(settings.FRONTEND_PATH),
-        "redirect": f"/v2_modulemanager/{path}" if path else "/v2_modulemanager/"
+        "redirect": f"/{{ module_name }}/{path}" if path else "/{{ module_name }}/"
     }

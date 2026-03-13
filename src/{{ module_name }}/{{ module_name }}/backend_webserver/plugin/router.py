@@ -1,7 +1,7 @@
 """
 Plugin Router — Communication endpoints for the plugin system.
 
-These endpoints are registered in v2_modulemanager.
+These endpoints are registered in {{ module_name }}.
 
 Endpoints:
   GET    /plugin/assets/{plugin_id}/{version}/{path} — Asset proxy (JS/CSS/WASM/SVG)

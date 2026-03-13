@@ -1,8 +1,8 @@
 """
-Authentication router for v2_modulemanager REST API
+Authentication router for {{ module_name }} REST API
 """
 
-from v2_modulemanager.logging_config import get_logger, log_exception, log_function_call, log_function_result
+from {{ module_name }}.logging_config import get_logger, log_exception, log_function_call, log_function_result
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Depends, Header, Response, Cookie
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials

@@ -9,17 +9,9 @@ Quick start
 The ``StateManager`` is instantiated in ``main.py`` with the shared
 ``VyraEntity`` and scheduled as an async broadcast task:
 
-.. code-block:: python
-
-    from {{ module_name }}.state import StateManager, state_manager_runner
-
-    state_manager = StateManager(entity)
-    await state_manager.setup_interfaces()
-    asyncio.create_task(state_manager_runner(state_manager))
-
 Note
 ----
-``StateManager`` and ``state_manager_runner`` are lazily imported (via
+``StateManager`` is lazily imported (via
 ``__getattr__``) to avoid pulling in ROS2/Zenoh dependencies at package
 import time.  Direct access via ``from .state_types import ...`` is always
 available without side-effects.
@@ -54,15 +46,14 @@ from .state_types import (
 )
 
 # ── Lazy imports — only loaded when actually requested ────────────────────────
-# StateManager / state_manager_runner pull in ament_index_python, interface.py,
+# StateManager pull in ament_index_python, interface.py,
 # logging_config.py etc. – packages that require a running ROS2 environment.
 # Using __getattr__ prevents import errors in unit-test environments.
 
 def __getattr__(name: str):  # noqa: N807
-    if name in ("StateManager", "state_manager_runner"):
-        from .state_manager import StateManager, state_manager_runner  # noqa: PLC0415
+    if name in ("StateManager"):
+        from .state_manager import StateManager  # noqa: PLC0415
         globals()["StateManager"] = StateManager
-        globals()["state_manager_runner"] = state_manager_runner
         return globals()[name]
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
@@ -70,7 +61,6 @@ def __getattr__(name: str):  # noqa: N807
 __all__ = [
     # Manager (lazy)
     "StateManager",
-    "state_manager_runner",
     # Enums (direct from vyra_base)
     "LifecycleState",
     "OperationalState",

@@ -1,11 +1,11 @@
 """
-Authentication Service for v2_modulemanager - Direct DI Version
+Authentication Service for {{ module_name }} - Direct DI Version
 
 Integrates with Internal User Manager via direct dependency injection
 (no gRPC needed since backend and core run in same process).
 """
 
-from v2_modulemanager.logging_config import get_logger, log_exception, log_function_call, log_function_result
+from {{ module_name }}.logging_config import get_logger, log_exception, log_function_call, log_function_result
 import secrets
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
@@ -53,7 +53,7 @@ class AuthenticationService:
         
         Args:
             redis_client: Redis client for session storage
-            module_id: Module identifier (e.g., 'v2_modulemanager')
+            module_id: Module identifier (e.g., '{{ module_name }}')
         """
         self.redis = redis_client
         self.module_id = module_id

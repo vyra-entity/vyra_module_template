@@ -5,7 +5,7 @@ Manages hardware nodes and module placements for container orchestration.
 Provides modernized version of hardware_registry.py with clean architecture.
 """
 import asyncio
-from v2_modulemanager.logging_config import get_logger, log_exception, log_function_call, log_function_result
+from {{ module_name }}.logging_config import get_logger, log_exception, log_function_call, log_function_result
 import os
 import socket
 from dataclasses import dataclass, field
