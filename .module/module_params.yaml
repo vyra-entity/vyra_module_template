@@ -12,6 +12,9 @@ permissions:
   
   # Can this module be updated?
   updatable: true
+
+  # Can this module be send to sleep mode?
+  suspendable: false
   
   # Can additional instances be created?
   multi_instance: true  # true: Multiple instances allowed

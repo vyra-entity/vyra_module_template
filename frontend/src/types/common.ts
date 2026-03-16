@@ -36,6 +36,7 @@ export interface ModuleInstance {
     visible?: boolean
     removable?: boolean
     updatable?: boolean
+    suspendable?: boolean
     protected?: boolean
     multi_instance?: boolean
   }

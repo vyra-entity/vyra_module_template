@@ -99,8 +99,8 @@ export function getActionsForState(
 
   switch (state) {
     case LifecycleState.ACTIVE:
-      actions.push(
-        {
+      if (instance.permissions?.suspendable !== false) {
+        actions.push({
           key: 'suspend',
           label: 'Suspend',
           icon: 'pi pi-pause',
@@ -108,14 +108,16 @@ export function getActionsForState(
           priority: 1,
           isLifecycleAction: true,
           requiresConfirm: false,
-        },
+        })
+      }
+      actions.push(
         {
           key: 'restart',
           label: 'Restart',
           icon: 'pi pi-refresh',
           severity: 'warn',
           variant: 'outlined',
-          priority: 2,
+          priority: instance.permissions?.suspendable !== false ? 2 : 1,
           requiresConfirm: true,
           confirmMessage: 'Restart this module instance?',
         },
@@ -125,7 +127,7 @@ export function getActionsForState(
           icon: 'pi pi-stop-circle',
           severity: 'warn',
           variant: 'tonal',
-          priority: 3,
+          priority: instance.permissions?.suspendable !== false ? 3 : 2,
           requiresConfirm: true,
           confirmMessage: 'Stop this module instance?',
         },
@@ -135,7 +137,7 @@ export function getActionsForState(
           icon: 'pi pi-trash',
           severity: 'danger',
           variant: 'outlined',
-          priority: 4,
+          priority: instance.permissions?.suspendable !== false ? 4 : 3,
           requiresConfirm: true,
           confirmMessage: 'Permanently delete this module instance?',
         }
