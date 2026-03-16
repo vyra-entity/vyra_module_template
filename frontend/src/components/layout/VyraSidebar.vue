@@ -9,7 +9,7 @@
     />
   </Transition>
 
-  <!-- The sidebar -->
+  <!-- The sidebar itself -->
   <aside
     class="vyra-sidebar"
     :class="{
@@ -20,23 +20,21 @@
     role="navigation"
     aria-label="Hauptnavigation"
   >
-    <!-- ── TOP ZONE: Branding + Toggle ──────────────────────────────────── -->
+    <!-- ── TOP ZONE: Branding + Toggle ─────────────────────────────────────── -->
     <div class="sidebar-top">
-      <!-- Slot: custom branding (icon + title by default) -->
-      <slot name="brand">
-        <div class="branding">
-          <div class="brand-icon">
-            <img src="@/assets/variobotic-kreis-transparent-blaugrau.svg" class="brand-svg" alt="VYRA" />
-          </div>
-          <span class="brand-label">{{ title }}</span>
+      <div class="branding">
+        <div class="brand-icon">
+          <img src="@/assets/variobotic-kreis-transparent-blaugrau.svg" class="brand-svg" alt="VYRA" />
         </div>
-      </slot>
+        <span class="brand-label">Module Manager</span>
+      </div>
 
       <button
         class="toggle-btn"
         @click="handleToggle"
-        :title="sidebarStore.isCollapsed ? 'Ausklappen' : 'Einklappen'"
+        :title="sidebarStore.isCollapsed ? 'Sidebar ausklappen' : 'Sidebar einklappen'"
         :aria-label="sidebarStore.isCollapsed ? 'Sidebar ausklappen' : 'Sidebar einklappen'"
+        aria-controls="sidebar-nav"
       >
         <i
           class="pi"
@@ -45,8 +43,8 @@
       </button>
     </div>
 
-    <!-- ── MAIN NAVIGATION ZONE ─────────────────────────────────────────── -->
-    <nav class="sidebar-main" aria-label="Navigation">
+    <!-- ── MAIN NAVIGATION ZONE ────────────────────────────────────────────── -->
+    <nav id="sidebar-nav" class="sidebar-main" aria-label="Navigation">
       <SidebarNavGroup
         v-for="group in sidebarStore.groupedItems"
         :key="group.id"
@@ -54,68 +52,86 @@
       />
     </nav>
 
-    <!-- ── BOTTOM ZONE: slot for health indicators, user info, etc. ─────── -->
+    <!-- ── BOTTOM ZONE: System Health + User + Settings ───────────────────── -->
     <div class="sidebar-bottom">
-      <!-- Slot: override bottom section entirely -->
-      <slot name="bottom">
-        <!-- Default: minimal status dot using the backendStatus prop -->
-        <div
-          v-if="backendStatus"
-          class="system-health"
-          :class="`health-${backendStatus}`"
-          :title="healthLabel"
-        >
-          <span class="health-dot" />
-          <span class="health-label">{{ healthLabel }}</span>
-        </div>
-      </slot>
+      <!-- System health indicator -->
+      <div
+        class="system-health"
+        :class="`health-${systemStore.backendStatus}`"
+        v-tooltip.right="healthTooltip"
+        :title="healthTooltip"
+        aria-live="polite"
+        :aria-label="`System Status: ${healthLabel}`"
+      >
+        <span class="health-dot" />
+        <span class="health-label">{{ healthLabel }}</span>
+      </div>
+
+      <!-- Username (collapsed: hidden) -->
+      <div class="user-info" v-if="authStore.isAuthenticated">
+        <i class="pi pi-user user-icon" />
+        <span class="user-name">{{ authStore.username }}</span>
+      </div>
+
+      <!-- Logout button -->
+      <button
+        v-if="authStore.isAuthenticated"
+        class="bottom-btn logout-btn"
+        @click="handleLogout"
+        title="Abmelden"
+        aria-label="Abmelden"
+        v-tooltip.right="sidebarStore.isCollapsed ? 'Abmelden' : undefined"
+      >
+        <i class="pi pi-sign-out" />
+        <span class="btn-label">Abmelden</span>
+      </button>
     </div>
   </aside>
 </template>
 
-<script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+<script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useSidebarStore } from '../../store/sidebar'
+import { useSystemStore } from '../../store/system'
+import { useAuthStore } from '../../store/auth'
+import { useToast } from 'primevue/usetoast'
 import SidebarNavGroup from './SidebarNavGroup.vue'
 
-const props = defineProps({
-  /** Module title shown in the branding area */
-  title: {
-    type: String,
-    default: 'VYRA Module'
-  },
-  /**
-   * System / backend status: 'running' | 'stopped' | 'checking' | null
-   * Pass null to hide the health indicator entirely.
-   */
-  backendStatus: {
-    type: String,
-    default: null
-  }
-})
-
+const router       = useRouter()
 const sidebarStore = useSidebarStore()
+const systemStore  = useSystemStore()
+const authStore    = useAuthStore()
+const toast        = useToast()
 
-// ─── Mobile detection ────────────────────────────────────────────────────────
+// ─── Mobile detection ──────────────────────────────────────────────────────
+const MOBILE_BREAKPOINT  = 768
+const DRAWER_BREAKPOINT  = 480
+
 const isMobile          = ref(false)
 const isMobileDrawerOpen = ref(false)
 
-function checkViewport() {
+function checkViewport(): void {
   const w = window.innerWidth
-  isMobile.value = w <= 768
-  if (w <= 480) sidebarStore.setCollapsed(true)
-  else if (w <= 768) sidebarStore.setCollapsed(true)
+  isMobile.value = w <= MOBILE_BREAKPOINT
+  if (w <= DRAWER_BREAKPOINT) {
+    // Drawer mode – sidebar is hidden until opened via mobile toggle
+    sidebarStore.setCollapsed(true)
+  } else if (w <= MOBILE_BREAKPOINT) {
+    sidebarStore.setCollapsed(true)
+  }
 }
 
-function handleToggle() {
-  if (window.innerWidth <= 480) {
+function handleToggle(): void {
+  if (window.innerWidth <= DRAWER_BREAKPOINT) {
+    // Mobile overlay drawer
     isMobileDrawerOpen.value = !isMobileDrawerOpen.value
   } else {
     sidebarStore.toggleCollapse()
   }
 }
 
-function closeMobileDrawer() {
+function closeMobileDrawer(): void {
   isMobileDrawerOpen.value = false
 }
 
@@ -128,24 +144,49 @@ onUnmounted(() => {
   window.removeEventListener('resize', checkViewport)
 })
 
-// ─── Health label ─────────────────────────────────────────────────────────────
+// ─── System health ─────────────────────────────────────────────────────────
 const healthLabel = computed(() => {
-  switch (props.backendStatus) {
+  switch (systemStore.backendStatus) {
     case 'running':  return 'System aktiv'
     case 'stopped':  return 'System gestoppt'
     case 'checking': return 'Verbinde...'
-    default:         return 'Status unbekannt'
+    default:         return 'Unbekannt'
   }
 })
+
+const healthTooltip = computed(() =>
+  sidebarStore.isCollapsed ? healthLabel.value : undefined
+)
+
+// ─── Logout ────────────────────────────────────────────────────────────────
+async function handleLogout(): Promise<void> {
+  try {
+    await authStore.logout()
+    toast.add({
+      severity: 'success',
+      summary: 'Abgemeldet',
+      detail: 'Sie wurden erfolgreich abgemeldet',
+      life: 3000,
+    })
+    router.push('/{{ module_name }}/login')
+  } catch {
+    toast.add({
+      severity: 'error',
+      summary: 'Fehler',
+      detail: 'Abmeldung fehlgeschlagen',
+      life: 3000,
+    })
+  }
+}
 </script>
 
 <style scoped>
+/* ── CSS variables (inherit from global :root) ── */
 .vyra-sidebar {
   --sb-width:           260px;
   --sb-collapsed-width: 64px;
-  --sb-bg:              #fff;
-  --sb-border:          #e0e0e0;
-  --sb-primary:         #2196F3;
+  --sb-bg:              var(--surface-card, #fff);
+  --sb-border:          var(--surface-border, #e0e0e0);
   --sb-transition:      0.25s ease;
 }
 
@@ -224,7 +265,7 @@ const healthLabel = computed(() => {
   pointer-events: none;
 }
 
-/* In collapsed state: hide branding entirely, center toggle button */
+/* In collapsed state: hide branding entirely, center the toggle button */
 .is-collapsed .branding {
   opacity: 0;
   flex: 0;
@@ -245,7 +286,7 @@ const healthLabel = computed(() => {
   border: 1px solid var(--sb-border);
   border-radius: 6px;
   background: transparent;
-  color: #607D8B;
+  color: var(--text-color-secondary, #607D8B);
   cursor: pointer;
   flex-shrink: 0;
   transition: background 0.15s ease, color 0.15s ease;
@@ -253,11 +294,11 @@ const healthLabel = computed(() => {
 }
 
 .toggle-btn:hover {
-  background: rgba(33, 150, 243, 0.08);
-  color: #2196F3;
+  background: var(--surface-hover, rgba(33, 150, 243, 0.08));
+  color: var(--vyra-primary, #2196F3);
 }
 
-/* ── MAIN NAV ── */
+/* ── MAIN NAV ZONE ── */
 .sidebar-main {
   flex: 1;
   overflow-y: auto;
@@ -267,12 +308,15 @@ const healthLabel = computed(() => {
   flex-direction: column;
   gap: 0.5rem;
   scrollbar-width: thin;
-  scrollbar-color: #e0e0e0 transparent;
+  scrollbar-color: var(--sb-border) transparent;
 }
 
-.sidebar-main::-webkit-scrollbar      { width: 4px; }
+.sidebar-main::-webkit-scrollbar {
+  width: 4px;
+}
+
 .sidebar-main::-webkit-scrollbar-thumb {
-  background: #e0e0e0;
+  background: var(--sb-border);
   border-radius: 2px;
 }
 
@@ -294,6 +338,7 @@ const healthLabel = computed(() => {
   padding: 0.5rem 0.75rem;
   border-radius: 8px;
   overflow: hidden;
+  transition: background 0.15s ease;
 }
 
 .health-dot {
@@ -301,14 +346,14 @@ const healthLabel = computed(() => {
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
-  background: #607D8B;
+  background: var(--vyra-secondary, #607D8B);
   transition: background 0.3s ease;
 }
 
-.health-running  .health-dot { background: #4CAF50; }
-.health-stopped  .health-dot { background: #F44336; }
+.health-running  .health-dot { background: var(--vyra-success, #4CAF50); }
+.health-stopped  .health-dot { background: var(--vyra-danger,  #F44336); }
 .health-checking .health-dot {
-  background: #FF9800;
+  background: var(--vyra-warning, #FF9800);
   animation: pulse-dot 1.2s ease-in-out infinite;
 }
 
@@ -319,7 +364,7 @@ const healthLabel = computed(() => {
 
 .health-label {
   font-size: 0.75rem;
-  color: #607D8B;
+  color: var(--text-color-secondary, #607D8B);
   white-space: nowrap;
   overflow: hidden;
   opacity: 1;
@@ -328,6 +373,85 @@ const healthLabel = computed(() => {
 }
 
 .is-collapsed .health-label {
+  opacity: 0;
+  max-width: 0;
+  pointer-events: none;
+}
+
+/* User info */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.75rem;
+  overflow: hidden;
+}
+
+.user-icon {
+  font-size: 0.9rem;
+  color: var(--text-color-secondary, #607D8B);
+  flex-shrink: 0;
+  width: 22px;
+  text-align: center;
+}
+
+.user-name {
+  font-size: 0.75rem;
+  color: var(--text-color-secondary, #607D8B);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 1;
+  max-width: 160px;
+  transition: opacity var(--sb-transition), max-width var(--sb-transition);
+}
+
+.is-collapsed .user-name {
+  opacity: 0;
+  max-width: 0;
+  pointer-events: none;
+}
+
+/* Bottom buttons */
+.bottom-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-color-secondary, #607D8B);
+  cursor: pointer;
+  font-size: 0.875rem;
+  text-align: left;
+  min-height: 38px;
+  overflow: hidden;
+  transition: background 0.15s ease, color 0.15s ease;
+  width: 100%;
+}
+
+.bottom-btn:hover {
+  background: var(--surface-hover, rgba(244, 67, 54, 0.06));
+  color: var(--vyra-danger, #F44336);
+}
+
+.bottom-btn .pi {
+  font-size: 1rem;
+  flex-shrink: 0;
+  width: 22px;
+  text-align: center;
+}
+
+.btn-label {
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 1;
+  max-width: 160px;
+  transition: opacity var(--sb-transition), max-width var(--sb-transition);
+}
+
+.is-collapsed .btn-label {
   opacity: 0;
   max-width: 0;
   pointer-events: none;
@@ -342,18 +466,26 @@ const healthLabel = computed(() => {
 }
 
 .backdrop-fade-enter-active,
-.backdrop-fade-leave-active { transition: opacity 0.25s ease; }
+.backdrop-fade-leave-active {
+  transition: opacity 0.25s ease;
+}
 .backdrop-fade-enter-from,
-.backdrop-fade-leave-to      { opacity: 0; }
+.backdrop-fade-leave-to {
+  opacity: 0;
+}
 
-/* ── Mobile drawer ── */
+/* ── Responsive: mobile drawer ── */
 @media (max-width: 480px) {
   .vyra-sidebar {
     position: fixed;
     left: 0;
     top: 0;
     transform: translateX(calc(-1 * var(--sb-width)));
-    transition: transform var(--sb-transition), width var(--sb-transition), min-width var(--sb-transition);
+    transition:
+      transform var(--sb-transition),
+      width var(--sb-transition),
+      min-width var(--sb-transition);
+    box-shadow: none;
   }
 
   .vyra-sidebar.is-mobile-open {
@@ -363,12 +495,14 @@ const healthLabel = computed(() => {
     min-width: var(--sb-width) !important;
   }
 
+  /* Show always-visible hamburger strip on mobile */
   .vyra-sidebar .toggle-btn {
     position: fixed;
     top: 12px;
     left: 12px;
     z-index: 101;
-    background: #fff;
+    background: var(--sb-bg);
+    border-color: var(--sb-border);
     width: 36px;
     height: 36px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);

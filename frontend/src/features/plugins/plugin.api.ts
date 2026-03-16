@@ -196,7 +196,7 @@ export const pluginApi = {
 
   /** URL zu einem Plugin-Asset (JS, CSS, SVG) */
   assetUrl(pluginId: string, version: string, filePath: string): string {
-    return `/v2_modulemanager/api/plugin/assets/${pluginId}/${version}/${filePath}`
+    return `/{{ module_name }}/api/plugin/assets/${pluginId}/${version}/${filePath}`
   }
 }
 

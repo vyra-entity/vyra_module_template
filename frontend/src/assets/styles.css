@@ -1,0 +1,196 @@
+/* VYRA Module Manager - Global Styles */
+
+:root {
+  --vyra-primary:       #2196F3;
+  --vyra-secondary:     #607D8B;
+  --vyra-success:       #4CAF50;
+  --vyra-warning:       #FF9800;
+  --vyra-danger:        #F44336;
+  --vyra-info:          #00BCD4;
+
+  /* Derived alpha variant used by sidebar active-state */
+  --vyra-primary-alpha: rgba(33, 150, 243, 0.1);
+
+  /* Sidebar layout dimensions (used by VyraSidebar.vue) */
+  --sidebar-width:           260px;
+  --sidebar-collapsed-width: 64px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f5f7fa;
+}
+
+.vyra-app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* .vyra-content is now scoped inside App.vue → removed from global */
+
+.vyra-footer {
+  background: var(--surface-ground);
+  padding: 1rem 2rem;
+  text-align: center;
+  border-top: 1px solid var(--surface-border);
+  color: var(--text-color-secondary);
+  font-size: 0.875rem;
+}
+
+/* Home View Styles */
+.home-view {
+  animation: fadeIn 0.3s ease-in;
+}
+
+.hero-card {
+  background: linear-gradient(135deg, var(--vyra-primary) 0%, #1976D2 100%);
+  color: white;
+  margin-bottom: 2rem;
+  border: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.hero-card .p-card-content {
+  padding: 0;
+}
+
+.stats-container .p-card {
+  border: 1px solid var(--surface-border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stats-container .p-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+/* Module & Repository Cards */
+.module-card,
+.repository-card {
+  border: 1px solid var(--surface-border);
+  transition: all 0.2s ease;
+  height: 100%;
+}
+
+.module-card:hover,
+.repository-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.module-card .p-card-header,
+.repository-card .p-card-header {
+  background: var(--surface-50);
+  border-bottom: 1px solid var(--surface-border);
+  padding: 1rem;
+}
+
+/* Monitoring Charts */
+.chart-container {
+  background: white;
+  border-radius: 6px;
+  padding: 1.5rem;
+  border: 1px solid var(--surface-border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .vyra-content {
+    padding: 1rem;
+  }
+  
+  .hero-card h1 {
+    font-size: 2rem !important;
+  }
+}
+
+/* Operation Progress Styles */
+.operation-progress-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease-in;
+}
+
+.operation-progress-card {
+  min-width: 500px;
+  max-width: 700px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+/* Status Tags */
+.status-tag {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+}
+
+/* Loading States */
+.skeleton-loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Utility Classes */
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}

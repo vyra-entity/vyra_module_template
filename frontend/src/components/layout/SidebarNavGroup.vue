@@ -1,6 +1,6 @@
 <template>
   <div class="sidebar-group">
-    <!-- Group label: only visible when expanded -->
+    <!-- Group label – only visible when sidebar is expanded -->
     <div
       class="group-header"
       :class="{ hidden: sidebarStore.isCollapsed }"
@@ -9,7 +9,7 @@
       <span class="group-label">{{ group.label }}</span>
     </div>
 
-    <!-- Divider (always shown, acts as separator in collapsed mode) -->
+    <!-- Divider line (always shown, acts as visual separator in collapsed mode) -->
     <div class="group-divider" :class="{ 'divider-only': sidebarStore.isCollapsed }" />
 
     <!-- Navigation items -->
@@ -23,16 +23,14 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useSidebarStore } from '../../store/sidebar'
+import type { SidebarNavGroup } from '../../types/sidebar'
 import SidebarNavItem from './SidebarNavItem.vue'
 
-defineProps({
-  group: {
-    type: Object,
-    required: true
-  }
-})
+defineProps<{
+  group: SidebarNavGroup
+}>()
 
 const sidebarStore = useSidebarStore()
 </script>
@@ -43,6 +41,7 @@ const sidebarStore = useSidebarStore()
   flex-direction: column;
 }
 
+/* ── Group header ── */
 .group-header {
   padding: 0.4rem 1rem 0.2rem;
   overflow: hidden;
@@ -62,14 +61,15 @@ const sidebarStore = useSidebarStore()
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #9E9E9E;
+  color: var(--text-color-secondary, #9E9E9E);
   white-space: nowrap;
 }
 
+/* ── Divider ── */
 .group-divider {
   height: 1px;
   margin: 0 0.75rem 0.4rem;
-  background: #e0e0e0;
+  background: var(--surface-border, #e0e0e0);
   opacity: 0.6;
   transition: margin 0.25s ease;
 }
@@ -78,6 +78,7 @@ const sidebarStore = useSidebarStore()
   margin: 0.4rem 0.5rem;
 }
 
+/* ── Items list ── */
 .group-items {
   display: flex;
   flex-direction: column;

@@ -1,93 +1,169 @@
 <template>
-  <div class="vyra-app">
-    <!-- Sidebar navigation -->
-    <VyraSidebar
-      title="VYRA Dashboard"
-      :backend-status="backendStatus"
-    />
+  <div class="vyra-app" :class="{ 'has-sidebar': authStore.isAuthenticated }">
+    <!-- Sidebar navigation (only when authenticated) -->
+    <VyraSidebar v-if="authStore.isAuthenticated" />
 
     <!-- Main content area -->
     <div
       class="vyra-main"
-      :class="{ 'sidebar-collapsed': sidebarStore.isCollapsed }"
+      :class="{ 'sidebar-collapsed': sidebarStore.isCollapsed && authStore.isAuthenticated }"
     >
-      <!-- Slim topbar -->
-      <header class="vyra-topbar">
+      <!-- Slim topbar: page title (only when authenticated) -->
+      <header v-if="authStore.isAuthenticated" class="vyra-topbar">
         <!-- Mobile hamburger -->
-        <button class="mobile-menu-btn" @click="sidebarStore.toggleCollapse()" aria-label="Menü">
+        <button
+          class="mobile-menu-btn"
+          @click="sidebarStore.toggleCollapse()"
+          aria-label="Menü öffnen"
+        >
           <i class="pi pi-bars" />
         </button>
-        <span class="page-title">{{ pageTitle }}</span>
+        <div class="topbar-title">
+          <span class="page-title">{{ pageTitle }}</span>
+        </div>
+
+        <!-- Alarm bell -->
+        <div class="topbar-actions">
+          <button
+            class="alarm-bell-btn"
+            :class="{ 'alarm-bell-btn--active': errorCount > 0 }"
+            @click="errorDialogVisible = true"
+            :aria-label="`${errorCount} Fehlermeldungen`"
+          >
+            <i class="pi pi-bell alarm-bell-icon" :class="{ 'bell-ring': errorCount > 0 }" />
+            <span v-if="errorCount > 0" class="alarm-badge">{{ errorCount > 99 ? '99+' : errorCount }}</span>
+          </button>
+        </div>
       </header>
 
       <main class="vyra-content">
-        <router-view />
+        <router-view :key="$route.fullPath" />
       </main>
 
-      <footer class="vyra-footer">
-        <p>&copy; 2025 VYRA Industrial Automation</p>
+      <footer v-if="authStore.isAuthenticated" class="vyra-footer">
+        <span>VYRA Industrial Automation © 2025</span>
       </footer>
     </div>
   </div>
+
+  <!-- Error Feed Dialog -->
+  <Dialog
+    v-model:visible="errorDialogVisible"
+    modal
+    header="Fehlermeldungen"
+    :style="{ width: '680px', maxWidth: '95vw' }"
+    :dismissable-mask="true"
+  >
+    <div v-if="errorFeeds.length === 0" class="text-center py-5 text-color-secondary">
+      <i class="pi pi-check-circle mb-3" style="font-size: 3rem; display:block; color: var(--green-500)"></i>
+      <p>Keine Fehlermeldungen vorhanden.</p>
+    </div>
+    <div v-else class="error-feed-list">
+      <div
+        v-for="(feed, idx) in [...errorFeeds].reverse()"
+        :key="idx"
+        class="error-feed-item"
+      >
+        <div class="error-feed-header">
+          <span class="error-feed-module">{{ feed.module_name || feed.module_id }}</span>
+          <span class="error-feed-time">{{ new Date(feed.timestamp).toLocaleString('de-DE') }}</span>
+        </div>
+        <p class="error-feed-message">{{ feed.message }}</p>
+      </div>
+    </div>
+    <template #footer>
+      <Button
+        label="Alle löschen"
+        icon="pi pi-trash"
+        severity="danger"
+        text
+        @click="feedStore.clearFeeds()"
+      />
+      <Button label="Schließen" @click="errorDialogVisible = false" />
+    </template>
+  </Dialog>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from 'vue'
+<script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import axios from 'axios'
-import VyraSidebar from './components/layout/VyraSidebar.vue'
 import { useSidebarStore } from './store/sidebar'
+import { useAuthStore } from './store/auth'
+import { useSystemStore } from './store/system'
+import { useModuleFeedStore } from './store/moduleFeed'
+import apiClient from './api/http'
+import VyraSidebar from './components/layout/VyraSidebar.vue'
+import Dialog from 'primevue/dialog'
+import Button from 'primevue/button'
 
 const route        = useRoute()
 const sidebarStore = useSidebarStore()
+const authStore    = useAuthStore()
+const systemStore  = useSystemStore()
+const feedStore    = useModuleFeedStore()
 
-// Page title from route meta or route name
-const pageTitle = computed(() =>
-  (route.meta?.title) ? String(route.meta.title).split(' - ')[0] : (route.name ?? 'Home')
-)
+const errorDialogVisible = ref(false)
+const errorFeeds         = computed(() => feedStore.errorFeeds)
+const errorCount         = computed(() => feedStore.errorFeeds.length)
 
-// Backend health check
-const backendStatus = ref('checking')
+/** Dynamic page title from route meta */
+const pageTitle = computed(() => {
+  const title = route.meta?.title as string | undefined
+  return title ? title.split(' - ')[0] : '{{ module_display_name }}'
+})
 
-async function checkBackend() {
+// ── Backend health check ──────────────────────────────────────────────────────
+let _healthTimer: ReturnType<typeof setInterval> | null = null
+
+const checkBackendHealth = async () => {
   try {
-    await axios.get('/api/status')
-    backendStatus.value = 'running'
+    await apiClient.get('/status')
+    systemStore.setBackendStatus('running')
   } catch {
-    backendStatus.value = 'stopped'
+    systemStore.setBackendStatus('stopped')
   }
 }
 
 onMounted(() => {
-  checkBackend()
-  setInterval(checkBackend, 30000)
+  checkBackendHealth()
+  _healthTimer = setInterval(checkBackendHealth, 15_000)
+  feedStore.connectWs()
+})
+
+onUnmounted(() => {
+  if (_healthTimer !== null) {
+    clearInterval(_healthTimer)
+    _healthTimer = null
+  }
+  feedStore.disconnectWs()
 })
 </script>
 
 <style scoped>
-/* ── Root layout: sidebar + scrollable main ── */
+/* ── Root layout: sidebar (fixed-width) + scrollable main ── */
 .vyra-app {
   display: flex;
   flex-direction: row;
   min-height: 100vh;
-  background: #f5f7fa;
+  background: var(--surface-ground, #f5f7fa);
 }
 
+/* ── Main area shifts right to make room for the sidebar ── */
 .vyra-main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-width: 0;
+  min-width: 0;       /* prevent flex overflow */
   overflow: hidden;
 }
 
-/* ── Topbar ── */
+/* ── Slim topbar ── */
 .vyra-topbar {
   display: flex;
   align-items: center;
   padding: 0.75rem 2rem;
-  border-bottom: 1px solid #e0e0e0;
-  background: #fff;
+  border-bottom: 1px solid var(--surface-border, #e0e0e0);
+  background: var(--surface-card, #fff);
   min-height: 52px;
   flex-shrink: 0;
 }
@@ -95,7 +171,7 @@ onMounted(() => {
 .page-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #212121;
+  color: var(--text-color, #212121);
 }
 
 /* ── Content ── */
@@ -109,24 +185,20 @@ onMounted(() => {
 .vyra-footer {
   padding: 1rem 2rem;
   text-align: center;
-  border-top: 1px solid #e0e0e0;
-  color: #607D8B;
+  border-top: 1px solid var(--surface-border, #e0e0e0);
+  color: var(--text-color-secondary, #607D8B);
   font-size: 0.875rem;
   flex-shrink: 0;
 }
 
-.vyra-footer p {
-  margin: 0;
-}
-
-/* ── Responsive: very small screens ── */
+/* ── Responsive: on very small screens hide the sidebar space offset ── */
 @media (max-width: 480px) {
   .vyra-app {
     flex-direction: column;
   }
 
   .vyra-main {
-    padding-top: 52px;
+    padding-top: 52px; /* space for the floating toggle button */
   }
 
   .vyra-topbar {
@@ -162,57 +234,121 @@ onMounted(() => {
 .mobile-menu-btn:hover {
   background: var(--surface-hover, #f0f0f0);
 }
-</style>
 
-<style scoped>
-#app {
-  min-height: 100vh;
+/* ── Topbar actions (right side) ── */
+.topbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ── Alarm bell button ── */
+.alarm-bell-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 6px;
+  color: var(--text-color-secondary, #607D8B);
+  transition: background 0.15s, color 0.15s;
+}
+
+.alarm-bell-btn:hover {
+  background: var(--surface-hover, #f0f0f0);
+}
+
+.alarm-bell-btn--active {
+  color: var(--red-500, #f44336);
+}
+
+.alarm-bell-icon {
+  font-size: 1.25rem;
+}
+
+@keyframes bell-ring {
+  0%   { transform: rotate(0deg); }
+  10%  { transform: rotate(18deg); }
+  20%  { transform: rotate(-16deg); }
+  30%  { transform: rotate(14deg); }
+  40%  { transform: rotate(-12deg); }
+  50%  { transform: rotate(8deg); }
+  60%  { transform: rotate(-6deg); }
+  70%  { transform: rotate(4deg); }
+  80%  { transform: rotate(-2deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.bell-ring {
+  animation: bell-ring 1.2s ease infinite;
+  transform-origin: top center;
+}
+
+.alarm-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  background: var(--red-500, #f44336);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* ── Error feed dialog list ── */
+.error-feed-list {
+  max-height: 440px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
 }
 
-.navbar {
-  background: #2c3e50;
-  color: white;
-  padding: 1rem 2rem;
+.error-feed-item {
+  padding: 0.75rem 1rem;
+  background: var(--surface-ground, #f5f7fa);
+  border-left: 3px solid var(--red-500, #f44336);
+  border-radius: 4px;
+}
+
+.error-feed-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-}
-
-.nav-brand h1 {
-  margin: 0;
-  font-size: 1.5rem;
-}
-
-.nav-links {
-  display: flex;
+  margin-bottom: 0.35rem;
   gap: 1rem;
 }
 
-.nav-link {
-  color: white;
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background 0.3s;
+.error-feed-module {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-color, #212121);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.nav-link:hover,
-.nav-link.router-link-active {
-  background: #34495e;
+.error-feed-time {
+  font-size: 0.75rem;
+  color: var(--text-color-secondary, #607D8B);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.main-content {
-  flex: 1;
-  padding: 2rem;
-  background: #f8f9fa;
-}
-
-.footer {
-  background: #34495e;
-  color: white;
-  text-align: center;
-  padding: 1rem;
+.error-feed-message {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-color, #212121);
+  word-break: break-word;
 }
 </style>

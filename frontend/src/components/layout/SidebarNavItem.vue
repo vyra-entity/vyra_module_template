@@ -1,8 +1,11 @@
 <template>
+  <!-- Tooltip only in collapsed mode – uses native title to stay dependency-free,
+       but PrimeVue v-tooltip.right is applied when available (see directive) -->
   <li
     class="sidebar-nav-item"
     :class="{ active: isActive, collapsed: sidebarStore.isCollapsed }"
     :title="sidebarStore.isCollapsed ? tooltipText : undefined"
+    v-tooltip.right="sidebarStore.isCollapsed ? tooltipText : undefined"
     @click="handleClick"
     role="menuitem"
     :aria-label="item.label"
@@ -14,37 +17,37 @@
     <!-- Icon wrapper with badge -->
     <span class="icon-wrap">
       <i :class="item.icon" class="nav-icon" />
-      <span v-if="badgeCount > 0" class="nav-badge">
-        {{ badgeCount > 99 ? '99+' : badgeCount }}
-      </span>
+      <span
+        v-if="badgeCount > 0"
+        class="nav-badge"
+        :aria-label="`${badgeCount} Benachrichtigungen`"
+      >{{ badgeCount > 99 ? '99+' : badgeCount }}</span>
     </span>
 
-    <!-- Label (hidden via CSS when collapsed) -->
+    <!-- Label (hidden when collapsed via CSS) -->
     <span class="nav-label">{{ item.label }}</span>
   </li>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useSidebarStore } from '../../store/sidebar'
+import type { SidebarNavItem } from '../../types/sidebar'
 
-const props = defineProps({
-  item: {
-    type: Object,
-    required: true
-  }
-})
+const props = defineProps<{
+  item: SidebarNavItem
+}>()
 
 const router       = useRouter()
 const route        = useRoute()
 const sidebarStore = useSidebarStore()
 
-const isActive    = computed(() => route.name === props.item.routeName)
+const isActive = computed(() => route.name === props.item.routeName)
 const tooltipText = computed(() => props.item.tooltip ?? props.item.label)
 const badgeCount  = computed(() => props.item.badge ?? 0)
 
-function handleClick() {
+function handleClick(): void {
   router.push({ name: props.item.routeName })
 }
 </script>
@@ -59,19 +62,22 @@ function handleClick() {
   border-radius: 8px;
   cursor: pointer;
   list-style: none;
-  color: #607D8B;
-  transition: background-color 0.18s ease, color 0.18s ease;
+  color: var(--text-color-secondary, #607D8B);
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    padding 0.25s ease;
   user-select: none;
   min-height: 42px;
   overflow: hidden;
 }
 
 .sidebar-nav-item:hover {
-  background-color: rgba(33, 150, 243, 0.06);
-  color: #212121;
+  background-color: var(--surface-hover, rgba(33, 150, 243, 0.06));
+  color: var(--text-color, #212121);
 }
 
-/* Active state */
+/* ── Active state ── */
 .active-bar {
   position: absolute;
   left: 0;
@@ -85,16 +91,16 @@ function handleClick() {
 }
 
 .sidebar-nav-item.active {
-  background-color: rgba(33, 150, 243, 0.1);
-  color: #2196F3;
+  background-color: var(--vyra-primary-alpha, rgba(33, 150, 243, 0.1));
+  color: var(--vyra-primary, #2196F3);
   font-weight: 600;
 }
 
 .sidebar-nav-item.active .active-bar {
-  background-color: #2196F3;
+  background-color: var(--vyra-primary, #2196F3);
 }
 
-/* Icon */
+/* ── Icon ── */
 .icon-wrap {
   position: relative;
   display: flex;
@@ -110,7 +116,7 @@ function handleClick() {
   line-height: 1;
 }
 
-/* Badge */
+/* ── Badge ── */
 .nav-badge {
   position: absolute;
   top: -6px;
@@ -119,7 +125,7 @@ function handleClick() {
   height: 16px;
   padding: 0 3px;
   border-radius: 8px;
-  background: #F44336;
+  background: var(--vyra-danger, #F44336);
   color: #fff;
   font-size: 0.6rem;
   font-weight: 700;
@@ -128,7 +134,7 @@ function handleClick() {
   pointer-events: none;
 }
 
-/* Label (collapses via CSS) */
+/* ── Label (collapses with CSS, no JS needed) ── */
 .nav-label {
   flex: 1;
   white-space: nowrap;
@@ -136,7 +142,9 @@ function handleClick() {
   font-size: 0.875rem;
   opacity: 1;
   max-width: 180px;
-  transition: opacity 0.2s ease, max-width 0.25s ease;
+  transition:
+    opacity 0.2s ease,
+    max-width 0.25s ease;
 }
 
 .sidebar-nav-item.collapsed .nav-label {
