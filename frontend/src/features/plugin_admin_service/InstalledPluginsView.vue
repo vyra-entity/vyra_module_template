@@ -51,7 +51,7 @@
     </div>
 
     <!-- Error -->
-    <Message v-if="error" severity="error" class="mb-4">{{ error }}</Message>
+    <Message v-if="error" severity="error" class="mb-4">{%- raw %}{{ error }}{%- endraw %}</Message>
 
     <!-- Loading -->
     <div v-if="loading" class="plugin-grid">
@@ -95,7 +95,7 @@
             <i v-else class="pi pi-puzzle" style="font-size: 2rem; color: var(--p-primary-color)"></i>
           </div>
           <div class="plugin-card__title">
-            <span class="plugin-card__name">{{ labelFor(entry) }}</span>
+            <span class="plugin-card__name">{%- raw %}{{ labelFor(entry) }}{%- endraw %}</span>
             <Tag :value="`v${entry.version}`" severity="secondary" class="text-xs mt-1" />
           </div>
           <!-- Active toggle -->
@@ -138,8 +138,8 @@
             class="assignment-row"
           >
             <Tag :severity="a.is_active ? 'success' : 'secondary'" :value="a.is_active ? 'Aktiv' : 'Inaktiv'" class="text-xs" />
-            <span class="text-xs">{{ a.scope_type }}</span>
-            <span v-if="a.scope_target" class="text-xs text-color-secondary">→ {{ a.scope_target }}</span>
+            <span class="text-xs">{%- raw %}{{ a.scope_type }}{%- endraw %}</span>
+            <span v-if="a.scope_target" class="text-xs text-color-secondary">→ {%- raw %}{{ a.scope_target }}{%- endraw %}</span>
           </div>
         </div>
         <div v-else class="text-xs text-color-secondary mt-2 italic">Keine Zuweisungen</div>
@@ -147,7 +147,7 @@
         <!-- Installed at -->
         <div class="text-xs text-color-secondary mt-2">
           <i class="pi pi-calendar mr-1"></i>
-          {{ formatDate(entry.installed_at) }}
+          {%- raw %}{{ formatDate(entry.installed_at) }}{%- endraw %}
         </div>
 
         <!-- Actions -->
@@ -179,8 +179,8 @@
     <Dialog v-model:visible="showUpdateDialog" modal header="Plugin aktualisieren" :style="{ width: '420px' }">
       <div v-if="updateTarget" class="flex flex-column gap-3">
         <p>
-          <strong>{{ labelFor(updateTarget) }}</strong> v{{ updateTarget.version }}
-          → v{{ repoVersionFor(updateTarget) }}
+          <strong>{%- raw %}{{ labelFor(updateTarget) }}{%- endraw %}</strong> v{%- raw %}{{ updateTarget.version }}{%- endraw %}
+          → v{%- raw %}{{ repoVersionFor(updateTarget) }}{%- endraw %}
         </p>
         <Message severity="info">Stellt eine neue Version aus dem Repository bereit.</Message>
       </div>

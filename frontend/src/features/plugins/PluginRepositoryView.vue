@@ -8,7 +8,7 @@
       :style="{ width: '420px' }"
     >
       <p class="mb-3">
-        The plugin <strong>{{ pendingInstall?.name }} v{{ selectedVersion }}</strong>
+        The plugin <strong>{%- raw %}{{ pendingInstall?.name }}{%- endraw %} v{%- raw %}{{ selectedVersion }}{%- endraw %}</strong>
         has <strong>not been verified</strong>. Its signature or checksum could not
         be confirmed.
       </p>
@@ -31,7 +31,7 @@
     >
       <div v-if="pendingInstall" class="flex flex-column gap-3">
         <div class="text-sm text-color-secondary mb-1">
-          <strong>{{ pendingInstall.name }}</strong>
+          <strong>{%- raw %}{{ pendingInstall.name }}{%- endraw %}</strong>
         </div>
 
         <!-- Version selector -->
@@ -44,7 +44,7 @@
             class="w-full"
           />
           <small v-if="isUpdate" class="text-color-secondary">
-            Installed: v{{ installedVersionFor(pendingInstall.id) }} &rarr; v{{ selectedVersion }}
+            Installed: v{%- raw %}{{ installedVersionFor(pendingInstall.id) }}{%- endraw %} &rarr; v{%- raw %}{{ selectedVersion }}{%- endraw %}
           </small>
         </div>
 
@@ -114,7 +114,7 @@
       <template #content>
         <!-- Error -->
         <Message v-if="pluginStore.error" severity="error" class="mb-4">
-          {{ pluginStore.error }}
+          {%- raw %}{{ pluginStore.error }}{%- endraw %}
         </Message>
 
         <!-- Empty state -->
@@ -148,7 +148,7 @@
             <!-- Info -->
             <div class="plugin-tile__info">
               <div class="flex align-items-center gap-2">
-                <h3 class="plugin-tile__name">{{ plugin.name }}</h3>
+                <h3 class="plugin-tile__name">{%- raw %}{{ plugin.name }}{%- endraw %}</h3>
                 <Tag
                   v-if="plugin.is_verified"
                   severity="success"
@@ -166,8 +166,8 @@
                   v-tooltip.top="'Checksum could not be verified'"
                 />
               </div>
-              <span class="plugin-tile__version">v{{ plugin.version }}</span>
-              <p class="plugin-tile__desc">{{ plugin.description }}</p>
+              <span class="plugin-tile__version">v{%- raw %}{{ plugin.version }}{%- endraw %}</span>
+              <p class="plugin-tile__desc">{%- raw %}{{ plugin.description }}{%- endraw %}</p>
 
               <div class="plugin-tile__meta">
                 <Tag
@@ -176,8 +176,8 @@
                   class="text-xs"
                 />
                 <span class="text-xs text-color-secondary">
-                  {{ plugin.scope?.type }}
-                  <span v-if="plugin.scope?.target"> → {{ plugin.scope.target }}</span>
+                  {%- raw %}{{ plugin.scope?.type }}{%- endraw %}
+                  <span v-if="plugin.scope?.target"> → {%- raw %}{{ plugin.scope.target }}{%- endraw %}</span>
                 </span>
               </div>
 

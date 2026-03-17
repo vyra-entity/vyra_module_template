@@ -64,13 +64,13 @@
         :aria-label="`System Status: ${healthLabel}`"
       >
         <span class="health-dot" />
-        <span class="health-label">{{ healthLabel }}</span>
+        <span class="health-label">{%- raw %}{{ healthLabel }}{%- endraw %}</span>
       </div>
 
       <!-- Username (collapsed: hidden) -->
       <div class="user-info" v-if="authStore.isAuthenticated">
         <i class="pi pi-user user-icon" />
-        <span class="user-name">{{ authStore.username }}</span>
+        <span class="user-name">{%- raw %}{{ authStore.username }}{%- endraw %}</span>
       </div>
 
       <!-- Logout button -->

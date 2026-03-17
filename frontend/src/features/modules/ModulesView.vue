@@ -37,9 +37,9 @@
 
       <template #subtitle>
         <div class="flex align-items-center gap-3 text-600">
-          <span>{{ totalModuleTypes }} verschiedene Module</span>
+          <span>{%- raw %}{{ totalModuleTypes }}{%- endraw %} verschiedene Module</span>
           <span>•</span>
-          <span>{{ totalInstances }} Instanzen</span>
+          <span>{%- raw %}{{ totalInstances }}{%- endraw %} Instanzen</span>
         </div>
       </template>
 
@@ -87,14 +87,14 @@
             <template #body="{ data }">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-box text-primary"></i>
-                <span class="font-semibold">{{ data.module_name }}</span>
+                <span class="font-semibold">{%- raw %}{{ data.module_name }}{%- endraw %}</span>
               </div>
             </template>
           </Column>
 
           <Column field="instance_id" header="Instanz ID" sortable>
             <template #body="{ data }">
-              <code class="text-sm">{{ data.instance_id }}</code>
+              <code class="text-sm">{%- raw %}{{ data.instance_id }}{%- endraw %}</code>
             </template>
           </Column>
 
@@ -220,11 +220,11 @@
               <div class="grid mt-2">
                 <div class="col-6">
                   <div class="text-500 text-sm mb-1">Modulname</div>
-                  <div class="font-semibold">{{ selectedInstance.module_name }}</div>
+                  <div class="font-semibold">{%- raw %}{{ selectedInstance.module_name }}{%- endraw %}</div>
                 </div>
                 <div class="col-6">
                   <div class="text-500 text-sm mb-1">Instanz ID</div>
-                  <code class="text-sm">{{ selectedInstance.instance_id }}</code>
+                  <code class="text-sm">{%- raw %}{{ selectedInstance.instance_id }}{%- endraw %}</code>
                 </div>
                 <div class="col-6">
                   <div class="text-500 text-sm mb-1">Version</div>
@@ -249,7 +249,7 @@
                 </div>
                 <div class="col-6">
                   <div class="text-500 text-sm mb-1">Autor</div>
-                  <span class="text-sm">{{ selectedInstance.author || '–' }}</span>
+                  <span class="text-sm">{%- raw %}{{ selectedInstance.author || '–' }}{%- endraw %}</span>
                 </div>
               </div>
             </TabPanel>
@@ -265,7 +265,7 @@
                   <!-- Header: function name + mode toggle -->
                   <div class="flex align-items-center justify-content-between mb-2">
                     <div class="text-sm font-semibold">
-                      <span v-if="selectedFunction">{{ selectedFunction.functionname }}</span>
+                      <span v-if="selectedFunction">{%- raw %}{{ selectedFunction.functionname }}{%- endraw %}</span>
                       <span v-else class="text-400 text-sm font-normal">← Funktion aus der Liste auswählen</span>
                     </div>
                     <div v-if="selectedFunction" class="flex gap-1 align-items-center">
@@ -302,8 +302,8 @@
                         class="flex flex-column gap-1"
                       >
                         <label class="text-xs font-medium flex align-items-center gap-1">
-                          {{ p.name || p.displayname }}
-                          <span class="text-300" style="font-size:0.65rem;">({{ p.datatype }})</span>
+                          {%- raw %}{{ p.name || p.displayname }}{%- endraw %}
+                          <span class="text-300" style="font-size:0.65rem;">({%- raw %}{{ p.datatype }}{%- endraw %})</span>
                           <i
                             v-if="p.description"
                             class="pi pi-info-circle text-300"
@@ -385,19 +385,19 @@
                           class="flex gap-2 align-items-start"
                         >
                           <span class="text-xs text-300 flex-shrink-0" style="min-width:90px;">
-                            {{ r.name || r.displayname }}
-                            <span class="text-200">({{ r.datatype }})</span>
+                            {%- raw %}{{ r.name || r.displayname }}{%- endraw %}
+                            <span class="text-200">({%- raw %}{{ r.datatype }}{%- endraw %})</span>
                           </span>
                           <code
                             class="text-xs surface-200 border-round px-1 flex-1"
                             style="overflow-wrap:anywhere; white-space:pre-wrap;"
                             v-tooltip.top="r.description || undefined"
-                          >{{ callResult?.[r.name || r.displayname] ?? callResult?.result ?? '—' }}</code>
+                          >{%- raw %}{{ callResult?.[r.name || r.displayname] ?? callResult?.result ?? '—' }}{%- endraw %}</code>
                         </div>
                       </div>
                     </template>
                     <template v-else>
-                      <pre class="m-0 text-xs" style="white-space: pre-wrap; max-height: 140px; overflow-y: auto;">{{ JSON.stringify(callResult, null, 2) }}</pre>
+                      <pre class="m-0 text-xs" style="white-space: pre-wrap; max-height: 140px; overflow-y: auto;">{%- raw %}{{ JSON.stringify(callResult, null, 2) }}{%- endraw %}</pre>
                     </template>
                   </div>
                 </div>
@@ -416,7 +416,7 @@
                     <div class="flex align-items-center justify-content-between">
                       <div class="flex-1 min-w-0">
                         <div class="flex align-items-center gap-2 flex-wrap">
-                          <span class="font-semibold text-sm">{{ iface.functionname }}</span>
+                          <span class="font-semibold text-sm">{%- raw %}{{ iface.functionname }}{%- endraw %}</span>
                           <Tag v-if="iface?.type" :value="iface.type" severity="secondary" style="font-size:0.6rem;padding:0.1rem 0.3rem;" />
                           <Tag
                             v-if="runningFunctions[String(iface.functionname)]"
@@ -429,8 +429,8 @@
                         <div v-if="iface.params?.length" class="mt-1 text-xs text-400 flex gap-1 flex-wrap align-items-center">
                           <span class="text-300 mr-1" style="font-size:0.65rem;">↓ IN:</span>
                           <span v-for="(p, pi) in iface.params" :key="pi" class="inline-flex align-items-center gap-1">
-                            <code class="surface-100 border-round px-1" style="font-size:0.65rem;">{{ p.name || p.displayname }}</code>
-                            <span class="text-300" style="font-size:0.6rem;">({{ p?.datatype }})</span>
+                            <code class="surface-100 border-round px-1" style="font-size:0.65rem;">{%- raw %}{{ p.name || p.displayname }}{%- endraw %}</code>
+                            <span class="text-300" style="font-size:0.6rem;">({%- raw %}{{ p?.datatype }}{%- endraw %})</span>
                             <span v-if="pi < (iface.params?.length ?? 0) - 1" class="text-200">,</span>
                           </span>
                         </div>
@@ -438,8 +438,8 @@
                         <div v-if="iface.returns?.length" class="mt-1 text-xs text-400 flex gap-1 flex-wrap align-items-center">
                           <span class="text-300 mr-1" style="font-size:0.65rem;">↑ OUT:</span>
                           <span v-for="(r, ri) in iface.returns" :key="ri" class="inline-flex align-items-center gap-1">
-                            <code class="surface-100 border-round px-1" style="font-size:0.65rem;">{{ r.name || r.displayname }}</code>
-                            <span class="text-300" style="font-size:0.6rem;">({{ r?.datatype }})</span>
+                            <code class="surface-100 border-round px-1" style="font-size:0.65rem;">{%- raw %}{{ r.name || r.displayname }}{%- endraw %}</code>
+                            <span class="text-300" style="font-size:0.6rem;">({%- raw %}{{ r?.datatype }}{%- endraw %})</span>
                             <span v-if="ri < (iface.returns?.length ?? 0) - 1" class="text-200">,</span>
                           </span>
                         </div>
@@ -490,11 +490,11 @@
                     <!-- Name row -->
                     <div class="flex align-items-start justify-content-between gap-2 flex-wrap">
                       <div class="flex-1 min-w-0">
-                        <div class="text-sm font-semibold">{{ param?.displayname || key }}</div>
-                        <div class="text-xs text-300 font-mono">(<code>{{ key }}</code>)</div>
-                        <div v-if="param?.description" class="text-xs text-400 mt-1">{{ param.description }}</div>
+                        <div class="text-sm font-semibold">{%- raw %}{{ param?.displayname || key }}{%- endraw %}</div>
+                        <div class="text-xs text-300 font-mono">(<code>{%- raw %}{{ key }}{%- endraw %}</code>)</div>
+                        <div v-if="param?.description" class="text-xs text-400 mt-1">{%- raw %}{{ param.description }}{%- endraw %}</div>
                         <div class="text-xs text-300 mt-1">
-                          Default: <code>{{ JSON.stringify(param?.default_value) ?? '–' }}</code>
+                          Default: <code>{%- raw %}{{ JSON.stringify(param?.default_value) ?? '–' }}{%- endraw %}</code>
                         </div>
                       </div>
                       <!-- Value editor -->
@@ -584,7 +584,7 @@
                         <InputText v-model="newParamForm.numberInteger" placeholder="1" size="small" class="flex-1" style="max-width:80px" />
                         <span class="text-400">.</span>
                         <InputText v-model="newParamForm.numberDecimal" placeholder="0" size="small" class="flex-1" style="max-width:80px" />
-                        <span class="text-xs text-300 ml-1">{{ newParamTypeName }}</span>
+                        <span class="text-xs text-300 ml-1">{%- raw %}{{ newParamTypeName }}{%- endraw %}</span>
                       </div>
                       <!-- Liste -->
                       <div v-else-if="newParamForm.type_ui === 'Liste'" class="flex flex-column gap-1">
@@ -630,11 +630,11 @@
                     <!-- Min / Max (for Zahl or Liste) -->
                     <div v-if="newParamForm.type_ui === 'Zahl' || newParamForm.type_ui === 'Liste'" class="flex gap-2 flex-wrap mb-2">
                       <div class="flex flex-column gap-1 flex-1" style="min-width:100px">
-                        <label class="text-xs text-500">{{ newParamForm.type_ui === 'Liste' ? 'Min Länge' : 'Min Wert' }}</label>
+                        <label class="text-xs text-500">{%- raw %}{{ newParamForm.type_ui === 'Liste' ? 'Min Länge' : 'Min Wert' }}{%- endraw %}</label>
                         <InputText v-model="newParamForm.min_value" placeholder="–" size="small" fluid />
                       </div>
                       <div class="flex flex-column gap-1 flex-1" style="min-width:100px">
-                        <label class="text-xs text-500">{{ newParamForm.type_ui === 'Liste' ? 'Max Länge' : 'Max Wert' }}</label>
+                        <label class="text-xs text-500">{%- raw %}{{ newParamForm.type_ui === 'Liste' ? 'Max Länge' : 'Max Wert' }}{%- endraw %}</label>
                         <InputText v-model="newParamForm.max_value" placeholder="–" size="small" fluid />
                       </div>
                     </div>
@@ -703,8 +703,8 @@
                   class="flex align-items-center justify-content-between p-2 mb-1 surface-50 border-round border-1 border-200"
                 >
                   <div class="flex-1 mr-3">
-                    <div class="text-sm font-semibold">{{ key }}</div>
-                    <div class="text-xs text-300 mt-1">Aktuell: {{ typeof vol === 'object' ? (vol?.value ?? '–') : (vol ?? '–') }}</div>
+                    <div class="text-sm font-semibold">{%- raw %}{{ key }}{%- endraw %}</div>
+                    <div class="text-xs text-300 mt-1">Aktuell: {%- raw %}{{ typeof vol === 'object' ? (vol?.value ?? '–') : (vol ?? '–') }}{%- endraw %}</div>
                   </div>
                   <div class="flex align-items-center gap-1">
                     <InputText
@@ -738,8 +738,8 @@
                   <div class="p-2 border-1 border-round surface-border font-mono" style="max-height:150px;overflow-y:auto;font-size:0.75rem;">
                     <div v-if="!instanceStateFeeds.length" class="text-400">Warte auf State-Feed Nachrichten...</div>
                     <div v-for="(f, idx) in instanceStateFeeds.slice().reverse()" :key="idx" class="mb-1">
-                      <span class="text-300 mr-2">{{ new Date(f.timestamp).toLocaleTimeString() }}</span>
-                      <span>{{ JSON.stringify(f.data) }}</span>
+                      <span class="text-300 mr-2">{%- raw %}{{ new Date(f.timestamp).toLocaleTimeString() }}{%- endraw %}</span>
+                      <span>{%- raw %}{{ JSON.stringify(f.data) }}{%- endraw %}</span>
                     </div>
                   </div>
                 </div>
@@ -753,8 +753,8 @@
                   <div class="p-2 border-1 border-round surface-border font-mono" style="max-height:150px;overflow-y:auto;font-size:0.75rem;">
                     <div v-if="!instanceErrorFeeds.length" class="text-400">Keine Fehler empfangen.</div>
                     <div v-for="(f, idx) in instanceErrorFeeds.slice().reverse()" :key="idx" class="mb-1" style="color:#ff6b6b">
-                      <span class="text-300 mr-2">{{ new Date(f.timestamp).toLocaleTimeString() }}</span>
-                      <span>{{ f.message || JSON.stringify(f.data) }}</span>
+                      <span class="text-300 mr-2">{%- raw %}{{ new Date(f.timestamp).toLocaleTimeString() }}{%- endraw %}</span>
+                      <span>{%- raw %}{{ f.message || JSON.stringify(f.data) }}{%- endraw %}</span>
                     </div>
                   </div>
                 </div>
@@ -768,8 +768,8 @@
                   <div class="p-2 border-1 border-round surface-border font-mono" style="max-height:150px;overflow-y:auto;font-size:0.75rem;">
                     <div v-if="!instanceNewsFeeds.length" class="text-400">Keine News empfangen.</div>
                     <div v-for="(f, idx) in instanceNewsFeeds.slice().reverse()" :key="idx" class="mb-1">
-                      <span class="text-300 mr-2">{{ new Date(f.timestamp).toLocaleTimeString() }}</span>
-                      <span>{{ f.message || JSON.stringify(f.data) }}</span>
+                      <span class="text-300 mr-2">{%- raw %}{{ new Date(f.timestamp).toLocaleTimeString() }}{%- endraw %}</span>
+                      <span>{%- raw %}{{ f.message || JSON.stringify(f.data) }}{%- endraw %}</span>
                     </div>
                   </div>
                 </div>
@@ -823,10 +823,10 @@
                     class="mb-1"
                     style="line-height: 1.4;"
                   >
-                    <span style="color: #666; margin-right: 8px;">{{ line.ts }}</span>
-                    <span :style="getLogLevelStyle(line.level)" style="margin-right: 8px; font-weight: bold;">[{{ line.level }}]</span>
-                    <span>{{ line.message }}</span>
-                    <span v-if="line.logger" style="color: #666; margin-left: 8px; font-size: 0.65rem;">({{ line.logger }})</span>
+                    <span style="color: #666; margin-right: 8px;">{%- raw %}{{ line.ts }}{%- endraw %}</span>
+                    <span :style="getLogLevelStyle(line.level)" style="margin-right: 8px; font-weight: bold;">[{%- raw %}{{ line.level }}{%- endraw %}]</span>
+                    <span>{%- raw %}{{ line.message }}{%- endraw %}</span>
+                    <span v-if="line.logger" style="color: #666; margin-left: 8px; font-size: 0.65rem;">({%- raw %}{{ line.logger }}{%- endraw %})</span>
                   </div>
                 </div>
               </div>

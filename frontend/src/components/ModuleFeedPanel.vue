@@ -4,7 +4,7 @@
       <div class="flex align-items-center justify-content-between">
         <div class="flex align-items-center gap-2">
           <i :class="['pi', titleIcon, titleIconColor]"></i>
-          <span>{{ title }}</span>
+          <span>{%- raw %}{{ title }}{%- endraw %}</span>
           <Badge v-if="feeds.length > 0" :value="feeds.length" :severity="badgeSeverity" />
         </div>
         <div class="flex gap-2">
@@ -32,7 +32,7 @@
       <div class="feed-scroll-container">
         <div v-if="filteredFeeds.length === 0" class="text-center py-5 text-500">
           <i class="pi pi-inbox text-4xl mb-3 block"></i>
-          <p>Keine {{ feedTypeLabel }} vorhanden</p>
+          <p>Keine {%- raw %}{{ feedTypeLabel }}{%- endraw %} vorhanden</p>
         </div>
         
         <Timeline 
@@ -51,13 +51,13 @@
             <Card class="mb-2">
               <template #title>
                 <div class="flex align-items-center justify-content-between">
-                  <span class="text-base">{{ item.module_name }}</span>
-                  <small class="text-500 font-normal">{{ formatTimestamp(item.timestamp) }}</small>
+                  <span class="text-base">{%- raw %}{{ item.module_name }}{%- endraw %}</span>
+                  <small class="text-500 font-normal">{%- raw %}{{ formatTimestamp(item.timestamp) }}{%- endraw %}</small>
                 </div>
               </template>
               <template #content>
                 <p class="m-0 text-sm">
-                  {{ item.message || getFallbackMessage(item) }}
+                  {%- raw %}{{ item.message || getFallbackMessage(item) }}{%- endraw %}
                 </p>
                 <div class="mt-2 flex gap-2">
                   <Tag :value="item.feed_type" :severity="getTagSeverity(item.feed_type)" size="small" />

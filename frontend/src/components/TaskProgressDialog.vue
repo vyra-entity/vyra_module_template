@@ -37,9 +37,9 @@
 
         <!-- Task Info -->
         <div class="task-content">
-          <div class="task-title">{{ task.title }}</div>
-          <div v-if="task.description" class="task-description">{{ task.description }}</div>
-          <div v-if="task.error" class="task-error">{{ task.error }}</div>
+          <div class="task-title">{%- raw %}{{ task.title }}{%- endraw %}</div>
+          <div v-if="task.description" class="task-description">{%- raw %}{{ task.description }}{%- endraw %}</div>
+          <div v-if="task.error" class="task-error">{%- raw %}{{ task.error }}{%- endraw %}</div>
         </div>
       </div>
 
@@ -61,8 +61,8 @@
           </div>
           
           <div class="prompt-body">
-            <h3 class="prompt-title">{{ userPrompt.title }}</h3>
-            <p class="prompt-message">{{ userPrompt.message }}</p>
+            <h3 class="prompt-title">{%- raw %}{{ userPrompt.title }}{%- endraw %}</h3>
+            <p class="prompt-message">{%- raw %}{{ userPrompt.message }}{%- endraw %}</p>
             
             <div class="prompt-actions">
               <Button
@@ -81,7 +81,7 @@
       <!-- Overall Status Message -->
       <div v-if="statusMessage" class="status-message" :class="`status-${operationStatus}`">
         <i class="pi" :class="getStatusIcon()" />
-        <span>{{ statusMessage }}</span>
+        <span>{%- raw %}{{ statusMessage }}{%- endraw %}</span>
       </div>
     </div>
 

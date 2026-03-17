@@ -63,7 +63,7 @@
                 <Tag :value="`${systemStats.memory}%`" :severity="getMemorySeverity(systemStats.memory)" />
               </div>
               <ProgressBar :value="systemStats.memory" :showValue="false" />
-              <div class="text-xs text-500">{{ systemStats.memoryUsed }} / {{ systemStats.memoryTotal }} GB</div>
+              <div class="text-xs text-500">{%- raw %}{{ systemStats.memoryUsed }}{%- endraw %} / {%- raw %}{{ systemStats.memoryTotal }}{%- endraw %} GB</div>
             </div>
           </template>
         </Card>
@@ -77,7 +77,7 @@
                 <Tag :value="`${systemStats.disk}%`" severity="info" />
               </div>
               <ProgressBar :value="systemStats.disk" :showValue="false" />
-              <div class="text-xs text-500">{{ systemStats.diskUsed }} / {{ systemStats.diskTotal }} GB</div>
+              <div class="text-xs text-500">{%- raw %}{{ systemStats.diskUsed }}{%- endraw %} / {%- raw %}{{ systemStats.diskTotal }}{%- endraw %} GB</div>
             </div>
           </template>
         </Card>
@@ -88,8 +88,8 @@
             <div class="flex flex-column gap-2">
               <span class="text-600 font-semibold">Network</span>
               <div class="flex justify-content-between text-sm">
-                <span>↓ {{ systemStats.networkRx }} MB/s</span>
-                <span>↑ {{ systemStats.networkTx }} MB/s</span>
+                <span>↓ {%- raw %}{{ systemStats.networkRx }}{%- endraw %} MB/s</span>
+                <span>↑ {%- raw %}{{ systemStats.networkTx }}{%- endraw %} MB/s</span>
               </div>
               <ProgressBar :value="systemStats.networkPercent" :showValue="false" severity="success" />
             </div>
@@ -209,7 +209,7 @@
                     :key="'lc-' + state"
                     class="flex align-items-center justify-content-between px-2 py-1 surface-50 border-round"
                   >
-                    <span class="text-sm">{{ state }}</span>
+                    <span class="text-sm">{%- raw %}{{ state }}{%- endraw %}</span>
                     <Tag :value="count" :severity="lifecycleSeverityMap[state] ?? 'secondary'" size="small" />
                   </div>
 
@@ -220,7 +220,7 @@
                     :key="'op-' + state"
                     class="flex align-items-center justify-content-between px-2 py-1 surface-50 border-round"
                   >
-                    <span class="text-sm">{{ state }}</span>
+                    <span class="text-sm">{%- raw %}{{ state }}{%- endraw %}</span>
                     <Tag :value="count" severity="secondary" size="small" />
                   </div>
 
@@ -231,7 +231,7 @@
                     :key="'h-' + state"
                     class="flex align-items-center justify-content-between px-2 py-1 surface-50 border-round"
                   >
-                    <span class="text-sm">{{ state }}</span>
+                    <span class="text-sm">{%- raw %}{{ state }}{%- endraw %}</span>
                     <Tag
                       :value="count"
                       :severity="state === 'HEALTHY' ? 'success' : state === 'WARNING' ? 'warn' : 'danger'"
@@ -275,7 +275,7 @@
             >
               <Column field="timestamp" header="Zeit" sortable style="width: 12rem">
                 <template #body="{ data }">
-                  <span class="text-sm">{{ formatLogTimestamp(data.timestamp) }}</span>
+                  <span class="text-sm">{%- raw %}{{ formatLogTimestamp(data.timestamp) }}{%- endraw %}</span>
                 </template>
               </Column>
               <Column field="type" header="Typ" sortable style="width: 8rem">

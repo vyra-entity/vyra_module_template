@@ -73,7 +73,7 @@
             <template #body="{ data }">
               <div class="flex align-items-center gap-2">
                 <i :class="data.icon || 'pi pi-cube'" class="text-primary"></i>
-                <span class="font-semibold">{{ data.displayName || data.name }}</span>
+                <span class="font-semibold">{%- raw %}{{ data.displayName || data.name }}{%- endraw %}</span>
               </div>
             </template>
           </Column>
@@ -150,7 +150,7 @@
       <div v-show="!pluginCardCollapsed" class="section-body">
         <!-- Error -->
         <Message v-if="pluginStore.error" severity="error" class="mb-4">
-          {{ pluginStore.error }}
+          {%- raw %}{{ pluginStore.error }}{%- endraw %}
         </Message>
 
         <!-- Loading skeleton -->
@@ -195,7 +195,7 @@
 
             <div class="plugin-tile__info">
               <div class="flex align-items-center gap-2 flex-wrap">
-                <h3 class="plugin-tile__name">{{ plugin.name }}</h3>
+                <h3 class="plugin-tile__name">{%- raw %}{{ plugin.name }}{%- endraw %}</h3>
                 <Tag
                   v-if="plugin.is_verified"
                   severity="success"
@@ -211,11 +211,11 @@
                   class="text-xs"
                 />
               </div>
-              <span class="plugin-tile__version text-xs text-color-secondary">v{{ plugin.version }}</span>
-              <p class="plugin-tile__desc">{{ plugin.description }}</p>
+              <span class="plugin-tile__version text-xs text-color-secondary">v{%- raw %}{{ plugin.version }}{%- endraw %}</span>
+              <p class="plugin-tile__desc">{%- raw %}{{ plugin.description }}{%- endraw %}</p>
               <div class="plugin-tile__meta">
                 <Tag :severity="pluginStatusSeverity(plugin.status)" :value="plugin.status" class="text-xs" />
-                <span class="text-xs text-color-secondary ml-2">{{ plugin.scope?.type }}</span>
+                <span class="text-xs text-color-secondary ml-2">{%- raw %}{{ plugin.scope?.type }}{%- endraw %}</span>
               </div>
               <div class="plugin-tile__actions mt-2 flex gap-2 flex-wrap">
                 <Button
@@ -251,7 +251,7 @@
     >
       <div v-if="pendingPlugin" class="flex flex-column gap-3">
         <div class="text-sm text-color-secondary">
-          <strong>{{ pendingPlugin.name }}</strong> v{{ pendingPlugin.version }}
+          <strong>{%- raw %}{{ pendingPlugin.name }}{%- endraw %}</strong> v{%- raw %}{{ pendingPlugin.version }}{%- endraw %}
         </div>
         <div class="field">
           <label class="block font-medium mb-1">Scope-Typ</label>

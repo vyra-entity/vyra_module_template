@@ -21,11 +21,11 @@
         </div>
         <div class="summary-tile__content">
           <div class="summary-tile__title">Module</div>
-          <div class="summary-tile__number">{{ stats.installed }}</div>
+          <div class="summary-tile__number">{%- raw %}{{ stats.installed }}{%- endraw %}</div>
           <div class="summary-tile__detail">
             <span class="text-500 text-sm">Instanzen</span>
             <Divider layout="vertical" class="mx-2" style="height: 1rem" />
-            <span class="text-cyan-600 font-semibold">{{ stats.moduleTypes }}</span>
+            <span class="text-cyan-600 font-semibold">{%- raw %}{{ stats.moduleTypes }}{%- endraw %}</span>
             <span class="text-500 text-sm ml-1">Typen</span>
           </div>
         </div>
@@ -41,7 +41,7 @@
         </div>
         <div class="summary-tile__content">
           <div class="summary-tile__title">Plugins</div>
-          <div class="summary-tile__number">{{ stats.plugins }}</div>
+          <div class="summary-tile__number">{%- raw %}{{ stats.plugins }}{%- endraw %}</div>
           <div class="summary-tile__detail">
             <span class="text-500 text-sm">installiert</span>
           </div>
@@ -58,7 +58,7 @@
         </div>
         <div class="summary-tile__content">
           <div class="summary-tile__title">Hardware</div>
-          <div class="summary-tile__number">{{ stats.hardware }}</div>
+          <div class="summary-tile__number">{%- raw %}{{ stats.hardware }}{%- endraw %}</div>
           <div class="summary-tile__detail">
             <span class="text-500 text-sm">Nodes</span>
           </div>
@@ -87,7 +87,7 @@
         <div class="summary-tile__content">
           <div class="summary-tile__title">Error Feeds</div>
           <div class="summary-tile__number" :class="stats.errorFeeds > 0 ? 'text-red-500' : ''">
-            {{ stats.errorFeeds }}
+            {%- raw %}{{ stats.errorFeeds }}{%- endraw %}
           </div>
           <div class="summary-tile__detail">
             <span class="text-500 text-sm">aktive Fehler</span>
@@ -174,12 +174,12 @@
             <Card>
               <template #title>
                 <div class="flex align-items-center justify-content-between">
-                  <span class="text-lg">{{ item.module_name }}</span>
-                  <small class="text-500">{{ formatTimestamp(item.timestamp) }}</small>
+                  <span class="text-lg">{%- raw %}{{ item.module_name }}{%- endraw %}</span>
+                  <small class="text-500">{%- raw %}{{ formatTimestamp(item.timestamp) }}{%- endraw %}</small>
                 </div>
               </template>
               <template #content>
-                <p class="m-0 text-sm">{{ item.message }}</p>
+                <p class="m-0 text-sm">{%- raw %}{{ item.message }}{%- endraw %}</p>
                 <div v-if="item.feed_type" class="mt-2">
                   <Tag :value="item.feed_type" severity="danger" size="small" />
                 </div>
