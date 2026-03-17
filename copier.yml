@@ -64,6 +64,8 @@ _exclude:
   - "log/**"
   - "*.pyc"
   - "__pycache__"
+  - "docs/**"
+  - "examples/**"
 
 _tasks:
   - "cp .env.example .env"
