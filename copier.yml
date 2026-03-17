@@ -2,6 +2,7 @@ _subdirectory: "."
 _answers_file: ".copier-answers.yml"
 _skip_if_exists: []
 _jinja_extension: jinja2.ext.do
+_templates_suffix: ""
 
 # === Pflichtfelder ===
 
@@ -65,6 +66,7 @@ _exclude:
   - "__pycache__"
 
 _tasks:
+  - "cp .env.example .env"
   - "chmod +x tools/*.sh"
   - "echo '✅ Modul {{ module_name }} wurde erstellt!'"
   - "echo '📦 Zum Publishen ins Repository: ./tools/publish_to_repo.sh'"
