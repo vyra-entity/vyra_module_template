@@ -56,7 +56,6 @@ _exclude:
   - "{% if not enable_frontend %}frontend/**{% endif %}"
   - "{% if not enable_frontend %}config/nginx.conf{% endif %}"
   - "copier.yml"
-  - ".copier-answers.yml"
   - ".git"
   - ".git/**"
   - ".github/**"
@@ -65,8 +64,6 @@ _exclude:
   - "log/**"
   - "*.pyc"
   - "__pycache__"
-  - "docs/**"
-  - "examples/**"
 
 _tasks:
   - "cp .env.example .env"
