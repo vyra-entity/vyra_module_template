@@ -59,6 +59,7 @@ _exclude:
   - ".copier-answers.yml"
   - ".git"
   - ".git/**"
+  - ".github/**"
   - "build/**"
   - "install/**"
   - "log/**"
