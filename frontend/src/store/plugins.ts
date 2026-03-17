@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, defineAsyncComponent, markRaw } from 'vue'
-import { pluginApi, type PluginListEntry, type UiManifestEntry } from '../features/plugins/plugin.api'
+import { pluginApi, type UiManifestEntry } from '../features/plugins/plugin.api'
 
 /**
  * Plugin Store — state management for the plugin system
@@ -13,7 +13,6 @@ export const usePluginStore = defineStore('plugins', () => {
   // -----------------------------------------------------------------------
   // State
   // -----------------------------------------------------------------------
-  const pluginList       = ref<PluginListEntry[]>([])
   const loading          = ref(false)
   const error            = ref<string | null>(null)
 
@@ -24,7 +23,6 @@ export const usePluginStore = defineStore('plugins', () => {
   // -----------------------------------------------------------------------
   // Getters
   // -----------------------------------------------------------------------
-  const pluginCount     = computed(() => pluginList.value.length)
   const hasSlot = (slotId: string) => computed(
     () => (slotComponents.value[slotId]?.length ?? 0) > 0
   )
@@ -32,19 +30,6 @@ export const usePluginStore = defineStore('plugins', () => {
   // -----------------------------------------------------------------------
   // Actions
   // -----------------------------------------------------------------------
-
-  /** Load plugin list from the repository */
-  async function fetchPluginList() {
-    loading.value = true
-    error.value   = null
-    try {
-      pluginList.value = await pluginApi.listPlugins()
-    } catch (e: any) {
-      error.value = e?.message ?? 'Failed to load plugin list'
-    } finally {
-      loading.value = false
-    }
-  }
 
   /**
    * Load the UI manifest for a scope and instantiate all components.
@@ -81,16 +66,13 @@ export const usePluginStore = defineStore('plugins', () => {
 
   return {
     // State
-    pluginList,
     loading,
     error,
     slotComponents,
     manifestLoaded,
     // Getters
-    pluginCount,
     hasSlot,
     // Actions
-    fetchPluginList,
     resolvePlugins,
     getSlotComponents,
   }

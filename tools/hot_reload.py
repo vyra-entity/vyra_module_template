@@ -39,7 +39,9 @@ class HotReloadHandler(FileSystemEventHandler):
         self.last_modified_time = 0
         self.last_build_time = 0  # Track when builds complete
         self.supervisord_program = supervisord_program
-        self.use_supervisord = self._check_supervisord_available()
+        # Wait up to 60 s for supervisord to start (hot_reload launches before supervisord)
+        self.use_supervisord = self._check_supervisord_available(max_wait=60)
+        self._supervisord_conf_path = getattr(self, "_supervisord_conf_path", "/etc/supervisor/conf.d/supervisord.conf")
         self.interface_files_changed = False  # Track if interface files changed
         self.slim_mode = slim_mode  # True = no colcon build, False = full ROS2 build
         
@@ -80,6 +82,8 @@ class HotReloadHandler(FileSystemEventHandler):
                 '/src/' in path_str and
                 any(iface_dir in path_str for iface_dir in ['/srv/', '/msg/', '/action/'])
             )
+            # Also watch JSON config files inside interface packages
+            # (e.g. vyra_com.meta.json) which are installed via colcon
             is_config_file = (
                 file_path.suffix == '.json' and
                 '/src/' in path_str and
@@ -179,6 +183,9 @@ class HotReloadHandler(FileSystemEventHandler):
         logger.info("🔨 Starting reload process...")
         
         # Step 1: Stop running process via Supervisord
+        # Re-check availability in case supervisord was not yet ready at startup
+        if not self.use_supervisord:
+            self.use_supervisord = self._check_supervisord_available(max_wait=10)
         if self.use_supervisord:
             logger.info(f"⏹️ Stopping Supervisord program: {self.supervisord_program}")
             self._supervisorctl("stop", self.supervisord_program)
@@ -196,6 +203,8 @@ class HotReloadHandler(FileSystemEventHandler):
             
             if build_result != 0:
                 logger.error(f"❌ Build failed with exit code {build_result}")
+                if not self.use_supervisord:
+                    self.use_supervisord = self._check_supervisord_available(max_wait=10)
                 if self.use_supervisord:
                     # Restart even if build failed to restore service
                     logger.warning("⚠️ Restarting process despite build failure...")
@@ -217,6 +226,9 @@ class HotReloadHandler(FileSystemEventHandler):
         self._clear_logs()
         
         # Step 4: Restart the process via Supervisord
+        # Re-check availability in case supervisord was not yet ready at startup
+        if not self.use_supervisord:
+            self.use_supervisord = self._check_supervisord_available(max_wait=10)
         if self.use_supervisord:
             logger.info(f"🚀 Restarting Supervisord program: {self.supervisord_program}")
             self._supervisorctl("start", self.supervisord_program)
@@ -262,8 +274,14 @@ class HotReloadHandler(FileSystemEventHandler):
                     shutil.rmtree(build_dir)
             
             # Step 3: Build all packages to ensure dependencies are up-to-date
+            # Source the ROS2 environment first so ament/cmake tools are available
+            ros2_setup = "/opt/ros/kilted/setup.bash"
+            build_cmd = (
+                f"source {ros2_setup} && "
+                "colcon --log-base log/ros2 build --cmake-args -DCMAKE_BUILD_TYPE=Release"
+            )
             result = subprocess.run(
-                ["colcon", "--log-base", "log/ros2", "build", "--cmake-args", "-DCMAKE_BUILD_TYPE=Release"],
+                ["bash", "-c", build_cmd],
                 cwd=self.workspace_path,
                 capture_output=True,
                 text=True
@@ -380,31 +398,63 @@ class HotReloadHandler(FileSystemEventHandler):
         except Exception as exc:
             logger.error(f"❌ _update_nfs_interfaces failed: {exc}")
 
-    def _check_supervisord_available(self) -> bool:
-        """Check if supervisorctl is available"""
-        try:
-            result = subprocess.run(
-                ["supervisorctl", "-c", "/etc/supervisor/conf.d/supervisord.conf", "status"],
-                capture_output=True,
-                timeout=5
+    def _check_supervisord_available(self, max_wait: float = 0) -> bool:
+        """Check if supervisorctl is available.
+
+        Args:
+            max_wait: Maximum seconds to wait for supervisord to become available.
+                      0 = single attempt without waiting, >0 = keep retrying until
+                      supervisord responds or the timeout elapses.
+        """
+        deadline = time.time() + max_wait
+        attempt = 0
+        # Try both standard and workspace-local config paths
+        conf_paths = [
+            "/etc/supervisor/conf.d/supervisord.conf",
+            "/workspace/supervisord.conf",
+        ]
+        while True:
+            attempt += 1
+            for conf_path in conf_paths:
+                try:
+                    result = subprocess.run(
+                        ["supervisorctl", "-c", conf_path, "status"],
+                        capture_output=True,
+                        timeout=5
+                    )
+                    # Exit code 0 = all processes running
+                    # Exit code 3 = some processes stopped (e.g., nginx) - still available!
+                    if result.returncode in [0, 3]:
+                        logger.info(f"✅ Supervisord is available (config: {conf_path})")
+                        self._supervisord_conf_path = conf_path
+                        return True
+                except (subprocess.TimeoutExpired, FileNotFoundError):
+                    pass
+
+            remaining = deadline - time.time()
+            if remaining <= 0:
+                if max_wait > 0:
+                    logger.warning(
+                        f"⚠️ Supervisord not responding after {max_wait:.0f}s "
+                        f"({attempt} attempts)"
+                    )
+                else:
+                    logger.warning("⚠️ Supervisord not responding")
+                return False
+
+            wait_time = min(3.0, remaining)
+            logger.debug(
+                f"⏳ Waiting for supervisord (attempt {attempt}, "
+                f"{remaining:.0f}s remaining)..."
             )
-            # Exit code 0 = all processes running
-            # Exit code 3 = some processes stopped (e.g., nginx) - still available!
-            available = result.returncode in [0, 3]
-            if available:
-                logger.info(f"✅ Supervisord is available")
-            else:
-                logger.warning(f"⚠️ Supervisord not responding")
-            return available
-        except (subprocess.TimeoutExpired, FileNotFoundError) as e:
-            logger.warning(f"⚠️ Supervisord not available: {e}")
-            return False
+            time.sleep(wait_time)
     
     def _supervisorctl(self, action: str, program: str) -> bool:
         """Execute supervisorctl command with explicit config file"""
+        conf_path = getattr(self, "_supervisord_conf_path", "/etc/supervisor/conf.d/supervisord.conf")
         try:
             result = subprocess.run(
-                ["supervisorctl", "-c", "/etc/supervisor/conf.d/supervisord.conf", action, program],
+                ["supervisorctl", "-c", conf_path, action, program],
                 capture_output=True,
                 text=True,
                 timeout=30

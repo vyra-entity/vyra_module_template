@@ -236,48 +236,30 @@ async def main() -> None:
     
     # Auto-start if configured
     if auto_start:
-        # Check current operational state and component initialization status
+        # Check current operational state
         current_state = component.get_operational_state()
         logger.info(f"🔍 Current operational state: {current_state}")
-        
-        # Initialize component if not already initialized
-        # Note: StatusManager may have set state to READY, but component business logic may not be initialized yet
-        component_needs_init = (component.permission is None or component.registry is None)
-        
-        if component_needs_init:
-            # Only call initialize() if state is IDLE, otherwise manually initialize components
-            if current_state.value == "Idle":
-                logger.info("🔄 Initializing component via initialize() method...")
-                success = component.initialize()
-                
-                if not success:
-                    logger.error("❌ Component initialization failed")
-                    if component.is_error():
-                        logger.error("💥 Component in ERROR state - manual reset required")
-            else:
-                # State is already READY but components not initialized (e.g., after recovery)
-                # Initialize components directly without state transition
-                logger.info(f"🔄 Component in state {current_state} but not initialized, initializing components directly...")
-                try:
-                    # TODO: Implement initialization logic here if manually needed
-                    
-                    success = True
-                except Exception as e:
-                    logger.exception(f"❌ Component initialization failed: {e}")
-                    success = False
+
+        # Only call initialize() if state is IDLE
+        if current_state.value == "Idle":
+            logger.info("🔄 Initializing component via initialize() method...")
+            success = await component.initialize()
+
+            if not success:
+                logger.error("❌ Component initialization failed")
+                if component.is_error():
+                    logger.error("💥 Component in ERROR state - manual reset required")
         else:
-            logger.info(f"⏭️  Component already initialized (state: {current_state})")
+            logger.info(f"⏭️  Component already in state {current_state}, skipping initialize()")
             success = True
-        
+
         if success:
-            # Setup async components after initialization
-                        
             logger.info("✅ Application setup complete - service running")
     else:
         logger.info("⏸️  Auto-start disabled, waiting for manual initialization")
-    
+
     # Keep service running indefinitely
     logger.info("♾️  Service running indefinitely...")
-    
+
     while True:
-        await asyncio.sleep(10)
+        await asyncio.sleep(1)

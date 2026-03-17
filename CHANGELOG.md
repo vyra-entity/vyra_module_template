@@ -4,6 +4,11 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — hot_reload supervisord detection (2026-03-17)
+
+- **`tools/hot_reload.py`** — Fixed race condition where hot_reload was launched before supervisord finished starting, causing `use_supervisord = False` to be cached for the entire session. Added retry logic (up to 60 s) at init time, auto-detection of supervisord config path, and per-restart re-checks.
+
+
 ### Changed — Plugin Cache RAM Fix & Docs Updated
 - **`PluginGateway._manifest_cache`** *(new)* — Replaced file-based cache (`plugin/cache/plugin_manifest.json`) with in-memory `dict`. Removed `import json`, `from pathlib import Path`, `_CACHE_DIR` module constant, and `_CACHE_DIR.mkdir()` call.
 - **`docs/plugin/PLUGIN_INTEGRATION.md`** — Rewritten: replaces outdated `PluginClient`/`get_ui_manifest` references with current `PluginGateway`/`resolve_plugins` API.

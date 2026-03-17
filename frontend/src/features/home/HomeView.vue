@@ -14,69 +14,10 @@
     <!-- Summary tiles -->
     <div class="summary-grid mb-4">
 
-      <!-- Modules tile -->
-      <div class="summary-tile summary-tile--blue cursor-pointer" @click="$router.push('/{{ module_name }}/modules')">
-        <div class="summary-tile__icon bg-blue-100">
-          <i class="pi pi-box text-blue-500 text-2xl"></i>
-        </div>
-        <div class="summary-tile__content">
-          <div class="summary-tile__title">Module</div>
-          <div class="summary-tile__number">{%- raw %}{{ stats.installed }}{%- endraw %}</div>
-          <div class="summary-tile__detail">
-            <span class="text-500 text-sm">Instanzen</span>
-            <Divider layout="vertical" class="mx-2" style="height: 1rem" />
-            <span class="text-cyan-600 font-semibold">{%- raw %}{{ stats.moduleTypes }}{%- endraw %}</span>
-            <span class="text-500 text-sm ml-1">Typen</span>
-          </div>
-        </div>
-        <div class="summary-tile__sub">
-          <Tag :value="`${stats.active} aktiv`" severity="success" class="text-xs" />
-        </div>
-      </div>
-
-      <!-- Plugins tile -->
-      <div class="summary-tile summary-tile--purple cursor-pointer" @click="$router.push('/{{ module_name }}/installed-plugins')">
-        <div class="summary-tile__icon bg-purple-100">
-          <i class="pi pi-th-large text-purple-500 text-2xl"></i>
-        </div>
-        <div class="summary-tile__content">
-          <div class="summary-tile__title">Plugins</div>
-          <div class="summary-tile__number">{%- raw %}{{ stats.plugins }}{%- endraw %}</div>
-          <div class="summary-tile__detail">
-            <span class="text-500 text-sm">installiert</span>
-          </div>
-        </div>
-        <div class="summary-tile__sub">
-          <Tag :value="`${stats.pluginsActive} aktiv`" severity="success" class="text-xs" />
-        </div>
-      </div>
-
-      <!-- Hardware tile -->
-      <div class="summary-tile summary-tile--green cursor-pointer" @click="$router.push('/{{ module_name }}/monitoring')">
-        <div class="summary-tile__icon bg-green-100">
-          <i class="pi pi-server text-green-500 text-2xl"></i>
-        </div>
-        <div class="summary-tile__content">
-          <div class="summary-tile__title">Hardware</div>
-          <div class="summary-tile__number">{%- raw %}{{ stats.hardware }}{%- endraw %}</div>
-          <div class="summary-tile__detail">
-            <span class="text-500 text-sm">Nodes</span>
-          </div>
-        </div>
-        <div class="summary-tile__sub">
-          <Tag
-            :value="stats.hardware > 0 ? `${stats.hardwareHealthy} gesund` : 'Keine'"
-            :severity="stats.hardware > 0 ? 'success' : 'secondary'"
-            class="text-xs"
-          />
-        </div>
-      </div>
-
       <!-- Error Feeds tile -->
       <div
         class="summary-tile cursor-pointer"
         :class="stats.errorFeeds > 0 ? 'summary-tile--red' : 'summary-tile--neutral'"
-        @click="$router.push('/{{ module_name }}/monitoring')"
       >
         <div class="summary-tile__icon" :class="stats.errorFeeds > 0 ? 'bg-red-100' : 'bg-surface-200'">
           <i
@@ -198,23 +139,12 @@ import Card from 'primevue/card'
 import Badge from 'primevue/badge'
 import Tag from 'primevue/tag'
 import Timeline from 'primevue/timeline'
-import Divider from 'primevue/divider'
-import { moduleInstanceApi } from '../modules/module.api'
-import { pluginApi } from '../plugins/plugin.api'
-import { monitoringApi } from '../monitoring/monitoring.api'
 import { useModuleFeed } from '../../composables/useModuleFeed'
 
 // Initialize WebSocket for feeds
 const { errorFeeds } = useModuleFeed()
 
 const stats = ref({
-  installed:      0,
-  active:         0,
-  moduleTypes:    0,
-  plugins:        0,
-  pluginsActive:  0,
-  hardware:       0,
-  hardwareHealthy: 0,
   errorFeeds:     0,
 })
 
@@ -238,33 +168,9 @@ const formatTimestamp = (timestamp: string): string => {
 
 onMounted(async () => {
   try {
-    // Modules
-    const modules = await moduleInstanceApi.getInstances(false)
-    stats.value.moduleTypes = Object.keys(modules).length
-    const allInstances = Object.values(modules).flat()
-    stats.value.installed   = allInstances.length
-    stats.value.active      = allInstances.filter(m => m.status === 'running').length
-  } catch (e) { console.error('Failed to load module stats:', e) }
-
-  try {
-    // Plugins
-    const pool        = await pluginApi.listPool()
-    const assignments = await pluginApi.listAssignments()
-    stats.value.plugins       = pool.length
-    stats.value.pluginsActive = pool.filter(pe =>
-      assignments.filter(a => a.p_id === pe.p_id).some(a => a.is_active)
-    ).length
-  } catch (e) { console.error('Failed to load plugin stats:', e) }
-
-  try {
-    // Hardware
-    const nodes = await monitoringApi.getHardwareNodes()
-    stats.value.hardware        = nodes.length
-    stats.value.hardwareHealthy = nodes.filter(n => n.is_healthy).length
-  } catch (e) { console.error('Failed to load hardware stats:', e) }
-
-  // Error feeds are reactive — sync once after load
-  stats.value.errorFeeds = errorFeedsCount.value
+    // Error feeds are reactive — sync once after load
+    stats.value.errorFeeds = errorFeedsCount.value
+  } catch (e) { console.error('Failed to update error feeds count:', e) }
 })
 </script>
 

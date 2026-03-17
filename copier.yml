@@ -20,6 +20,17 @@ module_description:
   type: str
   help: "Kurze Beschreibung des Moduls (für README und metadata)"
 
+module_version:
+  type: str
+  help: "Benutze Semantic Versioning (z.B. 0.1.0) [Major.Minor.Patch] - Kein Build-Metadaten oder Prä-Release-Tags"
+  default: "0.0.0"
+  validator: "{% if not (module_version | regex_search('^\\d+\\.\\d+\\.\\d+$')) %}Version muss im Format X.Y.Z sein (z.B. 0.1.0){% endif %}"
+
+module_template:
+  type: str
+  help: "Welches Template soll als Basis verwendet werden?"
+  validator: "{% if not (module_template | regex_search('^[a-z][a-z0-9_]*$')) %}Nur Kleinbuchstaben, Zahlen und Unterstriche erlaubt{% endif %}"
+
 author_name:
   type: str
   help: "Dein Name"
@@ -27,22 +38,23 @@ author_name:
 author_email:
   type: str
   help: "Deine E-Mail-Adresse"
+  validator: "{% if not (author_email | regex_search('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')) %}Ungültige E-Mail-Adresse{% endif %}"
 
 # === Optionale Feature-Flags ===
 
 enable_frontend:
   type: bool
-  help: "Soll ein Vue.js-Frontend eingebunden werden?"
+  help: "Soll ein Webinterface eingebunden werden?"
   default: true
 
 enable_dev_mode:
   type: bool
-  help: "Soll VYRA_DEV_MODE=true als Standard gesetzt werden? (Vue Dev Server + Hot-Reload)"
+  help: "Soll im Entwicklungsmodus gestartet werden? (Vite - Frontend Dev Server + Hot-Reload)"
   default: true
 
 enable_slim_mode:
   type: bool
-  help: "Soll VYRA_SLIM=true als Standard gesetzt werden? (ohne ROS2, nur Python)"
+  help: "Soll der Slim-Modus als Standard gesetzt werden? (ohne ROS2, nur Python - ideal für ressourcenbeschränkte Module)"
   default: false
 
 # === Interne/abgeleitete Variablen (keine Abfrage) ===
@@ -52,9 +64,16 @@ enable_slim_mode:
 # {{ module_name | replace('_', '-') }}       → my-detector  (entrypoint name)
 # {{ module_name | title | replace('_','') }} → MyDetector   (Klassenname)
 
+# docs und examples sollen in das neue modul mit übernommen werden, damit man
+# dort direkt loslegen kann. Daher werden sie nicht ausgeschlossen, sondern 
+# als Hilfe für die Nutzer bereitgestellt. In der .gitignore des Moduls werden 
+# sie dann ausgeschlossen, damit sie nicht ins Repository gelangen.
+
+
 _exclude:
   - "{% if not enable_frontend %}frontend/**{% endif %}"
   - "{% if not enable_frontend %}config/nginx.conf{% endif %}"
+  - "{% if not enable_frontend %}src/{{ module_name }}/{{ module_name }}/backend_webserver/**{% endif %}"
   - "copier.yml"
   - ".git"
   - ".git/**"
@@ -64,8 +83,6 @@ _exclude:
   - "log/**"
   - "*.pyc"
   - "__pycache__"
-  - "docs/**"
-  - "examples/**"
 
 _tasks:
   - "cp .env.example .env"

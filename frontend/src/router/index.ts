@@ -27,67 +27,7 @@ const routes: RouteRecordRaw[] = [
       sidebarIcon: 'pi pi-home',
     }
   },
-  {
-    path: '/{{ module_name }}/modules',
-    name: 'modules',
-    component: () => import('../features/modules/ModulesView.vue'),
-    meta: {
-      title: 'Installierte Module - {{ module_display_name }}',
-      requiresAuth: true,
-      sidebarGroup: 'main',
-      sidebarPriority: 90,
-      sidebarIcon: 'pi pi-box',
-    }
-  },
-  {
-    path: '/{{ module_name }}/repository',
-    name: 'repository',
-    component: () => import('../features/repository/RepositoryView.vue'),
-    meta: {
-      title: 'Module Repository - {{ module_display_name }}',
-      requiresAuth: true,
-      sidebarGroup: 'main',
-      sidebarPriority: 80,
-      sidebarIcon: 'pi pi-cloud-download',
-    }
-  },
-  {
-    path: '/{{ module_name }}/plugins',
-    name: 'plugins',
-    component: () => import('../features/plugins/PluginRepositoryView.vue'),
-    meta: {
-      title: 'Plugin Repository - {{ module_display_name }}',
-      requiresAuth: true,
-      sidebarGroup: 'main',
-      sidebarPriority: 75,
-      sidebarIcon: 'pi pi-puzzle',
-    }
-  },
-  {
-    path: '/{{ module_name }}/installed-plugins',
-    name: 'installed-plugins',
-    component: () => import('../features/plugin_admin_service/InstalledPluginsView.vue'),
-    meta: {
-      title: 'Installierte Plugins - {{ module_display_name }}',
-      requiresAuth: true,
-      sidebarGroup: 'main',
-      sidebarPriority: 73,
-      sidebarIcon: 'pi pi-th-large',
-      sidebarLabel: 'Plugins',
-    }
-  },
-  {
-    path: '/{{ module_name }}/monitoring',
-    name: 'monitoring',
-    component: () => import('../features/monitoring/MonitoringView.vue'),
-    meta: {
-      title: 'System Monitoring - {{ module_display_name }}',
-      requiresAuth: true,
-      sidebarGroup: 'analysis',
-      sidebarPriority: 100,
-      sidebarIcon: 'pi pi-chart-line',
-    }
-  }
+
 ]
 
 const router = createRouter({

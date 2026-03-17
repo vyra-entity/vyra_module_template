@@ -1,5 +1,5 @@
 """
-Main REST API application for V2 ModuleManager Backend Webserver
+Main REST API application for V2 Usermanager Backend Webserver
 
 Modern FastAPI application with direct dependency injection (no gRPC).
 Communicates with core application components via container_injection.
@@ -16,8 +16,6 @@ from .core.config import settings
 from ..logging_config import get_logger, log_exception, log_function_call, log_function_result
 
 # Import structured routers
-from .module_repository.router import router as repository_router
-from .module.router import router as modules_router
 from .websocket.router import (
     router as websocket_router,
     operation_monitor,
@@ -25,17 +23,23 @@ from .websocket.router import (
 
 # Plugin system
 from .plugin import plugin_router
-from .plugin_admin_service.router import router as plugin_admin_service_router
 
-# Import hardware management
-from .clients.http.hardware import hardware_registry_client
-from .hardware import router as hardware_router
 from .services.redis_service import redis_service
 
 # Import authentication
 from .auth import auth_router, set_auth_service, AuthenticationService
 
+
+# Add additional imports for {{ module_name }}-specific routers, services, clients, etc. here
+
+# ==> INSERT HERE <==
+
+
+
+
+
 logger = get_logger(__name__)
+
 
 
 @asynccontextmanager
@@ -46,8 +50,12 @@ async def lifespan(app: FastAPI):
     """
     # Startup
     asyncio.create_task(operation_monitor())
-    await hardware_registry_client.start()
+
+    # Add any additional startup tasks here (e.g. initialize database connections, load models, etc.)
     
+    # => INSERT HERE <==
+
+
     # Connect Redis and initialise authentication service
     try:
         redis_client = await redis_service.get_client()
@@ -66,7 +74,6 @@ async def lifespan(app: FastAPI):
     yield
 
     # Shutdown
-    await hardware_registry_client.stop()
     await redis_service.cleanup()
 
 
@@ -82,27 +89,9 @@ app = FastAPI(
 
 # Include routers with proper prefixes and tags
 app.include_router(
-    repository_router, 
-    prefix="/repository", 
-    tags=["Repository"]
-)
-
-app.include_router(
-    modules_router, 
-    prefix="/modules", 
-    tags=["Modules"]
-)
-
-app.include_router(
     websocket_router,
     prefix="/ws",
     tags=["WebSocket"]
-)
-
-# Include hardware management router
-app.include_router(
-    hardware_router,
-    tags=["Hardware Management"]
 )
 
 # Include authentication router
@@ -118,12 +107,18 @@ app.include_router(
     tags=["Plugin System"]
 )
 
-# Include plugin admin service router (management: list/install/uninstall/assignments — {{ module_name }} only)
-app.include_router(
-    plugin_admin_service_router,
-    prefix="/plugin_admin_service",
-    tags=["Plugin Admin Service"]
-)
+
+# ------------------------ API Endpoints -------------------------
+# Add additional {{ module_name }}-specific API routers here
+
+# ==> INSERT HERE <==
+
+
+
+
+
+
+# ------------------------ Frontend & Static Files -------------------------
 
 # Mount static files if available
 if settings.frontend_assets_available:
@@ -143,9 +138,9 @@ async def root():
         "endpoints": {
             "status": "/status",
             "health": "/health",
-            "repository": "/repository",
-            "modules": "/modules",
-            "hardware": "/api/hardware",
+            "auth": "/auth",
+            "plugin": "/plugin",
+            "ws": "/ws",
             "docs": "/api/docs",
             "redoc": "/api/redoc"
         },
