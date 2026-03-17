@@ -64,6 +64,11 @@ _exclude:
   - "log/**"
   - "*.pyc"
   - "__pycache__"
+  - "docs/development/COPIER_QUICKUSE.md"
+  - "docs/development/GIT_TEMPLATE_AS_UPSTREAM_GUIDE.md"
+  - "docs/deprecated/**"
+  - "docs/migrations/**"
+  - "examples/**"
 
 _tasks:
   - "cp .env.example .env"
