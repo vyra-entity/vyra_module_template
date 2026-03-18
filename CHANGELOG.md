@@ -4,6 +4,17 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — backend_webserver imports and cyclonedds security (2026-03-18)
+
+#### `src/{{ module_name }}/{{ module_name }}/backend_webserver/__init__.py`
+- Simplified to only export `app` from `main_rest`. Removed incorrect v2_modulemanager-specific router imports (`repository_router`, `modules_router`, `hardware_router`) that don't exist in the template's `main_rest.py`.
+
+#### `.module/requirements.txt`
+- Added missing `python-json-logger` and `colorlog` packages required by the logging system.
+
+#### `config/cyclonedds.xml`
+- Removed or fixed Security section that caused DDS startup failures in non-SROS2 environments.
+
 #### `vyra_entrypoint.sh`
 - **`FORCE_UPDATE` detection bug** — The checksum check previously only compared 3 hardcoded files (`vyra_core.meta.json`, `vyra_com.meta.json`, `vyra_security.meta.json`). Newly added `*.meta.json` files and new `.srv`/`.msg`/`.action` files were never detected, so NFS was never updated after `docker service update`.
 - **Fix**: Replaced hardcoded 3-file check with a comprehensive check:
