@@ -310,7 +310,7 @@ curl -k https://localhost:8443/api/docs
 ### Direkte Container-Tests
 ```bash
 # In Container einloggen
-docker exec -it $(docker ps --filter name={module_name} --format "{{.ID}}") bash
+docker exec -it $(docker ps --filter name={module_name} --format "{% raw %}{{.ID}}{% endraw %}") bash
 
 # API direkt testen
 curl -k https://localhost:8443/modules/instances

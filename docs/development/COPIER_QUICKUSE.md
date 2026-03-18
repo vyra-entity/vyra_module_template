@@ -180,8 +180,8 @@ REPO_PATH=/custom/path/to/local_repository ./tools/publish_to_repo.sh
 | `{{ module_description }}` | `Erkennt Objekte...` | README, Metadaten |
 | `{{ author_name }}` | `Max Mustermann` | pyproject.toml, Metadaten |
 | `{{ author_email }}` | `max@example.com` | pyproject.toml, Metadaten |
-| `{{ module_name \| replace('_', '-') }}` | `my-detector` | Poetry-Entrypoint-Name |
-| `{{ module_name \| title \| replace('_','') }}` | `MyDetector` | Klassenname (PascalCase) |
+| `{% raw %}{{ module_name | replace('_', '-') }}{% endraw %}` | `my-detector` | Poetry-Entrypoint-Name |
+| `{% raw %}{{ module_name | title | replace('_','') }}{% endraw %}` | `MyDetector` | Klassenname (PascalCase) |
 
 ### Feature-Flags
 
