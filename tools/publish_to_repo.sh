@@ -36,11 +36,11 @@ fi
 
 echo "📦 Publiziere Modul '$MODULE_NAME' ins Repository: $REPO_PATH"
 
-SYNC_SCRIPT="$REPO_PATH/tools/sync_from_modules.sh"
+SYNC_SCRIPT="$REPO_PATH/tools/sync_from_modules.py"
 if [ ! -f "$SYNC_SCRIPT" ]; then
-    echo "❌ sync_from_modules.sh nicht gefunden: $SYNC_SCRIPT"
+    echo "❌ sync_from_modules.py nicht gefunden: $SYNC_SCRIPT"
     exit 1
 fi
 
-"$SYNC_SCRIPT" "$(dirname "$MODULE_DIR")"
+python3 "$SYNC_SCRIPT" --module "$MODULE_DIR"
 echo "✅ Modul '$MODULE_NAME' erfolgreich publiziert!"

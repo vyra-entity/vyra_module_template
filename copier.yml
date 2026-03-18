@@ -57,6 +57,16 @@ enable_slim_mode:
   help: "Soll der Slim-Modus als Standard gesetzt werden? (ohne ROS2, nur Python - ideal für ressourcenbeschränkte Module)"
   default: false
 
+build_after_copy:
+  type: bool
+  help: "Soll das Docker-Image nach dem Erstellen automatisch gebaut werden? (beide Varianten: development + production)"
+  default: true
+
+publish_to_repo_after_copy:
+  type: bool
+  help: "Soll das Modul nach dem Bauen automatisch ins lokale Repository geladen werden?"
+  default: true
+
 # === Interne/abgeleitete Variablen (keine Abfrage) ===
 # Nutzung in Templates:
 # {{ module_name }}                           → my_detector
@@ -89,3 +99,5 @@ _tasks:
   - "chmod +x tools/*.sh"
   - "echo '✅ Modul {{ module_name }} wurde erstellt!'"
   - "echo '📦 Zum Publishen ins Repository: ./tools/publish_to_repo.sh'"
+  - "{% if build_after_copy %}cd ../.. && ./tools/quick_rebuild_module.sh {{ module_name }} --all-variants || echo '⚠️  Build fehlgeschlagen. Manuell bauen: cd VOS2_WORKSPACE && ./tools/quick_rebuild_module.sh {{ module_name }} --all-variants'{% else %}echo '⏭️  Build übersprungen. Zum Bauen: cd VOS2_WORKSPACE && ./tools/quick_rebuild_module.sh {{ module_name }} --all-variants'{% endif %}"
+  - "{% if publish_to_repo_after_copy %}bash tools/publish_to_repo.sh || echo '⚠️  Repository-Publish fehlgeschlagen. Details siehe oben.'{% else %}echo '⏭️  Repository-Publish übersprungen. Zum Publizieren: ./tools/publish_to_repo.sh'{% endif %}"

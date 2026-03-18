@@ -370,26 +370,59 @@ if [ -d "$NFS_VOLUME_PATH" ]; then
     mkdir -p "$NFS_ROS_DIR" "$NFS_CONFIG_DIR" "$NFS_MSG_DIR" "$NFS_SRV_DIR" "$NFS_ACTION_DIR"
 
     # ------------------------------------------------------------------
-    # Determine whether an update is needed (checksum on config files)
+    # Determine whether an update is needed (comprehensive check)
+    # Checks: first-time, config file count, interface file counts, checksums
     # ------------------------------------------------------------------
     FORCE_UPDATE=false
     if [ ! -f "$NFS_ROS_DIR/setup.bash" ]; then
         echo "ℹ️  First-time setup: will copy all interfaces to NFS..."
         FORCE_UPDATE=true
     else
-        for config_file in vyra_core.meta.json vyra_com.meta.json vyra_security.meta.json; do
-            SOURCE_CONFIG="$INTERFACE_SOURCE/share/${MODULE_NAME}_interfaces/config/$config_file"
-            NFS_CONFIG_FILE="$NFS_CONFIG_DIR/$config_file"
-            if [ -f "$SOURCE_CONFIG" ] && [ -f "$NFS_CONFIG_FILE" ]; then
-                SOURCE_MD5=$(md5sum "$SOURCE_CONFIG" | awk '{print $1}')
-                NFS_MD5=$(md5sum "$NFS_CONFIG_FILE" | awk '{print $1}')
-                if [ "$SOURCE_MD5" != "$NFS_MD5" ]; then
-                    echo "⚠️  Config update detected: $config_file differs — forcing NFS update"
+        # Use src tree as source of truth for config count (always has latest,
+        # even before colcon rebuild; install tree may lag behind)
+        SOURCE_CONFIG_DIR="$INTERFACE_SRC_DIR/config"
+
+        # 1. Compare config file count (detects new *.meta.json files)
+        SOURCE_CONFIG_COUNT=$(find "$SOURCE_CONFIG_DIR" -maxdepth 1 -name "*.meta.json" 2>/dev/null | wc -l)
+        NFS_CONFIG_COUNT=$(find "$NFS_CONFIG_DIR" -maxdepth 1 -name "*.json" 2>/dev/null | wc -l)
+        if [ "$SOURCE_CONFIG_COUNT" != "$NFS_CONFIG_COUNT" ]; then
+            echo "⚠️  Config file count changed ($NFS_CONFIG_COUNT → $SOURCE_CONFIG_COUNT) — forcing NFS update"
+            FORCE_UPDATE=true
+        fi
+
+        # 2. Compare interface file counts (.srv, .msg, .action)
+        if [ "$FORCE_UPDATE" = false ]; then
+            for iface_type in srv msg action; do
+                SRC_COUNT=$(find "$INTERFACE_SRC_DIR/$iface_type" -maxdepth 1 -name "*.${iface_type}" 2>/dev/null | wc -l)
+                NFS_COUNT=$(find "$NFS_MODULE_DIR/$iface_type" -maxdepth 1 -name "*.${iface_type}" 2>/dev/null | wc -l)
+                if [ "$SRC_COUNT" != "$NFS_COUNT" ]; then
+                    echo "⚠️  ${iface_type}/ file count changed ($NFS_COUNT → $SRC_COUNT) — forcing NFS update"
                     FORCE_UPDATE=true
                     break
                 fi
-            fi
-        done
+            done
+        fi
+
+        # 3. Check checksums of ALL config JSON files
+        if [ "$FORCE_UPDATE" = false ] && [ -d "$SOURCE_CONFIG_DIR" ]; then
+            while IFS= read -r config_file; do
+                name=$(basename "$config_file")
+                nfs_file="$NFS_CONFIG_DIR/$name"
+                if [ ! -f "$nfs_file" ]; then
+                    echo "⚠️  New config file: $name — forcing NFS update"
+                    FORCE_UPDATE=true
+                    break
+                fi
+                SOURCE_MD5=$(md5sum "$config_file" | awk '{print $1}')
+                NFS_MD5=$(md5sum "$nfs_file" | awk '{print $1}')
+                if [ "$SOURCE_MD5" != "$NFS_MD5" ]; then
+                    echo "⚠️  Config update detected: $name differs — forcing NFS update"
+                    FORCE_UPDATE=true
+                    break
+                fi
+            done < <(find "$SOURCE_CONFIG_DIR" -maxdepth 1 -name "*.meta.json" 2>/dev/null)
+        fi
+
         [ "$FORCE_UPDATE" = false ] && echo "✅ NFS interfaces up-to-date (checksums match)"
     fi
 
@@ -438,7 +471,20 @@ SETUPEOF
             else
                 cp -r "$CONFIG_SRC"/* "$NFS_CONFIG_DIR"/
             fi
-            echo "✅ config/ deployed"
+            echo "✅ config/ deployed (from install tree)"
+        fi
+
+        # Merge any JSON config files from src tree that are not yet in the install
+        # (e.g. newly added *.meta.json files that haven't been rebuilt yet)
+        if [ -d "$INTERFACE_SRC_DIR/config" ]; then
+            for src_json in "$INTERFACE_SRC_DIR/config"/*.json; do
+                [ -f "$src_json" ] || continue
+                dest_json="$NFS_CONFIG_DIR/$(basename "$src_json")"
+                if [ ! -f "$dest_json" ]; then
+                    cp "$src_json" "$dest_json"
+                    echo "✅ config/ added from src tree: $(basename "$src_json")"
+                fi
+            done
         fi
 
         # 3. Raw interface definitions (.msg / .srv / .action + _gen/) → msg/ srv/ action/

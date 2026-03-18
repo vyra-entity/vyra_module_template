@@ -618,6 +618,71 @@ class HotReloadHandler(FileSystemEventHandler):
         except Exception as e:
             logger.warning(f"⚠️ Log clearing failed: {e}")
 
+    def _check_initial_sync(self) -> None:
+        """
+        At startup, compare the src interface tree with the compiled install tree.
+        If they differ (e.g. a new .srv was added before the container started),
+        schedule a rebuild so the new interfaces are compiled and pushed to NFS.
+        """
+        try:
+            iface_src_dir = self.workspace_path / "src" / f"{self.package_name}_interfaces"
+            iface_install = self.workspace_path / "install" / f"{self.package_name}_interfaces"
+            python_ver = f"python{sys.version_info.major}.{sys.version_info.minor}"
+            rebuild_needed = False
+
+            for iface_type in ["srv", "msg", "action"]:
+                src_dir = iface_src_dir / iface_type
+                if not src_dir.is_dir():
+                    continue
+                # Valid ROS2 interface names start with an uppercase letter
+                src_count = len([
+                    f for f in src_dir.glob(f"*.{iface_type}")
+                    if f.stem[:1].isupper()
+                ])
+                installed_dir = (
+                    iface_install / "lib" / python_ver / "site-packages"
+                    / f"{self.package_name}_interfaces" / iface_type
+                )
+                # Compiled Python modules are named _snake_case.py (exclude __init__.py)
+                installed_count = (
+                    len([f for f in installed_dir.glob("_*.py") if f.name != "__init__.py"])
+                    if installed_dir.is_dir() else 0
+                )
+                if src_count != installed_count:
+                    logger.info(
+                        f"🔍 Startup sync: {iface_type}/ "
+                        f"(src={src_count}, installed={installed_count}) "
+                        f"— scheduling initial rebuild"
+                    )
+                    rebuild_needed = True
+                    break
+
+            if not rebuild_needed:
+                src_config = iface_src_dir / "config"
+                install_config = (
+                    iface_install / "share" / f"{self.package_name}_interfaces" / "config"
+                )
+                src_json = len(list(src_config.glob("*.json"))) if src_config.is_dir() else 0
+                inst_json = len(list(install_config.glob("*.json"))) if install_config.is_dir() else 0
+                if src_json != inst_json:
+                    logger.info(
+                        f"🔍 Startup sync: config/ "
+                        f"(src={src_json}, installed={inst_json}) "
+                        f"— scheduling initial rebuild"
+                    )
+                    rebuild_needed = True
+
+            if rebuild_needed:
+                self.interface_files_changed = True
+                import threading
+                threading.Timer(10.0, self._schedule_rebuild).start()
+                logger.info("⏳ Initial rebuild scheduled in 10 s (interface files out of sync)")
+            else:
+                logger.info("✅ Startup sync check: install tree up-to-date")
+
+        except Exception as exc:
+            logger.warning(f"⚠️ Startup sync check failed: {exc}")
+
     def check_pending_rebuild(self):
         """Check if there's a pending rebuild to execute"""
         if self.pending_rebuild:
@@ -681,6 +746,10 @@ def main():
     # Start watching
     observer.start()
     logger.info("👀 Watching for file changes... (Press Ctrl+C to stop)")
+
+    # Check if the install tree is behind the src tree (files added before container start)
+    if not slim_mode:
+        event_handler._check_initial_sync()
     
     try:
         while True:

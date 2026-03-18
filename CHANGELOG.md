@@ -4,6 +4,18 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+#### `vyra_entrypoint.sh`
+- **`FORCE_UPDATE` detection bug** — The checksum check previously only compared 3 hardcoded files (`vyra_core.meta.json`, `vyra_com.meta.json`, `vyra_security.meta.json`). Newly added `*.meta.json` files and new `.srv`/`.msg`/`.action` files were never detected, so NFS was never updated after `docker service update`.
+- **Fix**: Replaced hardcoded 3-file check with a comprehensive check:
+  1. Compares config JSON file count between src tree and NFS (detects new `*.meta.json`)
+  2. Compares `.srv`/`.msg`/`.action` file count between src tree and NFS (detects new interface files)
+  3. Checks checksums of ALL config JSON files (detects modified files)
+  - Uses the `src/` tree (not the install tree) as source of truth for counts, so new files are detected even before a colcon rebuild.
+- **Config push from src tree** — After deploying config from the install tree, newly added JSON config files from the src tree (not yet present in install) are now also merged into NFS `config/`.
+
+#### `tools/hot_reload.py`
+- **Startup sync check** — Added `_check_initial_sync()` method: at container startup, hot_reload now compares the src interface tree with the compiled install tree. If they differ (e.g. a `.srv` was added before the container started), a rebuild is scheduled after 10 s. Covers the case where `on_created` events are missed because files existed before the watchdog started.
+
 ### Fixed — hot_reload supervisord detection (2026-03-17)
 
 - **`tools/hot_reload.py`** — Fixed race condition where hot_reload was launched before supervisord finished starting, causing `use_supervisord = False` to be cached for the entire session. Added retry logic (up to 60 s) at init time, auto-detection of supervisord config path, and per-restart re-checks.
