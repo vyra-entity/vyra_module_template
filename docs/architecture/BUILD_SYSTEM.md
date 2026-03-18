@@ -177,7 +177,7 @@ docker system prune -a --volumes
 
 GitHub Actions example:
 ```yaml
-- name: Cache Docker layers
+{% raw %}- name: Cache Docker layers
   uses: actions/cache@v3
   with:
     path: /tmp/.buildx-cache
@@ -189,7 +189,7 @@ GitHub Actions example:
   uses: docker/build-push-action@v5
   with:
     cache-from: type=local,src=/tmp/.buildx-cache
-    cache-to: type=local,dest=/tmp/.buildx-cache-new
+    cache-to: type=local,dest=/tmp/.buildx-cache-new{% endraw %}
 ```
 
 ## Dependency Updates
