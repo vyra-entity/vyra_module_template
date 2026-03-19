@@ -63,9 +63,9 @@ class HotReloadHandler(FileSystemEventHandler):
         # Watch Python files and ROS2 interface files (.srv, .msg, .action)
         file_path = Path(event.src_path)
         
-        # Ignore install, build, log directories
+        # Ignore install, build, log directories, and generated protobuf files
         path_str = str(file_path)
-        if any(excluded in path_str for excluded in ['/install/', '/build/', '/log/']):
+        if any(excluded in path_str for excluded in ['/install/', '/build/', '/log/', '/_gen/']):
             logger.debug(f"🚫 Ignoring file in excluded directory: {path_str}")
             return
         
@@ -124,8 +124,8 @@ class HotReloadHandler(FileSystemEventHandler):
         file_path = Path(event.src_path)
         path_str = str(file_path)
         
-        # Ignore install, build, log directories
-        if any(excluded in path_str for excluded in ['/install/', '/build/', '/log/']):
+        # Ignore install, build, log directories, and generated protobuf files
+        if any(excluded in path_str for excluded in ['/install/', '/build/', '/log/', '/_gen/']):
             return
         
         # Check if it's a Python file in the main package

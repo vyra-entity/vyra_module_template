@@ -4,6 +4,14 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — setup_interfaces.py workspace detection (2026-03-19)
+
+- `tools/setup_interfaces.py` `main()`: replaced the name-based heuristic
+  (`script_dir.name.startswith("v2_") or == "vyra_module_template"`) with a
+  directory-content check (`src/` or `.module/` present). Any module directory
+  is now correctly detected as a local-development workspace, so CMakeLists.txt
+  can be generated locally without requiring the directory to start with `v2_`.
+
 ### Fixed — backend_webserver imports and cyclonedds security (2026-03-18)
 
 #### `src/{{ module_name }}/{{ module_name }}/backend_webserver/__init__.py`

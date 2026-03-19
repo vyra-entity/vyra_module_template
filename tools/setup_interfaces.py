@@ -242,7 +242,7 @@ def update_CMakefile(interface_package_path: Path, package_name: str):
     print(f"✓ CMakeLists.txt: project() set to '{package_name}'.")
 
     # Ersetze oder ergänze rosidl_generate_interfaces(...)
-    rosidl_line = f'rosidl_generate_interfaces(${{PROJECT_NAME}}\n'
+    rosidl_line = 'rosidl_generate_interfaces(${PROJECT_NAME}\n'
     for msg_file in msg_files:
         rosidl_line += f'  "{msg_file}"\n'
     for srv_file in srv_files:
@@ -665,8 +665,8 @@ def main(interface_package_name: str):
     """
     # Workspace setup - detect if we're in container or local development
     script_dir = Path(__file__).parent.parent  # Go up from tools/ to module root
-    if script_dir.name.startswith("v2_") or script_dir.name == "vyra_module_template":
-        workspace_root = script_dir          # local development
+    if (script_dir / "src").exists() or (script_dir / ".module").exists():
+        workspace_root = script_dir          # local development (any module)
     else:
         workspace_root = Path("/workspace")  # inside container
 
