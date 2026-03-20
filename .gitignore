@@ -3,10 +3,10 @@ build/*
 install/*
 package-lock.json
 yarn.lock
-**/VBASE*.msg
-**/VBASE*.srv
-**/VBASE*.action
-**/VBASE*.proto
+*.msg
+*.srv
+*.action
+*.proto
 **/_gen/*.py
 **/_gen/*.pyi
 **/_gen/*.h

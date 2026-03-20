@@ -147,11 +147,16 @@ RUN apt-get update -qq && \
 RUN if [ -z "$MODULE_NAME" ] && [ -f ".module/module_data.yaml" ]; then \
         export MODULE_NAME=$(grep "^name:" .module/module_data.yaml | cut -d: -f2 | tr -d ' ' | tr -d "'" | tr -d '"'); \
     fi && \
-    python3 tools/setup_interfaces.py --interface_pkg "${MODULE_NAME}_interfaces"
+    # Create interfaces for colcon build (must be done before colcon build and after wheel installation)
+    python3 tools/setup_interfaces.py --interface_pkg "${MODULE_NAME}_interfaces" && \
+    # Source base ros2 workspace and build module interfaces (skipping template interfaces from base image)
+    source /opt/ros/kilted/setup.bash && \
+    # Build interfaces and project
+    colcon --log-base log/ros2 build --packages-skip vyra_module_template_interfaces --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 # Build ROS2 packages (skip vyra_module_template_interfaces template from base image)
-RUN source /opt/ros/kilted/setup.bash && \
-    colcon --log-base log/ros2 build --packages-skip vyra_module_template_interfaces --cmake-args -DCMAKE_BUILD_TYPE=Release
+# RUN source /opt/ros/kilted/setup.bash && \
+#     colcon --log-base log/ros2 build --packages-skip vyra_module_template_interfaces --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 # Stamp install/ with build ID so the entrypoint can detect stale installs at runtime
 RUN cp /opt/vyra/build_id /workspace/install/.build_id
