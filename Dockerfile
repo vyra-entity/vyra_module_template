@@ -70,7 +70,7 @@ RUN poetry install --only main -E slim --no-interaction --no-ansi || \
 
 # Fallback: Install module-specific Python dependencies via pip (legacy support)
 RUN if [ -f ".module/requirements.txt" ]; then \
-        pip install --no-cache-dir -r .module/requirements.txt --break-system-packages; \
+        pip install --no-cache-dir --timeout 120 --retries 5 -r .module/requirements.txt --break-system-packages; \
     fi
 
 # Run pre-install script if exists (for custom repository setup, etc.)
@@ -285,7 +285,7 @@ RUN chown -R vyrauser:vyrauser /workspace/log /workspace/storage
 
 # Install Python dependencies for runtime (uvicorn, fastapi, etc.)
 RUN if [ -f ".module/requirements.txt" ]; then \
-        pip install --no-cache-dir -r .module/requirements.txt --break-system-packages; \
+        pip install --no-cache-dir --timeout 120 --retries 5 -r .module/requirements.txt --break-system-packages; \
     fi
 
 # ROS2 environment configuration

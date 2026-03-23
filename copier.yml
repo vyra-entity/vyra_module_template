@@ -3,6 +3,11 @@ _answers_file: ".copier-answers.yml"
 _skip_if_exists: []
 _jinja_extension: jinja2.ext.do
 _templates_suffix: ""
+# IMPORTANT: Always use HEAD so that local uncommitted template changes
+# are picked up when running `copier copy` from a local path.
+# Template changes MUST be committed to git before running `copier update`
+# on existing modules (git history is used for diffing on update).
+_vcs_ref: HEAD
 
 # === Pflichtfelder ===
 
@@ -28,8 +33,8 @@ module_version:
 
 module_template:
   type: str
-  help: "Welches Template soll als Basis verwendet werden?"
-  validator: "{% if not (module_template | regex_search('^[a-z][a-z0-9_]*$')) %}Nur Kleinbuchstaben, Zahlen und Unterstriche erlaubt{% endif %}"
+  help: "Welches Template(s) soll als Basis verwendet werden? (kommagetrennt, z.B. basic  oder basic,production-line-1)"
+  validator: "{% if not (module_template | regex_search('^[a-z][a-z0-9_]*(,[a-z][a-z0-9_]*)*$')) %}Nur Kleinbuchstaben, Zahlen und Unterstriche erlaubt; mehrere Werte kommagetrennt{% endif %}"
 
 author_name:
   type: str

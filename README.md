@@ -3,7 +3,33 @@
 > **This is a [Copier](https://copier.readthedocs.io/) template** for creating new VYRA modules.
 > It is **not** a runnable module itself — use it to scaffold a new module project.
 
-## 📋 Overview
+## �️ Template Development Workflow
+
+> **IMPORTANT**: `copier.yml` sets `_vcs_ref: HEAD`. This means `copier copy` from a **local path**
+> always uses the current working tree (including uncommitted changes).
+> `copier update` on existing modules still diffs against git history — so commit changes before updating.
+
+### Edit → Copy workflow (local development)
+```bash
+# 1. Edit template files (Dockerfile, copier.yml, src/, …)
+# 2. Commit your changes (required for copier update to work on existing modules)
+git -C /path/to/vyra_module_template add -A
+git -C /path/to/vyra_module_template commit -m "feat: <describe change>"
+
+# 3. Create a new module from the current HEAD
+copier copy --trust /path/to/vyra_module_template ./modules/my_new_module
+
+# 4. Update an existing module (applies template diff since last copy)
+copier update --trust --skip-answered
+```
+
+### Bump template version (for releases)
+```bash
+# Increments patch version, commits and tags
+bash /path/to/vyra_module_template/tools/bump_template_version.sh
+```
+
+## �📋 Overview
 
 VYRA modules are the building blocks of the [VYRA Framework](https://github.com/Variobotic-GmbH/vyra_framework). Each module is a self-contained service that runs inside a **VYRA Framework deployment** (Docker Swarm) and communicates with other modules via ROS2/Zenoh.
 

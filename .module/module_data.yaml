@@ -4,5 +4,8 @@ description: "{{ module_description }}"
 version: "{{ module_version }}"
 author: "{{ author_name }}"
 author_email: "{{ author_email }}"
-template: "{{ module_template }}"
+template:
+{% for t in module_template.split(',') %}
+  - "{{ t.strip() }}"
+{% endfor %}
 uuid: ""
