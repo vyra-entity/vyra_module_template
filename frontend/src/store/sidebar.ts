@@ -13,9 +13,9 @@ const STORAGE_KEY = 'vyra:sidebar:collapsed'
 
 /** Visual order and labels for the available groups */
 const GROUP_CONFIG: { id: SidebarGroup; label: string; order: number }[] = [
-  { id: 'system',   label: 'System',       order: 0 },
-  { id: 'main',     label: 'Navigation',   order: 1 },
-  { id: 'analysis', label: 'Analyse',      order: 2 },
+  { id: 'main',     label: 'Navigation',   order: 0 },
+  { id: 'analysis', label: 'Analyse',      order: 1 },
+  { id: 'system',   label: 'System',       order: 2 },
   { id: 'settings', label: 'Einstellungen', order: 3 },
 ]
 
@@ -59,6 +59,14 @@ const DEFAULT_ITEMS: SidebarNavItem[] = [
     icon:      'pi pi-chart-line',
     routeName: 'monitoring',
     group:     'analysis',
+    priority:  100,
+  },
+  {
+    id:        'settings',
+    label:     'Einstellungen',
+    icon:      'pi pi-cog',
+    routeName: 'settings',
+    group:     'system',
     priority:  100,
   },
 ]

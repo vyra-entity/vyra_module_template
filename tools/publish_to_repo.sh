@@ -7,7 +7,14 @@
 set -e
 
 MODULE_DIR=$(cd "$(dirname "$0")/.." && pwd)
-REPO_PATH=${REPO_PATH:-"$MODULE_DIR/../../local_repository"}
+
+# Find workspace root by searching upward for docker-compose.yml
+WORKSPACE_ROOT="$MODULE_DIR"
+while [ "$WORKSPACE_ROOT" != "/" ] && [ ! -f "$WORKSPACE_ROOT/docker-compose.yml" ]; do
+    WORKSPACE_ROOT=$(dirname "$WORKSPACE_ROOT")
+done
+
+REPO_PATH=${REPO_PATH:-"$WORKSPACE_ROOT/local_repository"}
 
 # Resolve absolute path
 REPO_PATH=$(cd "$REPO_PATH" 2>/dev/null && pwd) || {

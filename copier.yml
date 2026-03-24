@@ -27,9 +27,9 @@ module_description:
 
 module_version:
   type: str
-  help: "Benutze Semantic Versioning (z.B. 0.1.0) [Major.Minor.Patch] - Kein Build-Metadaten oder Prä-Release-Tags"
-  default: "0.0.0"
-  validator: "{% if not (module_version | regex_search('^\\d+\\.\\d+\\.\\d+$')) %}Version muss im Format X.Y.Z sein (z.B. 0.1.0){% endif %}"
+  help: "Benutze Semantic Versioning (z.B. 1.0.0) [Major.Minor.Patch] - Kein Build-Metadaten oder Prä-Release-Tags"
+  default: "1.0.0"
+  validator: "{% if not (module_version | regex_search('^\\d+\\.\\d+\\.\\d+$')) %}Version muss im Format X.Y.Z sein (z.B. 1.0.0){% endif %}"
 
 module_template:
   type: str
@@ -104,5 +104,5 @@ _tasks:
   - "chmod +x tools/*.sh"
   - "echo '✅ Modul {{ module_name }} wurde erstellt!'"
   - "echo '📦 Zum Publishen ins Repository: ./tools/publish_to_repo.sh'"
-  - "{% if build_after_copy %}cd ../.. && ./tools/quick_rebuild_module.sh {{ module_name }} --all-variants || echo '⚠️  Build fehlgeschlagen. Manuell bauen: cd VOS2_WORKSPACE && ./tools/quick_rebuild_module.sh {{ module_name }} --all-variants'{% else %}echo '⏭️  Build übersprungen. Zum Bauen: cd VOS2_WORKSPACE && ./tools/quick_rebuild_module.sh {{ module_name }} --all-variants'{% endif %}"
+  - "{% if build_after_copy %}WORKSPACE=$(d=\"$PWD\"; while [ \"$d\" != \"/\" ] && [ ! -f \"$d/docker-compose.yml\" ]; do d=$(dirname \"$d\"); done; echo \"$d\") && cd \"$WORKSPACE\" && ./tools/quick_rebuild_module.sh {{ module_name }} --all-variants || echo '⚠️  Build fehlgeschlagen. Manuell bauen: cd VOS2_WORKSPACE && ./tools/quick_rebuild_module.sh {{ module_name }} --all-variants'{% else %}echo '⏭️  Build übersprungen. Zum Bauen: cd VOS2_WORKSPACE && ./tools/quick_rebuild_module.sh {{ module_name }} --all-variants'{% endif %}"
   - "{% if publish_to_repo_after_copy %}bash tools/publish_to_repo.sh || echo '⚠️  Repository-Publish fehlgeschlagen. Details siehe oben.'{% else %}echo '⏭️  Repository-Publish übersprungen. Zum Publizieren: ./tools/publish_to_repo.sh'{% endif %}"

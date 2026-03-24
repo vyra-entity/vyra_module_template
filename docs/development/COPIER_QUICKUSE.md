@@ -19,7 +19,9 @@ pip install yq
 ### Interaktiv (empfohlen)
 
 ```bash
-copier copy /home/holgder-dach/VYRA/vyra_module_template /home/holgder-dach/VOS2_WORKSPACE/modules/my_detector_<hash>
+VERSION="0.1.0"   # module_version aus copier-Antwort
+copier copy /home/holgder-dach/VYRA/vyra_module_template \
+  /home/holgder-dach/VOS2_WORKSPACE/module-storages/${VERSION}/my_detector_<hash>
 ```
 
 Copier fragt Schritt für Schritt ab:
@@ -96,7 +98,7 @@ Die Datei `.copier-answers.yml` muss im Modulverzeichnis vorhanden sein (wird be
 ### Update ausführen
 
 ```bash
-cd /home/holgder-dach/VOS2_WORKSPACE/modules/my_detector_<hash>
+cd /home/holgder-dach/VOS2_WORKSPACE/module-storages/<version>/my_detector_<hash>
 copier update
 ```
 
@@ -133,7 +135,7 @@ git commit -m "chore: apply template update"
 Willst du z. B. den Autor-Namen korrigieren oder ein Feature nachträglich aktivieren:
 
 ```bash
-cd /home/holgder-dach/VOS2_WORKSPACE/modules/my_detector_<hash>
+cd /home/holgder-dach/VOS2_WORKSPACE/module-storages/<version>/my_detector_<hash>
 copier update --overwrite
 ```
 
@@ -152,7 +154,7 @@ copier update --overwrite --data enable_frontend=false
 Nachdem das Modul erstellt oder aktualisiert wurde, kann es im `local_repository` registriert werden:
 
 ```bash
-cd /home/holgder-dach/VOS2_WORKSPACE/modules/my_detector_<hash>
+cd /home/holgder-dach/VOS2_WORKSPACE/module-storages/<version>/my_detector_<hash>
 ./tools/publish_to_repo.sh
 ```
 
@@ -198,12 +200,14 @@ REPO_PATH=/custom/path/to/local_repository ./tools/publish_to_repo.sh
 ### Workflow A — Schnellstart neues Modul
 
 ```bash
-# 1. Modul aus Template generieren
+# 1. Modul aus Template generieren (Version entspricht module_version aus Copier)
+VERSION="0.1.0"
+MODULE_HASH=$(python3 -c "import uuid; print(uuid.uuid4().hex)")
 copier copy /home/holgder-dach/VYRA/vyra_module_template \
-  /home/holgder-dach/VOS2_WORKSPACE/modules/my_detector_$(python3 -c "import uuid; print(uuid.uuid4().hex)")
+  /home/holgder-dach/VOS2_WORKSPACE/module-storages/${VERSION}/my_detector_${MODULE_HASH}
 
 # 2. Ins Modulverzeichnis wechseln
-cd /home/holgder-dach/VOS2_WORKSPACE/modules/my_detector_*
+cd /home/holgder-dach/VOS2_WORKSPACE/module-storages/${VERSION}/my_detector_*
 
 # 3. Git initialisieren
 git init && git add -A && git commit -m "feat: initial module from template"
@@ -220,7 +224,7 @@ cd /home/holgder-dach/VYRA/vyra_module_template
 git pull
 
 # 2. Update ins Modul übernehmen
-cd /home/holgder-dach/VOS2_WORKSPACE/modules/my_detector_<hash>
+cd /home/holgder-dach/VOS2_WORKSPACE/module-storages/<version>/my_detector_<hash>
 copier update
 
 # 3. Konflikte prüfen und lösen

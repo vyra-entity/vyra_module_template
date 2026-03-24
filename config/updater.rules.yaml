@@ -1,0 +1,53 @@
+# VYRA Module Update Rules — vyra_module_template
+#
+# Processed by container_manager UpdateRulesProcessor on module upgrade.
+# The processor selects the FIRST rule whose `condition` matches the version
+# bump type (major / minor / patch) and executes its `operations` list.
+#
+# Supported actions:
+#   mirror   — recursive copy (overwrites destination)
+#   copy     — alias for mirror
+#   transform — copy single file, optionally renaming extension via `ext` field
+#   symlink  — create symlink at `dest` pointing to `src` (no data copy)
+#
+# Placeholders in src / dest:
+#   /old_vol/  → old versioned module directory
+#   /new_vol/  → new versioned module directory
+#
+# Default (no matching rule): copies storage/ and certificates/ as-is.
+
+rules:
+  - condition: "major"
+    description: "Breaking update — full data migration"
+    operations:
+      - action: mirror
+        src: /old_vol/storage/
+        dest: /new_vol/storage/
+      - action: mirror
+        src: /old_vol/certificates/
+        dest: /new_vol/certificates/
+
+  - condition: "minor"
+    description: "Feature update — selective migration"
+    operations:
+      - action: mirror
+        src: /old_vol/storage/
+        dest: /new_vol/storage/
+      - action: mirror
+        src: /old_vol/certificates/
+        dest: /new_vol/certificates/
+
+  - condition: "patch"
+    description: "Patch update — transparent transfer"
+    operations:
+      - action: mirror
+        src: /old_vol/storage/
+        dest: /new_vol/storage/
+      - action: mirror
+        src: /old_vol/certificates/
+        dest: /new_vol/certificates/
+
+hooks:
+  pre_import: null
+  post_import: null
+  on_failure: null

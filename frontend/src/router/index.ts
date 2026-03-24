@@ -27,6 +27,18 @@ const routes: RouteRecordRaw[] = [
       sidebarIcon: 'pi pi-home',
     }
   },
+  {
+    path: '/{{ module_name }}/settings',
+    name: 'settings',
+    component: () => import('../features/settings/SettingsView.vue'),
+    meta: {
+      title: 'Einstellungen - {{ module_display_name }}',
+      requiresAuth: true,
+      sidebarGroup: 'system',
+      sidebarPriority: 100,
+      sidebarIcon: 'pi pi-cog',
+    }
+  },
 
 ]
 

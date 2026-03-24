@@ -22,7 +22,11 @@
   >
     <!-- ── TOP ZONE: Branding + Toggle ─────────────────────────────────────── -->
     <div class="sidebar-top">
-      <div class="branding">
+      <div
+        class="branding"
+        :class="{ 'branding--clickable': sidebarStore.isCollapsed }"
+        @click="sidebarStore.isCollapsed && handleToggle()"
+      >
         <div class="brand-icon">
           <img src="@/assets/variobotic-kreis-transparent-blaugrau.svg" class="brand-svg" alt="VYRA" />
         </div>
@@ -30,30 +34,34 @@
       </div>
 
       <button
+        v-if="!sidebarStore.isCollapsed"
         class="toggle-btn"
         @click="handleToggle"
-        :title="sidebarStore.isCollapsed ? 'Sidebar ausklappen' : 'Sidebar einklappen'"
-        :aria-label="sidebarStore.isCollapsed ? 'Sidebar ausklappen' : 'Sidebar einklappen'"
+        title="Sidebar einklappen"
+        aria-label="Sidebar einklappen"
         aria-controls="sidebar-nav"
       >
-        <i
-          class="pi"
-          :class="sidebarStore.isCollapsed ? 'pi-chevron-right' : 'pi-chevron-left'"
-        />
+        <i class="pi pi-bars" />
       </button>
     </div>
 
     <!-- ── MAIN NAVIGATION ZONE ────────────────────────────────────────────── -->
     <nav id="sidebar-nav" class="sidebar-main" aria-label="Navigation">
       <SidebarNavGroup
-        v-for="group in sidebarStore.groupedItems"
+        v-for="group in sidebarStore.groupedItems.filter(g => g.id !== 'system')"
         :key="group.id"
         :group="group"
       />
     </nav>
 
-    <!-- ── BOTTOM ZONE: System Health + User + Settings ───────────────────── -->
+    <!-- ── BOTTOM ZONE: System Navigation + System Health + User + Settings ── -->
     <div class="sidebar-bottom">
+      <!-- System navigation group (fixed at bottom) -->
+      <SidebarNavGroup
+        v-for="group in sidebarStore.groupedItems.filter(g => g.id === 'system')"
+        :key="group.id"
+        :group="group"
+      />
       <!-- System health indicator -->
       <div
         class="system-health"
@@ -265,12 +273,10 @@ async function handleLogout(): Promise<void> {
   pointer-events: none;
 }
 
-/* In collapsed state: hide branding entirely, center the toggle button */
+/* In collapsed state: keep branding visible (icon only), center it */
 .is-collapsed .branding {
-  opacity: 0;
-  flex: 0;
-  min-width: 0;
-  overflow: hidden;
+  cursor: default;
+  flex: 1;
 }
 
 .is-collapsed .sidebar-top {
@@ -283,7 +289,7 @@ async function handleLogout(): Promise<void> {
   justify-content: center;
   width: 28px;
   height: 28px;
-  border: 1px solid var(--sb-border);
+  border: none;
   border-radius: 6px;
   background: transparent;
   color: var(--text-color-secondary, #607D8B);
@@ -296,6 +302,14 @@ async function handleLogout(): Promise<void> {
 .toggle-btn:hover {
   background: var(--surface-hover, rgba(33, 150, 243, 0.08));
   color: var(--vyra-primary, #2196F3);
+}
+
+.branding--clickable {
+  cursor: pointer;
+}
+
+.branding--clickable:hover {
+  opacity: 0.8;
 }
 
 /* ── MAIN NAV ZONE ── */

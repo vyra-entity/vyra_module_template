@@ -4,6 +4,21 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Changed — module-storages path convention (2026-03-24)
+
+- `copier.yml` `_tasks`: replaced `cd ../..` with a dynamic workspace-root
+  discovery that walks up the directory tree searching for `docker-compose.yml`.
+  This makes the task work from any nesting depth, e.g.
+  `module-storages/<version>/<module>/` as well as `modules/<module>/`.
+- `tools/publish_to_repo.sh`: replaced the hardcoded `../../local_repository`
+  default with the same upward workspace-root search so the script resolves
+  correctly from any path depth.
+- `VOS2_WORKSPACE/tools/quick_rebuild_module.sh`: extended module search to
+  also cover `module-storages/<version>/<module>/` (depth 2 under
+  `module-storages/`) in addition to the legacy `modules/` directory.
+- `docs/development/COPIER_QUICKUSE.md`: updated all example `copier copy`
+  destination paths to use `module-storages/<version>/` instead of `modules/`.
+
 ### Fixed — setup_interfaces.py workspace detection (2026-03-19)
 
 - `tools/setup_interfaces.py` `main()`: replaced the name-based heuristic

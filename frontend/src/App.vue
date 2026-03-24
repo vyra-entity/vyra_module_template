@@ -22,7 +22,7 @@
           <span class="page-title">{%- raw %}{{ pageTitle }}{%- endraw %}</span>
         </div>
 
-        <!-- Alarm bell -->
+        <!-- Alarm bell + three-dot menu -->
         <div class="topbar-actions">
           <button
             class="alarm-bell-btn"
@@ -33,6 +33,14 @@
             <i class="pi pi-bell alarm-bell-icon" :class="{ 'bell-ring': errorCount > 0 }" />
             <span v-if="errorCount > 0" class="alarm-badge">{%- raw %}{{ errorCount > 99 ? '99+' : errorCount }}{%- endraw %}</span>
           </button>
+          <button
+            class="top-menu-btn"
+            @click="(e) => topMenu?.toggle(e)"
+            aria-label="Menü"
+          >
+            <i class="pi pi-ellipsis-v" />
+          </button>
+          <Menu ref="topMenu" :model="topMenuItems" :popup="true" />
         </div>
       </header>
 
@@ -86,7 +94,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useSidebarStore } from './store/sidebar'
 import { useAuthStore } from './store/auth'
 import { useSystemStore } from './store/system'
@@ -95,12 +103,23 @@ import apiClient from './api/http'
 import VyraSidebar from './components/layout/VyraSidebar.vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
+import Menu from 'primevue/menu'
 
 const route        = useRoute()
+const router       = useRouter()
 const sidebarStore = useSidebarStore()
 const authStore    = useAuthStore()
 const systemStore  = useSystemStore()
 const feedStore    = useModuleFeedStore()
+
+const topMenu      = ref<InstanceType<typeof Menu> | null>(null)
+const topMenuItems = [
+  {
+    label: 'Einstellungen',
+    icon:  'pi pi-cog',
+    command: () => router.push({ name: 'settings' }),
+  },
+]
 
 const errorDialogVisible = ref(false)
 const errorFeeds         = computed(() => feedStore.errorFeeds)
@@ -213,6 +232,25 @@ onUnmounted(() => {
   .mobile-menu-btn {
     display: flex !important;
   }
+}
+
+/* ── Three-dot menu button ── */
+.top-menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 6px;
+  color: var(--text-color-secondary, #607D8B);
+  transition: background 0.15s;
+}
+
+.top-menu-btn:hover {
+  background: var(--surface-hover, #f0f0f0);
 }
 
 /* ── Mobile hamburger (hidden on desktop) ── */

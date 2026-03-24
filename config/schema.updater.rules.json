@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://vyra.io/schemas/updater.rules.schema.json",
+  "title": "UpdaterRules",
+  "description": "Schema for config/updater.rules.yaml — VYRA module update rules.",
+  "type": "object",
+  "required": ["rules"],
+  "additionalProperties": false,
+  "properties": {
+    "rules": {
+      "type": "array",
+      "description": "Ordered list of rules. The first matching condition wins.",
+      "items": {
+        "type": "object",
+        "required": ["condition", "operations"],
+        "additionalProperties": false,
+        "properties": {
+          "condition": {
+            "type": "string",
+            "enum": ["major", "minor", "patch"],
+            "description": "Version bump type that triggers this rule."
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of what this rule does."
+          },
+          "operations": {
+            "type": "array",
+            "description": "List of file operations to execute.",
+            "items": {
+              "type": "object",
+              "required": ["action", "src", "dest"],
+              "additionalProperties": false,
+              "properties": {
+                "action": {
+                  "type": "string",
+                  "enum": ["mirror", "copy", "transform", "symlink"],
+                  "description": "mirror/copy: recursive copy | transform: file copy with optional extension rename | symlink: create symlink (no data copy, for large volumes)"
+                },
+                "src": {
+                  "type": "string",
+                  "description": "Source path. Use /old_vol/ or /new_vol/ as placeholders."
+                },
+                "dest": {
+                  "type": "string",
+                  "description": "Destination path. Use /old_vol/ or /new_vol/ as placeholders."
+                },
+                "ext": {
+                  "type": "string",
+                  "description": "For transform action only: target file extension (e.g. '.json')."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hooks": {
+      "type": "object",
+      "description": "Optional hook scripts (relative paths inside the module directory).",
+      "additionalProperties": false,
+      "properties": {
+        "pre_import": {
+          "type": ["string", "null"],
+          "description": "Script to run before data migration."
+        },
+        "post_import": {
+          "type": ["string", "null"],
+          "description": "Script to run after successful data migration."
+        },
+        "on_failure": {
+          "type": ["string", "null"],
+          "description": "Script to run if the upgrade fails."
+        }
+      }
+    }
+  }
+}
