@@ -3,10 +3,17 @@ _answers_file: ".copier-answers.yml"
 _skip_if_exists: []
 _jinja_extension: jinja2.ext.do
 _templates_suffix: ""
-# IMPORTANT: Always use HEAD so that local uncommitted template changes
-# are picked up when running `copier copy` from a local path.
-# Template changes MUST be committed to git before running `copier update`
-# on existing modules (git history is used for diffing on update).
+# IMPORTANT: _vcs_ref: HEAD causes copier to use git HEAD (committed state) as the
+# template source. This ensures `copier copy` and `copier update` always use the
+# latest committed template fixes — NOT uncommitted working-tree changes.
+# Template changes MUST be committed before running `copier update` on existing modules.
+#
+# NOTE for `copier update`: The destination module directory must be its own git repo
+# (i.e. not inside a parent repo with the module path gitignored). If the module is in
+# a gitignored path (e.g. module-storages/), copier's git diff-tree will fail with
+# exit code 128. Fix: run `git init && git add -A && git commit -m init` in the module
+# dir first, then run `copier update --trust --defaults --vcs-ref HEAD`.
+# Alternatively use `copier copy --trust --force` to regenerate all files from HEAD.
 _vcs_ref: HEAD
 
 # === Pflichtfelder ===

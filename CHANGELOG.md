@@ -4,6 +4,16 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — copier.yml: clarified _vcs_ref: HEAD behavior and gitignore caveat (2026-03-25)
+
+- `copier.yml`: corrected the `_vcs_ref: HEAD` comment. The setting makes copier use
+  git HEAD (committed state) as the template source — NOT the working tree.
+  Added a note explaining that `copier update` fails with exit code 128 when the
+  destination module lives in a gitignored path (e.g. `module-storages/`). Fix:
+  `git init && git add -A && git commit -m init` in the module dir first, then
+  `copier update --trust --defaults --vcs-ref HEAD`. Alternatively use
+  `copier copy --trust --force` to regenerate all files from HEAD.
+
 ### Changed — module-storages path convention (2026-03-24)
 
 - `copier.yml` `_tasks`: replaced `cd ../..` with a dynamic workspace-root
