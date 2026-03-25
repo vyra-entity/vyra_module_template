@@ -16,7 +16,11 @@
 git -C /path/to/vyra_module_template add -A
 git -C /path/to/vyra_module_template commit -m "feat: <describe change>"
 
-# 3. Create a new module from the current HEAD
+# 3a. Create a new module from the current HEAD
+copier copy --trust /path/to/vyra_module_template ./modules/my_new_module --trust --vcs-ref HEAD
+
+# 3b. Create a new module from the current tag
+git tag v1.x.y HEAD  # be sure to create a higher version as the latest
 copier copy --trust /path/to/vyra_module_template ./modules/my_new_module
 
 # 4. Update an existing module (applies template diff since last copy)

@@ -4,6 +4,12 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Added — publish_to_repo.sh: run update_index.sh after publishing (2026-03-25)
+
+- After `sync_from_modules.py` completes, `tools/publish_to_repo.sh` now automatically
+  calls `local_repository/tools/update_index.sh` to rebuild `index.json` with the newly
+  published module entry.
+
 ### Fixed — copier uses stale v1.3.0 tag instead of local HEAD (2026-03-25)
 
 - Removed `_vcs_ref: HEAD` from `copier.yml` — this key is NOT read by copier for

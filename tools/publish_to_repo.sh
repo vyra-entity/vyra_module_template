@@ -51,3 +51,13 @@ fi
 
 python3 "$SYNC_SCRIPT" --module "$MODULE_DIR"
 echo "✅ Modul '$MODULE_NAME' erfolgreich publiziert!"
+
+# Update index.json in the repository
+UPDATE_INDEX_SCRIPT="$REPO_PATH/tools/update_index.sh"
+if [ -f "$UPDATE_INDEX_SCRIPT" ]; then
+    echo "🔄 Aktualisiere index.json..."
+    bash "$UPDATE_INDEX_SCRIPT"
+    echo "✅ index.json aktualisiert!"
+else
+    echo "⚠️  update_index.sh nicht gefunden: $UPDATE_INDEX_SCRIPT"
+fi
