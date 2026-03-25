@@ -4,6 +4,19 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — copier uses stale v1.3.0 tag instead of local HEAD (2026-03-25)
+
+- Removed `_vcs_ref: HEAD` from `copier.yml` — this key is NOT read by copier for
+  template resolution and was dead/misleading configuration.
+- Deleted local-only tags `v1.1.0`, `v1.2.0`, `v1.3.0` which pointed to old commits
+  (e.g. `v1.3.0` → commit with `module_version: default: "0.0.0"`). These tags were
+  never pushed to origin and caused `get_latest_tag()` to always pick the stale commit.
+- Created tag `v1.4.0` at the current HEAD so copier now resolves to the correct
+  template with `module_version: default: "1.0.0"`.
+- Updated comment in `copier.yml` to explain the actual copier behaviour: copier picks
+  the HIGHEST PEP 440 git tag when no `--vcs-ref` is given. Use
+  `copier copy <template> <dest> --trust --vcs-ref HEAD` to force local HEAD.
+
 ### Fixed — copier.yml: clarified _vcs_ref: HEAD behavior and gitignore caveat (2026-03-25)
 
 - `copier.yml`: corrected the `_vcs_ref: HEAD` comment. The setting makes copier use

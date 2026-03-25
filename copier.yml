@@ -3,18 +3,21 @@ _answers_file: ".copier-answers.yml"
 _skip_if_exists: []
 _jinja_extension: jinja2.ext.do
 _templates_suffix: ""
-# IMPORTANT: _vcs_ref: HEAD causes copier to use git HEAD (committed state) as the
-# template source. This ensures `copier copy` and `copier update` always use the
-# latest committed template fixes — NOT uncommitted working-tree changes.
-# Template changes MUST be committed before running `copier update` on existing modules.
+# HOW COPIER RESOLVES THE TEMPLATE SOURCE:
+# When running `copier copy <local-path> <dest>` WITHOUT --vcs-ref, copier picks the
+# HIGHEST PEP 440 git tag in the template repo (via get_latest_tag). It does NOT use
+# the working tree or HEAD automatically. To ensure copier uses the latest committed
+# template, always create a new version tag at HEAD BEFORE running copier copy:
+#   git tag v<major>.<minor>.<patch> HEAD    # must be higher than all existing tags
+#
+# To force a specific version (e.g. local HEAD):
+#   copier copy <template> <dest> --trust --vcs-ref HEAD
 #
 # NOTE for `copier update`: The destination module directory must be its own git repo
 # (i.e. not inside a parent repo with the module path gitignored). If the module is in
 # a gitignored path (e.g. module-storages/), copier's git diff-tree will fail with
 # exit code 128. Fix: run `git init && git add -A && git commit -m init` in the module
 # dir first, then run `copier update --trust --defaults --vcs-ref HEAD`.
-# Alternatively use `copier copy --trust --force` to regenerate all files from HEAD.
-_vcs_ref: HEAD
 
 # === Pflichtfelder ===
 
