@@ -42,6 +42,9 @@ if [ "$VYRA_SLIM" = "true" ]; then
         poetry install --only main -E slim --no-interaction
     fi
     
+    # Disable Python stdout buffering (see startup_ros2_core.sh for explanation)
+    export PYTHONUNBUFFERED=1
+
     # Execute Python main() via Poetry
     cd /workspace
     exec poetry run python3 -m v2_modulemanager.main

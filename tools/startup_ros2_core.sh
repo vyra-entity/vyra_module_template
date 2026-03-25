@@ -26,6 +26,11 @@ source install/setup.bash
 
 echo "SECURITY ENCLAVE: $ROS_SECURITY_ENCLAVE"
 
+# Disable Python stdout buffering so logs appear immediately in supervisord log files
+# Without this, Python buffers stdout in 8 KB blocks when writing to a pipe (non-TTY),
+# causing log entries to appear in bursts instead of in real time.
+export PYTHONUNBUFFERED=1
+
 # Start main module node
 echo "🚀 Starting Core Module..."
 # All logs are now handled by Python Logger -> log/ros2/ros2_stdout.log
