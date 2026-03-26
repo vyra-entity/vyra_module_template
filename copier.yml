@@ -53,7 +53,6 @@ author_name:
 author_email:
   type: str
   help: "Deine E-Mail-Adresse"
-  validator: "{% if not (author_email | regex_search('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')) %}Ungültige E-Mail-Adresse{% endif %}"
 
 # === Optionale Feature-Flags ===
 
@@ -113,6 +112,5 @@ _tasks:
   - "cp .env.example .env"
   - "chmod +x tools/*.sh"
   - "echo '✅ Modul {{ module_name }} wurde erstellt!'"
-  - "echo '📦 Zum Publishen ins Repository: ./tools/publish_to_repo.sh'"
-  - "{% if build_after_copy %}DEST=\"$PWD\"; WORKSPACE=$(d=\"$DEST\"; while [ \"$d\" != \"/\" ] && [ ! -f \"$d/docker-compose.yml\" ]; do d=$(dirname \"$d\"); done; echo \"$d\"); DEST_REL=\"${DEST#$WORKSPACE/}\"; cd \"$WORKSPACE\" && ./tools/quick_rebuild_module.sh {{ module_name }} --module-dir \"$DEST_REL\" --all-variants || echo '⚠️  Build fehlgeschlagen. Manuell bauen: cd VOS2_WORKSPACE && ./tools/quick_rebuild_module.sh {{ module_name }} --all-variants'{% else %}echo '⏭️  Build übersprungen. Zum Bauen: cd VOS2_WORKSPACE && ./tools/quick_rebuild_module.sh {{ module_name }} --all-variants'{% endif %}"
-  - "{% if publish_to_repo_after_copy %}bash tools/publish_to_repo.sh || echo '⚠️  Repository-Publish fehlgeschlagen. Details siehe oben.'{% else %}echo '⏭️  Repository-Publish übersprungen. Zum Publizieren: ./tools/publish_to_repo.sh'{% endif %}"
+  - "echo '⚙️  Führe Post-Setup durch (UUID generieren, Verzeichnis umbenennen)...'"
+  - "bash tools/post_copier_setup.sh{% if build_after_copy %} --build{% endif %}{% if publish_to_repo_after_copy %} --publish{% endif %}"
