@@ -39,6 +39,11 @@ package.xml
 *.launch.py
 *.launch
 
+# Exception: template source package.xml files must be tracked by git
+# so that `copier copy --vcs-ref HEAD` includes them in generated modules
+!src/*/package.xml
+!src/*_interfaces/package.xml
+
 # Temporary files
 temp/*
 
