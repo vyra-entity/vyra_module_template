@@ -4,26 +4,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
-from ament_index_python.packages import get_package_share_directory  # pyright: ignore[reportMissingImports]
-
-from std_msgs.msg import String # pyright: ignore[reportMissingImports]
-
-# msg
-from {{ module_name }}_interfaces.msg import VBASEErrorFeed # pyright: ignore[reportAttributeAccessIssue]
-from {{ module_name }}_interfaces.msg import VBASEVolatileList # pyright: ignore[reportAttributeAccessIssue]
-from {{ module_name }}_interfaces.msg import VBASEStateFeed # pyright: ignore[reportAttributeAccessIssue]
-from {{ module_name }}_interfaces.msg import VBASENewsFeed # pyright: ignore[reportAttributeAccessIssue]
-from {{ module_name }}_interfaces.msg import VBASEUpdateParamEvent # pyright: ignore[reportAttributeAccessIssue]
-
-from {{ module_name }}_interfaces.msg import VBASEVolatileList # pyright: ignore[reportAttributeAccessIssue]
-from {{ module_name }}_interfaces.msg import VBASEVolatileSet # pyright: ignore[reportAttributeAccessIssue]
-from {{ module_name }}_interfaces.msg import VBASEVolatileHash # pyright: ignore[reportAttributeAccessIssue]
-from {{ module_name }}_interfaces.msg import VBASEVolatileString # pyright: ignore[reportAttributeAccessIssue]
-# srv
-import {{ module_name }}_interfaces.srv # pyright: ignore[reportMissingImports]
-# add base services here
-# action
-# add base actions here 
+VYRA_SLIM = os.getenv('VYRA_SLIM', 'false').lower() == 'true'
+if not VYRA_SLIM:
+    from ament_index_python.packages import get_package_share_directory  # pyright: ignore[reportMissingImports]
 
 from vyra_base.core.entity import VyraEntity
 from vyra_base.defaults.entries import (
@@ -50,15 +33,53 @@ else:
 
 logger = get_logger(__name__)
 
+
+def _get_package_dir(package_name: str) -> Path:
+    """Return the share/resource directory for a package.
+
+    In SLIM mode the Python source tree is used directly (no ROS2 install).
+    In FULL mode the standard ROS2 ament index is queried.
+    """
+    if VYRA_SLIM:
+        # Try source tree first (development / direct run)
+        candidate = Path(__file__).parent.parent.parent.parent / "src" / package_name
+        if candidate.exists():
+            return candidate
+        # Fall back to src/ relative to workspace root (colcon install)
+        return _get_workspace_root() / "src" / package_name
+    return Path(get_package_share_directory(package_name))
+
+
+def _get_workspace_root() -> Path:
+    """Return the workspace root directory.
+
+    Used in both SLIM and FULL modes to locate workspace-level files
+    such as pyproject.toml and .module/module_data.yaml.
+    """
+    if VYRA_SLIM:
+        # When running from source (e.g. src/<pkg>/<pkg>/_base_.py), the
+        # four-ancestor walk points directly at the workspace root.
+        # When running from the colcon install tree the walk resolves to
+        # install/<pkg>/lib/ which is wrong — fall back to cwd() which
+        # startup_core.sh guarantees is /workspace.
+        candidate = Path(__file__).parent.parent.parent.parent
+        if (candidate / "pyproject.toml").exists():
+            return candidate
+        return Path.cwd()
+    return Path(get_package_share_directory(PACKAGE_NAME)).parents[3]
+
+
 async def load_resource(package_name: str, resource_name: Path) -> Any:
     """
-    Load a resource file from a ROS2 package.
+    Load a resource file from a VYRA package.
     
     Supports .ini, .json, .yaml, and .yml files.
+    In SLIM mode the Python source tree is searched; in FULL mode the ROS2
+    ament package share directory is used.
     
     Args:
-        package_name: Name of the ROS2 package
-        resource_name: Path to the resource relative to package share directory
+        package_name: Name of the package
+        resource_name: Path to the resource relative to the package directory
         
     Returns:
         Parsed resource content
@@ -76,8 +97,8 @@ async def load_resource(package_name: str, resource_name: Path) -> Any:
     )
     
     try:
-        package_path = get_package_share_directory(package_name)
-        resource_path: Path = Path(package_path) / resource_name
+        package_path = _get_package_dir(package_name)
+        resource_path: Path = package_path / resource_name
 
         if not resource_path.exists():
             logger.error(
@@ -444,8 +465,7 @@ async def _load_module_data() -> Optional[dict[str, Any]]:
     """
     log_function_call(logger, function="_load_module_data", package=PACKAGE_NAME)
     
-    pkg_dir = Path(get_package_share_directory(PACKAGE_NAME))
-    data_path: Path = pkg_dir.parents[3] / ".module" / "module_data.yaml"
+    data_path: Path = _get_workspace_root() / ".module" / "module_data.yaml"
 
     logger.debug("checking_module_data_file", path=str(data_path))
 
@@ -488,8 +508,7 @@ async def _write_module_data(data: dict[str, Any]) -> None:
     log_function_call(logger, function="_write_module_data", data_keys=list(data.keys()))
     
     try:
-        pkg_dir = Path(get_package_share_directory(PACKAGE_NAME))
-        data_path: Path = pkg_dir.parents[3] / ".module" / "module_data.yaml"
+        data_path: Path = _get_workspace_root() / ".module" / "module_data.yaml"
 
         logger.debug("writing_module_data", path=str(data_path))
         await FileWriter.write_yaml_file(data_path, data)
@@ -515,8 +534,7 @@ async def _load_project_settings() -> dict[str, Any]:
     log_function_call(logger, function="_load_project_settings", package=PACKAGE_NAME)
     
     try:
-        pkg_dir = Path(get_package_share_directory(PACKAGE_NAME))
-        pyproject_path: Path = pkg_dir.parents[3] / "pyproject.toml"
+        pyproject_path: Path = _get_workspace_root() / "pyproject.toml"
         
         logger.debug("loading_pyproject", path=str(pyproject_path))
         module_settings: Optional[dict[str, Any]] = await FileReader.open_toml_file(pyproject_path)
@@ -658,19 +676,16 @@ async def build_entity(project_settings) -> VyraEntity:
             module_id=me.uuid,
             module_name=me.name,
             timestamp=datetime.now(),
-            _type=VBASEStateFeed
         )
 
         ne = NewsEntry(
             module_id=me.uuid,
             module_name=me.name,
-            _type=VBASENewsFeed
         )
 
         ee = ErrorEntry(
             module_id=me.uuid,
             module_name=me.name,
-            _type=VBASEErrorFeed
         )
         
         logger.debug("state_entries_created")
@@ -691,17 +706,11 @@ async def build_entity(project_settings) -> VyraEntity:
             module_config=module_config
         )
 
-        # Setup transient base types
-        transient_base_types: dict[str, Any] = {
-            'VolatileString': VBASEVolatileString,
-            'VolatileHash': VBASEVolatileHash,
-            'VolatileList': VBASEVolatileList,
-            'VolatileSet': VBASEVolatileSet
-        }
+        # Transient and parameter type dicts are left empty;
+        # the VYRA interface layer resolves message types internally.
+        transient_base_types: dict[str, Any] = {}
 
-        parameter_types: dict[str, Any] = {
-            'UpdateParamEvent': VBASEUpdateParamEvent
-        }
+        parameter_types: dict[str, Any] = {}
 
         logger.debug("starting_entity_startup")
         await entity.startup_entity()

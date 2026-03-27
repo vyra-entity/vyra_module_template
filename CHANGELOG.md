@@ -4,6 +4,11 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Changed — decouple ROS2 imports, SLIM-mode path resolution (2026-03-27)
+
+- **`_base_.py`**: Removed all `{{ module_name }}_interfaces.*`, `std_msgs.msg` imports. Added `VYRA_SLIM` guard for `ament_index_python`. Added `_get_package_dir()` / `_get_workspace_root()` helpers. `StateEntry`, `NewsEntry`, `ErrorEntry` no longer pass `_type`. `transient_base_types` and `parameter_types` set to `{}`.
+- **`interface.py`**: `ament_index_python` import conditional on `VYRA_SLIM`. `_load_metadata()` uses Python source tree in SLIM mode.
+
 ### Added — publish_to_repo.sh: run update_index.sh after publishing (2026-03-25)
 
 - After `sync_from_modules.py` completes, `tools/publish_to_repo.sh` now automatically

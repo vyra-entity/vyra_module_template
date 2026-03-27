@@ -179,6 +179,7 @@ echo "=== SETTING UP LOG DIRECTORIES ==="
 
 mkdir -p /workspace/log/nginx
 mkdir -p /workspace/log/ros2
+mkdir -p /workspace/log/core
 
 # Set write permissions for all users (ROS2 logging needs this)
 chmod -R 777 /workspace/log/

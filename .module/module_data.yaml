@@ -9,3 +9,4 @@ template:
   - "{{ t.strip() }}"
 {% endfor %}
 uuid: ""
+alias: ""

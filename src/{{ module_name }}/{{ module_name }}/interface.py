@@ -10,7 +10,9 @@ from typing import Any, TYPE_CHECKING
 from typing import Callable
 
 
-from ament_index_python.packages import get_package_share_directory  # pyright: ignore[reportMissingImports]
+VYRA_SLIM = os.getenv('VYRA_SLIM', 'false').lower() == 'true'
+if not VYRA_SLIM:
+    from ament_index_python.packages import get_package_share_directory  # pyright: ignore[reportMissingImports]
 
 from vyra_base.defaults.entries import FunctionConfigEntry
 from vyra_base.defaults.entries import FunctionConfigDisplaystyle
@@ -192,9 +194,15 @@ def _autoload_all_remote_service_from_parent(callback_parent: object) -> list:
     return callable_list
 
 def _load_metadata(package_name: str, resource_folder: Path) -> list[dict[str, Any]]:
-    """Loads metadata from a specified package and resource."""
-    package_path = get_package_share_directory(package_name)
-    resource_path = Path(package_path) / resource_folder
+    """Loads metadata from a specified package and resource.
+
+    In SLIM mode the Python source tree is used; in FULL mode the ROS2 ament
+    package share directory is queried.
+    """
+    if VYRA_SLIM:
+        resource_path = Path(__file__).parent.parent.parent.parent / "src" / package_name / resource_folder
+    else:
+        resource_path = Path(get_package_share_directory(package_name)) / resource_folder
     meta_paths: list[Path] = list(resource_path.rglob("*.json"))
 
     metadata: list[dict] = []

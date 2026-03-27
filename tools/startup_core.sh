@@ -18,7 +18,7 @@ fi
 # Default VYRA_SLIM to false (normal ROS2 mode)
 VYRA_SLIM="${VYRA_SLIM:-false}"
 LOG_DIR="${LOG_DIR:-/workspace/log}"
-MODULE_NAME="${MODULE_NAME:-v2_modulemanager}"
+MODULE_NAME="${MODULE_NAME:-unknown_module}"
 
 # Ensure log directory exists
 mkdir -p "$LOG_DIR/core"
@@ -34,20 +34,30 @@ echo "=========================================="
 # Determine startup mode
 if [ "$VYRA_SLIM" = "true" ]; then
     echo "🎯 SLIM Mode: Running Python application directly (no ROS2)"
-    
-    # Install SLIM dependencies with Poetry if not already installed
-    if [ -f "/workspace/pyproject.toml" ]; then
-        echo "📦 Ensuring SLIM dependencies are installed..."
-        cd /workspace
-        poetry install --only main -E slim --no-interaction
+
+    # In SLIM mode there is no ROS2 installation and no colcon build.
+    # PYTHONPATH must NOT contain any ROS2 paths (no rclpy, etc.).
+    # Reset PYTHONPATH completely and only add the module source tree and any
+    # additional pure-Python install paths.
+    export PYTHONPATH=""
+
+    # Prepend the source tree so the module is importable directly from src/.
+    # This also ensures that edits take effect without a colcon rebuild.
+    SRC_DIR="/workspace/src/${MODULE_NAME}"
+    if [ -d "$SRC_DIR" ]; then
+        export PYTHONPATH="${SRC_DIR}:${PYTHONPATH}"
+        echo "📂 PYTHONPATH set to ${SRC_DIR} (SLIM mode, no ROS2)"
+    else
+        echo "❌ ERROR: Source directory ${SRC_DIR} not found"
+        exit 1
     fi
-    
-    # Disable Python stdout buffering (see startup_ros2_core.sh for explanation)
+
+    # Disable Python stdout buffering so log lines appear immediately
     export PYTHONUNBUFFERED=1
 
-    # Execute Python main() via Poetry
+    echo "🚀 Launching: python3 -m ${MODULE_NAME}.main"
     cd /workspace
-    exec poetry run python3 -m v2_modulemanager.main
+    exec python3 -m "${MODULE_NAME}.main"
 
 else
     echo "🎯 Normal Mode: Starting with Full ROS2 core"
