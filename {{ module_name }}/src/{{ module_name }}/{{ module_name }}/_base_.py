@@ -289,6 +289,7 @@ async def _create_base_interfaces() -> list[FunctionConfigEntry]:
                     displaystyle=displaystyle,
                     params=metadata['params'],
                     returns=metadata['returns'],
+                    namespace=metadata.get('namespace', None),
                     qosprofile=metadata.get('qosprofile', 10),
                     callbacks=None,
                     periodic=None
@@ -331,6 +332,7 @@ async def _create_base_interfaces() -> list[FunctionConfigEntry]:
                     displaystyle=displaystyle,
                     params=metadata.get('params', []),
                     returns=metadata.get('returns', []),
+                    namespace=metadata.get('namespace', None),
                     qosprofile=metadata.get('qosprofile', 10),
                     callbacks=None,
                     periodic=None
@@ -534,31 +536,24 @@ async def _load_project_settings() -> dict[str, Any]:
     log_function_call(logger, function="_load_project_settings", package=PACKAGE_NAME)
     
     try:
-        pyproject_path: Path = _get_workspace_root() / "pyproject.toml"
+        pyproject_path: Path = _get_workspace_root() / ".module" / "module_data.yaml"
         
         logger.debug("loading_pyproject", path=str(pyproject_path))
-        module_settings: Optional[dict[str, Any]] = await FileReader.open_toml_file(pyproject_path)
+        module_settings: Optional[dict[str, Any]] = await FileReader.open_yaml_file(pyproject_path)
 
         if not module_settings:
             logger.error("module_settings_empty", path=str(pyproject_path))
-            raise ValueError("Module settings not found in pyproject.toml")
+            raise ValueError("Module settings not found in module_data.yaml")
 
-        project_settings = module_settings['tool']['vyra']
-        project_settings['version'] = module_settings['tool']['poetry']['version']
-
-        if not project_settings:
-            logger.error("project_settings_empty", path=str(pyproject_path))
-            raise ValueError("Project settings not found in pyproject.toml")
-        
         logger.info(
             "project_settings_loaded",
-            module_name=project_settings.get('module_name', 'unknown'),
-            version=project_settings.get('version', 'unknown'),
-            template=project_settings.get('module_template', 'unknown')
+            module_name=module_settings.get('name', 'unknown'),
+            version=module_settings.get('version', 'unknown'),
+            template=module_settings.get('template', 'unknown')
         )
         log_function_result(logger, success=True, function="_load_project_settings")
         
-        return project_settings
+        return module_settings
         
     except Exception as e:
         log_exception(logger, e, context={"function": "_load_project_settings", "path": str(pyproject_path)})
@@ -657,7 +652,11 @@ async def build_entity(project_settings) -> VyraEntity:
         
         # Persist module data
         logger.debug("persisting_module_data")
-        await _write_module_data(module_data)
+
+        if isinstance(module_data, dict):
+            await _write_module_data(module_data)
+        else:
+            logger.warning(f"module_data is not a dict, cannot persist: {module_data}")
         
         logger.info(
             "module_entry_ready",
