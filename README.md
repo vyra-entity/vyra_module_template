@@ -1,171 +1,173 @@
-# vyra_module_template - VYRA Module Template
+# vyra_module_template
 
-> **This is a [Copier](https://copier.readthedocs.io/) template** for creating new VYRA modules.
-> It is **not** a runnable module itself — use it to scaffold a new module project.
+[Copier](https://copier.readthedocs.io/) template for scaffolding new VYRA modules.
 
-## �️ Template Development Workflow
+> **This is not a runnable module.** It generates the full directory structure for a new module via `copier copy`.
 
-> **IMPORTANT**: `copier.yml` sets `_vcs_ref: HEAD`. This means `copier copy` from a **local path**
-> always uses the current working tree (including uncommitted changes).
-> `copier update` on existing modules still diffs against git history — so commit changes before updating.
+---
 
-### Edit → Copy workflow (local development)
-```bash
-# 1. Edit template files (Dockerfile, copier.yml, src/, …)
-# 2. Commit your changes (required for copier update to work on existing modules)
-git -C /path/to/vyra_module_template add -A
-git -C /path/to/vyra_module_template commit -m "feat: <describe change>"
+## Target Directory
 
-# 3a. Create a new module from the current HEAD
-copier copy --trust /path/to/vyra_module_template ./modules/my_new_module --trust --vcs-ref HEAD
+> **Default target: `module-storages/` inside VOS2_WORKSPACE**
 
-# 3b. Create a new module from the current tag
-git tag v1.x.y HEAD  # be sure to create a higher version as the latest
-copier copy --trust /path/to/vyra_module_template ./modules/my_new_module
-
-# 4. Update an existing module (applies template diff since last copy)
-copier update --trust --skip-answered
+```
+/home/holgder/VOS2_WORKSPACE/module-storages/
 ```
 
-### Bump template version (for releases)
-```bash
-# Increments patch version, commits and tags
-bash /path/to/vyra_module_template/tools/bump_template_version.sh
+The `post_copier_setup.sh` script (automatically called by Copier as a task) renames the generated folder into the canonical layout:
+
+```
+module-storages/
+└── {module_name}_{uuid}/
+    └── {version}/          ← actual module content lives here
 ```
 
-## �📋 Overview
+A symlink is then managed by `tools/setup.sh`:
 
-VYRA modules are the building blocks of the [VYRA Framework](https://github.com/Variobotic-GmbH/vyra_framework). Each module is a self-contained service that runs inside a **VYRA Framework deployment** (Docker Swarm) and communicates with other modules via ROS2/Zenoh.
-
-This template provides:
-
-- **Standardized project structure** matching all official VYRA modules
-- **Backend scaffold** using `vyra_base_python` as the core library
-- **Optional Vue.js frontend** with Vite dev proxy and hot-reload
-- **Docker / Docker Swarm** deployment files
-- **Full Mode** (ROS2 + Zenoh) and **SLIM Mode** (Python-only, no ROS2) support
-- **Testing scaffold** with pytest (unit, integration, e2e)
-
-## ⚙️ Prerequisites
-
-| Requirement | Notes |
-|---|---|
-| [Copier](https://copier.readthedocs.io/) ≥ 9 | `pip install copier` |
-| [VYRA Framework](https://github.com/Variobotic-GmbH/vyra_framework) | The runtime environment for all modules |
-| [vyra_base_python](https://github.com/vyra-entity/vyra_base_python) | Core library used by every module |
-| Docker + Docker Swarm | For deployment |
-| Python ≥ 3.11 | Backend development |
-
-## 🚀 Creating a New Module
-
-Use Copier to generate a new module from this template:
-
-```bash
-# Generate a new module into a target directory
-copier copy https://github.com/vyra-entity/vyra_module_template ./modules/my_new_module
-
-# Or use a local copy of the template
-copier copy /path/to/vyra_module_template ./modules/my_new_module
+```
+modules/{module_name}_{uuid}  →  ../module-storages/{module_name}_{uuid}/{version}/
 ```
 
-### Copier prompts
+**Only deviate from `module-storages/` if you are intentionally creating a standalone module outside the VYRA workspace (e.g. a separate git repository). In all other cases, always use `module-storages/` as the target.**
 
-| Variable | Description | Example |
+---
+
+## Quick Start
+
+```bash
+# From VOS2_WORKSPACE root — standard usage
+copier copy --trust ~/VYRA/vyra_module_template module-storages/ --vcs-ref HEAD
+```
+
+Copier will interactively ask for all fields, generate the module inside `module-storages/{module_name}/`, and then `post_copier_setup.sh` moves it into the canonical `{module_name}_{uuid}/{version}/` layout automatically.
+
+### Using the latest tagged version instead of HEAD
+
+```bash
+# Omit --vcs-ref to let Copier pick the highest git tag
+copier copy --trust ~/VYRA/vyra_module_template module-storages/
+```
+
+> See comments in `copier.yml` for details on how Copier resolves the template source.
+
+---
+
+## Template Fields (copier.yml)
+
+### Required fields
+
+| Field | Type | Description | Example |
+|---|---|---|---|
+| `module_name` | `str` | Module name in `snake_case`. Used as directory name, Python package name, and Docker image name. Only lowercase letters, digits, and underscores allowed. | `my_detector` |
+| `module_display_name` | `str` | Human-readable display name shown in the dashboard UI. Defaults to title-case of `module_name`. | `My Detector Module` |
+| `module_description` | `str` | Short description of the module. Written into `README.md` and `.module/module_data.yaml`. | `Detects anomalies in sensor data` |
+| `module_version` | `str` | Semantic version (`Major.Minor.Patch`). No pre-release or build metadata tags. Defaults to `1.0.0`. | `1.0.0` |
+| `module_template` | `str` | One or more template names (comma-separated) this module is based on. Used for tracking and registry metadata. | `basic` or `basic,production-line-1` |
+| `author_name` | `str` | Name of the module author. | `Max Mustermann` |
+| `author_email` | `str` | Email address of the module author. | `max@example.com` |
+
+### Optional feature flags
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `enable_frontend` | `bool` | `true` | Include a web frontend (Vue/Vite). Set to `false` for backend-only modules. |
+| `enable_dev_mode` | `bool` | `true` | Start in development mode (Vite dev server + hot-reload). Set to `false` for production-mode defaults. |
+| `enable_slim_mode` | `bool` | `false` | Slim mode: no ROS2 nodes, Python-only. Ideal for lightweight or resource-constrained modules. FULL mode (default) includes own ROS2 nodes. |
+| `build_after_copy` | `bool` | `true` | Automatically build the Docker image (both `development` and `production` variants) after scaffolding. |
+| `publish_to_repo_after_copy` | `bool` | `true` | Automatically publish the module to the local repository after building. |
+
+### Derived variables (no prompt, available in templates)
+
+| Expression | Result | Usage |
 |---|---|---|
-| `module_name` | Snake_case module identifier | `my_detector` |
-| `module_display_name` | Human-readable name | `My Detector Module` |
-| `module_description` | Short description | `Detects things` |
-| `author_name` | Your name | `Jane Doe` |
-| `author_email` | Your email | `jane@example.com` |
-| `enable_frontend` | Include Vue.js frontend | `true` / `false` |
-| `enable_dev_mode` | Enable hot-reload dev mode by default | `true` / `false` |
-| `enable_slim_mode` | SLIM mode (no ROS2, Python-only) | `false` (default) |
+| `{{ module_name }}` | `my_detector` | Directory name, Python package |
+| `{{ module_display_name }}` | `My Detector Module` | UI label |
+| `{{ module_name \| replace('_', '-') }}` | `my-detector` | Docker entrypoint / service name |
+| `{{ module_name \| title \| replace('_','') }}` | `MyDetector` | Python class name |
 
-After generation the module is ready to be built and deployed via the VYRA Framework.
+---
 
-## 🏗️ VYRA Framework Requirement
+## Generated Directory Structure
 
-VYRA modules **cannot run standalone**. They require a running VYRA Framework deployment that provides:
-
-- **Docker Swarm** orchestration
-- **Traefik** reverse proxy / routing
-- **Redis** shared state storage
-- **ROS2 / Zenoh** communication bus
-- **Module Manager** (`v2_modulemanager`) for lifecycle management
+After `post_copier_setup.sh` completes:
 
 ```
-VYRA Framework (Docker Swarm)
-  ├── Traefik          → routing / TLS termination
-  ├── Redis            → shared state
-  ├── v2_modulemanager → module lifecycle & plugin management
-  └── <your module>    → your custom service
+module-storages/
+└── {module_name}_{uuid}/          ← instance directory (UUID v4, 32 hex chars)
+    └── {version}/                 ← versioned module root (e.g. 1.0.0/)
+        ├── .module/
+        │   └── module_data.yaml   ← name, version, description, uuid, author, template
+        ├── .copier-answers.yml    ← copier metadata (do not edit manually)
+        ├── Dockerfile
+        ├── Makefile
+        ├── README.md
+        ├── vyra_entrypoint.sh
+        ├── config/
+        ├── src/
+        ├── tests/
+        ├── tools/
+        │   ├── post_copier_setup.sh
+        │   └── publish_to_repo.sh
+        └── frontend/              ← only if enable_frontend=true
 ```
 
-See the [VYRA Framework repository](https://github.com/Variobotic-GmbH/vyra_framework) for setup instructions.
+---
 
-## 📦 Module Manager & Plugin Installation
+## What post_copier_setup.sh does
 
-All modules and plugins are managed by the **Module Manager** (`v2_modulemanager`). You do not install modules by hand — the Module Manager handles:
+Copier invokes `tools/post_copier_setup.sh` automatically as a task after copying. It:
 
-- **Module installation** from a configured repository (local or remote)
-- **Plugin installation** (lightweight extensions added on top of modules)
-- **Updates** for both modules and plugins
-- **Lifecycle control** (start, stop, restart)
+1. Reads `name` and `version` from `.module/module_data.yaml`
+2. Generates a UUID v4 (32 hex chars, no dashes)
+3. Writes the UUID back into `.module/module_data.yaml`
+4. Moves the module from `module-storages/{module_name}/` → `module-storages/{module_name}_{uuid}/{version}/`
+5. Optionally builds the Docker image (`build_after_copy=true`)
+6. Optionally publishes to the local repository (`publish_to_repo_after_copy=true`)
 
-Once your module is published to a VYRA repository, it can be discovered and installed directly from the Module Manager UI or API:
+You can also run the flags manually:
 
 ```bash
-# Install a module via the Module Manager API
-curl -k -X POST https://localhost/v2_modulemanager/api/modules/install \
-  -H "Content-Type: application/json" \
-  -d '{"module_name": "my_detector", "version": "1.0.0"}'
-
-# Install a plugin
-curl -k -X POST https://localhost/v2_modulemanager/api/plugins/install \
-  -H "Content-Type: application/json" \
-  -d '{"plugin_name": "my-plugin", "version": "1.0.0"}'
+bash tools/post_copier_setup.sh --build --publish
 ```
 
-See the [Module Manager documentation](https://github.com/Variobotic-GmbH/vyra_framework) for repository configuration and publishing details.
+---
 
-## 🔧 vyra_base_python
+## Updating an existing module
 
-Every VYRA module is built on top of [`vyra_base_python`](https://github.com/vyra-entity/vyra_base_python), which provides:
+To apply template changes to an already-generated module, the module directory must be its own git repository (Copier uses `git diff-tree` internally):
 
-- **`VyraEntity`** — base class for all modules (state machine, lifecycle hooks)
-- **ROS2 / Zenoh** communication abstractions
-- **Redis** integration helpers
-- **Structured logging** via `structlog`
-- **Security** (SROS2, access levels)
-- **Plugin loader** — dynamic plugin system
+```bash
+cd module-storages/{module_name}_{uuid}/{version}
+git init && git add -A && git commit -m "init"
+copier update --trust --defaults --vcs-ref HEAD
+```
 
-The generated module already has `vyra_base_python` as a dependency. Do not implement these concerns from scratch.
+---
 
-## 🎯 Deployment Modes
+## Slim vs. Full mode
 
-### Full Mode (Default)
-- ROS2 + Zenoh communication
-- Full framework feature set
-- Suitable for production environments
+| | Slim (`enable_slim_mode=true`) | Full (`enable_slim_mode=false`) |
+|---|---|---|
+| ROS2 nodes | None | Own ROS2 nodes |
+| Complexity | Low | Higher |
+| Resource usage | Minimal | Standard |
+| Use case | Simple logic, lightweight modules | Complex business logic, inter-module communication |
 
-### SLIM Mode (Python-only)
-- Zenoh communication only (no ROS2)
-- 10x faster startup, ~90% smaller footprint
-- Ideal for edge devices, CI/CD, and lightweight services
+---
 
-Enable via `enable_slim_mode: true` during template generation, or set `VYRA_SLIM=true` at runtime.
+## Template development
 
-See [SLIM Mode Documentation](docs/SLIM_MODE.md) for details.
+To modify the template itself and test changes:
 
-## 📚 Documentation
+```bash
+# 1. Edit files inside {{ module_name }}/ or copier.yml
+# 2. Commit (required for copier update on existing modules to work)
+git -C ~/VYRA/vyra_module_template add -A
+git -C ~/VYRA/vyra_module_template commit -m "feat: describe change"
 
-| Document | Description |
-|---|---|
-| [docs/README.md](docs/README.md) | Full documentation index |
-| [docs/development/DEVEL.md](docs/development/DEVEL.md) | Development workflow |
-| [docs/deployment/DEPLOYMENT.md](docs/deployment/DEPLOYMENT.md) | Production deployment |
-| [docs/backend/](docs/backend/) | Backend API reference |
-| [docs/frontend/FRONTEND_ARCHITECTURE.md](docs/frontend/FRONTEND_ARCHITECTURE.md) | UI structure |
-| [docs/architecture/](docs/architecture/) | Module architecture |
-| [docs/plugin/](docs/plugin/) | Plugin development |
-| [examples/README.md](examples/README.md) | Isolated usage examples |
+# 3. Tag a new version (required if not using --vcs-ref HEAD)
+git -C ~/VYRA/vyra_module_template tag v1.x.y HEAD
+
+# 4. Test by copying a new module
+copier copy --trust ~/VYRA/vyra_module_template module-storages/ --vcs-ref HEAD
+```

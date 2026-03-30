@@ -1,5 +1,5 @@
 _subdirectory: "."
-_answers_file: ".copier-answers.yml"
+_answers_file: "{{ module_name }}/.copier-answers.yml"
 _skip_if_exists: []
 _jinja_extension: jinja2.ext.do
 _templates_suffix: ""
@@ -12,6 +12,16 @@ _templates_suffix: ""
 #
 # To force a specific version (e.g. local HEAD):
 #   copier copy <template> <dest> --trust --vcs-ref HEAD
+#
+# USAGE:
+# The template wraps all files inside a `{{ module_name }}/` directory, so you only
+# need to point copier at the *parent* folder (e.g. module-storages/) without
+# specifying a subdir name — the module_name is used automatically:
+#
+#   copier copy ~/VYRA/vyra_module_template module-storages/ --trust --vcs-ref HEAD
+#
+# post_copier_setup.sh then renames  module-storages/<module_name>/
+#   → module-storages/<module_name>_<uuid>/<version>/
 #
 # NOTE for `copier update`: The destination module directory must be its own git repo
 # (i.e. not inside a parent repo with the module path gitignored). If the module is in
@@ -95,22 +105,25 @@ publish_to_repo_after_copy:
 
 
 _exclude:
-  - "{% if not enable_frontend %}frontend/**{% endif %}"
-  - "{% if not enable_frontend %}config/nginx.conf{% endif %}"
-  - "{% if not enable_frontend %}src/{{ module_name }}/{{ module_name }}/backend_webserver/**{% endif %}"
+  - "{% if not enable_frontend %}{{ module_name }}/frontend/**{% endif %}"
+  - "{% if not enable_frontend %}{{ module_name }}/config/nginx.conf{% endif %}"
+  - "{% if not enable_frontend %}{{ module_name }}/src/{{ module_name }}/{{ module_name }}/backend_webserver/**{% endif %}"
   - "copier.yml"
   - ".git"
   - ".git/**"
   - ".github/**"
-  - "build/**"
-  - "install/**"
+  - "{{ module_name }}/build/**"
+  - "{{ module_name }}/install/**"
+  - "log"
   - "log/**"
-  - "*.pyc"
-  - "__pycache__"
+  - "debug.log"
+  - "debug2.log"
+  - ".env"
+  - ".copier-answers.yml"
 
 _tasks:
-  - "cp .env.example .env"
-  - "chmod +x tools/*.sh"
+  - "cp {{ module_name }}/.env.example {{ module_name }}/.env"
+  - "chmod +x {{ module_name }}/tools/*.sh"
   - "echo '✅ Modul {{ module_name }} wurde erstellt!'"
   - "echo '⚙️  Führe Post-Setup durch (UUID generieren, Verzeichnis umbenennen)...'"
-  - "bash tools/post_copier_setup.sh{% if build_after_copy %} --build{% endif %}{% if publish_to_repo_after_copy %} --publish{% endif %}"
+  - "bash {{ module_name }}/tools/post_copier_setup.sh{% if build_after_copy %} --build{% endif %}{% if publish_to_repo_after_copy %} --publish{% endif %}"

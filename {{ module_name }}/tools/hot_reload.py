@@ -65,12 +65,25 @@ class HotReloadHandler(FileSystemEventHandler):
         
         # Ignore install, build, log directories, and generated protobuf files
         path_str = str(file_path)
+
+        logger.debug(f"File modified: {path_str}")
+        
         if any(excluded in path_str for excluded in ['/install/', '/build/', '/log/', '/_gen/']):
             logger.debug(f"🚫 Ignoring file in excluded directory: {path_str}")
             return
+
+        # Ignore generated protobuf/grpc stubs by filename suffix
+        if file_path.suffix in ['.pyi'] or '_pb2' in file_path.stem or '_pb2_grpc' in file_path.stem:
+            logger.debug(f"🚫 Ignoring generated protobuf file: {path_str}")
+            return
         
         # Check if it's a Python file in the main package
-        is_python_file = file_path.suffix == '.py' and f'/src/{self.package_name}' in path_str
+        # Use exact path segment match (not substring) to avoid matching
+        # v2_modulemanager_interfaces when package_name is v2_modulemanager
+        is_python_file = (
+            file_path.suffix == '.py' and
+            f'/src/{self.package_name}/' in path_str
+        )
         
         # Check if it's a ROS2 interface file (.srv, .msg, .action) in any package
         # Only monitor interface files in FULL mode
@@ -90,9 +103,10 @@ class HotReloadHandler(FileSystemEventHandler):
                 '/config/' in path_str
             )
             
-            # Ignore interface/config file events for 20 seconds after build completes
+            # Ignore interface/config file events for 60 seconds after build completes
             # This prevents loops from setup_interfaces.py modifying interface files
-            if (is_interface_file or is_config_file) and (time.time() - self.last_build_time < 20.0):
+            # 60s because a colcon build takes ~50s and file events can arrive late
+            if (is_interface_file or is_config_file) and (time.time() - self.last_build_time < 60.0):
                 return
         
         if is_python_file or is_interface_file or is_config_file:
@@ -107,7 +121,7 @@ class HotReloadHandler(FileSystemEventHandler):
             self.last_modified_time = current_time
             
             file_type = "interface/config" if (is_interface_file or is_config_file) else "Python"
-            logger.info(f"📝 {file_type} file changed: {file_path.name}")
+            logger.info(f"📝 {file_type} file changed: {file_path}")
             if is_interface_file or is_config_file:
                 self.interface_files_changed = True
             self._schedule_rebuild()
@@ -127,9 +141,18 @@ class HotReloadHandler(FileSystemEventHandler):
         # Ignore install, build, log directories, and generated protobuf files
         if any(excluded in path_str for excluded in ['/install/', '/build/', '/log/', '/_gen/']):
             return
+
+        # Ignore generated protobuf/grpc stubs by filename suffix
+        if file_path.suffix in ['.pyi'] or '_pb2' in file_path.stem or '_pb2_grpc' in file_path.stem:
+            return
         
         # Check if it's a Python file in the main package
-        is_python_file = file_path.suffix == '.py' and f'/src/{self.package_name}' in path_str
+        # Use exact path segment match (not substring) to avoid matching
+        # v2_modulemanager_interfaces when package_name is v2_modulemanager
+        is_python_file = (
+            file_path.suffix == '.py' and
+            f'/src/{self.package_name}/' in path_str
+        )
         
         # Check if it's a ROS2 interface file (.srv, .msg, .action) in any package
         # Only monitor interface files in FULL mode
@@ -147,13 +170,13 @@ class HotReloadHandler(FileSystemEventHandler):
                 '/config/' in path_str
             )
             
-            # Ignore interface/config file events for 20 seconds after build completes
-            if (is_interface_file or is_config_file) and (time.time() - self.last_build_time < 20.0):
+            # Ignore interface/config file events for 60 seconds after build completes
+            if (is_interface_file or is_config_file) and (time.time() - self.last_build_time < 60.0):
                 return
         
         if is_python_file or is_interface_file or is_config_file:
             file_type = "interface/config" if (is_interface_file or is_config_file) else "Python"
-            logger.info(f"➕ {file_type} file created: {file_path.name}")
+            logger.info(f"➕ {file_type} file created: {file_path}")
             if is_interface_file or is_config_file:
                 self.interface_files_changed = True
             
@@ -229,18 +252,20 @@ class HotReloadHandler(FileSystemEventHandler):
         # Re-check availability in case supervisord was not yet ready at startup
         if not self.use_supervisord:
             self.use_supervisord = self._check_supervisord_available(max_wait=10)
+        # Reset timestamps BEFORE restarting the service so that any file-system
+        # events generated during or right after the supervisor start (e.g. from
+        # ROS2 sourcing install/setup.bash) fall inside the cooldown window and
+        # are ignored.
+        self.last_modified_time = time.time()
+        self.last_build_time = time.time()  # Start cooldown period
+        self.is_building = False
+
         if self.use_supervisord:
             logger.info(f"🚀 Restarting Supervisord program: {self.supervisord_program}")
             self._supervisorctl("start", self.supervisord_program)
             logger.info(f"✅ Process restarted via Supervisord")
         else:
             logger.warning("⚠️ Supervisord not available, manual restart required")
-        
-        # Reset timestamp to ignore any file events that occurred during build
-        # This prevents loops from setup_interfaces.py modifying files
-        self.last_modified_time = time.time()
-        self.last_build_time = time.time()  # Start cooldown period
-        self.is_building = False
     
     def _build_package(self) -> int:
         """Build the ROS2 package (Full mode only)"""

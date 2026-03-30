@@ -4,6 +4,20 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Changed — copier template wraps content in `{{ module_name }}/` subdir (2026-03-30)
+
+- All template files now live inside a `{{ module_name }}/` directory in the template
+  repo. Copier renders this directory name to the actual module name at copy time.
+- Users can now specify only the parent destination folder instead of a dummy subdir:
+  ```
+  copier copy ~/VYRA/vyra_module_template module-storages/ --trust --vcs-ref HEAD
+  ```
+  `post_copier_setup.sh` continues to work unchanged — it renames
+  `module-storages/<module_name>/` → `module-storages/<module_name>_<uuid>/<version>/`.
+- Updated `_answers_file`, `_exclude`, and `_tasks` in `copier.yml` to reflect new paths.
+- Added `log` to `_exclude` so the empty runtime `log/` dir is not created at the
+  destination root.
+
 ### Changed — decouple ROS2 imports, SLIM-mode path resolution (2026-03-27)
 
 - **`_base_.py`**: Removed all `{{ module_name }}_interfaces.*`, `std_msgs.msg` imports. Added `VYRA_SLIM` guard for `ament_index_python`. Added `_get_package_dir()` / `_get_workspace_root()` helpers. `StateEntry`, `NewsEntry`, `ErrorEntry` no longer pass `_type`. `transient_base_types` and `parameter_types` set to `{}`.
