@@ -4,6 +4,16 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — copier.yml: Jinja2 TemplateSyntaxError in root README.md (2026-03-30)
+
+- **`copier.yml`**: Added `README.md` to `_exclude`. The root `README.md` is template
+  documentation and must not be processed as a Jinja2 template (it contained escaped
+  pipe characters inside Jinja2 expression delimiters, causing `TemplateSyntaxError:
+  unexpected char '\'`).
+- **`README.md`**: Replaced escaped pipe characters with Jinja2 raw-block wrapping in
+  the derived variables table to produce valid Jinja2 even if the file is processed
+  directly.
+
 ### Changed — copier template wraps content in `{{ module_name }}/` subdir (2026-03-30)
 
 - All template files now live inside a `{{ module_name }}/` directory in the template

@@ -1,16 +1,54 @@
-# NPM-Pakete die global installiert werden
-# Ein Paket pro Zeile, Kommentare mit #
+# =============================================================================
+# npm-packages.txt — Global npm packages for {{ module_name }}
+# =============================================================================
+#
+# PURPOSE
+#   Installed by the VYRA Module Manager as STEP 4 of the deployment pipeline:
+#     1. pre-install.sh        (custom shell setup)
+#     2. system-packages.txt   (apt packages)
+#     3. requirements.txt      (pip packages)
+#   → 4. npm-packages.txt      (npm install -g <packages>)
+#
+#   This step only runs when enable_frontend = true in the Copier configuration.
+#
+# FORMAT
+#   - One package name per line (with optional @version, e.g. typescript@5.4.0).
+#   - Lines starting with # are ignored.
+#   - The Module Manager runs: npm install -g <package> for each entry.
+#
+# NOTES
+#   - This file is for GLOBAL CLI tools only (e.g. build toolchains, generators).
+#   - Project-level frontend dependencies belong in frontend/package.json,
+#     not here. They are installed automatically via `npm install` in frontend/.
+#   - Node.js and npm are pre-installed in the VYRA base image.
+#
+# =============================================================================
 
-# Frontend Build Tools
-#vite
-#@vue/cli
 
-# Development Tools
-#nodemon
+# ── TypeScript Compiler ───────────────────────────────────────────────────────
+# Needed globally when running tsc as a CLI tool outside of vite/vue-tsc.
+#
+# typescript                # TypeScript compiler (tsc)
+# @types/node               # Node.js type definitions
 
-# Utility Tools
-#http-server
 
-# Optional: TypeScript
-# typescript
-# @types/node
+# ── Code Generation ───────────────────────────────────────────────────────────
+# Tools that generate TypeScript clients from OpenAPI specs or proto files.
+#
+# openapi-typescript-codegen   # Generate TypeScript API clients from OpenAPI schemas
+# @protobuf-ts/plugin          # Generate TypeScript from proto files
+
+
+# ── Testing & Quality ─────────────────────────────────────────────────────────
+#
+# vitest                    # Unit test runner for Vue 3 / Vite projects (prefer local install)
+
+
+# ── Utility CLI Tools ─────────────────────────────────────────────────────────
+#
+# http-server               # Simple static file server for frontend previews
+# serve                     # Serve static files (alternative to http-server)
+
+
+# ── Add Module-Specific Global npm Packages Below ────────────────────────────
+

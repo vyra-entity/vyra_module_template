@@ -82,8 +82,8 @@ copier copy --trust ~/VYRA/vyra_module_template module-storages/
 |---|---|---|
 | `{{ module_name }}` | `my_detector` | Directory name, Python package |
 | `{{ module_display_name }}` | `My Detector Module` | UI label |
-| `{{ module_name \| replace('_', '-') }}` | `my-detector` | Docker entrypoint / service name |
-| `{{ module_name \| title \| replace('_','') }}` | `MyDetector` | Python class name |
+| `{% raw %}{{ module_name | replace('_', '-') }}{% endraw %}` | `my-detector` | Docker entrypoint / service name |
+| `{% raw %}{{ module_name | title | replace('_','') }}{% endraw %}` | `MyDetector` | Python class name |
 
 ---
 

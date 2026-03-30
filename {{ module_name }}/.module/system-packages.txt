@@ -1,25 +1,75 @@
-# System-Pakete die beim VYRA_STARTUP_ACTIVE installiert werden
-# Ein Paket pro Zeile, Kommentare mit #
+# =============================================================================
+# system-packages.txt — APT system packages for {{ module_name }}
+# =============================================================================
+#
+# PURPOSE
+#   Installed by the VYRA Module Manager as STEP 2 of the deployment pipeline:
+#     1. pre-install.sh        (custom shell setup)
+#   → 2. system-packages.txt   (apt-get install -y <packages>)
+#     3. requirements.txt      (pip packages)
+#     4. npm-packages.txt      (global npm packages, frontend only)
+#
+# FORMAT
+#   - One package name per line.
+#   - Lines starting with # are ignored.
+#   - The Module Manager runs: apt-get install -y <package> for each entry.
+#
+# NOTES
+#   - Node.js and npm are PRE-INSTALLED in the VYRA base image. Do not add them.
+#   - Use pre-install.sh to add custom APT repositories before listing packages here.
+#   - Only add packages actually required at runtime or build time.
+#
+# =============================================================================
 
-# Node.js ist bereits im Base Image installiert (neueste LTS Version)
-# nodejs - nicht mehr nötig, im Base Image enthalten
-# npm - nicht mehr nötig, im Base Image enthalten
 
-# Development Tools
-#build-essential
-#curl
-#wget
-#tree
+# ── Build & Compilation Tools ─────────────────────────────────────────────────
+# Needed when pip packages compile native C/C++ extensions from source.
+#
+# build-essential          # gcc, g++, make — required for many native extensions
+# cmake                    # CMake build system
 
-# Python Development
-#python3-dev
-#python3-pip
 
-# Network Tools
-#netcat-openbsd
-#telnet
-#iputils-ping
+# ── Python Development Headers ────────────────────────────────────────────────
+# Required when building Python C-extension packages from source.
+#
+# python3-dev              # Python C headers
 
-# Web-Server Tools (optional)
-#nginx
-# supervisor
+
+# ── Cryptography / TLS ────────────────────────────────────────────────────────
+#
+# libssl-dev               # OpenSSL headers (needed by some cryptography builds)
+# ca-certificates          # Root CA bundle (usually pre-installed)
+
+
+# ── Network Utilities ─────────────────────────────────────────────────────────
+# Useful for health checks and debugging inside the container.
+#
+# curl                     # HTTP client (often pre-installed)
+# wget                     # Alternative HTTP downloader
+# netcat-openbsd           # TCP/UDP connectivity tests
+
+
+# ── Hardware / Serial Interfaces ─────────────────────────────────────────────
+# Uncomment for modules that communicate with physical hardware.
+#
+# libusb-dev               # USB device access (required by some USB libs)
+# libudev-dev              # udev rule support
+# libgpiod2                # GPIO access on embedded hardware
+
+
+# ── Media & Image Processing ─────────────────────────────────────────────────
+#
+# ffmpeg                   # Video/audio encoding, decoding, streaming
+# libopencv-dev            # OpenCV native libraries
+
+
+# ── Diagnostic & Debugging Tools ─────────────────────────────────────────────
+# Generally only needed in development images.
+#
+# tree                     # Directory tree viewer
+# htop                     # Interactive process viewer
+# iputils-ping             # ICMP ping utility
+
+
+# ── Add Module-Specific System Packages Below ─────────────────────────────────
+

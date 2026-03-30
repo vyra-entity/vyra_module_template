@@ -1,32 +1,72 @@
-fastapi==0.115.0
-redis==5.0.1
-aiohttp==3.9.1
-dependency-injector==4.42.0
-pydantic-settings==2.1.0
-python-json-logger>=2.0.7
-colorlog>=6.0.0
+# =============================================================================
+# requirements.txt — Python pip dependencies for {{ module_name }}
+# =============================================================================
+#
+# PURPOSE
+#   Installed by the VYRA Module Manager as STEP 3 of the deployment pipeline:
+#     1. pre-install.sh        (custom shell setup)
+#     2. system-packages.txt   (apt packages)
+#   → 3. requirements.txt      (pip install -r requirements.txt)
+#     4. npm-packages.txt      (global npm packages, frontend only)
+#
+# FORMAT
+#   - One package per line. Pinned versions (==) are recommended for
+#     reproducible builds. Use >= only for non-critical / optional packages.
+#   - Lines starting with # are ignored.
+#
+# =============================================================================
 
-# --- Optional dependencies ---
-# If ENABLE_FRONTEND_WEBSERVER and ENABLE_BACKEND_WEBSERVER are set to true
-# in the .env file, the following packages are required:
-uvicorn[standard]==0.30.6
-requests==2.32.5
-httpx==0.24.1
 
-# Needed for ros2 hot-reload [activated via ENABLE_HOT_RELOAD in .env]
-watchdog>=3.0.0
+# ── Core Framework ────────────────────────────────────────────────────────────
+# Packages required by every VYRA module regardless of feature flags.
 
-# --- Multi-protocol communication (optional) ---
-# MQTT protocol support
-paho-mqtt>=2.0.0
+fastapi==0.115.0              # Async REST API framework
+pydantic-settings==2.1.0      # Settings management via env vars / .env files
+dependency-injector==4.42.0   # IoC container used in container_injection.py
 
-# gRPC protocol support
-grpcio>=1.60.0
-grpcio-tools>=1.60.0
 
-# Industrial protocols (Modbus, OPC UA)
-pymodbus>=3.6.0
-asyncua>=1.1.0
+# ── Logging ───────────────────────────────────────────────────────────────────
 
-# WebSocket support (already covered by aiohttp)
-# REST support (already covered by aiohttp)
+python-json-logger>=2.0.7     # Structured JSON log output
+colorlog>=6.0.0               # Coloured console log formatting
+
+
+# ── Data & Cache ──────────────────────────────────────────────────────────────
+
+redis==5.0.1                  # Redis client — used by RedisService and StateFeeder
+aiohttp==3.9.1                # Async HTTP client/server (WebSocket support included)
+
+
+# ── Web Server ────────────────────────────────────────────────────────────────
+# Required when ENABLE_BACKEND_WEBSERVER=true in the module .env file.
+
+uvicorn[standard]==0.30.6     # ASGI server hosting FastAPI
+requests==2.32.5              # Synchronous HTTP client (used in tests and scripts)
+httpx==0.24.1                 # Async HTTP client with request/response interceptors
+
+
+# ── Hot Reload (Development) ──────────────────────────────────────────────────
+# Watches source files and triggers ROS2 node restarts in dev mode.
+# Activated via ENABLE_HOT_RELOAD=true in the module .env file.
+
+watchdog>=3.0.0               # Filesystem event watcher
+
+
+# ── Multi-Protocol Communication (Optional) ───────────────────────────────────
+# Uncomment the protocols your module actually uses.
+
+# MQTT — lightweight pub/sub for IoT and edge devices
+# paho-mqtt>=2.0.0
+
+# gRPC — high-performance RPC for inter-service communication
+# grpcio>=1.60.0
+# grpcio-tools>=1.60.0        # protoc compiler plugin for Python
+
+# Modbus — industrial fieldbus protocol (serial and TCP)
+# pymodbus>=3.6.0
+
+# OPC UA — industrial M2M communication standard
+# asyncua>=1.1.0
+
+
+# ── Add Module-Specific Dependencies Below ────────────────────────────────────

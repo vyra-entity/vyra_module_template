@@ -1,89 +1,10 @@
-# vyra_module_template - VYRA Module Template
+# {{ module_name }}
 
-> **This is a [Copier](https://copier.readthedocs.io/) template** for creating new VYRA modules.
-> It is **not** a runnable module itself — use it to scaffold a new module project.
+This is a **VYRA module** — a self-contained service built on the [VYRA Framework](https://github.com/Variobotic-GmbH/vyra_framework).
+It was generated from the [vyra_module_template](https://github.com/vyra-entity/vyra_module_template).
+For template and Copier usage instructions see the [template README](https://github.com/vyra-entity/vyra_module_template#readme).
 
-## �️ Template Development Workflow
-
-> **IMPORTANT**: `copier.yml` sets `_vcs_ref: HEAD`. This means `copier copy` from a **local path**
-> always uses the current working tree (including uncommitted changes).
-> `copier update` on existing modules still diffs against git history — so commit changes before updating.
-
-### Edit → Copy workflow (local development)
-```bash
-# 1. Edit template files (Dockerfile, copier.yml, src/, …)
-# 2. Commit your changes (required for copier update to work on existing modules)
-git -C /path/to/vyra_module_template add -A
-git -C /path/to/vyra_module_template commit -m "feat: <describe change>"
-
-# 3a. Create a new module from the current HEAD
-copier copy --trust /path/to/vyra_module_template ./modules/my_new_module --trust --vcs-ref HEAD
-
-# 3b. Create a new module from the current tag
-git tag v1.x.y HEAD  # be sure to create a higher version as the latest
-copier copy --trust /path/to/vyra_module_template ./modules/my_new_module
-
-# 4. Update an existing module (applies template diff since last copy)
-copier update --trust --skip-answered
-```
-
-### Bump template version (for releases)
-```bash
-# Increments patch version, commits and tags
-bash /path/to/vyra_module_template/tools/bump_template_version.sh
-```
-
-## �📋 Overview
-
-VYRA modules are the building blocks of the [VYRA Framework](https://github.com/Variobotic-GmbH/vyra_framework). Each module is a self-contained service that runs inside a **VYRA Framework deployment** (Docker Swarm) and communicates with other modules via ROS2/Zenoh.
-
-This template provides:
-
-- **Standardized project structure** matching all official VYRA modules
-- **Backend scaffold** using `vyra_base_python` as the core library
-- **Optional Vue.js frontend** with Vite dev proxy and hot-reload
-- **Docker / Docker Swarm** deployment files
-- **Full Mode** (ROS2 + Zenoh) and **SLIM Mode** (Python-only, no ROS2) support
-- **Testing scaffold** with pytest (unit, integration, e2e)
-
-## ⚙️ Prerequisites
-
-| Requirement | Notes |
-|---|---|
-| [Copier](https://copier.readthedocs.io/) ≥ 9 | `pip install copier` |
-| [VYRA Framework](https://github.com/Variobotic-GmbH/vyra_framework) | The runtime environment for all modules |
-| [vyra_base_python](https://github.com/vyra-entity/vyra_base_python) | Core library used by every module |
-| Docker + Docker Swarm | For deployment |
-| Python ≥ 3.11 | Backend development |
-
-## 🚀 Creating a New Module
-
-Use Copier to generate a new module from this template:
-
-```bash
-# Generate a new module into a target directory
-copier copy https://github.com/vyra-entity/vyra_module_template ./modules/my_new_module
-
-# Or use a local copy of the template
-copier copy /path/to/vyra_module_template ./modules/my_new_module
-```
-
-### Copier prompts
-
-| Variable | Description | Example |
-|---|---|---|
-| `module_name` | Snake_case module identifier | `my_detector` |
-| `module_display_name` | Human-readable name | `My Detector Module` |
-| `module_description` | Short description | `Detects things` |
-| `author_name` | Your name | `Jane Doe` |
-| `author_email` | Your email | `jane@example.com` |
-| `enable_frontend` | Include Vue.js frontend | `true` / `false` |
-| `enable_dev_mode` | Enable hot-reload dev mode by default | `true` / `false` |
-| `enable_slim_mode` | SLIM mode (no ROS2, Python-only) | `false` (default) |
-
-After generation the module is ready to be built and deployed via the VYRA Framework.
-
-## 🏗️ VYRA Framework Requirement
+## Overview
 
 VYRA modules **cannot run standalone**. They require a running VYRA Framework deployment that provides:
 
@@ -91,81 +12,135 @@ VYRA modules **cannot run standalone**. They require a running VYRA Framework de
 - **Traefik** reverse proxy / routing
 - **Redis** shared state storage
 - **ROS2 / Zenoh** communication bus
-- **Module Manager** (`v2_modulemanager`) for lifecycle management
+- **Module Manager** (`v2_modulemanager`) — installation, lifecycle, plugin management
+
+The Module Manager is the only correct way to install, start, stop, or update a module. Do not start the module container directly.
+
+## Foundation: vyra_base_python
+
+Every VYRA module is built on [`vyra_base_python`](https://github.com/vyra-entity/vyra_base_python), which provides:
+
+- **`VyraEntity`** — the module's network identity and main interface point
+- **3-layer state machine** — Lifecycle / Operational / Health states with automatic transitions
+- **CAL (Communication Abstraction Layer)** — unified interface over all supported protocols
+- **Feeders** — structured publishing of state changes, news, and error events
+- **Security** — SROS2 policies and access-level enforcement
+
+Do not re-implement any of these concerns from scratch.
+
+## Communication Protocols (CAL)
+
+All inter-module communication goes through the CAL. The four core protocols are:
+
+| Protocol | Use Case |
+|---|---|
+| **ROS2** | Robot Operating System 2 — industrial-standard DDS-based messaging (services, actions, topics). Full Mode only. |
+| **Zenoh** | Lightweight, high-performance pub/sub and query layer. Works in both Full and SLIM Mode. Recommended for new service interfaces. |
+| **Redis** | Key-value store pub/sub and shared state. Fast event distribution and cross-cluster state sharing. |
+| **UDS** | Unix Domain Sockets — low-latency local IPC within the same container or host. |
+
+The protocol(s) a function is exposed on are declared per interface in the interface config files (see below).
+
+## Interfaces
+
+Module interfaces — the remote-callable functions and published events — live in:
 
 ```
-VYRA Framework (Docker Swarm)
-  ├── Traefik          → routing / TLS termination
-  ├── Redis            → shared state
-  ├── v2_modulemanager → module lifecycle & plugin management
-  └── <your module>    → your custom service
+src/{{ module_name }}_interfaces/
 ```
 
-See the [VYRA Framework repository](https://github.com/Variobotic-GmbH/vyra_framework) for setup instructions.
+They are **automatically generated** from JSON config files during `colcon build`. Config files are placed in:
 
-## 📦 Module Manager & Plugin Installation
+```
+src/{{ module_name }}_interfaces/config/
+```
 
-All modules and plugins are managed by the **Module Manager** (`v2_modulemanager`). You do not install modules by hand — the Module Manager handles:
+Preferred naming convention for config files:
 
-- **Module installation** from a configured repository (local or remote)
-- **Plugin installation** (lightweight extensions added on top of modules)
-- **Updates** for both modules and plugins
-- **Lifecycle control** (start, stop, restart)
+```
+<module_name>_<area>.meta.json
+```
 
-Once your module is published to a VYRA repository, it can be discovered and installed directly from the Module Manager UI or API:
+For example: `{{ module_name }}_sensors.meta.json`, `{{ module_name }}_control.meta.json`. The name can be freely chosen as long as it is unique within the `config/` directory.
 
+See [src/{{ module_name }}_interfaces/README.md](src/{{ module_name }}_interfaces/README.md) for the full config format and generation details.
+
+## Deployment Modes
+
+| Mode | Protocols | Notes |
+|---|---|---|
+| **Full Mode** (default) | ROS2 + Zenoh + Redis + UDS | Full framework feature set, production-ready |
+| **SLIM Mode** | Zenoh + Redis + UDS | Python-only, no ROS2 runtime. Faster startup, smaller footprint. Enable via `VYRA_SLIM=true`. |
+
+See [docs/architecture/SLIM_MODE.md](docs/architecture/SLIM_MODE.md) for details.
+
+## Directory Overview
+
+```
+{{ module_name }}/
+├── src/
+│   ├── {{ module_name }}_interfaces/   ← ROS2/Zenoh interface definitions (auto-generated from config/)
+│   │   └── README.md
+│   └── {{ module_name }}/              ← Python source package
+│       ├── README.md
+│       └── {{ module_name }}/          ← Main Python module
+│           └── README.md
+├── frontend/                           ← Vue 3 + TypeScript UI (if enabled)
+│   └── README.md
+├── tests/                              ← Pytest: unit / integration / e2e
+├── examples/                           ← Isolated usage examples
+├── config/                             ← Runtime config (logging, nginx, cyclonedds, uvicorn)
+├── storage/                            ← Persistent runtime data and DB files
+├── logs/                               ← Runtime logs (core_stdout.log, etc.)
+├── .module/                            ← Module metadata and plugin interface definitions
+├── docs/                               ← Extended architecture and deployment documentation
+└── Dockerfile
+```
+
+### Internal Code Structure
+
+- [src/{{ module_name }}_interfaces/README.md](src/{{ module_name }}_interfaces/README.md) — Interface config format, protocol tags, auto-generation
+- [src/{{ module_name }}/README.md](src/{{ module_name }}/README.md) — Python package layout, Alembic migrations
+- [src/{{ module_name }}/{{ module_name }}/README.md](src/{{ module_name }}/{{ module_name }}/README.md) — Entry points, state machine, application, interfaces, user management
+- [src/{{ module_name }}/{{ module_name }}/backend_webserver/README.md](src/{{ module_name }}/{{ module_name }}/backend_webserver/README.md) — REST API, WebSocket, auth, services
+- [src/{{ module_name }}/{{ module_name }}/plugin/README.md](src/{{ module_name }}/{{ module_name }}/plugin/README.md) — WASM plugin system
+
+### Frontend
+
+The Vue 3 frontend lives in `frontend/`. It uses Vite for development (with a dev proxy to the backend),
+PrimeVue as the component library, and Pinia for state management.
+
+See [frontend/README.md](frontend/README.md) for the full structure, available stores, and development instructions.
+
+### Examples
+
+`examples/` contains isolated, runnable Python snippets demonstrating key patterns such as feeders,
+state transitions, interface definitions, config helpers, and access policy patterns.
+Read [examples/README.md](examples/README.md) for an index of all examples.
+
+### Tests
+
+`tests/` uses pytest with three tiers:
+
+| Marker | Scope | External Dependencies |
+|---|---|---|
+| `@pytest.mark.unit` | Single class / function | None |
+| `@pytest.mark.integration` | Service interaction | Redis, ROS2 |
+| `@pytest.mark.e2e` | Full module workflow | Full VYRA stack |
+
+Run with:
 ```bash
-# Install a module via the Module Manager API
-curl -k -X POST https://localhost/v2_modulemanager/api/modules/install \
-  -H "Content-Type: application/json" \
-  -d '{"module_name": "my_detector", "version": "1.0.0"}'
-
-# Install a plugin
-curl -k -X POST https://localhost/v2_modulemanager/api/plugins/install \
-  -H "Content-Type: application/json" \
-  -d '{"plugin_name": "my-plugin", "version": "1.0.0"}'
+pytest -m unit          # fast, no external services required
+pytest -m integration   # requires Redis and ROS2
+pytest -m e2e           # requires full VYRA deployment
 ```
 
-See the [Module Manager documentation](https://github.com/Variobotic-GmbH/vyra_framework) for repository configuration and publishing details.
-
-## 🔧 vyra_base_python
-
-Every VYRA module is built on top of [`vyra_base_python`](https://github.com/vyra-entity/vyra_base_python), which provides:
-
-- **`VyraEntity`** — base class for all modules (state machine, lifecycle hooks)
-- **ROS2 / Zenoh** communication abstractions
-- **Redis** integration helpers
-- **Structured logging** via `structlog`
-- **Security** (SROS2, access levels)
-- **Plugin loader** — dynamic plugin system
-
-The generated module already has `vyra_base_python` as a dependency. Do not implement these concerns from scratch.
-
-## 🎯 Deployment Modes
-
-### Full Mode (Default)
-- ROS2 + Zenoh communication
-- Full framework feature set
-- Suitable for production environments
-
-### SLIM Mode (Python-only)
-- Zenoh communication only (no ROS2)
-- 10x faster startup, ~90% smaller footprint
-- Ideal for edge devices, CI/CD, and lightweight services
-
-Enable via `enable_slim_mode: true` during template generation, or set `VYRA_SLIM=true` at runtime.
-
-See [SLIM Mode Documentation](docs/SLIM_MODE.md) for details.
-
-## 📚 Documentation
+## Further Documentation
 
 | Document | Description |
 |---|---|
 | [docs/README.md](docs/README.md) | Full documentation index |
 | [docs/development/DEVEL.md](docs/development/DEVEL.md) | Development workflow |
 | [docs/deployment/DEPLOYMENT.md](docs/deployment/DEPLOYMENT.md) | Production deployment |
-| [docs/backend/](docs/backend/) | Backend API reference |
-| [docs/frontend/FRONTEND_ARCHITECTURE.md](docs/frontend/FRONTEND_ARCHITECTURE.md) | UI structure |
-| [docs/architecture/](docs/architecture/) | Module architecture |
+| [docs/architecture/](docs/architecture/) | Architecture deep-dives |
 | [docs/plugin/](docs/plugin/) | Plugin development |
-| [examples/README.md](examples/README.md) | Isolated usage examples |

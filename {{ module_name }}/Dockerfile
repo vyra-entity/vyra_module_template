@@ -34,7 +34,8 @@ WORKDIR /workspace
 # Poetry Installation & Dependency Management (Cache-Optimized)
 # =============================================================================
 # Install Poetry for professional dependency management
-RUN pip install --no-cache-dir poetry --break-system-packages
+# --ignore-installed packaging: avoids conflict with Debian-managed packaging package
+RUN pip install --no-cache-dir poetry --break-system-packages --ignore-installed packaging
 
 # Configure Poetry to NOT create virtualenvs (use system Python in container)
 RUN poetry config virtualenvs.create false
@@ -82,7 +83,9 @@ RUN if [ -f ".module/pre-install.sh" ]; then \
 RUN if [ -f ".module/system-packages.txt" ]; then \
         apt-get update -qq && \
         while read -r package; do \
-            [ -n "$package" ] && [ "${package:0:1}" != "#" ] && apt-get install -y "$package" || exit 0; \
+            [ -z "$package" ] && continue; \
+            [ "${package:0:1}" = "#" ] && continue; \
+            apt-get install -y "$package" || echo "⚠️  Failed to install $package, skipping"; \
         done < .module/system-packages.txt; \
         apt-get clean && rm -rf /var/lib/apt/lists/*; \
     fi

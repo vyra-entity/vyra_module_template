@@ -1,0 +1,52 @@
+# Plugin Host Function Interface Definitions
+#
+# This file defines which host functions are available to WASM plugins
+# inside v2_modulemanager. The LinkerFactory reads this file and binds
+# each entry to the corresponding method on PluginGateway.
+#
+# Location: .module/plugin_interfaces.yaml
+# Used by:  PluginGateway → LinkerFactory.create_linker()
+#
+# ── Structure ─────────────────────────────────────────────────────────────────
+# linker_map:
+#   - namespace: "<wasm_import_namespace>"
+#     functions:
+#       - wasm_name: "<name as declared in WASM import>"
+#         host_func:  "<PluginGateway method name>"
+#         # Optional: explicit WASM type override.
+#         # When omitted, types are inferred from the Python signature
+#         # (int→i32, float→f32, str→i32+i32 ptr/len pair, None return→void).
+#         wasm_types:
+#           params:  ["i32", "i32"]   # wasmtime type names
+#           results: ["i32"]
+
+linker_map:
+
+  # ── Core namespace — provided by PluginGateway ───────────────────────────
+  - namespace: "vyra"
+    functions:
+
+      # Log a message from inside the WASM plugin.
+      # Python: gateway.log(msg: str, level: str)
+      # WASM call: log(msg_ptr: i32, msg_len: i32, level_ptr: i32, level_len: i32)
+      - wasm_name: "log"
+        host_func: "log"
+        # wasm_types inferred from gateway.log(msg: str, level: str) → 4×i32, no result
+
+      # Publish a pub/sub event from inside the WASM plugin.
+      # The payload must be a JSON string.
+      # Python: gateway.publish_event(topic: str, payload: str)
+      # WASM call: publish(topic_ptr, topic_len, payload_ptr, payload_len)
+      - wasm_name: "publish"
+        host_func: "publish_event"
+
+      # Send a request and receive a JSON-encoded response string.
+      # Python: gateway.send_request(topic: str, payload: str) → str
+      # WASM call: request(topic_ptr, topic_len, payload_ptr, payload_len) → i32 result_ptr
+      # NOTE: Returning a string from WASM requires shared memory.
+      #       Use explicit wasm_types if your WASM module returns a pointer.
+      - wasm_name: "request"
+        host_func: "send_request"
+        wasm_types:
+          params:  ["i32", "i32", "i32", "i32"]
+          results: ["i32"]
