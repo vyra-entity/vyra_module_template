@@ -184,6 +184,15 @@ mkdir -p /workspace/log/core
 # Set write permissions for all users (ROS2 logging needs this)
 chmod -R 777 /workspace/log/
 
+# Ensure nginx temp directories are writable by vyrauser
+# (nginx creates /var/lib/nginx/body etc. at runtime; if root-owned it fails)
+mkdir -p /var/lib/nginx/body /var/lib/nginx/fastcgi /var/lib/nginx/proxy /var/lib/nginx/scgi /var/lib/nginx/uwsgi
+chown -R vyrauser:vyrauser /var/lib/nginx 2>/dev/null || true
+mkdir -p /var/log/nginx
+chown -R vyrauser:vyrauser /var/log/nginx 2>/dev/null || true
+mkdir -p /run/nginx
+chown -R vyrauser:vyrauser /run/nginx 2>/dev/null || true
+
 # Clean up old thread log files if cleanup script exists
 if [ -f "/workspace/tools/cleanup_thread_logs.sh" ]; then
     /workspace/tools/cleanup_thread_logs.sh
@@ -630,6 +639,11 @@ check_and_create_certificates() {
     if [ -f "$cert_path" ] && [ -f "$key_path" ]; then
         echo "✅ SSL certificates found for $cert_name"
         
+        # Ensure certificates are readable by vyrauser (may be root-owned from prior run)
+        chown vyrauser:vyrauser "$cert_path" "$key_path" 2>/dev/null || true
+        chmod 640 "$key_path"
+        chmod 644 "$cert_path"
+        
         # Check if certificates are still valid (not expired)
         if openssl x509 -checkend 86400 -noout -in "$cert_path" >/dev/null 2>&1; then
             echo "✅ SSL certificates for $cert_name are valid (>24h remaining)"
@@ -667,8 +681,9 @@ check_and_create_certificates() {
             -nodes \
             -subj "/CN=localhost/O=VYRA Dashboard/OU=${cert_name}/C=DE" >/dev/null 2>&1; then
             
-            # Set secure permissions
-            chmod 600 "$key_path"
+            # Set secure permissions and correct ownership
+            chown vyrauser:vyrauser "$key_path" "$cert_path" 2>/dev/null || true
+            chmod 640 "$key_path"
             chmod 644 "$cert_path"
             
             echo "✅ SSL certificates for $cert_name created manually"

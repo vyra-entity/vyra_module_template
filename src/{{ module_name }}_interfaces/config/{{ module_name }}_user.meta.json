@@ -1,0 +1,40 @@
+[
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "list_users",
+        "displayname": "List Users",
+        "description": "List all users registered in the VYRA user management system. Returns a JSON-encoded list of user objects including username, email, role, level, and status.",
+        "filetype": [
+            "VModuleListUsers.proto"
+        ],
+        "params": [],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Indicates whether the operation was successful"
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "A message providing additional information about the result"
+            },
+            {
+                "name": "users",
+                "datatype": "string",
+                "displayname": "Users (JSON)",
+                "description": "JSON-encoded array of user objects. Each object contains: user_id, username, email, role, level, enabled, created_at, last_login"
+            }
+        ],
+        "access_level": 2,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    }
+]

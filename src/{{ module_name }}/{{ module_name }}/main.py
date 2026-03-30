@@ -322,6 +322,7 @@ async def web_backend_runner() -> None:
             host="0.0.0.0",
             port=8443,
             log_level="info",
+            log_config=None,  # Use our existing logging config instead of uvicorn's default
             ssl_certfile=cert_path,
             ssl_keyfile=key_path,
             reload=False
@@ -338,6 +339,7 @@ async def web_backend_runner() -> None:
             host="0.0.0.0",
             port=8443,
             log_level="info",
+            log_config=None,  # Use our existing logging config instead of uvicorn's default
             reload=False
         )
     

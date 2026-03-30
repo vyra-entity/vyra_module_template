@@ -260,6 +260,14 @@ WORKDIR /workspace
 # Copy ONLY module artifacts (base image already has everything else)
 COPY --from=builder /workspace/install/ ./install/
 # Note: build/ directory not needed in runtime (only for compilation)
+
+# Override vyra_base with the version installed in the builder stage.
+# The builder stage installs the wheel from wheels/, which may be newer than
+# what is baked into the base image (vyra_base_image:production).
+# This ensures fixes (e.g. conditional rclpy import in SLIM mode) are applied.
+COPY --from=builder /usr/local/lib/python3.12/dist-packages/vyra_base/ \
+     /usr/local/lib/python3.12/dist-packages/vyra_base/
+
 COPY --from=builder /workspace/sros2_ca_public.pem ./sros2_ca_public.pem
 COPY --from=builder /workspace/config/ ./config/
 COPY --from=builder /workspace/tools/ ./tools/
