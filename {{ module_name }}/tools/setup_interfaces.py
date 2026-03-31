@@ -359,7 +359,7 @@ def check_reserved_function_names(
         if info['function_name']
     }
 
-    for json_file in config_path.glob('*_meta.json'):
+    for json_file in list(config_path.glob("*.meta.json")) + list(config_path.glob("*_meta.json")):
         # Skip files that originally come from vyra_base
         if json_file.name in vyra_base_files:
             logging.debug(f"  ✓ {json_file.name} is from vyra_base – skipping reserved check")
@@ -690,11 +690,24 @@ def main(interface_package_name: str):
         logging.info("📥 Loading config files from vyra_base (new package)...")
     load_default_interfaces(interface_package_name, interface_package_path)
 
+    # ── Step 1.5: Remove stale old-convention base files ─────────────────────
+    # Old vyra_base used underscore naming (e.g. vyra_com_meta.json).
+    # New vyra_base uses dot naming (e.g. vyra_com.meta.json).
+    # After extract_interfaces(), clean up any stale underscore copies so the
+    # reserved-name check does not flag them as module-specific violations.
+    config_path = interface_package_path / "config"
+    vyra_base_files = get_vyra_base_config_files()
+    for _base_file in vyra_base_files:
+        if _base_file.endswith('.meta.json'):
+            _old_name = _base_file.replace('.meta.json', '_meta.json')
+            _old_file = config_path / _old_name
+            if _old_file.exists():
+                _old_file.unlink()
+                logging.info(f"🗑️  Removed stale old-named base file: {_old_name}")
+
     # ── Step 2: Validate module-specific configs against RESERVED list ───────
     logging.info("🔍 Checking module-specific config JSONs for reserved function names...")
     reserved_interfaces = load_reserved_list()
-    vyra_base_files = get_vyra_base_config_files()
-    config_path = interface_package_path / "config"
     violations = check_reserved_function_names(config_path, reserved_interfaces, vyra_base_files)
     if violations:
         logging.error("\n" + "=" * 70)
@@ -713,7 +726,7 @@ def main(interface_package_name: str):
     _renamed_invalid: list[tuple[Path, Path]] = []   # [(renamed_path, original_path)]
     try:
         import vyra_base as _vyra_base_module
-        _meta_jsons = list(config_path.glob("*_meta.json"))
+        _meta_jsons = list(config_path.glob("*.meta.json"))
         _valid_jsons, _invalid_jsons = _vyra_base_module.validate_config_schema(_meta_jsons)
         if _invalid_jsons:
             for _bad_file, _reason in _invalid_jsons:

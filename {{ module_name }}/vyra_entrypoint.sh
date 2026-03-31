@@ -26,16 +26,6 @@ fi
 chmod 777 .env
 
 # =============================================================================
-# Sync module_data.yaml from pyproject.toml (name, description, version, etc.)
-# =============================================================================
-echo "=== SYNCING MODULE MANIFEST ==="
-if [ -f "/workspace/tools/update_manifest.py" ]; then
-    python3 /workspace/tools/update_manifest.py \
-        "/workspace/pyproject.toml" \
-        "/workspace/.module/module_data.yaml"
-else
-    echo "⚠️ update_manifest.py not found, skipping manifest sync"
-fi
 
 # =============================================================================
 # Environment Variable Setup
@@ -679,7 +669,7 @@ check_and_create_certificates() {
             -out "$cert_path" \
             -days 365 \
             -nodes \
-            -subj "/CN=localhost/O=VYRA Dashboard/OU=${cert_name}/C=DE" >/dev/null 2>&1; then
+            -subj "/CN=localhost/O={{ module_name }}/OU=${cert_name}/C=DE" >/dev/null 2>&1; then
             
             # Set secure permissions and correct ownership
             chown vyrauser:vyrauser "$key_path" "$cert_path" 2>/dev/null || true

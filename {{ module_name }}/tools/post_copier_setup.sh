@@ -137,6 +137,50 @@ echo "   $NEW_INSTANCE_DIR/"
 echo "   └── $MODULE_VERSION/   ← $(basename "$NEW_MODULE_DIR")"
 
 # ---------------------------------------------------------------------------
+# 4.5. Update pyproject.toml from module_data.yaml
+# ---------------------------------------------------------------------------
+echo ""
+echo "📝 Syncing module_data.yaml to pyproject.toml [tool.poetry]..."
+python3 - "$NEW_MODULE_DIR/.module/module_data.yaml" "$NEW_MODULE_DIR/pyproject.toml" <<'PYEOF'
+import sys
+import re
+
+yaml_path = sys.argv[1]
+toml_path = sys.argv[2]
+
+try:
+    with open(yaml_path, 'r') as f:
+        yaml_content = f.read()
+
+    name = re.search(r'^name:\s*"?([^"\n]+)"?', yaml_content, re.MULTILINE)
+    version = re.search(r'^version:\s*"?([^"\n]+)"?', yaml_content, re.MULTILINE)
+    desc = re.search(r'^description:\s*"?([^"\n]+)"?', yaml_content, re.MULTILINE)
+
+    with open(toml_path, 'r') as f:
+        toml_content = f.read()
+
+    # Split into tool.poetry part and the rest
+    poetry_match = re.search(r'^\[tool\.poetry\]\s*\n(.*?)(?=\n\[|$)', toml_content, re.DOTALL | re.MULTILINE)
+    if poetry_match:
+        poetry_body = poetry_match.group(1)
+        
+        if name:
+            poetry_body = re.sub(r'^(name\s*=\s*)"[^"]*"', f'\\g<1>"{name.group(1)}"', poetry_body, flags=re.MULTILINE)
+        if version:
+            poetry_body = re.sub(r'^(version\s*=\s*)"[^"]*"', f'\\g<1>"{version.group(1)}"', poetry_body, flags=re.MULTILINE)
+        if desc:
+            poetry_body = re.sub(r'^(description\s*=\s*)"[^"]*"', f'\\g<1>"{desc.group(1)}"', poetry_body, flags=re.MULTILINE)
+
+        new_toml = toml_content[:poetry_match.start(1)] + poetry_body + toml_content[poetry_match.end(1):]
+        with open(toml_path, 'w') as f:
+            f.write(new_toml)
+        
+        print("✅ Successfully updated pyproject.toml [tool.poetry] from module_data.yaml")
+except Exception as e:
+    print(f"⚠️ Error syncing: {e}")
+PYEOF
+
+# ---------------------------------------------------------------------------
 # 5. Optionally build Docker image
 # ---------------------------------------------------------------------------
 if [ "$BUILD" = "true" ]; then

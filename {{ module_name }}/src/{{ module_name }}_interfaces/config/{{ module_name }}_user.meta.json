@@ -31,7 +31,7 @@
                 "description": "JSON-encoded array of user objects. Each object contains: user_id, username, email, role, level, enabled, created_at, last_login"
             }
         ],
-        "access_level": 2,
+        "access_level": 1,
         "displaystyle": {
             "visible": true,
             "published": false

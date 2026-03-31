@@ -49,7 +49,7 @@
                 "description": "True on successful call."
             }
         ],
-        "access_level": 0,
+        "access_level": 1,
         "displaystyle": {
             "visible": true,
             "published": true
@@ -87,7 +87,7 @@
                 "description": "True on successful call."
             }
         ],
-        "access_level": 0,
+        "access_level": 1,
         "displaystyle": {
             "visible": true,
             "published": true
@@ -125,7 +125,7 @@
                 "description": "True on successful call."
             }
         ],
-        "access_level": 0,
+        "access_level": 1,
         "displaystyle": {
             "visible": true,
             "published": true
@@ -163,7 +163,7 @@
                 "description": "True on successful call."
             }
         ],
-        "access_level": 0,
+        "access_level": 1,
         "displaystyle": {
             "visible": true,
             "published": true
@@ -293,7 +293,7 @@
                 "description": "True on successful call."
             }
         ],
-        "access_level": 0,
+        "access_level": 1,
         "displaystyle": {
             "visible": true,
             "published": true

@@ -356,35 +356,6 @@ ssl_certificate_key /workspace/storage/certificates/webserver.key;
 ---
 
 ## 🏷️ Module Tools
-### `update_manifest.py`
-
-Synchronisiert Modul-Metadaten aus `pyproject.toml` in `.module/module_data.yaml`.  
-Wird automatisch beim Start des Moduls im Entrypoint aufgerufen.
-
-**Synchronisierte Felder:**
-
-| Ziel (`module_data.yaml`) | Quelle (`pyproject.toml`)        |
-|---------------------------|----------------------------------|
-| `name`                    | `[tool.poetry].name`             |
-| `description`             | `[tool.poetry].description`      |
-| `version`                 | `[tool.poetry].version`          |
-| `template`                | `[tool.vyra].module_template`    |
-| `author`                  | `[tool.poetry].authors[0]`       |
-| `uuid`                    | **unverändert** (deployment-UUID)|
-
-**Verwendung:**
-```bash
-# Standard (workspace-Wurzel ermittelt automatisch)
-python3 tools/update_manifest.py
-
-# Explizite Pfade
-python3 tools/update_manifest.py pyproject.toml .module/module_data.yaml
-```
-
-**TOML-Parsing:**  
-Nutzt in dieser Reihenfolge: `tomllib` (Python ≥ 3.11) → `tomli` (pip) → eingebauten Regex-Fallback. Keine zusätzlichen Abhängigkeiten erforderlich.
-
----
 ### \`rename_module.sh\`
 
 Benennt das Modul komplett um - alle Referenzen, Verzeichnisse und Dateien.
