@@ -4,6 +4,19 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — vite.config.ts: DNS-Fehler ENOTFOUND im Dev-Proxy behoben (2026-03-31)
+- **`frontend/vite.config.ts`**: Proxy-Target von `https://{{ module_name }}:8443` auf `https://localhost:8443` geändert.
+  Module mit Hash-Suffix im Swarm-Servicenamen (z.B. `testv8_<hash>`) sind per kurzem Modulnamen
+  nicht auflösbar. Da Vite und Backend immer im gleichen Container laufen, ist `localhost` die
+  universell korrekte Lösung für alle aus diesem Template erzeugten Module.
+
+### Changed — plugin_gateway: service-based NFS path lookup (2026-04-01)
+
+- **`plugin/plugin_gateway.py`**: Removed direct `PluginPool` DB import from `_lookup_nfs_path`. NFS path is now resolved by calling the `plugin/get_nfs_path` Zenoh service exposed by `v2_modulemanager`.
+- Added `_get_nfs_path_client` field and expanded `_setup_resolve_client()` to create both `resolve_plugins` and `get_nfs_path` clients.
+- Added `_read_modulemanager_id()` static method that reads `labels.modulemanager.module_id` from `/workspace/.module/module_params.yaml` to identify the correct `v2_modulemanager` instance to route calls to.
+- Added teardown for `_get_nfs_path_client`.
+
 ### Fixed — copier.yml: Jinja2 TemplateSyntaxError in root README.md (2026-03-30)
 
 - **`copier.yml`**: Added `README.md` to `_exclude`. The root `README.md` is template

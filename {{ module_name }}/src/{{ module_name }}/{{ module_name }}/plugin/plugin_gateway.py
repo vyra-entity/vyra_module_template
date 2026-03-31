@@ -339,6 +339,7 @@ class PluginGateway:
         self._linker_factory: LinkerFactory | None = None
         self._runtime_pool: Any = None  # GatewayWasmRuntimePool, injected lazily
         self._resolve_client: Any = None  # Vyra Transport client → plugin/resolve_plugins
+        self._get_nfs_path_client: Any = None  # Vyra Transport client → plugin/get_nfs_path
         self._own_module_name: str = ""
         self._own_module_id: str = ""
         self._manifest_cache: dict = {}  # In-memory manifest cache (avoids disk I/O)
@@ -368,17 +369,65 @@ class PluginGateway:
         logger.info("✅ PluginGateway: interfaces registered")
 
     async def _setup_resolve_client(self) -> None:
-        """Create the Vyra transport client for the resolve_plugins self-call."""
+        """
+        Create the Vyra transport clients for plugin service calls.
+
+        The ``module_name`` for both clients is read from
+        ``/workspace/.module/module_params.yaml`` under
+        ``labels.modulemanager.module_id`` so that requests are routed to the
+        correct ``v2_modulemanager`` instance that manages this module.
+        """
+        module_name = self._read_modulemanager_id() or self._own_module_name
         try:
             self._resolve_client = await InterfaceFactory.create_client(
                 name="resolve_plugins",
-                module_name=self._own_module_name,
+                module_name=module_name,
                 namespace="plugin",
             )
-            logger.info("✅ PluginGateway: resolve_plugins client ready (self-call)")
+            logger.info("✅ PluginGateway: resolve_plugins client ready (module=%s)", module_name)
         except Exception as exc:
             logger.warning("⚠️  PluginGateway: resolve_plugins client failed: %s", exc)
             self._resolve_client = None
+
+        try:
+            self._get_nfs_path_client = await InterfaceFactory.create_client(
+                name="get_nfs_path",
+                module_name=module_name,
+                namespace="plugin",
+            )
+            logger.info("✅ PluginGateway: get_nfs_path client ready (module=%s)", module_name)
+        except Exception as exc:
+            logger.warning("⚠️  PluginGateway: get_nfs_path client failed: %s", exc)
+            self._get_nfs_path_client = None
+
+    @staticmethod
+    def _read_modulemanager_id() -> str | None:
+        """
+        Read ``labels.modulemanager.module_id`` from
+        ``/workspace/.module/module_params.yaml``.
+
+        :returns: The full module instance name of the managing v2_modulemanager,
+                  e.g. ``v2_modulemanager_733256b82d6b48a48bc52b5ec73ebfff``,
+                  or ``None`` if the value is not set / file not found.
+        """
+        params_path = Path("/workspace/.module/module_params.yaml")
+        try:
+            with params_path.open() as fh:
+                data = yaml.safe_load(fh) or {}
+            labels: dict = data.get("labels") or {}
+            modulemanager: dict = labels.get("modulemanager") or {}
+            module_id: str | None = modulemanager.get("module_id") or None
+            if module_id:
+                logger.debug("PluginGateway: resolved modulemanager.module_id=%s", module_id)
+            else:
+                logger.debug("PluginGateway: modulemanager.module_id not set in module_params.yaml")
+            return module_id
+        except FileNotFoundError:
+            logger.debug("PluginGateway: module_params.yaml not found at %s", params_path)
+            return None
+        except Exception as exc:
+            logger.warning("PluginGateway: could not read module_params.yaml: %s", exc)
+            return None
 
     async def run(self) -> None:
         """
@@ -400,6 +449,12 @@ class PluginGateway:
             except Exception:
                 pass
             self._resolve_client = None
+        if self._get_nfs_path_client is not None:
+            try:
+                await self._get_nfs_path_client.close()
+            except Exception:
+                pass
+            self._get_nfs_path_client = None
         logger.info("PluginGateway: shutdown complete")
 
     # ------------------------------------------------------------------
@@ -425,6 +480,28 @@ class PluginGateway:
         :param p_id:         Optional direct filter on plugin pool entry ID.
         :returns:            The resolve_plugins response dict.
         """
+        # --- Local fast-path ---------------------------------------------------
+        # When this module IS the plugin host (i.e. plugin_manager is registered
+        # in the ServiceRegistry), call _resolve_plugins_impl() directly instead
+        # of making an unnecessary Zenoh round-trip to ourselves.
+        local_pm = container_injection.get_service("plugin_manager")
+        if local_pm is not None:
+            try:
+                result = await local_pm._resolve_plugins_impl(
+                    scope_type_raw=scope_type,
+                    scope_target=scope_target,
+                    module_name=module_name or scope_target or self._own_module_name,
+                    module_id=module_id or self._own_module_id,
+                    p_id=p_id,
+                )
+                self._manifest_cache = result
+                return result
+            except Exception as exc:
+                logger.error("PluginGateway.resolve_plugins direct impl call failed: %s", exc)
+                return self.get_manifest()
+
+        # --- Remote path (consumer modules like v2_dashboard) ------------------
+        # No local plugin_manager → call via Zenoh transport.
         if self._resolve_client is None:
             await self._setup_resolve_client()
 
@@ -616,25 +693,32 @@ class PluginGateway:
 
     async def _lookup_nfs_path(self, plugin_id: str) -> Path:
         """
-        Look up the NFS path for a plugin from the local DB (PluginPool).
+        Look up the NFS path for a plugin via the ``plugin/get_nfs_path`` Zenoh
+        service exposed by ``v2_modulemanager``.
 
-        :raises RuntimeError: If the plugin is not found in the DB.
+        No direct database access is performed here.  The target
+        ``v2_modulemanager`` instance is determined by reading
+        ``labels.modulemanager.module_id`` from ``module_params.yaml``.
+
+        :raises RuntimeError: If the plugin is not found or the service is unavailable.
         """
-        from ..application.tb_plugin_pool import PluginPool
-        from vyra_base.storage.db_manipulator import DbManipulator  # type: ignore[import]
+        if self._get_nfs_path_client is None:
+            await self._setup_resolve_client()
 
-        if self.entity is None:
-            raise RuntimeError("PluginGateway entity not set — call setup() first")
+        if self._get_nfs_path_client is None:
+            raise RuntimeError(
+                f"PluginGateway: get_nfs_path client not available — "
+                f"cannot resolve NFS path for '{plugin_id}'"
+            )
 
-        pool_mani: DbManipulator = DbManipulator(self.entity.database_access, PluginPool)  # type: ignore[type-arg]
-        result = await pool_mani.get_all(filters={"plugin_name_id": plugin_id})
-        entries = result.value or []
-        if not entries:
-            raise RuntimeError(f"Plugin '{plugin_id}' not found in plugin_pool DB")
-        # Pick the most recently installed entry
-        entries_sorted = sorted(
-            entries,
-            key=lambda e: e.installed_at if e.installed_at else "",
-            reverse=True,
-        )
-        return Path(entries_sorted[0].nfs_path)
+        try:
+            response = await self._get_nfs_path_client.call({"plugin_id": plugin_id})
+        except Exception as exc:
+            raise RuntimeError(
+                f"PluginGateway: get_nfs_path call failed for '{plugin_id}': {exc}"
+            ) from exc
+
+        nfs_path_str = (response or {}).get("nfs_path", "")
+        if not nfs_path_str:
+            raise RuntimeError(f"Plugin '{plugin_id}' not found (get_nfs_path returned empty)")
+        return Path(nfs_path_str)

@@ -20,13 +20,13 @@ export default defineConfig({
     },
     proxy: {
       '/{{ module_name }}/api': {
-        target: 'https://{{ module_name }}:8443',
+        target: 'https://localhost:8443',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/{{ module_name }}/, '')
       },
       '/{{ module_name }}/ws': {
-        target: 'wss://{{ module_name }}:8443',
+        target: 'wss://localhost:8443',
         changeOrigin: true,
         secure: false,
         ws: true,
