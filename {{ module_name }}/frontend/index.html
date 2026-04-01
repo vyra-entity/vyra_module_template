@@ -151,6 +151,19 @@
         </div>
     </div>
 
+    <!-- Import map: resolves bare specifier "vue" for dynamically loaded plugins.
+         Plugins are pre-built ES modules that import from "vue" — the browser
+         cannot resolve bare specifiers without this map.
+         The vue.esm-browser.prod.js file is a self-contained full build of Vue
+         that matches the version used by the host application. -->
+    <script type="importmap">
+    {
+      "imports": {
+        "vue": "/{{ module_name }}/vendor/vue.esm-browser.prod.js"
+      }
+    }
+    </script>
+
     <!-- Vue.js wird von Vite automatisch hier eingefügt -->
     <script type="module" src="/src/main.ts"></script>
     

@@ -1,5 +1,19 @@
 <template>
   <div class="vyra-app" :class="{ 'has-sidebar': authStore.isAuthenticated }">
+    <!-- Invisible infrastructure plugin slots (rendered at App root, no visual output) -->
+    <PluginSlot v-if="authStore.isAuthenticated" slot-id="background" />
+    <PluginSlot v-if="authStore.isAuthenticated" slot-id="notification-provider" />
+    <PluginSlot v-if="authStore.isAuthenticated" slot-id="component-decorator" />    <!-- SDP registration wrappers: load at App root so they survive navigation -->
+    <PluginSlot v-if="authStore.isAuthenticated" slot-id="side-dock-popup.header" />
+    <PluginSlot v-if="authStore.isAuthenticated" slot-id="side-dock-popup.content" />
+    <PluginSlot v-if="authStore.isAuthenticated" slot-id="side-dock-popup.footer" />
+    <!-- Overlay / popup layers -->
+    <PluginSlot v-if="authStore.isAuthenticated" slot-id="overlay" />
+    <PluginSlot v-if="authStore.isAuthenticated" slot-id="popup" />
+
+    <!-- Side-Dock-Popup panel (right fly-in) -->
+    <SideDockPopup v-if="authStore.isAuthenticated" />
+
     <!-- Sidebar navigation (only when authenticated) -->
     <VyraSidebar v-if="authStore.isAuthenticated" />
 
@@ -21,6 +35,10 @@
         <div class="topbar-title">
           <span class="page-title">{%- raw %}{{ pageTitle }}{%- endraw %}</span>
         </div>
+
+        <!-- Topbar plugin slots -->
+        <PluginSlot slot-id="topbar.menu" />
+        <PluginSlot slot-id="topbar.display" />
 
         <!-- Alarm bell + three-dot menu -->
         <div class="topbar-actions">
@@ -47,6 +65,9 @@
       <main class="vyra-content">
         <router-view :key="$route.fullPath" />
       </main>
+
+      <!-- Status bar with plugin action slots -->
+      <VyraStatusbar v-if="authStore.isAuthenticated" />
 
       <footer v-if="authStore.isAuthenticated" class="vyra-footer">
         <span>VYRA Industrial Automation © 2025</span>
@@ -93,17 +114,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useSidebarStore } from './store/sidebar'
 import { useAuthStore } from './store/auth'
 import { useSystemStore } from './store/system'
 import { useModuleFeedStore } from './store/moduleFeed'
+import { usePluginStore } from './store/plugins'
 import apiClient from './api/http'
 import VyraSidebar from './components/layout/VyraSidebar.vue'
+import SideDockPopup from './components/layout/SideDockPopup.vue'
+import VyraStatusbar from './components/layout/VyraStatusbar.vue'
+import PluginSlot from './components/PluginSlot.vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import Menu from 'primevue/menu'
+import { providePluginApi } from './composables/usePluginApi'
 
 const route        = useRoute()
 const router       = useRouter()
@@ -111,6 +137,23 @@ const sidebarStore = useSidebarStore()
 const authStore    = useAuthStore()
 const systemStore  = useSystemStore()
 const feedStore    = useModuleFeedStore()
+
+// Provide the Global Plugin API to all child components (including plugins)
+providePluginApi()
+
+const pluginStore = usePluginStore()
+
+// Load plugins as soon as the user is authenticated so that infrastructure
+// slots (SDP pockets, background workers, etc.) are active from the start.
+watch(
+  () => authStore.isAuthenticated,
+  async (isAuth) => {
+    if (isAuth) {
+      await pluginStore.resolvePlugins('MODULE', '{{ module_name }}')
+    }
+  },
+  { immediate: true },
+)
 
 const topMenu      = ref<InstanceType<typeof Menu> | null>(null)
 const topMenuItems = [

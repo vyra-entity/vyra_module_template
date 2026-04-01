@@ -4,6 +4,11 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — Plugin bare specifier resolution for "vue" (2026-04-01)
+
+- **`frontend/index.html`** — Added `<script type="importmap">` mapping `"vue"` → `/{{ module_name }}/vendor/vue.esm-browser.prod.js`.
+- **`frontend/package.json`** — Added `postinstall` script that copies `vue.esm-browser.prod.js` to `public/vendor/` after `npm install`.
+
 ### Fixed — vite.config.ts: DNS-Fehler ENOTFOUND im Dev-Proxy behoben (2026-03-31)
 - **`frontend/vite.config.ts`**: Proxy-Target von `https://{{ module_name }}:8443` auf `https://localhost:8443` geändert.
   Module mit Hash-Suffix im Swarm-Servicenamen (z.B. `testv8_<hash>`) sind per kurzem Modulnamen

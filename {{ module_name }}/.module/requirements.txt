@@ -43,7 +43,7 @@ aiohttp==3.9.1                # Async HTTP client/server (WebSocket support incl
 uvicorn[standard]==0.30.6     # ASGI server hosting FastAPI
 requests==2.32.5              # Synchronous HTTP client (used in tests and scripts)
 httpx==0.24.1                 # Async HTTP client with request/response interceptors
-
+python-multipart>=0.0.22      # Required for handling multipart/form-data (file uploads) in FastAPI
 
 # ── Hot Reload (Development) ──────────────────────────────────────────────────
 # Watches source files and triggers ROS2 node restarts in dev mode.

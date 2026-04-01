@@ -1,10 +1,10 @@
 import apiClient from '../../api/http'
 
 /**
- * Plugin Runtime API — HTTP client for running plugins.
+ * Plugin Runtime API — HTTP-Client für laufende Plugins
  *
- * Runtime endpoints (WASM calls, slot resolution) are under /plugin/.
- * Admin endpoints (install/uninstall/pool) → plugin_admin_service/plugin_admin_service.api.ts
+ * Laufzeit-Endpunkte (WASM-Aufrufe, Slot-Auflösung, Assets) laufen unter /plugin/.
+ * Verwaltungs-Endpunkte (Install/Uninstall/Pool) → plugin_admin_service/plugin_admin_service.api.ts
  */
 
 export interface PluginCallRequest {
@@ -20,15 +20,29 @@ export interface PluginCallResponse {
 }
 
 export interface UiManifestEntry {
-  slot_id:        string
-  component_name: string
-  js_entry_point: string
-  plugin_id:      string
-  version:        string
-  assignment_id:  string
-  is_active:      boolean
-  scope_type:     string
-  scope_target:   string | null
+  slot_id:         string
+  /** List of scope target IDs (new field; mirrors `scope:` in manifest.yaml). */
+  slot_ids:        string[]
+  component_name:  string
+  js_entry_point:  string
+  plugin_id:       string
+  version:         string
+  assignment_id:   string
+  is_active:       boolean
+  scope_type:      string
+  scope_target:    string | null
+  /** Human-readable plugin title shown in UI. */
+  title:           string
+  /** Render priority (lower = rendered first). Default: 50. */
+  priority:        number
+  /** Minimum user role required to see/use this plugin. */
+  min_user_role:   string
+  /** Search keywords used by the global search-provider. */
+  search_keywords: string[]
+  /** Icon asset URL or PrimeIcons class name. */
+  icon:            string | null
+  /** Slot category type (mirrors SlotCategory). */
+  slot_type:       string
 }
 
 export interface ResolvePluginsResponse {
@@ -49,7 +63,7 @@ export interface ResolvePluginsResponse {
 
 export const pluginApi = {
   /**
-   * Generic plugin function call (WASM runtime in the backend).
+   * Generischer Plugin-Funktionsaufruf (WASM-Runtime im Backend).
    */
   async callPlugin(
     pluginId:     string,
@@ -76,7 +90,7 @@ export const pluginApi = {
       module_id:    params?.module_id,
       p_id:         params?.p_id,
     }})
+    console.log('Resolved plugins:', res.data)
     return res.data
   },
 }
-

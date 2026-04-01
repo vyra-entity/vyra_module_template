@@ -8,6 +8,7 @@
     "build": "vite build",
     "build:check": "vue-tsc && vite build",
     "preview": "vite preview",
+    "postinstall": "node -e \"const fs=require('fs');const src='node_modules/vue/dist/vue.esm-browser.prod.js';const dest='public/vendor/vue.esm-browser.prod.js';fs.mkdirSync('public/vendor',{recursive:true});fs.copyFileSync(src,dest);console.log('✅ Copied vue.esm-browser.prod.js to public/vendor/')\"",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",

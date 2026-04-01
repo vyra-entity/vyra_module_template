@@ -39,6 +39,15 @@ const routes: RouteRecordRaw[] = [
       sidebarIcon: 'pi pi-cog',
     }
   },
+  {
+    path: '/{{ module_name }}/p/:pluginSlug',
+    name: 'plugin-page',
+    component: () => import('../features/plugins/PluginPageView.vue'),
+    meta: {
+      title: 'Plugin Page - {{ module_display_name }}',
+      requiresAuth: true,
+    },
+  },
 
 ]
 
