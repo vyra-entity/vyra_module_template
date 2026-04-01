@@ -3,9 +3,8 @@
     <Card class="login-card">
       <template #header>
         <div class="login-header">
-          <!-- <img :src="logo" alt="Vyra Logo" width="180" height="60" /> -->
-          <i class="pi pi-shield text-6xl text-primary mb-3"></i>
-          <h2 class="m-0">VYRA Module Manager</h2>
+          <img :src="logo" alt="VYRA Logo" class="login-logo mb-3" />
+          <h2 class="m-0">VYRA {{ module_name }}</h2>
           <p class="text-600 mt-2">Bitte melden Sie sich an</p>
         </div>
       </template>
@@ -102,8 +101,11 @@ import Select from 'primevue/select'
 import Message from 'primevue/message'
 import { useAuthStore } from '../../store/auth'
 import { useToast } from 'primevue/usetoast'
-
-// import logo from '../../assets/variobotic-blau.svg'; // Importiert das Logo als Variable
+// Primary: module-specific icon — replace 'logo.svg' in assets/ with your own icon
+import logo from '../../assets/logo.svg'
+// Alternative: use one of the Variobotic logos as placeholder instead
+// import logo from '../../assets/variobotic-kreis-transparent-blaugrau.svg'
+// import logo from '../../assets/variobotic-blau.svg'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -188,6 +190,11 @@ onMounted(async () => {
   text-align: center;
   padding: 2rem 2rem 1rem;
   background: var(--surface-ground);
+}
+
+.login-logo {
+  width: 80px;
+  height: 80px;
 }
 
 .login-form {

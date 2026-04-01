@@ -25,7 +25,7 @@ logger = get_logger(__name__)
 
 class Component(OperationalStateMachine):
     """
-    Base component class for VYRA Module Manager application.
+    Base component class for {{ module_name }} application.
     
     Provides operational state management following industrial automation
     best practices with automatic state transitions.
@@ -74,10 +74,10 @@ class Component(OperationalStateMachine):
     @remote_service()
     async def initialize(self, request: Any=None, response: Any=None) -> bool:
         """
-        Initialize the VYRA Module Manager components.
+        Initialize the {{ module_name }} components.
         
         State Transition: IDLE -> READY
-        On Success: Module Manager fully initialized and ready for operations
+        On Success: {{ module_name }} fully initialized and ready for operations
         On Failure: IDLE -> ERROR
         
         Returns:
@@ -118,7 +118,7 @@ class Component(OperationalStateMachine):
         Resume from paused state.
         
         State Transition: PAUSED -> READY
-        On Success: Operations resumed, operation counter reset
+        On Success: {{ module_name }} operations resumed, operation counter reset
         On Failure: PAUSED -> ERROR
         
         Returns:
@@ -137,7 +137,7 @@ class Component(OperationalStateMachine):
         Stop component operations cleanly.
         
         State Transition: RUNNING/PAUSED -> STOPPED
-        On Success: Clean shutdown completed
+        On Success: {{ module_name }} clean shutdown completed
         On Failure: -> ERROR
         
         Returns:
@@ -209,7 +209,7 @@ class Component(OperationalStateMachine):
 
 async def main() -> None:
     """
-    Main application entry point for VYRA Module Manager.
+    Main application entry point for {{ module_name }}.
     
     Loads configuration, initializes component, and manages lifecycle based on
     module_params.yaml configuration.
@@ -220,7 +220,7 @@ async def main() -> None:
     task_manager = container_injection.get_task_manager()
     status_manager = container_injection.get_state_manager()
     component = container_injection.get_component()
-    logger.info("🚀 Starting VYRA Module Manager...")
+    logger.info(f"🚀 Starting {{ module_name }}...")
     
     # Load module configuration
     module_params_path = Path(".module/module_params.yaml")
