@@ -12,7 +12,8 @@
     <PluginSlot v-if="authStore.isAuthenticated" slot-id="popup" />
 
     <!-- Side-Dock-Popup panel (right fly-in) -->
-    <SideDockPopup v-if="authStore.isAuthenticated" />
+    <!-- Side-Dock-Popup floating widgets -->
+    <SideDockPopup v-if="authStore.isAuthenticated && uiSettingsStore.sideDockPocketEnabled" />
 
     <!-- Sidebar navigation (only when authenticated) -->
     <VyraSidebar v-if="authStore.isAuthenticated" />
@@ -121,7 +122,7 @@ import { useAuthStore } from './store/auth'
 import { useSystemStore } from './store/system'
 import { useModuleFeedStore } from './store/moduleFeed'
 import { usePluginStore } from './store/plugins'
-import apiClient from './api/http'
+import { useUiSettingsStore } from './store/uiSettings'
 import VyraSidebar from './components/layout/VyraSidebar.vue'
 import SideDockPopup from './components/layout/SideDockPopup.vue'
 import VyraStatusbar from './components/layout/VyraStatusbar.vue'
@@ -141,7 +142,8 @@ const feedStore    = useModuleFeedStore()
 // Provide the Global Plugin API to all child components (including plugins)
 providePluginApi()
 
-const pluginStore = usePluginStore()
+const pluginStore         = usePluginStore()
+const uiSettingsStore     = useUiSettingsStore()
 
 // Load plugins as soon as the user is authenticated so that infrastructure
 // slots (SDP pockets, background workers, etc.) are active from the start.

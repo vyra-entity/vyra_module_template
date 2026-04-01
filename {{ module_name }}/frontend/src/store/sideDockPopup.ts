@@ -122,12 +122,30 @@ export const useSideDockPopupStore = defineStore('sideDockPopup', () => {
     if (pocket) pocket.isPinned = false
   }
 
-  /** Close the SDP panel. Un-pinned pockets are collapsed. */
-  function closePanel(): void {
-    isPanelOpen.value = false
+  /** Close all pockets that are not pinned. */
+  function closeAllUnpinned(): void {
     pockets.value.forEach((p) => {
       if (!p.isPinned) p.isOpen = false
     })
+  }
+
+  /**
+   * Close a pocket unconditionally, also clearing the pin.
+   * Use this for the explicit close (X) action inside the popup header.
+   */
+  function closePocketForcefully(id: string): void {
+    const pocket = pockets.value.find((p) => p.id === id)
+    if (pocket) {
+      pocket.isPinned = false
+      pocket.isOpen = false
+      if (activePocketId.value === id) activePocketId.value = null
+    }
+  }
+
+  /** @deprecated Use closeAllUnpinned(); kept for API compatibility. */
+  function closePanel(): void {
+    isPanelOpen.value = false
+    closeAllUnpinned()
     activePocketId.value = null
   }
 
@@ -157,6 +175,8 @@ export const useSideDockPopupStore = defineStore('sideDockPopup', () => {
     unregisterPocket,
     openPocket,
     closePocket,
+    closePocketForcefully,
+    closeAllUnpinned,
     pinPocket,
     unpinPocket,
     closePanel,

@@ -4,6 +4,14 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Changed — SDP redesigned as floating right-edge icon tabs (2026-04-01)
+
+- **`src/components/layout/SideDockPopup.vue`** — Complete rewrite. Floating icon tabs on the right edge; hover shows label, click opens popup panel, pin keeps it open.
+- **`src/store/sideDockPopup.ts`** — Added `closeAllUnpinned()` and `closePocketForcefully(id)`. `closePanel()` now delegates to `closeAllUnpinned()`.
+- **`src/store/uiSettings.ts`** — New Pinia store `useUiSettingsStore` with `sideDockPocketEnabled` (localStorage-persisted, default `true`).
+- **`src/features/settings/SettingsView.vue`** — Side-Dock Widgets toggle card replaces the placeholder.
+- **`src/App.vue`** — `SideDockPopup` conditionally rendered via `uiSettingsStore.sideDockPocketEnabled`.
+
 ### Fixed — Plugin bare specifier resolution for "vue" (2026-04-01)
 
 - **`frontend/index.html`** — Added `<script type="importmap">` mapping `"vue"` → `/{{ module_name }}/vendor/vue.esm-browser.prod.js`.

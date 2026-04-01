@@ -9,13 +9,24 @@
     </div>
 
     <div class="grid">
-      <!-- Placeholder: future settings cards go here -->
-      <div class="col-12">
+      <!-- Side-Dock Widgets -->
+      <div class="col-12 md:col-6">
         <Card>
+          <template #title>
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-th-large"></i>
+              <span>Side-Dock Widgets</span>
+            </div>
+          </template>
           <template #content>
-            <div class="text-center py-5 text-color-secondary">
-              <i class="pi pi-cog mb-3" style="font-size: 3rem; display: block; opacity: 0.3" />
-              <p class="m-0">Einstellungen werden in einer späteren Version verfügbar sein.</p>
+            <div class="flex align-items-center justify-content-between gap-3">
+              <div>
+                <p class="m-0 font-semibold">Show floating widget tabs</p>
+                <p class="m-0 text-sm text-color-secondary mt-1">
+                  Plugin widgets appear as floating icon tabs on the right edge.
+                </p>
+              </div>
+              <InputSwitch v-model="uiSettingsStore.sideDockPocketEnabled" />
             </div>
           </template>
         </Card>
@@ -26,6 +37,10 @@
 
 <script setup lang="ts">
 import Card from 'primevue/card'
+import InputSwitch from 'primevue/inputswitch'
+import { useUiSettingsStore } from '../../store/uiSettings'
+
+const uiSettingsStore = useUiSettingsStore()
 </script>
 
 <style scoped>
