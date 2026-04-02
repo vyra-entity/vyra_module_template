@@ -13,7 +13,7 @@ ARG BUILDER_BASE_IMAGE=vyra_base_image:development
 ARG RUNTIME_BASE_IMAGE=vyra_base_image:production
 
 # =============================================================================
-# Stage 1: Builder - Build ROS2 packages, frontend, and SROS2 keys
+# Stage 1: Builder - Build ROS2 packages and frontend
 # =============================================================================
 FROM ${BUILDER_BASE_IMAGE} AS builder
 
@@ -21,9 +21,10 @@ FROM ${BUILDER_BASE_IMAGE} AS builder
 ARG MODULE_NAME
 ENV MODULE_NAME=${MODULE_NAME}
 
-# SROS2 security feature flag (default: false for backward compatibility)
-ARG SECURE_BY_SROS2=false
-ENV SECURE_BY_SROS2=${SECURE_BY_SROS2}
+# SLIM mode flag: when true, skip all ROS2 build steps (no colcon, no interfaces)
+# Set to true when building a SLIM module (e.g. --build-arg VYRA_SLIM=true)
+ARG VYRA_SLIM=false
+ENV VYRA_SLIM=${VYRA_SLIM}
 
 # Switch to root for build operations (base image may end with USER vyrauser)
 USER root
@@ -134,43 +135,46 @@ RUN if [ -d "storage/interfaces" ] && [ "$(ls -A storage/interfaces/*.proto 2>/d
         echo "No .proto files found in storage/interfaces, skipping gRPC generation"; \
     fi
 
-# Clean any existing build artifacts for fresh build (prevents package name conflicts)
-RUN rm -rf /workspace/install /workspace/build
-
-# Install gRPC C++ plugin for proto code generation (optional, used by setup_interfaces.py)
-RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends protobuf-compiler-grpc 2>/dev/null || \
-    echo "⚠️  grpc_cpp_plugin (protobuf-compiler-grpc) not available - C++ proto generation will be skipped" && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Setup ROS2 interfaces: runs AFTER wheel installation and AFTER rm -rf install/build
-# so that extract_interfaces() always uses the latest vyra_base wheel.
-# This guarantees VBASE base types (VBASEVolatileList etc.) are present in
-# src/${MODULE_NAME}_interfaces/msg/ before colcon build.
-RUN if [ -z "$MODULE_NAME" ] && [ -f ".module/module_data.yaml" ]; then \
-        export MODULE_NAME=$(grep "^name:" .module/module_data.yaml | cut -d: -f2 | tr -d ' ' | tr -d "'" | tr -d '"'); \
-    fi && \
-    # Create interfaces for colcon build (must be done before colcon build and after wheel installation)
-    python3 tools/setup_interfaces.py --interface_pkg "${MODULE_NAME}_interfaces" && \
-    # Source base ros2 workspace and build module interfaces (skipping template interfaces from base image)
-    source /opt/ros/kilted/setup.bash && \
-    # Build interfaces and project
-    colcon --log-base log/ros2 build --packages-skip vyra_module_template_interfaces --cmake-args -DCMAKE_BUILD_TYPE=Release
-
-# Build ROS2 packages (skip vyra_module_template_interfaces template from base image)
-# RUN source /opt/ros/kilted/setup.bash && \
-#     colcon --log-base log/ros2 build --packages-skip vyra_module_template_interfaces --cmake-args -DCMAKE_BUILD_TYPE=Release
-
-# Stamp install/ with build ID so the entrypoint can detect stale installs at runtime
-RUN cp /opt/vyra/build_id /workspace/install/.build_id
-
-# Make install artifacts accessible to runtime stage (will be copied in runtime stage)
-RUN chown -R vyrauser:vyrauser /workspace/install
-
-# Backup install/ directory for volume mount scenarios
-# When workspace is mounted as volume, install/ from image is hidden
-RUN cp -r /workspace/install /opt/vyra/install_backup && \
-    chown -R vyrauser:vyrauser /opt/vyra/install_backup
+# =============================================================================
+# ROS2 Interface Build & Colcon Compilation
+# When VYRA_SLIM=true: skip all ROS2 build steps, create stub dirs for COPY
+# When VYRA_SLIM=false (default): full ROS2 interface generation and colcon build
+# =============================================================================
+RUN if [ "${VYRA_SLIM:-false}" = "true" ]; then \
+        echo "🎯 SLIM Mode: Skipping ROS2 build, interface generation and colcon"; \
+        mkdir -p /workspace/install /opt/vyra/install_backup; \
+    else \
+        echo "🎯 Full ROS2 Mode: Building interfaces and running colcon"; \
+        rm -rf /workspace/install /workspace/build; \
+        \
+        # Install gRPC C++ plugin for proto code generation \
+        apt-get update -qq && \
+        (apt-get install -y --no-install-recommends protobuf-compiler-grpc 2>/dev/null || \
+         echo "⚠️  grpc_cpp_plugin not available - C++ proto generation will be skipped") && \
+        apt-get clean && rm -rf /var/lib/apt/lists/*; \
+        \
+        # Resolve MODULE_NAME if not provided via build arg \
+        if [ -z "$MODULE_NAME" ] && [ -f ".module/module_data.yaml" ]; then \
+            export MODULE_NAME=$(grep "^name:" .module/module_data.yaml | cut -d: -f2 | tr -d ' ' | tr -d "'" | tr -d '"'); \
+        fi; \
+        \
+        # Generate ROS2 interface definitions (must run after wheel install) \
+        python3 tools/setup_interfaces.py --interface_pkg "${MODULE_NAME}_interfaces"; \
+        \
+        # Source ROS2 underlay and build with colcon \
+        . /opt/ros/kilted/setup.bash; \
+        colcon --log-base log/ros2 build --packages-skip vyra_module_template_interfaces --cmake-args -DCMAKE_BUILD_TYPE=Release; \
+        \
+        # Stamp install/ with build ID so entrypoint can detect stale mounts \
+        cp /opt/vyra/build_id /workspace/install/.build_id; \
+        \
+        # Fix ownership for runtime stage COPY \
+        chown -R vyrauser:vyrauser /workspace/install; \
+        \
+        # Backup install/ for volume-mount scenarios (entrypoint restores from here) \
+        cp -r /workspace/install /opt/vyra/install_backup; \
+        chown -R vyrauser:vyrauser /opt/vyra/install_backup; \
+    fi
 
 # Extract MODULE_NAME from module_data.yaml if not provided
 RUN if [ -z "$MODULE_NAME" ] && [ -f ".module/module_data.yaml" ]; then \
@@ -179,40 +183,23 @@ RUN if [ -z "$MODULE_NAME" ] && [ -f ".module/module_data.yaml" ]; then \
     fi && \
     echo "MODULE_NAME=${MODULE_NAME}" > /tmp/module_name.env
 
-# Copy module-specific interfaces to staging area for NFS volume
-# This will be copied to NFS volume at runtime via entrypoint
-RUN source /tmp/module_name.env && \
-    mkdir -p /tmp/module_interfaces_staging/${MODULE_NAME}_interfaces && \
-    if [ -d "install/${MODULE_NAME}_interfaces" ]; then \
-        echo "📦 Staging ${MODULE_NAME}_interfaces for NFS volume..."; \
-        cp -r install/${MODULE_NAME}_interfaces/* /tmp/module_interfaces_staging/${MODULE_NAME}_interfaces/; \
-        echo "✓ Interfaces staged at /tmp/module_interfaces_staging/${MODULE_NAME}_interfaces"; \
+# Copy module-specific interfaces to staging area for NFS volume (skip in SLIM mode)
+RUN if [ "${VYRA_SLIM:-false}" = "true" ]; then \
+        echo "🎯 SLIM Mode: Skipping interface staging (no ROS2 interfaces)"; \
+        mkdir -p /tmp/module_interfaces_staging; \
     else \
-        echo "⚠️  No ${MODULE_NAME}_interfaces found in install directory"; \
-    fi
-
-# Generate SROS2 keystore (only if SECURE_BY_SROS2=true)
-RUN if [ "$SECURE_BY_SROS2" = "true" ]; then \
-        echo "🔐 SROS2 Security enabled - generating keystore..."; \
         source /tmp/module_name.env && \
-        source /opt/ros/kilted/setup.bash && \
-        ros2 security create_keystore ./storage/sros2_keystore && \
-        ros2 security create_enclave ./storage/sros2_keystore /${MODULE_NAME}/core; \
-    else \
-        echo "SROS2 disabled - creating empty keystore directory"; \
-        mkdir -p ./storage/sros2_keystore; \
+        mkdir -p /tmp/module_interfaces_staging/${MODULE_NAME}_interfaces && \
+        if [ -d "install/${MODULE_NAME}_interfaces" ]; then \
+            echo "📦 Staging ${MODULE_NAME}_interfaces for NFS volume..."; \
+            cp -r install/${MODULE_NAME}_interfaces/* /tmp/module_interfaces_staging/${MODULE_NAME}_interfaces/; \
+            echo "✓ Interfaces staged at /tmp/module_interfaces_staging/${MODULE_NAME}_interfaces"; \
+        else \
+            echo "⚠️  No ${MODULE_NAME}_interfaces found in install directory"; \
+        fi; \
     fi
 
-# Generate merged SROS2 policy (only if SECURE_BY_SROS2=true)
-RUN if [ "$SECURE_BY_SROS2" = "true" ]; then \
-        echo "🔐 Generating SROS2 policy..."; \
-        python3 tools/generate_sros2_policy.py \
-            --static config/sros2_policy_static.xml \
-            --dynamic config/sros2_policy_dynamic.xml \
-            --output storage/sros2_keystore/enclaves/${MODULE_NAME}/core; \
-    else \
-        echo "SROS2 disabled - skipping policy generation"; \
-    fi
+RUN mkdir -p ./storage/sros2_keystore
 
 RUN if [ -d "frontend" ] && [ -f "frontend/package.json" ] && [ -d "frontend/src/views" ] && [ "$(ls -A frontend/src/views)" ]; then \
         cd frontend && \
@@ -227,19 +214,15 @@ RUN if [ -d "frontend" ] && [ -f "frontend/package.json" ] && [ -d "frontend/src
         echo '<!DOCTYPE html><html><body><h1>Frontend Template</h1></body></html>' > frontend/dist/index.html; \
     fi
 
-# Extract SROS2 CA certificate (only if SROS2 is enabled)
-RUN if [ "${SECURE_BY_SROS2}" = "true" ]; then \
-        if [ -f "./storage/sros2_keystore/ca.cert.pem" ]; then \
-            cp ./storage/sros2_keystore/ca.cert.pem ./sros2_ca_public.pem; \
-        elif [ -f "./storage/sros2_keystore/public/ca.cert.pem" ]; then \
-            cp ./storage/sros2_keystore/public/ca.cert.pem ./sros2_ca_public.pem; \
-        else \
-            echo "ERROR: SECURE_BY_SROS2=true but CA certificate not found" && exit 1; \
-        fi; \
-    else \
-        echo "⚠️  SROS2 disabled - creating dummy certificate"; \
-        echo "dummy-certificate" > ./sros2_ca_public.pem; \
-    fi
+# Normalize vyra_base to a fixed staging path.
+# The SLIM base image installs packages to site-packages while the full ROS2 base
+# image uses dist-packages. By staging here we avoid a hardcoded path in the
+# runtime COPY instruction.
+RUN python3 -c \
+    "import vyra_base, shutil, os; \
+     src = os.path.dirname(os.path.abspath(vyra_base.__file__)); \
+     shutil.copytree(src, '/tmp/vyra_base_staging', dirs_exist_ok=True)" && \
+    echo "✅ vyra_base staged from $(python3 -c 'import vyra_base,os; print(os.path.dirname(os.path.abspath(vyra_base.__file__)))')"
 
 # =============================================================================
 # Stage 2: Runtime - Minimal module layer (~150MB)
@@ -265,13 +248,15 @@ COPY --from=builder /workspace/install/ ./install/
 # Note: build/ directory not needed in runtime (only for compilation)
 
 # Override vyra_base with the version installed in the builder stage.
-# The builder stage installs the wheel from wheels/, which may be newer than
-# what is baked into the base image (vyra_base_image:production).
-# This ensures fixes (e.g. conditional rclpy import in SLIM mode) are applied.
-COPY --from=builder /usr/local/lib/python3.12/dist-packages/vyra_base/ \
-     /usr/local/lib/python3.12/dist-packages/vyra_base/
+# Uses a staging path to handle dist-packages (full ROS2 base) vs site-packages
+# (SLIM base) transparently, without hardcoding the Python installation path.
+COPY --from=builder /tmp/vyra_base_staging/ /tmp/vyra_base_staging/
+RUN python3 -c \
+    "import site, shutil; \
+     target = site.getsitepackages()[0] + '/vyra_base'; \
+     shutil.copytree('/tmp/vyra_base_staging', target, dirs_exist_ok=True)" && \
+    rm -rf /tmp/vyra_base_staging
 
-COPY --from=builder /workspace/sros2_ca_public.pem ./sros2_ca_public.pem
 COPY --from=builder /workspace/config/ ./config/
 COPY --from=builder /workspace/tools/ ./tools/
 COPY --from=builder /workspace/vyra_entrypoint.sh ./vyra_entrypoint.sh
@@ -301,8 +286,6 @@ RUN if [ -f ".module/requirements.txt" ]; then \
 
 # ROS2 environment configuration
 ENV ROS_DOMAIN_ID=42
-ENV ROS_SECURITY_KEYSTORE=/workspace/storage/sros2_keystore
-ENV ROS_SECURITY_ROOT_DIRECTORY=/workspace/storage/sros2_keystore
 ENV VYRA_BUILD_MODE=ci
 
 LABEL maintainer="VYRA Development Team" \

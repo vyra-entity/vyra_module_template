@@ -102,18 +102,20 @@ echo "===================================="
 : "${CMAKE_PREFIX_PATH:="/opt/ros/kilted"}"
 
 # =============================================================================
-# Source Vyra Base and Package Setup
+# Source Vyra Base and Package Setup (skip in SLIM mode)
 # =============================================================================
-echo "=== SOURCING VYRA BASE SETUP ==="
-
-# source /workspace/tools/setup_ros_global.sh
-source /opt/ros/kilted/setup.bash
-
-if [ $? -eq 0 ]; then
-    echo "✅ Source ROS global setup successful"
+if [ "${VYRA_SLIM:-false}" != "true" ]; then
+    echo "=== SOURCING VYRA BASE SETUP ==="
+    # source /workspace/tools/setup_ros_global.sh
+    source /opt/ros/kilted/setup.bash
+    if [ $? -eq 0 ]; then
+        echo "✅ Source ROS global setup successful"
+    else
+        echo "❌ Source ROS global setup failed"
+        exit 1
+    fi
 else
-    echo "❌ Source ROS global setup failed"
-    exit 1
+    echo "=== SLIM MODE: Skipping ROS2 sourcing (no ROS2 required) ==="
 fi
 
 # =============================================================================
@@ -191,86 +193,90 @@ fi
 rm -rf /workspace/log/ros2/*.log
 
 # =============================================================================
-# Install Directory Restoration
+# Install Directory Restoration (skip in SLIM mode - no colcon build artifacts)
 # =============================================================================
-echo "=== CHECKING install/ DIRECTORY ==="
+if [ "${VYRA_SLIM:-false}" != "true" ]; then
+    echo "=== CHECKING install/ DIRECTORY ==="
 
-# Get module name for checking install integrity
-if [ -f ".module/module_data.yaml" ]; then
-    MODULE_NAME=$(grep "^name:" .module/module_data.yaml | cut -d: -f2 | tr -d ' ' | tr -d "'" | tr -d '"')
-else
-    echo "⚠️  Warning: module_data.yaml not found, cannot verify module package installation"
-    MODULE_NAME=""
-fi
-
-# This happens when using full workspace mount for development
-if [ -d "/opt/vyra/install_backup" ]; then
-    # Check if install directory is complete (has setup.bash AND module package with executable)
-    INSTALL_COMPLETE=true
-    
-    if [ ! -f "/workspace/install/setup.bash" ]; then
-        echo "❌ install/setup.bash missing"
-        INSTALL_COMPLETE=false
-    elif [ -n "$MODULE_NAME" ] && [ ! -d "/workspace/install/$MODULE_NAME" ]; then
-        echo "❌ install/$MODULE_NAME package missing"
-        INSTALL_COMPLETE=false
-    elif [ -n "$MODULE_NAME" ] && [ ! -f "/workspace/install/$MODULE_NAME/lib/$MODULE_NAME/core" ]; then
-        echo "❌ install/$MODULE_NAME/lib/$MODULE_NAME/core executable missing"
-        INSTALL_COMPLETE=false
-    elif [ -n "$MODULE_NAME" ] && [ ! -d "/workspace/install/${MODULE_NAME}_interfaces" ]; then
-        echo "❌ install/${MODULE_NAME}_interfaces package missing"
-        INSTALL_COMPLETE=false
+    # Get module name for checking install integrity
+    if [ -f ".module/module_data.yaml" ]; then
+        MODULE_NAME=$(grep "^name:" .module/module_data.yaml | cut -d: -f2 | tr -d ' ' | tr -d "'" | tr -d '"')
+    else
+        echo "⚠️  Warning: module_data.yaml not found, cannot verify module package installation"
+        MODULE_NAME=""
     fi
 
-    # Check build ID: detect when image was rebuilt with new interfaces/wheels
-    # /opt/vyra/build_id is written during docker build (from CACHE_BUST)
-    # install/.build_id is stamped into install/ before the backup is created
-    # If they differ, the current install/ is from an old image → force restore
-    if [ "$INSTALL_COMPLETE" = true ] && [ -f "/opt/vyra/build_id" ]; then
-        if [ ! -f "/workspace/install/.build_id" ] || \
-           [ "$(cat /opt/vyra/build_id)" != "$(cat /workspace/install/.build_id)" ]; then
-            echo "🔄 Image has been rebuilt (build ID changed) - forcing install/ restore"
-            echo "   Image build ID : $(cat /opt/vyra/build_id)"
-            echo "   Install build ID: $(cat /workspace/install/.build_id 2>/dev/null || echo 'missing')"
+    # This happens when using full workspace mount for development
+    if [ -d "/opt/vyra/install_backup" ]; then
+        # Check if install directory is complete (has setup.bash AND module package with executable)
+        INSTALL_COMPLETE=true
+        
+        if [ ! -f "/workspace/install/setup.bash" ]; then
+            echo "❌ install/setup.bash missing"
             INSTALL_COMPLETE=false
+        elif [ -n "$MODULE_NAME" ] && [ ! -d "/workspace/install/$MODULE_NAME" ]; then
+            echo "❌ install/$MODULE_NAME package missing"
+            INSTALL_COMPLETE=false
+        elif [ -n "$MODULE_NAME" ] && [ ! -f "/workspace/install/$MODULE_NAME/lib/$MODULE_NAME/core" ]; then
+            echo "❌ install/$MODULE_NAME/lib/$MODULE_NAME/core executable missing"
+            INSTALL_COMPLETE=false
+        elif [ -n "$MODULE_NAME" ] && [ ! -d "/workspace/install/${MODULE_NAME}_interfaces" ]; then
+            echo "❌ install/${MODULE_NAME}_interfaces package missing"
+            INSTALL_COMPLETE=false
+        fi
+
+        # Check build ID: detect when image was rebuilt with new interfaces/wheels
+        # /opt/vyra/build_id is written during docker build (from CACHE_BUST)
+        # install/.build_id is stamped into install/ before the backup is created
+        # If they differ, the current install/ is from an old image → force restore
+        if [ "$INSTALL_COMPLETE" = true ] && [ -f "/opt/vyra/build_id" ]; then
+            if [ ! -f "/workspace/install/.build_id" ] || \
+               [ "$(cat /opt/vyra/build_id)" != "$(cat /workspace/install/.build_id)" ]; then
+                echo "🔄 Image has been rebuilt (build ID changed) - forcing install/ restore"
+                echo "   Image build ID : $(cat /opt/vyra/build_id)"
+                echo "   Install build ID: $(cat /workspace/install/.build_id 2>/dev/null || echo 'missing')"
+                INSTALL_COMPLETE=false
+            else
+                echo "✅ Build ID matches - install/ is current ($(cat /opt/vyra/build_id))"
+            fi
+        fi
+
+        if [ "$INSTALL_COMPLETE" = false ]; then
+            echo "📦 Restoring complete install/ directory from image backup..."
+            rm -rf /workspace/install
+            cp -r /opt/vyra/install_backup /workspace/install
+            chown -R vyrauser:vyrauser /workspace/install
+            echo "✅ install/ directory restored (including $MODULE_NAME package)"
         else
-            echo "✅ Build ID matches - install/ is current ($(cat /opt/vyra/build_id))"
+            echo "✅ install/ directory complete (setup.bash + $MODULE_NAME + interfaces + build ID verified)"
+            echo "🔧 Fixing ownership of install/ directory..."
+            chown -R vyrauser:vyrauser /workspace/install
+            echo "✅ Ownership fixed to vyrauser:vyrauser"
+        fi
+    else
+        if [ ! -f "/workspace/install/setup.bash" ]; then
+            echo "❌ ERROR: install/setup.bash not found and no backup available"
+            echo "💡 Image may not have been built correctly"
+            exit 1
         fi
     fi
 
-    if [ "$INSTALL_COMPLETE" = false ]; then
-        echo "📦 Restoring complete install/ directory from image backup..."
-        rm -rf /workspace/install
-        cp -r /opt/vyra/install_backup /workspace/install
-        chown -R vyrauser:vyrauser /workspace/install
-        echo "✅ install/ directory restored (including $MODULE_NAME package)"
+    # =============================================================================
+    # Source Package Setup
+    # =============================================================================
+    echo "=== SOURCING PACKAGE SETUP ==="
+
+    # Source package setup (install folder already built in image or restored)
+    source install/setup.bash
+
+    if [ $? -eq 0 ]; then
+        echo "✅ Source package setup successful"
     else
-        echo "✅ install/ directory complete (setup.bash + $MODULE_NAME + interfaces + build ID verified)"
-        echo "🔧 Fixing ownership of install/ directory..."
-        chown -R vyrauser:vyrauser /workspace/install
-        echo "✅ Ownership fixed to vyrauser:vyrauser"
-    fi
-else
-    if [ ! -f "/workspace/install/setup.bash" ]; then
-        echo "❌ ERROR: install/setup.bash not found and no backup available"
-        echo "💡 Image may not have been built correctly"
+        echo "❌ Source package setup failed"
         exit 1
     fi
-fi
-
-# =============================================================================
-# Source Package Setup
-# =============================================================================
-echo "=== SOURCING PACKAGE SETUP ==="
-
-# Source package setup (install folder already built in image or restored)
-source install/setup.bash
-
-if [ $? -eq 0 ]; then
-    echo "✅ Source package setup successful"
 else
-    echo "❌ Source package setup failed"
-    exit 1
+    echo "=== SLIM MODE: No ROS2 install/ needed, skipping colcon package setup ==="
 fi
 
 # =============================================================================
@@ -312,7 +318,7 @@ fi
 echo "===================================="
 
 # =============================================================================
-# Setup interfaces
+# Setup interfaces (always runs - proto files and config are needed in all modes)
 # =============================================================================
 python3 tools/setup_interfaces.py
 
@@ -447,10 +453,10 @@ if [ -d "$NFS_VOLUME_PATH" ]; then
 # Auto-generated by vyra_entrypoint.sh — do not edit manually
 COLCON_CURRENT_PREFIX="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
 export COLCON_CURRENT_PREFIX
-if [ -z "$AMENT_PREFIX_PATH" ]; then
+if [ -z "${AMENT_PREFIX_PATH:-}" ]; then
     export AMENT_PREFIX_PATH="$COLCON_CURRENT_PREFIX"
-elif [[ ":$AMENT_PREFIX_PATH:" != *":$COLCON_CURRENT_PREFIX:"* ]]; then
-    export AMENT_PREFIX_PATH="$COLCON_CURRENT_PREFIX:$AMENT_PREFIX_PATH"
+elif [[ ":${AMENT_PREFIX_PATH:-}:" != *":$COLCON_CURRENT_PREFIX:"* ]]; then
+    export AMENT_PREFIX_PATH="$COLCON_CURRENT_PREFIX:${AMENT_PREFIX_PATH:-}"
 fi
 if [ -f "$COLCON_CURRENT_PREFIX/local_setup.bash" ]; then
     . "$COLCON_CURRENT_PREFIX/local_setup.bash"
@@ -535,7 +541,9 @@ SETUPEOF
         if [ -d "$interface_dir/ros2" ] && [ -f "$interface_dir/ros2/setup.bash" ]; then
             interface_name=$(basename "$interface_dir")
             echo "   Sourcing $interface_name/ros2..."
+            set +u  # ROS2 setup.bash may reference AMENT_PREFIX_PATH before it's initialised
             source "$interface_dir/ros2/setup.bash" || echo "⚠️  Failed to source $interface_name"
+            set -u
             INTERFACES_SOURCED=$((INTERFACES_SOURCED + 1))
         fi
     done
@@ -578,36 +586,6 @@ else
         fi
     done
 fi
-
-# SROS2 Setup
-echo "=== SROS2 SETUP ==="
-echo "ROS_SECURITY_ENABLE: ${ROS_SECURITY_ENABLE:-false}"
-echo "ROS_SECURITY_KEYSTORE: $ROS_SECURITY_KEYSTORE"
-
-if [ "${ROS_SECURITY_ENABLE:-false}" = "true" ]; then
-    echo "[SROS2] Security enabled - preparing keystore at $ROS_SECURITY_KEYSTORE"
-    mkdir -p "$ROS_SECURITY_KEYSTORE"
-    ros2 security create_keystore $ROS_SECURITY_KEYSTORE || true
-    # Only generate policy if enclave doesn't exist yet (avoids hanging when ROS graph is active)
-    if [ ! -d "$ROS_SECURITY_KEYSTORE/enclaves/$MODULE_NAME/core" ]; then
-        timeout --kill-after=5s 30s ros2 security generate_policy $ROS_SECURITY_KEYSTORE/ || true
-    fi
-    if [ ! -d "$ROS_SECURITY_KEYSTORE/enclaves" ]; then
-        echo "[SROS2] Creating enclaves at $ROS_SECURITY_KEYSTORE"
-        mkdir -p $ROS_SECURITY_KEYSTORE/enclaves
-    fi
-    echo "[SROS2] Creating enclave for /$MODULE_NAME/core"
-    ros2 security create_enclave $ROS_SECURITY_KEYSTORE /$MODULE_NAME/core || true
-    echo "\u2705 SROS2 keystore ready"
-else
-    echo "[SROS2] Security disabled (ROS_SECURITY_ENABLE != true) - ensuring storage directory exists"
-    mkdir -p "$ROS_SECURITY_KEYSTORE"
-fi
-
-echo "=== FINAL ENVIRONMENT ==="
-echo "ROS_SECURITY_ENABLE: $ROS_SECURITY_ENABLE"
-echo "ROS_SECURITY_STRATEGY: $ROS_SECURITY_STRATEGY"
-echo "ROS_SECURITY_KEYSTORE: $ROS_SECURITY_KEYSTORE"
 
 # =============================================================================
 # SSL Certificate Auto-Generation

@@ -756,39 +756,54 @@ def main(interface_package_name: str):
         )
 
     # ── Step 3: Generate msg / srv / action / .proto from config JSONs ───────
-    try:
-        if not generate_all_interfaces(interface_package_path):
-            logging.error("❌ Interface generation failed – aborting.")
-            sys.exit(1)
-    finally:
-        # Always restore files that were temporarily renamed due to schema violations
+    vyra_slim = os.environ.get("VYRA_SLIM", "false").lower() == "true"
+    if vyra_slim:
+        logging.info("⚡ SLIM mode: Skipping InterfaceGenerator (.msg/.srv/.action), only proto stubs needed")
         for _renamed_path, _original_path in _renamed_invalid:
             if _renamed_path.exists():
                 _renamed_path.rename(_original_path)
         if _renamed_invalid:
             logging.info(
-                "♻️  Restored %d temporarily renamed file(s) after interface generation.",
+                "♻️  Restored %d temporarily renamed file(s) after skipping interface generation.",
                 len(_renamed_invalid),
             )
+    else:
+        try:
+            if not generate_all_interfaces(interface_package_path):
+                logging.error("❌ Interface generation failed – aborting.")
+                sys.exit(1)
+        finally:
+            # Always restore files that were temporarily renamed due to schema violations
+            for _renamed_path, _original_path in _renamed_invalid:
+                if _renamed_path.exists():
+                    _renamed_path.rename(_original_path)
+            if _renamed_invalid:
+                logging.info(
+                    "♻️  Restored %d temporarily renamed file(s) after interface generation.",
+                    len(_renamed_invalid),
+                )
 
-    # ── Step 4: Update CMakeLists.txt and package.xml ────────────────────────
-    print(f"\nUpdate package.xml for {interface_package_name}")
-    update_package_xml(interface_package_path, interface_package_name)
+    # ── Step 4: Update CMakeLists.txt and package.xml (ROS2 only, skip in SLIM) ──
+    if vyra_slim:
+        logging.info("⚡ SLIM mode: Skipping CMakeLists.txt / package.xml update (no ROS2 colcon build)")
+    else:
+        print(f"\nUpdate package.xml for {interface_package_name}")
+        update_package_xml(interface_package_path, interface_package_name)
 
-    print(f"\nUpdate CMakefile for {interface_package_name}")
-    update_CMakefile(interface_package_path, interface_package_name)
+        print(f"\nUpdate CMakefile for {interface_package_name}")
+        update_CMakefile(interface_package_path, interface_package_name)
 
-    interface_files = collect_interface_files(interface_package_path)
-    for file_collection in interface_files.values():
-        for file in file_collection:
-            print(interface_package_path / file)
-            replace_libname_in_file(
-                interface_package_path / file,
-                "vyra_base",
-                interface_package_name
-            )
+        interface_files = collect_interface_files(interface_package_path)
+        for file_collection in interface_files.values():
+            for file in file_collection:
+                print(interface_package_path / file)
+                replace_libname_in_file(
+                    interface_package_path / file,
+                    "vyra_base",
+                    interface_package_name
+                )
 
-    print(f"✓ Package '{interface_package_name}' updated successfully!")
+        print(f"✓ Package '{interface_package_name}' updated successfully!")
 
     # ── Step 5: Compile proto stubs (Python + optional C++) ──────────────────
     try:

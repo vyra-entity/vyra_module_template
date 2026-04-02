@@ -10,7 +10,7 @@
  */
 
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { Component } from 'vue'
 import type { SdpPocketApi } from '../types/plugin_slots'
 
@@ -44,6 +44,13 @@ export const useSideDockPopupStore = defineStore('sideDockPopup', () => {
   const pockets = ref<SdpPocket[]>([])
   const activePocketId = ref<string | null>(null)
   const isPanelOpen = ref(false)
+
+  /** Vertical offset (px) from the default 25%-top anchor, persisted to localStorage. */
+  const _savedOffset = parseFloat(localStorage.getItem('sdp-strip-y-offset') ?? '0')
+  const stripYOffset = ref<number>(isNaN(_savedOffset) ? 0 : _savedOffset)
+  watch(stripYOffset, (val) => {
+    localStorage.setItem('sdp-strip-y-offset', String(val))
+  })
 
   const sortedPockets = computed(() =>
     [...pockets.value].sort((a, b) => a.priority - b.priority),
@@ -168,6 +175,7 @@ export const useSideDockPopupStore = defineStore('sideDockPopup', () => {
     pockets,
     activePocketId,
     isPanelOpen,
+    stripYOffset,
     sortedPockets,
     pocketsInSection,
     overflowCount,

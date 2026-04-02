@@ -4,8 +4,6 @@ import os
 import sys
 from pathlib import Path
 
-from lark import logger
-
 from typing import Any, TYPE_CHECKING
 from typing import Callable
 

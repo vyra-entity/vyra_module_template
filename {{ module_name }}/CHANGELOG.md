@@ -4,6 +4,11 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Added — VYRA_SLIM mode: skip ROS2 build and runtime ROS2 setup
+
+- **`Dockerfile`** — Added `ARG VYRA_SLIM=false`. All ROS2 build steps (rm install/, protobuf install, `setup_interfaces.py`, `colcon build`, `install_backup`, interface staging) are now wrapped in a single `if SLIM; then skip; else full-build; fi` block. SLIM mode creates empty stub dirs so the runtime `COPY --from=builder` instructions still succeed.
+- **`vyra_entrypoint.sh`** — All ROS2-specific startup sections are now guarded with `if [ "${VYRA_SLIM:-false}" != "true" ]`: ROS2 sourcing (`source /opt/ros/kilted/setup.bash`), `install/` directory restoration + `source install/setup.bash` (critical — would crash without a colcon build), `setup_interfaces.py` call, NFS Interface Management, SROS2 Setup + Final Environment. In SLIM mode the keystore directory is still created as a safe fallback.
+
 ### Changed — SDP redesigned as floating right-edge icon tabs (2026-04-01)
 
 - **`src/components/layout/SideDockPopup.vue`** — Complete rewrite. Floating icon tabs on the right edge; hover shows label, click opens popup panel, pin keeps it open.

@@ -18,7 +18,16 @@
     </Transition>
 
     <!-- Right-edge strip: one widget per visible pocket -->
-    <div class="sdp-strip" role="complementary" aria-label="Side Dock Widgets">
+    <div class="sdp-strip" :style="stripStyle" role="complementary" aria-label="Side Dock Widgets">
+      <!-- Y-axis drag handle – reposition the whole strip -->
+      <div
+        class="sdp-strip-handle"
+        @mousedown.prevent="startStripDrag"
+        title="Drag to reposition"
+        aria-label="Reposition side dock"
+      >
+        <i class="pi pi-ellipsis-h" aria-hidden="true" />
+      </div>
       <div
         v-for="pocket in visiblePockets"
         :key="pocket.id"
@@ -31,6 +40,7 @@
         <!-- Always-visible tab (icon + slide-out label) -->
         <button
           class="sdp-tab"
+          :style="tabStyle(pocket)"
           @click="togglePocket(pocket)"
           :aria-label="pocket.title"
           :title="pocket.title"
@@ -84,6 +94,7 @@
                 :sdpApi="sdpStore.getPocketApi(pocket.id)"
               />
             </div>
+            <div class="sdp-popup-footer" />
           </div>
         </Transition>
       </div>
@@ -100,6 +111,11 @@ import type { SdpPocket } from '../../store/sideDockPopup'
 const sdpStore = useSideDockPopupStore()
 const route = useRoute()
 const activeContext = computed(() => String(route.name ?? route.path))
+
+/** Inline style for the strip — positions it at 25% from top + persistent Y offset. */
+const stripStyle = computed(() => ({
+  top: `calc(25% + ${sdpStore.stripYOffset}px)`,
+}))
 
 /** All pockets that pass the current context scope filter, sorted by priority. */
 const visiblePockets = computed((): SdpPocket[] =>
@@ -176,6 +192,51 @@ function togglePocket(pocket: SdpPocket): void {
     sdpStore.openPocket(pocket.id)
   }
 }
+
+/**
+ * Drag the strip vertically. Only the Y axis is tracked; X is ignored.
+ * The accumulated offset is stored in the Pinia store (localStorage-persisted).
+ */
+function startStripDrag(e: MouseEvent): void {
+  const startY = e.clientY
+  const initOffset = sdpStore.stripYOffset
+
+  const onMove = (ev: MouseEvent) => {
+    sdpStore.stripYOffset = initOffset + (ev.clientY - startY)
+  }
+
+  const onUp = () => {
+    window.removeEventListener('mousemove', onMove)
+    window.removeEventListener('mouseup', onUp)
+  }
+
+  window.addEventListener('mousemove', onMove)
+  window.addEventListener('mouseup', onUp)
+}
+
+// ── Tab color palette (glassmorphism, index-based) ──────────────────────────
+const TAB_COLORS = [
+  { bg: 'rgba(99,102,241,0.62)',  bgHover: 'rgba(99,102,241,0.82)',  border: 'rgba(99,102,241,0.75)',  shadow: 'rgba(99,102,241,0.28)' },
+  { bg: 'rgba(16,185,129,0.62)', bgHover: 'rgba(16,185,129,0.82)', border: 'rgba(16,185,129,0.75)', shadow: 'rgba(16,185,129,0.28)' },
+  { bg: 'rgba(249,115,22,0.62)', bgHover: 'rgba(249,115,22,0.82)', border: 'rgba(249,115,22,0.75)', shadow: 'rgba(249,115,22,0.28)' },
+  { bg: 'rgba(168,85,247,0.62)', bgHover: 'rgba(168,85,247,0.82)', border: 'rgba(168,85,247,0.75)', shadow: 'rgba(168,85,247,0.28)' },
+  { bg: 'rgba(20,184,166,0.62)', bgHover: 'rgba(20,184,166,0.82)', border: 'rgba(20,184,166,0.75)', shadow: 'rgba(20,184,166,0.28)' },
+  { bg: 'rgba(244,63,94,0.62)',  bgHover: 'rgba(244,63,94,0.82)',  border: 'rgba(244,63,94,0.75)',  shadow: 'rgba(244,63,94,0.28)' },
+  { bg: 'rgba(245,158,11,0.62)', bgHover: 'rgba(245,158,11,0.82)', border: 'rgba(245,158,11,0.75)', shadow: 'rgba(245,158,11,0.28)' },
+  { bg: 'rgba(14,165,233,0.62)', bgHover: 'rgba(14,165,233,0.82)', border: 'rgba(14,165,233,0.75)', shadow: 'rgba(14,165,233,0.28)' },
+] as const
+
+/** Inject glassmorphism color CSS vars into each tab via pocket index. */
+function tabStyle(pocket: SdpPocket): Record<string, string> {
+  const idx = visiblePockets.value.indexOf(pocket) % TAB_COLORS.length
+  const c = TAB_COLORS[idx]
+  return {
+    '--tab-bg':       c.bg,
+    '--tab-bg-hover': c.bgHover,
+    '--tab-border':   c.border,
+    '--tab-shadow':   c.shadow,
+  }
+}
 </script>
 
 <style scoped>
@@ -195,7 +256,7 @@ function togglePocket(pocket: SdpPocket): void {
 .sdp-strip {
   position: fixed;
   right: 0;
-  top: 50%;
+  /* top is bound via inline style (calc(25% + stripYOffset)) */
   transform: translateY(-50%);
   z-index: 1100;
   display: flex;
@@ -203,6 +264,34 @@ function togglePocket(pocket: SdpPocket): void {
   gap: 6px;
   /* Let click events pass through the strip background to the page */
   pointer-events: none;
+}
+
+/* ───────────────────────────────────────────────
+   Strip Y-drag handle
+──────────────────────────────────────────────── */
+.sdp-strip-handle {
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 18px;
+  margin-left: auto;
+  margin-right: 0;
+  background: var(--surface-card, #fff);
+  border: 1px solid var(--surface-border, #e0e0e0);
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  cursor: ns-resize;
+  color: var(--text-color-secondary, #607d8b);
+  font-size: 0.65rem;
+  box-shadow: -1px 0 4px rgba(0, 0, 0, 0.06);
+  transition: background 0.12s;
+}
+
+.sdp-strip-handle:hover {
+  background: var(--surface-hover, #f5f5f5);
+  color: var(--primary-color, #6366f1);
 }
 
 /* ───────────────────────────────────────────────
@@ -217,48 +306,59 @@ function togglePocket(pocket: SdpPocket): void {
 }
 
 /* ───────────────────────────────────────────────
-   Tab button (icon + slide-out label)
+   Tab button — bookmark with glassmorphism
+   (color CSS vars injected per-tab via tabStyle())
 ──────────────────────────────────────────────── */
 .sdp-tab {
   display: flex;
   align-items: center;
-  /* Collapsed state: only wide enough for the icon (icon 22px + padding 2×10px = 42px) */
-  max-width: 42px;
-  min-width: 42px;
-  height: 42px;
-  padding: 0 10px;
+  max-width: 46px;
+  min-width: 46px;
+  height: 44px;
+  padding: 0 10px 0 12px;
   overflow: hidden;
   white-space: nowrap;
 
-  background: var(--surface-card, #fff);
-  border: 1px solid var(--surface-border, #e0e0e0);
+  background: var(--tab-bg, rgba(99, 102, 241, 0.62));
+  border: 1px solid var(--tab-border, rgba(99, 102, 241, 0.75));
   border-right: none;
-  border-radius: 8px 0 0 8px;
+  border-radius: 10px 0 0 10px;
   cursor: pointer;
-  color: var(--text-color-secondary, #607d8b);
-  box-shadow: -2px 0 6px rgba(0, 0, 0, 0.06);
+  color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px) saturate(1.5);
+  -webkit-backdrop-filter: blur(10px) saturate(1.5);
+  box-shadow:
+    -3px 2px 14px var(--tab-shadow, rgba(99, 102, 241, 0.28)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.08);
 
   transition:
     max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
     background 0.15s ease,
-    color 0.15s ease,
-    box-shadow 0.15s ease;
+    box-shadow 0.15s ease,
+    color 0.15s ease;
 }
 
 /* Expanded on hover or when the popup is open */
 .sdp-widget:hover .sdp-tab,
 .sdp-widget--open .sdp-tab {
-  max-width: 200px;
-  background: var(--surface-hover, #f5f5f5);
-  color: var(--primary-color, #6366f1);
-  box-shadow: -3px 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 210px;
+  background: var(--tab-bg-hover, rgba(99, 102, 241, 0.82));
+  color: rgba(255, 255, 255, 0.98);
+  box-shadow:
+    -5px 3px 20px var(--tab-shadow, rgba(99, 102, 241, 0.35)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.10);
 }
 
-/* Pinned state: accent styling */
+/* Pinned state: fully opaque accent */
 .sdp-widget--pinned .sdp-tab {
-  background: var(--primary-50, #eef2ff);
-  border-color: var(--primary-200, #c7d2fe);
-  color: var(--primary-color, #6366f1);
+  background: var(--tab-bg-hover, rgba(99, 102, 241, 0.90));
+  border-color: var(--tab-border, rgba(99, 102, 241, 0.90));
+  color: rgba(255, 255, 255, 0.98);
+  box-shadow:
+    -4px 3px 16px var(--tab-shadow, rgba(99, 102, 241, 0.40)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.30);
 }
 
 .sdp-tab-icon {
@@ -311,7 +411,7 @@ function togglePocket(pocket: SdpPocket): void {
   padding: 0.65rem 0.85rem;
   border-bottom: 1px solid var(--surface-border, #e0e0e0);
   flex-shrink: 0;
-  background: var(--surface-section, #fafafa);
+  background: var(--surface-section, #e8f0fe);
   cursor: move;
 }
 
@@ -380,6 +480,13 @@ function togglePocket(pocket: SdpPocket): void {
   flex: 1;
   overflow-y: auto;
   padding: 0.75rem;
+}
+
+.sdp-popup-footer {
+  flex-shrink: 0;
+  min-height: 8px;
+  border-top: 1px solid var(--surface-border, #e0e0e0);
+  background: var(--surface-section, #f5f0ff);
 }
 
 /* ───────────────────────────────────────────────
