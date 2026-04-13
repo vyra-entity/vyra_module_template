@@ -30,7 +30,7 @@
         <div class="brand-icon">
           <img src="@/assets/variobotic-kreis-transparent-blaugrau.svg" class="brand-svg" alt="VYRA" />
         </div>
-        <span class="brand-label">Module Manager</span>
+        <span class="brand-label">{{ module_display_name }}</span>
       </div>
 
       <button

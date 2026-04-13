@@ -34,8 +34,8 @@ const routes: RouteRecordRaw[] = [
     meta: {
       title: 'Einstellungen - {{ module_display_name }}',
       requiresAuth: true,
-      sidebarGroup: 'system',
-      sidebarPriority: 100,
+      sidebarGroup: 'settings',
+      sidebarPriority: 50,
       sidebarIcon: 'pi pi-cog',
     }
   },
