@@ -44,6 +44,7 @@
         <!-- Alarm bell + three-dot menu -->
         <div class="topbar-actions">
           <button
+            v-if="bellVisible"
             class="alarm-bell-btn"
             :class="{ 'alarm-bell-btn--active': errorCount > 0 }"
             @click="errorDialogVisible = true"
@@ -123,6 +124,8 @@ import { useSystemStore } from './store/system'
 import { useModuleFeedStore } from './store/moduleFeed'
 import { usePluginStore } from './store/plugins'
 import { useUiSettingsStore } from './store/uiSettings'
+import { useSettingsStore } from './store/settings'
+import apiClient from './api/http'
 import VyraSidebar from './components/layout/VyraSidebar.vue'
 import SideDockPopup from './components/layout/SideDockPopup.vue'
 import VyraStatusbar from './components/layout/VyraStatusbar.vue'
@@ -144,6 +147,7 @@ providePluginApi()
 
 const pluginStore         = usePluginStore()
 const uiSettingsStore     = useUiSettingsStore()
+const settingsStore       = useSettingsStore()
 
 // Load plugins as soon as the user is authenticated so that infrastructure
 // slots (SDP pockets, background workers, etc.) are active from the start.
@@ -169,6 +173,9 @@ const topMenuItems = [
 const errorDialogVisible = ref(false)
 const errorFeeds         = computed(() => feedStore.errorFeeds)
 const errorCount         = computed(() => feedStore.errorFeeds.length)
+
+/** Bell is visible when notifications are enabled in settings. */
+const bellVisible        = computed(() => settingsStore.settings.notifications)
 
 /** Dynamic page title from route meta */
 const pageTitle = computed(() => {

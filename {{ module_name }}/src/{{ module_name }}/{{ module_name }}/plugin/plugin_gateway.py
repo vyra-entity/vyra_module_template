@@ -372,19 +372,35 @@ class PluginGateway:
         """
         Create the Vyra transport clients for plugin service calls.
 
-        The ``module_name`` for both clients is read from
-        ``/workspace/.module/module_params.yaml`` under
-        ``labels.modulemanager.module_id`` so that requests are routed to the
-        correct ``v2_modulemanager`` instance that manages this module.
+        The target module is read from ``labels.modulemanager.module_id``
+        in ``/workspace/.module/module_params.yaml``.
+        Both ``module_name`` and ``module_id`` are passed to
+        InterfaceFactory so that a remote TopicBuilder is created,
+        routing requests to the correct v2_modulemanager instance.
         """
-        module_name = self._read_modulemanager_id() or self._own_module_name
+        full_instance_name = self._read_modulemanager_id()
+        if full_instance_name:
+            # Split "v2_modulemanager_733256b82d6b48a48bc52b5ec73ebfff"
+            # into module_name="v2_modulemanager" and module_id="733256b8..."
+            parts = full_instance_name.rsplit("_", 1)
+            if len(parts) == 2 and len(parts[1]) == 32:
+                target_module_name = parts[0]
+                target_module_id = parts[1]
+            else:
+                target_module_name = full_instance_name
+                target_module_id = full_instance_name
+        else:
+            target_module_name = self._own_module_name
+            target_module_id = self._own_module_id
+
         try:
             self._resolve_client = await InterfaceFactory.create_client(
                 name="resolve_plugins",
-                module_name=module_name,
+                module_name=target_module_name,
+                module_id=target_module_id,
                 namespace="plugin",
             )
-            logger.info("✅ PluginGateway: resolve_plugins client ready (module=%s)", module_name)
+            logger.info("✅ PluginGateway: resolve_plugins client ready (module=%s)", full_instance_name or self._own_module_name)
         except Exception as exc:
             logger.warning("⚠️  PluginGateway: resolve_plugins client failed: %s", exc)
             self._resolve_client = None
@@ -392,10 +408,11 @@ class PluginGateway:
         try:
             self._get_nfs_path_client = await InterfaceFactory.create_client(
                 name="get_nfs_path",
-                module_name=module_name,
+                module_name=target_module_name,
+                module_id=target_module_id,
                 namespace="plugin",
             )
-            logger.info("✅ PluginGateway: get_nfs_path client ready (module=%s)", module_name)
+            logger.info("✅ PluginGateway: get_nfs_path client ready (module=%s)", full_instance_name or self._own_module_name)
         except Exception as exc:
             logger.warning("⚠️  PluginGateway: get_nfs_path client failed: %s", exc)
             self._get_nfs_path_client = None
@@ -415,8 +432,12 @@ class PluginGateway:
             with params_path.open() as fh:
                 data = yaml.safe_load(fh) or {}
             labels: dict = data.get("labels") or {}
+            # Support nested format: labels.modulemanager.module_id
             modulemanager: dict = labels.get("modulemanager") or {}
             module_id: str | None = modulemanager.get("module_id") or None
+            # Fallback: flat key format "modulemanager.module_id"
+            if not module_id:
+                module_id = labels.get("modulemanager.module_id") or None
             if module_id:
                 logger.debug("PluginGateway: resolved modulemanager.module_id=%s", module_id)
             else:
@@ -519,10 +540,14 @@ class PluginGateway:
                 result = await self._resolve_client.call(request) or {}
             except Exception as exc:
                 logger.error("PluginGateway.resolve_plugins Vyra transport call failed: %s", exc)
-                return self.get_manifest()
+                return self.get_manifest() or self._empty_manifest(scope_type, scope_target)
         else:
             logger.warning("PluginGateway.resolve_plugins: no resolve_client available")
-            return self.get_manifest()
+            return self.get_manifest() or self._empty_manifest(scope_type, scope_target)
+
+        if not result or "slots" not in result:
+            logger.warning("PluginGateway.resolve_plugins: empty/invalid result from remote")
+            return self._empty_manifest(scope_type, scope_target)
 
         # Update in-memory cache
         self._manifest_cache = result
@@ -535,6 +560,15 @@ class PluginGateway:
         :returns: Cached manifest dict, or empty dict if no cache has been loaded.
         """
         return self._manifest_cache
+
+    @staticmethod
+    def _empty_manifest(scope_type: str = "MODULE", scope_target: str | None = None) -> dict:
+        """Return a valid but empty manifest response for the given scope."""
+        return {
+            "scope_type": scope_type,
+            "scope_target": scope_target or "",
+            "slots": {},
+        }
 
     # ------------------------------------------------------------------
     # Linker access

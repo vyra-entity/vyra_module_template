@@ -4,6 +4,16 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Added — Dark theme, settings store, plugins settings page (2026-01-27)
+
+- **`src/store/settings.ts`** — New Pinia store `useSettingsStore` with theme (light/dark/auto), language, notifications toggle. Persists to localStorage. Applies `html.dark-mode` class to document root.
+- **`src/features/settings/pages/PluginsPage.vue`** — New settings page listing all active plugins with UI-slot overview and toggle functionality.
+- **`src/features/settings/pages/AppearancePage.vue`** — Rewritten with theme `SelectButton` (light/dark/auto) and language `Dropdown` using `useSettingsStore`.
+- **`src/store/sidebar.ts`** — Added `settings-plugins` entry (priority 60). Settings route changed from `settings` to `settings-general`.
+- **`src/router/index.ts`** — Added `settings-plugins` route as child of `/settings`.
+- **`src/style.css`** — Added `html.dark-mode {}` CSS variable overrides for dark mode (surface, text, scrollbar, sidebar variables).
+- **`src/App.vue`** — Added `useSettingsStore` + `apiClient` imports. Bell button now conditionally rendered via `bellVisible` (based on `settings.notifications`).
+
 ### Added — VYRA_SLIM mode: skip ROS2 build and runtime ROS2 setup
 
 - **`Dockerfile`** — Added `ARG VYRA_SLIM=false`. All ROS2 build steps (rm install/, protobuf install, `setup_interfaces.py`, `colcon build`, `install_backup`, interface staging) are now wrapped in a single `if SLIM; then skip; else full-build; fi` block. SLIM mode creates empty stub dirs so the runtime `COPY --from=builder` instructions still succeed.

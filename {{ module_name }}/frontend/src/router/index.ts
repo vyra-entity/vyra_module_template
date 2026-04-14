@@ -44,6 +44,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'appearance', name: 'settings-appearance', component: () => import('../features/settings/pages/AppearancePage.vue'), meta: { requiresAuth: true } },
       { path: 'notifications', name: 'settings-notifications', component: () => import('../features/settings/pages/NotificationsPage.vue'), meta: { requiresAuth: true } },
       { path: 'auth', name: 'settings-auth', component: () => import('../features/settings/pages/AuthPage.vue'), meta: { requiresAuth: true } },
+      { path: 'plugins', name: 'settings-plugins', component: () => import('../features/settings/pages/PluginsPage.vue'), meta: { requiresAuth: true } },
     ]
   },
   {

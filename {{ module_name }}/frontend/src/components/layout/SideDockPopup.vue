@@ -91,6 +91,7 @@
             <div class="sdp-popup-body">
               <component
                 :is="pocket.component"
+                :pluginApi="pluginApi"
                 :sdpApi="sdpStore.getPocketApi(pocket.id)"
               />
             </div>
@@ -103,13 +104,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSideDockPopupStore } from '../../store/sideDockPopup'
 import type { SdpPocket } from '../../store/sideDockPopup'
+import { PLUGIN_API_INJECTION_KEY } from '../../composables/usePluginApi'
 
 const sdpStore = useSideDockPopupStore()
 const route = useRoute()
+const pluginApi = inject(PLUGIN_API_INJECTION_KEY, undefined)
 const activeContext = computed(() => String(route.name ?? route.path))
 
 /** Inline style for the strip — positions it at 25% from top + persistent Y offset. */

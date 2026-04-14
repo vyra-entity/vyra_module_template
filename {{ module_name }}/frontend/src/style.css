@@ -1,4 +1,4 @@
-/* Global Styles for VYRA Module Manager */
+/* Global Styles */
 /* PrimeVue 4.x uses theme presets via JavaScript, no need to import theme CSS */
 
 /* Base Resets */
@@ -31,6 +31,36 @@ body {
 /* Dark mode support */
 .dark-mode {
   /* PrimeVue handles dark mode automatically with Aura theme */
+}
+
+/* ── Dark Mode: map custom CSS variables to dark values ── */
+html.dark-mode {
+  color-scheme: dark;
+  --surface-ground:       #09090b;
+  --surface-section:      #18181b;
+  --surface-card:         #18181b;
+  --surface-overlay:      #27272a;
+  --surface-border:       #3f3f46;
+  --surface-hover:        rgba(255, 255, 255, 0.06);
+  --text-color:           #f4f4f5;
+  --text-color-secondary: #a1a1aa;
+  --scrollbar-track: #18181b;
+  --scrollbar-thumb: #52525b;
+  --sb-bg:     #18181b;
+  --sb-border: #3f3f46;
+}
+
+html.dark-mode ::-webkit-scrollbar-track {
+  background: #18181b;
+}
+
+html.dark-mode ::-webkit-scrollbar-thumb {
+  background: #52525b;
+  border-radius: 4px;
+}
+
+html.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: #71717a;
 }
 
 /* Scrollbar styling */
