@@ -90,12 +90,32 @@
           >
             <div class="slot-row__info">
               <i class="pi pi-window-minimize slot-row__icon" />
-              <span class="slot-row__label">{%- raw %}{{ slot.slot_id }}{%- endraw %}</span>
+              <div class="slot-row__ids">
+                <span
+                  v-for="sid in (slot.slot_ids?.length ? slot.slot_ids : [slot.slot_id])"
+                  :key="sid"
+                  class="slot-row__label"
+                >{%- raw %}{{ sid }}{%- endraw %}</span>
+              </div>
               <Tag
                 v-if="slot.slot_type"
                 :value="slot.slot_type"
                 severity="secondary"
-                class="text-xs ml-1"
+                class="text-xs"
+              />
+              <Tag
+                v-if="slot.priority !== undefined && slot.priority !== 50"
+                :value="`p:${slot.priority}`"
+                severity="secondary"
+                class="text-xs"
+                v-tooltip.top="'Priorität'"
+              />
+              <Tag
+                v-if="slot.min_user_role && slot.min_user_role !== 'operator'"
+                :value="slot.min_user_role"
+                severity="warn"
+                class="text-xs"
+                v-tooltip.top="'Mindest-Rolle'"
               />
             </div>
             <div class="slot-row__actions">
@@ -335,6 +355,13 @@ async function doRefresh(): Promise<void> {
 .slot-row__icon {
   color: var(--text-color-secondary);
   font-size: 0.8rem;
+}
+
+.slot-row__ids {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
 }
 
 .slot-row__label {

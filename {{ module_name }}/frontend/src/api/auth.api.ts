@@ -115,15 +115,15 @@ class AuthApi {
   }
 
   async checkUserManagerAvailable(): Promise<UserManagerStatus> {
-    const response = await fetch(`${API_BASE}/auth/check-usermanager`, {
-      credentials: 'include'
-    })
-
-    if (!response.ok) {
-      throw new Error('Failed to check usermanager status')
+    try {
+      const response = await fetch(`${API_BASE}/auth/check-usermanager`, {
+        credentials: 'include'
+      })
+      if (!response.ok) return { available: false, message: 'Nicht erreichbar' }
+      return await response.json()
+    } catch {
+      return { available: false, message: 'Kein externer UserManager erreichbar' }
     }
-
-    return await response.json()
   }
 
   async listUsers(): Promise<any[]> {

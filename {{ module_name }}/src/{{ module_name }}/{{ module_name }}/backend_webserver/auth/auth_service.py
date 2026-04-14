@@ -6,13 +6,16 @@ Integrates with Internal User Manager via direct dependency injection
 """
 
 from {{ module_name }}.logging_config import get_logger, log_exception, log_function_call, log_function_result
+import os
 import secrets
+import ssl
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 from pydantic import BaseModel, json
+import aiohttp
 
 from vyra_base.com.transport.t_redis.communication import RedisClient
-from ...container_injection import get_component, get_user_manager
+from ...container_injection import get_user_manager
 
 logger = get_logger(__name__)
 
@@ -261,50 +264,34 @@ class AuthenticationService:
         """
         Check if external usermanager service is available.
 
-        Queries the module registry for modules with template='usermanager'.
+        Delegates the check to the modulemanager via HTTP, since the module
+        registry lives in the modulemanager, not in individual modules.
 
         Returns:
             Dict with available status and details
         """
+        gateway = os.environ.get("GATEWAY_URL", "https://traefik:443")
+        url = f"{gateway}/v2_modulemanager/api/auth/check-usermanager"
+        ssl_ctx = ssl.create_default_context()
+        ssl_ctx.check_hostname = False
+        ssl_ctx.verify_mode = ssl.CERT_NONE
         try:
-            component = get_component()
-            if not component or not component.registry:
-                logger.error("Module registry not available in component")
-                raise Exception("Module registry not available in component")
-
-            # Query for usermanager modules by their template field
-            result = await component.registry.get_registered_modules_impl(
-                include_disabled=False,
-                filter={"template": "usermanager"}
-            )
-            
-            if result and result.get("success"):
-                usermanager_modules = result.get("modules", [])
-                
-                if usermanager_modules:
-                    logger.info(f"✅ Found {len(usermanager_modules)} external usermanager(s)")
-                    return {
-                        "available": True,
-                        "message": f"Found {len(usermanager_modules)} usermanager module(s)",
-                        "modules": usermanager_modules
-                    }
-                else:
-                    logger.info("No external usermanager modules found")
-                    return {
-                        "available": False,
-                        "message": "No external usermanager modules registered"
-                    }
-            else:
-                return {
-                    "available": False,
-                    "message": "Failed to query module registry"
-                }
-                
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, ssl=ssl_ctx, timeout=aiohttp.ClientTimeout(total=5)) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        return data
+                    else:
+                        logger.warning(f"Module manager returned {resp.status} for usermanager check")
+                        return {
+                            "available": False,
+                            "message": f"Module manager returned status {resp.status}"
+                        }
         except Exception as e:
-            logger.error(f"❌ Error checking usermanager availability: {e}", exc_info=True)
+            logger.error(f"❌ Error checking usermanager availability via gateway: {e}", exc_info=True)
             return {
                 "available": False,
-                "message": f"Error: {str(e)}"
+                "message": f"Error reaching module manager: {str(e)}"
             }
     
     async def list_local_users(self) -> list:
