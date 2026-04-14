@@ -34,10 +34,17 @@ const routes: RouteRecordRaw[] = [
     meta: {
       title: 'Einstellungen - {{ module_display_name }}',
       requiresAuth: true,
-      sidebarGroup: 'settings',
-      sidebarPriority: 50,
+      sidebarGroup: 'system',
+      sidebarPriority: 100,
       sidebarIcon: 'pi pi-cog',
-    }
+    },
+    children: [
+      { path: '', redirect: { name: 'settings-general' } },
+      { path: 'general', name: 'settings-general', component: () => import('../features/settings/pages/GeneralPage.vue'), meta: { requiresAuth: true } },
+      { path: 'appearance', name: 'settings-appearance', component: () => import('../features/settings/pages/AppearancePage.vue'), meta: { requiresAuth: true } },
+      { path: 'notifications', name: 'settings-notifications', component: () => import('../features/settings/pages/NotificationsPage.vue'), meta: { requiresAuth: true } },
+      { path: 'auth', name: 'settings-auth', component: () => import('../features/settings/pages/AuthPage.vue'), meta: { requiresAuth: true } },
+    ]
   },
   {
     path: '/{{ module_name }}/p/:pluginSlug',

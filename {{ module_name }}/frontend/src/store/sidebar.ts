@@ -7,7 +7,7 @@
  */
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { SidebarNavItem, SidebarNavGroup, SidebarGroup } from '../types/sidebar'
+import type { SidebarNavItem, SidebarNavGroup, SidebarGroup, SettingsNavItem } from '../types/sidebar'
 
 const STORAGE_KEY = 'vyra:sidebar:collapsed'
 
@@ -37,6 +37,14 @@ const DEFAULT_ITEMS: SidebarNavItem[] = [
     group:     'settings',
     priority:  50,
   },
+]
+
+/** Default settings sub-navigation items for {{ module_name }} */
+const DEFAULT_SETTINGS_ITEMS: SettingsNavItem[] = [
+  { id: 'settings-general',       label: 'Allgemein',          icon: 'pi pi-sliders-h', routeName: 'settings-general',       priority: 100 },
+  { id: 'settings-appearance',    label: 'Darstellung',        icon: 'pi pi-palette',   routeName: 'settings-appearance',    priority: 90  },
+  { id: 'settings-notifications', label: 'Benachrichtigungen', icon: 'pi pi-bell',      routeName: 'settings-notifications', priority: 80  },
+  { id: 'settings-auth',          label: 'Authentifizierung',  icon: 'pi pi-lock',      routeName: 'settings-auth',          priority: 70  },
 ]
 
 export const useSidebarStore = defineStore('sidebar', () => {
@@ -93,17 +101,42 @@ export const useSidebarStore = defineStore('sidebar', () => {
     return result
   })
 
+  // ─── Settings item registry ─────────────────────────────────────────────────────────
+  const _settingsItems = ref<SettingsNavItem[]>([...DEFAULT_SETTINGS_ITEMS])
+
+  /** Sorted settings items – higher priority first */
+  const settingsItems = computed<SettingsNavItem[]>(() =>
+    [..._settingsItems.value].sort((a, b) => b.priority - a.priority)
+  )
+
+  function registerSettingsItem(item: SettingsNavItem): void {
+    const idx = _settingsItems.value.findIndex(i => i.id === item.id)
+    if (idx !== -1) {
+      _settingsItems.value[idx] = item
+    } else {
+      _settingsItems.value.push(item)
+    }
+  }
+
+  function unregisterSettingsItem(id: string): void {
+    const idx = _settingsItems.value.findIndex(i => i.id === id)
+    if (idx !== -1) _settingsItems.value.splice(idx, 1)
+  }
+
   return {
     // state
     isCollapsed,
     navItems,
     // getters
     groupedItems,
+    settingsItems,
     // actions
     toggleCollapse,
     setCollapsed,
     registerItem,
     unregisterItem,
     updateBadge,
+    registerSettingsItem,
+    unregisterSettingsItem,
   }
 })

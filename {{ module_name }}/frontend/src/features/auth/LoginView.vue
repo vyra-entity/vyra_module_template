@@ -159,9 +159,10 @@ onMounted(async () => {
   // Update auth mode options based on availability
   if (userManagerAvailable.value) {
     authModeOptions.value = [
-      { label: 'Lokal', value: 'local' },
-      { label: 'User Manager', value: 'usermanager' }
+      { label: 'User Manager', value: 'usermanager' },
+      { label: 'Lokal', value: 'local' }
     ]
+    authMode.value = 'usermanager'
   } else {
     authModeOptions.value = [
       { label: 'Lokal', value: 'local' }

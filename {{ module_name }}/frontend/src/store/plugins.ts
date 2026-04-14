@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia'
-import { ref, computed, defineAsyncComponent, markRaw } from 'vue'
+import { ref, computed, defineAsyncComponent, markRaw, h } from 'vue'
 import { pluginApi, type UiManifestEntry } from '../features/plugins/plugin.api'
+
+/** Silent placeholder rendered when a plugin fails to load or throws at runtime. */
+const PluginErrorFallback = markRaw({ render: () => h('span', { style: 'display:none' }) })
 
 /**
  * Plugin Store — state management for the plugin system
@@ -34,6 +37,8 @@ export const usePluginStore = defineStore('plugins', () => {
   /**
    * Load the UI manifest for a scope and instantiate all components.
    * Uses defineAsyncComponent so Vue lazily fetches each index.js from the backend.
+   * Each plugin is wrapped with an error component and onError handler so that
+   * a broken plugin never crashes the host application.
    */
   async function resolvePlugins(scopeType = 'MODULE', scopeTarget?: string) {
     try {
@@ -43,11 +48,15 @@ export const usePluginStore = defineStore('plugins', () => {
       for (const [slotId, entries] of Object.entries(manifest.ui_slots)) {
         result[slotId] = entries.map(entry => ({
           entry,
-          // Lazily imports index.js via ES module dynamic import
           component: markRaw(
-            defineAsyncComponent(() =>
-              import(/* @vite-ignore */ entry.js_entry_point)
-            )
+            defineAsyncComponent({
+              loader: () => import(/* @vite-ignore */ entry.js_entry_point),
+              errorComponent: PluginErrorFallback,
+              onError(err, _retry, fail) {
+                console.error(`[PluginSlot] Plugin '${entry.plugin_id}' (${entry.js_entry_point}) failed to load:`, err)
+                fail()
+              },
+            })
           )
         }))
       }

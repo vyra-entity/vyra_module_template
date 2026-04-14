@@ -187,6 +187,15 @@ async def websocket_module_feed_endpoint(websocket: WebSocket):
                 await task
             except (asyncio.CancelledError, WebSocketDisconnect):
                 pass
+    except asyncio.CancelledError:
+        # Expected during server shutdown — cancel pending tasks and exit cleanly.
+        for task in [send_task, recv_task]:
+            if not task.done():
+                task.cancel()
+                try:
+                    await task
+                except (asyncio.CancelledError, Exception):
+                    pass
     except WebSocketDisconnect:
         pass
     except Exception as e:
@@ -275,6 +284,15 @@ async def websocket_plugin_endpoint(websocket: WebSocket, plugin_id: str, channe
                 await task
             except (asyncio.CancelledError, WebSocketDisconnect):
                 pass
+    except asyncio.CancelledError:
+        # Expected during server shutdown — cancel pending tasks and exit cleanly.
+        for task in [send_task, recv_task]:
+            if not task.done():
+                task.cancel()
+                try:
+                    await task
+                except (asyncio.CancelledError, Exception):
+                    pass
     except WebSocketDisconnect:
         pass
     finally:

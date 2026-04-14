@@ -46,7 +46,27 @@
     </div>
 
     <!-- ── MAIN NAVIGATION ZONE ────────────────────────────────────────────── -->
-    <nav id="sidebar-nav" class="sidebar-main" aria-label="Navigation">
+    <!-- Settings sub-nav: shown when inside /settings routes -->
+    <nav v-if="isInSettings" class="sidebar-main" aria-label="Einstellungen">
+      <button class="settings-back-btn" @click="goBack" title="Zurück zur Hauptnavigation">
+        <i class="pi pi-arrow-left" />
+        <span class="btn-label">Zurück</span>
+      </button>
+      <div class="settings-nav-group">
+        <RouterLink
+          v-for="item in sidebarStore.settingsItems"
+          :key="item.id"
+          :to="{ name: item.routeName }"
+          class="settings-nav-item"
+          active-class="is-active"
+        >
+          <i :class="item.icon" />
+          <span class="nav-item-label">{{ item.label }}</span>
+        </RouterLink>
+      </div>
+    </nav>
+    <!-- Normal main nav: shown when NOT in settings -->
+    <nav v-else id="sidebar-nav" class="sidebar-main" aria-label="Navigation">
       <SidebarNavGroup
         v-for="group in sidebarStore.groupedItems.filter(g => g.id !== 'system')"
         :key="group.id"
@@ -75,42 +95,49 @@
         <span class="health-label">{%- raw %}{{ healthLabel }}{%- endraw %}</span>
       </div>
 
-      <!-- Username (collapsed: hidden) -->
-      <div class="user-info" v-if="authStore.isAuthenticated">
-        <i class="pi pi-user user-icon" />
-        <span class="user-name">{%- raw %}{{ authStore.username }}{%- endraw %}</span>
-      </div>
-
-      <!-- Logout button -->
-      <button
+      <!-- User panel (clickable → opens dropdown menu) -->
+      <Menu ref="userMenu" :model="userMenuItems" popup />
+      <div
         v-if="authStore.isAuthenticated"
-        class="bottom-btn logout-btn"
-        @click="handleLogout"
-        title="Abmelden"
-        aria-label="Abmelden"
-        v-tooltip.right="sidebarStore.isCollapsed ? 'Abmelden' : undefined"
+        class="user-info user-info--clickable"
+        role="button"
+        tabindex="0"
+        @click="userMenu?.toggle($event)"
+        @keydown.enter="userMenu?.toggle($event)"
+        aria-label="Benutzermenü"
+        v-tooltip.right="sidebarStore.isCollapsed ? authStore.username : undefined"
       >
-        <i class="pi pi-sign-out" />
-        <span class="btn-label">Abmelden</span>
-      </button>
+        <i class="pi pi-user user-icon" />
+        <span class="user-name">{{ authStore.username }}</span>
+        <i class="pi pi-ellipsis-v user-menu-icon" v-if="!sidebarStore.isCollapsed" />
+      </div>
     </div>
   </aside>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useSidebarStore } from '../../store/sidebar'
 import { useSystemStore } from '../../store/system'
 import { useAuthStore } from '../../store/auth'
 import { useToast } from 'primevue/usetoast'
 import SidebarNavGroup from './SidebarNavGroup.vue'
+import Menu from 'primevue/menu'
 
 const router       = useRouter()
+const route        = useRoute()
 const sidebarStore = useSidebarStore()
 const systemStore  = useSystemStore()
 const authStore    = useAuthStore()
 const toast        = useToast()
+
+// ─── Settings context detection ───────────────────────────────────────────────
+const isInSettings = computed(() => route.path.includes('/settings'))
+
+function goBack(): void {
+  router.push('/{{ module_name }}/home')
+}
 
 // ─── Mobile detection ──────────────────────────────────────────────────────
 const MOBILE_BREAKPOINT  = 768
@@ -165,7 +192,22 @@ const healthLabel = computed(() => {
 const healthTooltip = computed(() =>
   sidebarStore.isCollapsed ? healthLabel.value : undefined
 )
+// ─── User dropdown menu ─────────────────────────────────────────────────────────
+const userMenu = ref<InstanceType<typeof Menu>>()
 
+const userMenuItems = [
+  {
+    label: 'Benutzerverwaltung',
+    icon: 'pi pi-users',
+    command: () => { window.location.href = '/v2_usermanager/' },
+  },
+  { separator: true },
+  {
+    label: 'Abmelden',
+    icon: 'pi pi-sign-out',
+    command: () => { void handleLogout() },
+  },
+]
 // ─── Logout ────────────────────────────────────────────────────────────────
 async function handleLogout(): Promise<void> {
   try {
@@ -426,6 +468,23 @@ async function handleLogout(): Promise<void> {
   pointer-events: none;
 }
 
+.user-info--clickable {
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background var(--sb-transition);
+}
+
+.user-info--clickable:hover {
+  background: var(--surface-hover, rgba(0, 0, 0, 0.05));
+}
+
+.user-menu-icon {
+  font-size: 0.8rem;
+  color: var(--text-color-secondary, #607D8B);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
 /* Bottom buttons */
 .bottom-btn {
   display: flex;
@@ -521,5 +580,98 @@ async function handleLogout(): Promise<void> {
     height: 36px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   }
+}
+
+/* ── Settings context navigation ────────────────────────────────────────────── */
+.settings-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-color-secondary, #607D8B);
+  cursor: pointer;
+  font-size: 0.875rem;
+  text-align: left;
+  min-height: 38px;
+  overflow: hidden;
+  width: 100%;
+  transition: background 0.15s ease, color 0.15s ease;
+  margin-bottom: 0.5rem;
+}
+
+.settings-back-btn:hover {
+  background: var(--surface-hover);
+  color: var(--primary-color);
+}
+
+.settings-back-btn .btn-label {
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 1;
+  max-width: 160px;
+  transition: opacity var(--sb-transition, 0.2s ease), max-width var(--sb-transition, 0.2s ease);
+}
+
+.is-collapsed .settings-back-btn .btn-label {
+  opacity: 0;
+  max-width: 0;
+  pointer-events: none;
+}
+
+.settings-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0.25rem 0;
+}
+
+.settings-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  color: var(--text-color-secondary, #607D8B);
+  cursor: pointer;
+  font-size: 0.875rem;
+  text-decoration: none;
+  min-height: 38px;
+  overflow: hidden;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.settings-nav-item:hover {
+  background: var(--surface-hover);
+  color: var(--primary-color);
+}
+
+.settings-nav-item.is-active {
+  background: var(--surface-hover);
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.settings-nav-item .pi {
+  font-size: 1rem;
+  flex-shrink: 0;
+  width: 22px;
+  text-align: center;
+}
+
+.settings-nav-item .nav-item-label {
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 1;
+  max-width: 160px;
+  transition: opacity var(--sb-transition, 0.2s ease), max-width var(--sb-transition, 0.2s ease);
+}
+
+.is-collapsed .settings-nav-item .nav-item-label {
+  opacity: 0;
+  max-width: 0;
+  pointer-events: none;
 }
 </style>

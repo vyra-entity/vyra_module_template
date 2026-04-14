@@ -43,6 +43,20 @@ export interface SidebarNavGroup {
   items: SidebarNavItem[]
 }
 
+/** A navigation item for the settings sub-navigation panel */
+export interface SettingsNavItem {
+  /** Unique identifier */
+  id: string
+  /** Display label shown next to the icon when sidebar is expanded */
+  label: string
+  /** PrimeIcons class string, e.g. "pi pi-sliders-h" */
+  icon: string
+  /** Vue Router route name to navigate to on click */
+  routeName: string
+  /** Sort order within the settings nav – higher number = closer to top */
+  priority: number
+}
+
 /** Sidebar collapse state stored in localStorage */
 export interface SidebarState {
   isCollapsed: boolean
