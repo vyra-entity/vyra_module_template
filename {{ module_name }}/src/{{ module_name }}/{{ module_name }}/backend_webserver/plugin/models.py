@@ -2,7 +2,7 @@
 Plugin API — Pydantic schemas for the plugin REST endpoints.
 
 WASM runtime management has moved to PluginGateway
-({{ module_name }}.plugin.plugin_gateway).  The legacy WasmRuntimePool
+(<module_name>.plugin.plugin_gateway).  The legacy WasmRuntimePool
 class is kept here only for reference — it is no longer instantiated
 as a module-level singleton.
 """
@@ -49,18 +49,34 @@ class PluginListEntry(BaseModel):
 
 
 class UiManifestEntry(BaseModel):
-    slot_id:        str
-    component_name: str
-    js_entry_point: str   # URL über den /plugin/assets/-Proxy
-    nfs_js_path:    str   # Absoluter NFS-Pfad (nur Backend-intern)
-    plugin_id:      str
-    version:        str
+    slot_id:         str
+    component_name:  str
+    js_entry_point:  str            # URL via /plugin/assets/ proxy
+    nfs_js_path:     str = ""       # Absolute NFS path (backend-internal only)
+    plugin_id:       str
+    version:         str
+    assignment_id:   str = ""
+    is_active:       bool = True
+    scope_type:      str = ""
+    scope_target:    str | None = None
+    # Plugin slot infrastructure fields (mirrors manifest.yaml / TypeScript UiManifestEntry)
+    slot_ids:        list[str] = Field(default_factory=list)
+    title:           str = ""
+    priority:        int = 50
+    min_user_role:   str = "operator"
+    search_keywords: list[str] = Field(default_factory=list)
+    icon:            str | None = None
+    slot_type:       str = ""
 
 
 class UiManifestResponse(BaseModel):
-    scope_type:   str
-    scope_target: str | None
-    slots:        dict[str, list[UiManifestEntry]]  # slot_id → list of components
+    # Field names mirror the dict returned by PluginManager._resolve_plugins_impl
+    # and the TypeScript ResolvePluginsResponse interface in plugin.api.ts.
+    scope_type:      str = ""
+    scope_target:    str | None = None
+    p_id:            str | None = None
+    ui_slots:        dict[str, list[UiManifestEntry]] = Field(default_factory=dict)
+    plugin_metadata: list[Any] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------

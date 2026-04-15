@@ -89,7 +89,9 @@ export interface PluginGlobalFunctions {
   trackEvent: (eventName: string, payload?: Record<string, unknown>) => void
   /**
    * Register a pocket in the Side-Dock-Popup panel.
-   * The `component` argument must be a resolved Vue component object.
+   * The `component` argument must be a resolved Vue component object
+   * (e.g. imported SFC or `defineComponent(...)`).
+   * The pocket appears immediately in the SDP trigger list.
    */
   registerSdpPocket: (registration: SdpPocketRegistration, component: unknown) => void
   /** Remove a previously registered SDP pocket by its id. */

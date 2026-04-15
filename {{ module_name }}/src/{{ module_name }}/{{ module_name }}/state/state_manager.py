@@ -455,6 +455,16 @@ class StateManager:
         logger.info("✅ Suspend goal accepted")
         return True
 
+    @remote_actionServer.on_cancel(name="request_lc_suspend")
+    async def _on_cancel_suspend(self, goal_handle: Any) -> bool:
+        """Accept cancel requests for the suspend action.
+
+        The execute handler will notice the cancellation via
+        ``goal_handle.is_cancel_requested()`` and abort cleanly.
+        """
+        logger.info("⚠️  Cancel requested for request_lc_suspend")
+        return True
+
     @remote_actionServer.execute(name="request_lc_suspend")
     async def _execute_suspend(self, goal_handle: Any) -> Dict[str, Any]:
         """Execute the suspend lifecycle transition.
@@ -518,6 +528,16 @@ class StateManager:
             )
             return False
         logger.info("✅ Resume goal accepted")
+        return True
+
+    @remote_actionServer.on_cancel(name="request_lc_resume")
+    async def _on_cancel_resume(self, goal_handle: Any) -> bool:
+        """Accept cancel requests for the resume action.
+
+        The execute handler will notice the cancellation via
+        ``goal_handle.is_cancel_requested()`` and abort cleanly.
+        """
+        logger.info("⚠️  Cancel requested for request_lc_resume")
         return True
 
     @remote_actionServer.execute(name="request_lc_resume")

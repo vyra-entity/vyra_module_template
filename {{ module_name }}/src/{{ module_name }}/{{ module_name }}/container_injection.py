@@ -48,7 +48,6 @@ if TYPE_CHECKING:
     from .taskmanager import TaskManager
     from .state.state_manager import StateManager
     from .user.usermanager import UserManager
-    from .application.plugin_manager import PluginManager
     from .plugin.plugin_gateway import PluginGateway
     from .backend_webserver.services.plugin_bridge import PluginBridge
 

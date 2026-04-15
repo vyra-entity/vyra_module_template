@@ -145,6 +145,9 @@ const feedStore    = useModuleFeedStore()
 // Provide the Global Plugin API to all child components (including plugins)
 providePluginApi()
 
+/** Derive the current module name from the API base URL at runtime */
+const MODULE_NAME = (apiClient.defaults.baseURL ?? '').replace(/\/api$/, '').replace(/^\//, '')
+
 const pluginStore         = usePluginStore()
 const uiSettingsStore     = useUiSettingsStore()
 const settingsStore       = useSettingsStore()
@@ -155,7 +158,7 @@ watch(
   () => authStore.isAuthenticated,
   async (isAuth) => {
     if (isAuth) {
-      await pluginStore.resolvePlugins('MODULE', '{{ module_name }}')
+      await pluginStore.resolvePlugins('MODULE', MODULE_NAME)
     }
   },
   { immediate: true },

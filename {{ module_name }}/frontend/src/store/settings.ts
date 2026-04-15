@@ -1,5 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import apiClient from '../api/http'
+
+/** Derive the localStorage key from the module's API base URL at runtime */
+const SETTINGS_KEY = `vyra_${(apiClient.defaults.baseURL ?? '').replace(/\/api$/, '').replace(/^\//, '')}_settings`
 
 export interface AppSettings {
   theme: 'light' | 'dark' | 'auto'
@@ -39,7 +43,7 @@ export const useSettingsStore = defineStore('settings', () => {
 
   const loadSettings = () => {
     try {
-      const stored = localStorage.getItem('vyra_{{ module_name }}_settings')
+      const stored = localStorage.getItem(SETTINGS_KEY)
       if (stored) {
         const parsed = JSON.parse(stored)
         settings.value = { ...DEFAULT_SETTINGS, ...parsed }
@@ -52,7 +56,7 @@ export const useSettingsStore = defineStore('settings', () => {
 
   const saveSettings = () => {
     try {
-      localStorage.setItem('vyra_{{ module_name }}_settings', JSON.stringify(settings.value))
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings.value))
     } catch (error) {
       console.error('Failed to save settings:', error)
     }

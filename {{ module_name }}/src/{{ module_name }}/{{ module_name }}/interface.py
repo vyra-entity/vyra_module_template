@@ -1,3 +1,4 @@
+import importlib
 import json
 from .logging_config import get_logger
 import os
@@ -87,17 +88,18 @@ async def auto_register_interfaces(
                 filename, ext = iface_type.split('.') if '.' in iface_type else (iface_type, '')
                 if ext in ['msg', 'srv', 'action']:
                     try:
-                        iface_module = sys.modules[f'{module_name}_interfaces.{ext}']
+                        module_key = f'{module_name}_interfaces.{ext}'
+                        iface_module = sys.modules.get(module_key) or importlib.import_module(module_key)
                         iface_class = getattr(iface_module, filename)
                         ifaces.append(iface_class)
-                    except (KeyError, AttributeError) as e:
+                    except (KeyError, AttributeError, ImportError) as e:
                         logger.warning(f"Could not load ROS2 type {iface_type}: {e}")
                         ifaces.append(iface_type)  # keep as string
                 else:
                     ifaces.append(iface_type)  # proto / custom type, keep as string
             metadata['interfacetypes'] = ifaces
         else:
-            # Old format: single string, e.g. "{{ module_name }}_interfaces/srv/Foo.srv"
+            # Old format: single string, e.g. "v2_modulemanager_interfaces/srv/Foo.srv"
             logger.warning(f"Old format not supported for filetype: {filetype_raw}. Please update to list format in your config.")
             raise ValueError(f"Old format not supported for filetype: {filetype_raw}. Please update to list format in your config.")
 
@@ -106,7 +108,12 @@ async def auto_register_interfaces(
                 interface_functions.append(_register_service_interface(
                     callback=callback,
                     metadata=metadata
-                )) 
+                ))
+
+            case FunctionConfigBaseTypes.message.value:
+                interface_functions.append(_register_publisher_interface(
+                    metadata=metadata
+                ))
 
             case FunctionConfigBaseTypes.action.value:
                 interface_functions.append(_register_action_interface(
@@ -114,9 +121,62 @@ async def auto_register_interfaces(
                     callbacks={}
                 ))
 
+    # Scan for @remote_actionServer decorated methods and register their action interfaces.
+    # These methods are NOT discovered by _autoload_all_remote_service_from_parent because
+    # they carry _vyra_action_name instead of _vyra_remote_server.
+    if callback_parent:
+        registered_names = {entry.functionname for entry in interface_functions}
+        action_names_seen: set[str] = set()
+        for attr_name in dir(callback_parent):
+            try:
+                attr = getattr(callback_parent, attr_name)
+                if not (callable(attr) and hasattr(attr, "_vyra_action_name")):
+                    continue
+                action_name: str = attr._vyra_action_name
+                if action_name in registered_names or action_name in action_names_seen:
+                    continue
+                action_names_seen.add(action_name)
+                config_list = [m for m in interface_metadata if m['functionname'] == action_name]
+                if not config_list:
+                    logger.warning(
+                        f"No metadata found for ActionServer '{action_name}', skipping."
+                    )
+                    continue
+                action_meta: dict = config_list[0]
+                if action_meta.get('type') != FunctionConfigBaseTypes.action.value:
+                    continue
+                # Resolve interfacetypes from filetype list
+                filetype_raw = action_meta.get('filetype', [])
+                if isinstance(filetype_raw, list):
+                    ifaces = []
+                    for iface_type in filetype_raw:
+                        filename, ext = (
+                            iface_type.split('.') if '.' in iface_type else (iface_type, '')
+                        )
+                        if ext in ['msg', 'srv', 'action']:
+                            try:
+                                module_key = f'{module_name}_interfaces.{ext}'
+                                iface_module = sys.modules.get(module_key) or importlib.import_module(module_key)
+                                iface_class = getattr(iface_module, filename)
+                                ifaces.append(iface_class)
+                            except (KeyError, AttributeError, ImportError) as e:
+                                logger.warning(f"Could not load ROS2 type {iface_type}: {e}")
+                                ifaces.append(iface_type)
+                        else:
+                            ifaces.append(iface_type)
+                    action_meta['interfacetypes'] = ifaces
+                interface_functions.append(
+                    _register_action_interface(metadata=action_meta, callbacks={})
+                )
+                logger.info(
+                    f"Auto-registered action interface from @remote_actionServer: {action_name}"
+                )
+            except Exception as e:
+                logger.debug(f"Error scanning '{attr_name}' for action server decorator: {e}")
+
     logger.info(f"Registering {len(interface_functions)} interfaces for entity")
-    
-    # NEW: Bind decorated callbacks from callback_parent (for multi-callback ActionServers)
+
+    # Bind decorated callbacks from callback_parent (for multi-callback ActionServers)
     if callback_parent:
         logger.debug("Binding decorated callbacks from component...")
         binding_results = entity.bind_interface_callbacks(
@@ -229,6 +289,7 @@ def _register_publisher_interface(
         description=metadata['description'],
         displaystyle=displaystyle,
         returns=metadata['returns'],
+        namespace=metadata.get('namespace', None),
         qosprofile=metadata.get('qosprofile', 10),
         periodic=metadata.get('periodic', None)
     )
@@ -252,6 +313,7 @@ def _register_service_interface(
         displaystyle=displaystyle,
         params=metadata['params'],
         returns=metadata['returns'],
+        namespace=metadata.get('namespace', None),
         qosprofile=metadata.get('qosprofile', 10),
         callbacks={'response': callback} if callback is not None else None
     )
@@ -274,5 +336,6 @@ def _register_action_interface(
         displaystyle=displaystyle,
         params=metadata['params'],
         returns=metadata['returns'],
+        namespace=metadata.get('namespace', None),
         qosprofile=metadata.get('qosprofile', 10)
     )

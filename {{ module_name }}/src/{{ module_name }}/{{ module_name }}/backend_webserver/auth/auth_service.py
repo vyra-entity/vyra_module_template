@@ -122,17 +122,97 @@ class AuthenticationService:
             raise Exception("General authentication error") from e
     
     async def _validate_usermanager_credentials(
-        self, 
-        username: str, 
+        self,
+        username: str,
         password: str
     ) -> Optional[Dict[str, Any]]:
         """
-        Validate credentials via external usermanager service
-        
-        TODO: Implement ROS2 service call to external usermanager
+        Validate credentials by delegating to the external v2_usermanager service.
+
+        Calls ``POST {GATEWAY_URL}/v2_usermanager/api/auth/login`` and then
+        ``GET  {GATEWAY_URL}/v2_usermanager/api/auth/verify`` to obtain the full
+        user claims (user_id, role, level) needed to create a local session.
+
+        Returns:
+            User info dict on success, or raises an exception on failure.
         """
-        logger.warning("External usermanager authentication not yet implemented")
-        return None
+        gateway = os.environ.get("GATEWAY_URL", "https://traefik:443")
+        login_url = f"{gateway}/v2_usermanager/api/auth/login"
+
+        ssl_ctx = ssl.create_default_context()
+        ssl_ctx.check_hostname = False
+        ssl_ctx.verify_mode = ssl.CERT_NONE
+
+        payload = {
+            "username": username,
+            "password": password,
+            "auth_mode": "local",
+            "module_name": "{{ module_name }}",
+        }
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(
+                    login_url,
+                    json=payload,
+                    ssl=ssl_ctx,
+                    timeout=aiohttp.ClientTimeout(total=10),
+                ) as resp:
+                    if resp.status not in (200, 201):
+                        logger.warning(
+                            f"v2_usermanager login returned HTTP {resp.status} for user {username}"
+                        )
+                        return None
+
+                    data = await resp.json()
+
+                if not data.get("success"):
+                    logger.warning(
+                        f"v2_usermanager login failed for {username}: {data.get('message')}"
+                    )
+                    return None
+
+                token: str = data.get("token", "")
+                roles: list = data.get("roles", [])
+                primary_role: str = roles[0] if roles else "viewer"
+
+                # Verify to get full claims (user_id, level) from the JWT.
+                verify_url = f"{gateway}/v2_usermanager/api/auth/verify"
+                async with session.get(
+                    verify_url,
+                    headers={"Authorization": f"Bearer {token}"},
+                    ssl=ssl_ctx,
+                    timeout=aiohttp.ClientTimeout(total=5),
+                ) as verify_resp:
+                    if verify_resp.status == 200:
+                        verify_data = await verify_resp.json()
+                        user_claims: dict = verify_data.get("user", {})
+                        logger.info(
+                            f"✅ User {username} authenticated via v2_usermanager"
+                        )
+                        return {
+                            "user_id": user_claims.get("user_id", 0),
+                            "username": username,
+                            "role": user_claims.get("role", primary_role),
+                            "level": user_claims.get("level", 3),
+                            "auth_mode": "usermanager",
+                        }
+
+                # Fallback: verify failed but login succeeded — use login data.
+                logger.warning(
+                    "v2_usermanager /auth/verify did not return 200; using login response data"
+                )
+                return {
+                    "user_id": 0,
+                    "username": username,
+                    "role": primary_role,
+                    "level": 3,
+                    "auth_mode": "usermanager",
+                }
+
+        except Exception as e:
+            logger.error(f"❌ Error authenticating via v2_usermanager: {e}", exc_info=True)
+            raise Exception("v2_usermanager authentication error") from e
     
     async def create_session(
         self, 

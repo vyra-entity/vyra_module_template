@@ -1,5 +1,5 @@
 """
-Core configuration for VYRA Module Manager API
+Core configuration for VYRA Module API
 """
 from pathlib import Path
 from typing import Optional

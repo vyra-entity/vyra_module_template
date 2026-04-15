@@ -17,7 +17,7 @@ export function setupPlugins(app: App): void {
   // Setup Pinia store
   const pinia = createPinia()
   app.use(pinia)
-
+  
   // Setup PrimeVue
   app.use(PrimeVue, {
     theme: {
@@ -27,11 +27,11 @@ export function setupPlugins(app: App): void {
       }
     }
   })
-
+  
   // PrimeVue Services
   app.use(ConfirmationService)
   app.use(ToastService)
-
+  
   // PrimeVue Directives
   app.directive('tooltip', Tooltip)
 }

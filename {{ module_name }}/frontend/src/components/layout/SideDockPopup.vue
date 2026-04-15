@@ -201,11 +201,25 @@ function togglePocket(pocket: SdpPocket): void {
  * The accumulated offset is stored in the Pinia store (localStorage-persisted).
  */
 function startStripDrag(e: MouseEvent): void {
-  const startY = e.clientY
+  const startY    = e.clientY
   const initOffset = sdpStore.stripYOffset
 
+  // Compute allowed offset range once at drag start (avoids querying on every move)
+  const topbar   = document.querySelector('.vyra-topbar') as HTMLElement | null
+  const footer   = document.querySelector('.vyra-footer') as HTMLElement | null
+  const statusbar = document.querySelector('.vyra-statusbar, .p-toolbar') as HTMLElement | null
+  const stripEl  = document.querySelector('.sdp-strip') as HTMLElement | null
+  const stripH   = stripEl?.offsetHeight ?? 60
+
+  // Strip top is placed at: 25% of viewport + stripYOffset
+  const baseY = window.innerHeight * 0.25
+  const minTop = (topbar?.getBoundingClientRect().bottom ?? 52) - baseY + 4
+  const bottomRef = statusbar ?? footer
+  const maxTop = (bottomRef?.getBoundingClientRect().top ?? window.innerHeight) - baseY - stripH - 4
+
   const onMove = (ev: MouseEvent) => {
-    sdpStore.stripYOffset = initOffset + (ev.clientY - startY)
+    const raw = initOffset + (ev.clientY - startY)
+    sdpStore.stripYOffset = Math.max(minTop, Math.min(maxTop, raw))
   }
 
   const onUp = () => {
@@ -315,6 +329,7 @@ function tabStyle(pocket: SdpPocket): Record<string, string> {
 .sdp-tab {
   display: flex;
   align-items: center;
+  /* Collapsed state: icon width + padding */
   max-width: 46px;
   min-width: 46px;
   height: 44px;
@@ -414,7 +429,7 @@ function tabStyle(pocket: SdpPocket): Record<string, string> {
   padding: 0.65rem 0.85rem;
   border-bottom: 1px solid var(--surface-border, #e0e0e0);
   flex-shrink: 0;
-  background: var(--surface-section, #e8f0fe);
+  background: #E8F0FE;
   cursor: move;
 }
 
@@ -483,13 +498,14 @@ function tabStyle(pocket: SdpPocket): Record<string, string> {
   flex: 1;
   overflow-y: auto;
   padding: 0.75rem;
+  background: #F0FBF4;
 }
 
 .sdp-popup-footer {
   flex-shrink: 0;
   min-height: 8px;
   border-top: 1px solid var(--surface-border, #e0e0e0);
-  background: var(--surface-section, #f5f0ff);
+  background: #F5F0FF;
 }
 
 /* ───────────────────────────────────────────────

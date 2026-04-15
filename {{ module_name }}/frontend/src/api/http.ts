@@ -31,7 +31,10 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('API Error:', error)
+    const method = (error.config?.method ?? 'HTTP').toUpperCase()
+    const url = (error.config?.baseURL ?? '') + (error.config?.url ?? '')
+    const status = error.response?.status ?? error.code ?? 'no status'
+    console.error(`API Error [${method} ${url}] → ${status}:`, error.message ?? error)
     return Promise.reject(error)
   }
 )

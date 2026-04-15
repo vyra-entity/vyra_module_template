@@ -4,7 +4,7 @@ Operation tracking service with task-based progress and user prompts
 import asyncio
 from {{ module_name }}.logging_config import get_logger, log_exception, log_function_call, log_function_result
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any, Callable
 from dataclasses import dataclass, field
 
@@ -14,6 +14,9 @@ from ..module.operation_models import (
 )
 
 logger = get_logger(__name__)
+
+# TTL for completed operations in seconds
+OPERATION_TTL_SECONDS = 60
 
 
 @dataclass
@@ -27,6 +30,7 @@ class OperationContext:
     tasks: List[OperationTask] = field(default_factory=list)
     prompt_responses: Dict[str, str] = field(default_factory=dict)
     prompt_event: Optional[asyncio.Event] = None
+    completed_at_timestamp: Optional[datetime] = None  # Tracks when operation completed for TTL
     
     def __post_init__(self):
         self.status = EnhancedOperationStatus(
@@ -292,6 +296,7 @@ class OperationTracker:
         
         context.status.status = "success" if success else "failed"
         context.status.completed_at = datetime.now().isoformat()
+        context.completed_at_timestamp = datetime.now()  # Store timestamp for TTL check
         context.status.current_task_id = None
         context.status.user_prompt = None
         
@@ -312,9 +317,25 @@ class OperationTracker:
         logger.info(f"{status_icon} Operation {operation_id} {'completed successfully' if success else 'failed'}")
     
     def get_status(self, operation_id: str) -> Optional[EnhancedOperationStatus]:
-        """Get operation status"""
+        """
+        Get operation status
+        
+        Returns None if operation is expired (completed > TTL seconds ago)
+        """
         context = self._operations.get(operation_id)
-        return context.status if context else None
+        if not context:
+            return None
+        
+        # Check if operation is expired (completed and TTL exceeded)
+        if context.completed_at_timestamp:
+            elapsed = datetime.now() - context.completed_at_timestamp
+            if elapsed > timedelta(seconds=OPERATION_TTL_SECONDS):
+                logger.debug(f"⏱️  Operation {operation_id} expired (completed {elapsed.total_seconds():.1f}s ago)")
+                # Remove expired operation from memory
+                del self._operations[operation_id]
+                return None
+        
+        return context.status
     
     def cancel_operation(self, operation_id: str):
         """
@@ -341,6 +362,7 @@ class OperationTracker:
         context.status.status = "failed"
         context.status.error = "Operation cancelled by user"
         context.status.completed_at = datetime.now().isoformat()
+        context.completed_at_timestamp = datetime.now()  # Store timestamp for TTL check
         
         self._persist_status(operation_id)
         logger.info(f"🚫 Operation {operation_id} cancelled")
@@ -349,6 +371,31 @@ class OperationTracker:
     def _find_task(self, context: OperationContext, task_id: str) -> Optional[OperationTask]:
         """Find task by ID"""
         return next((t for t in context.tasks if t.id == task_id), None)
+    
+    def cleanup_expired_operations(self) -> int:
+        """
+        Remove expired operations from memory
+        
+        Returns:
+            Number of operations removed
+        """
+        now = datetime.now()
+        expired_ids = []
+        
+        for operation_id, context in self._operations.items():
+            if context.completed_at_timestamp:
+                elapsed = now - context.completed_at_timestamp
+                if elapsed > timedelta(seconds=OPERATION_TTL_SECONDS):
+                    expired_ids.append(operation_id)
+        
+        for operation_id in expired_ids:
+            del self._operations[operation_id]
+            logger.debug(f"🗑️  Cleaned up expired operation {operation_id}")
+        
+        if expired_ids:
+            logger.info(f"🧹 Cleaned up {len(expired_ids)} expired operations")
+        
+        return len(expired_ids)
     
     def _persist_status(self, operation_id: str):
         """Persist operation status to storage"""

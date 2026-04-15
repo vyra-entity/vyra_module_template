@@ -28,7 +28,7 @@
       <i class="pi pi-puzzle" style="font-size: 2.5rem; color: var(--text-color-secondary); opacity: 0.4" />
       <p>Keine Plugins aktiv.</p>
       <p class="plugins-settings__empty-hint">
-        Installiere Plugins über den v2_modulemanager.
+        Installiere Plugins über den {%- raw %}{{ MODULE_NAME }}{%- endraw %}.
       </p>
     </div>
 
@@ -137,14 +137,17 @@
 
 <script setup lang="ts">
 /**
- * PluginsPage — Settings page for active plugins in the current web interface.
- * Lists all loaded UI slots with activation status and toggle function.
+ * PluginsPage — Einstellungsseite für aktive Plugins im aktuellen Webinterface.
+ * Listet alle geladenen UI-Slots mit Aktivierungsstatus und Toggle-Funktion.
  */
 import { ref, computed, reactive } from 'vue'
 import { usePluginStore } from '../../../store/plugins'
 import type { UiManifestEntry } from '../../plugins/plugin.api'
 import apiClient from '../../../api/http'
 import Button from 'primevue/button'
+
+/** Derive the current module name from the API base URL at runtime */
+const MODULE_NAME = (apiClient.defaults.baseURL ?? '').replace(/\/api$/, '').replace(/^\//, '')
 import Tag from 'primevue/tag'
 import InputSwitch from 'primevue/inputswitch'
 
@@ -209,9 +212,10 @@ async function toggleSlot(slot: UiManifestEntry): Promise<void> {
   try {
     await apiClient.patch(`/plugin_admin_service/assignments/${slot.assignment_id}/toggle`)
     // Reload manifest to get fresh state
-    await pluginStore.resolvePlugins('MODULE', '{{ module_name }}')
+    await pluginStore.resolvePlugins('MODULE', MODULE_NAME)
   } catch (e) {
     console.error('[PluginsPage] Toggle failed:', e)
+    // Revert optimistic update handled by re-resolving
   } finally {
     toggling.delete(slot.assignment_id)
   }
@@ -220,7 +224,7 @@ async function toggleSlot(slot: UiManifestEntry): Promise<void> {
 async function doRefresh(): Promise<void> {
   refreshing.value = true
   try {
-    await pluginStore.resolvePlugins('MODULE', '{{ module_name }}')
+    await pluginStore.resolvePlugins('MODULE', MODULE_NAME)
   } finally {
     refreshing.value = false
   }

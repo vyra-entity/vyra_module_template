@@ -1,5 +1,5 @@
 """
-Common dependencies for VYRA Module Manager API
+Common dependencies for VYRA Module API
 """
 from fastapi import HTTPException, BackgroundTasks, Depends
 from typing import Optional, Dict, Any
@@ -64,17 +64,46 @@ def validate_module_name(module_name: str) -> str:
     return module_name
 
 def validate_instance_id(instance_id: str) -> str:
-    """Validate instance ID format"""
+    """
+    Validate instance ID format
+    
+    Accepts two formats:
+    1. Pure 32-character hex string (e.g., "aef036f639d3486a985b65ee25df8fec")
+    2. Prefixed format: {prefix}_{32-char-hex} (e.g., "v3_ff063be9da4d4e44892fff113a885d17")
+    
+    The prefixed format is used by test modules and some legacy installations.
+    """
     if not instance_id:
         raise HTTPException(status_code=400, detail="Instance ID cannot be empty")
     
-    if len(instance_id) != 32 or not all(c in "0123456789abcdef" for c in instance_id):
-        raise HTTPException(
-            status_code=400, 
-            detail="Instance ID must be a 32-character hexadecimal string"
-        )
+    # Check for prefixed format (e.g., "v3_abc123...")
+    if "_" in instance_id:
+        parts = instance_id.split("_", 1)
+        if len(parts) == 2:
+            prefix, hex_part = parts
+            # Validate prefix (alphanumeric)
+            if not prefix.replace("-", "").isalnum():
+                raise HTTPException(
+                    status_code=400,
+                    detail="Instance ID prefix must be alphanumeric"
+                )
+            # Validate hex part (32 chars, hex)
+            if len(hex_part) == 32 and all(c in "0123456789abcdef" for c in hex_part):
+                return instance_id
+            raise HTTPException(
+                status_code=400,
+                detail="Instance ID hex part must be a 32-character hexadecimal string"
+            )
     
-    return instance_id
+    # Check for pure hex format (original format)
+    if len(instance_id) == 32 and all(c in "0123456789abcdef" for c in instance_id):
+        return instance_id
+    
+    raise HTTPException(
+        status_code=400,
+        detail="Instance ID must be either a 32-character hexadecimal string or {prefix}_{32-char-hex}"
+    )
+
 
 def get_module_path(module_name: str, instance_id: str) -> Path:
     """Get the file system path for a module instance"""

@@ -1,7 +1,4 @@
-/* Global Styles */
-/* PrimeVue 4.x uses theme presets via JavaScript, no need to import theme CSS */
-
-/* Base Resets */
+/* Global Base Styles */
 * {
   margin: 0;
   padding: 0;
@@ -10,117 +7,95 @@
 
 html, body {
   height: 100%;
-  font-family: var(--font-family);
+  overflow-x: hidden;
 }
 
 body {
-  background: var(--surface-ground);
-  color: var(--text-color);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
-#app {
-  height: 100%;
-}
-
-/* Ensure PrimeVue components inherit theme variables */
-:root {
-  /* Optional: Override theme variables if needed */
-  /* Example: --primary-color: #your-color; */
-}
-
-/* Dark mode support */
-.dark-mode {
-  /* PrimeVue handles dark mode automatically with Aura theme */
-}
-
-/* ── Dark Mode: map custom CSS variables to dark values ── */
-html.dark-mode {
-  color-scheme: dark;
-  --surface-ground:       #09090b;
-  --surface-section:      #18181b;
-  --surface-card:         #18181b;
-  --surface-overlay:      #27272a;
-  --surface-border:       #3f3f46;
-  --surface-hover:        rgba(255, 255, 255, 0.06);
-  --text-color:           #f4f4f5;
-  --text-color-secondary: #a1a1aa;
-  --scrollbar-track: #18181b;
-  --scrollbar-thumb: #52525b;
-  --sb-bg:     #18181b;
-  --sb-border: #3f3f46;
-}
-
-html.dark-mode ::-webkit-scrollbar-track {
-  background: #18181b;
-}
-
-html.dark-mode ::-webkit-scrollbar-thumb {
-  background: #52525b;
-  border-radius: 4px;
-}
-
-html.dark-mode ::-webkit-scrollbar-thumb:hover {
-  background: #71717a;
-}
-
-/* Scrollbar styling */
+/* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--surface-ground);
+  background: #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--surface-border);
+  background: #888;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-color);
+  background: #555;
 }
 
-/* Utility classes */
-.full-width {
-  width: 100%;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.flex-center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
+/* Utility Classes */
 .fade-in {
   animation: fadeIn 0.3s ease-in;
 }
 
-/* Loading states */
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
+
+/* ── VYRA CSS Variables ── */
+:root {
+  --vyra-primary:       #2196F3;
+  --vyra-primary-alpha: rgba(33, 150, 243, 0.1);
+  --vyra-secondary:     #607D8B;
+  --vyra-success:       #4CAF50;
+  --vyra-warning:       #FF9800;
+  --vyra-danger:        #F44336;
+  --sidebar-width:          260px;
+  --sidebar-collapsed-width: 64px;
+}
+
+/* Full viewport layout */
+#app {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Dark Mode: map custom CSS variables to dark values ── */
+/* Applied when PrimeVue sets html.dark-mode via darkModeSelector */
+html.dark-mode {
+  color-scheme: dark;
+
+  /* Surface colors */
+  --surface-ground:   #09090b;
+  --surface-section:  #18181b;
+  --surface-card:     #18181b;
+  --surface-overlay:  #27272a;
+  --surface-border:   #3f3f46;
+  --surface-hover:    rgba(255, 255, 255, 0.06);
+
+  /* Text */
+  --text-color:           #f4f4f5;
+  --text-color-secondary: #a1a1aa;
+
+  /* Dark scrollbars */
+  --scrollbar-track: #18181b;
+  --scrollbar-thumb: #52525b;
+
+  /* Sidebar specific */
+  --sb-bg:     #18181b;
+  --sb-border: #3f3f46;
+}
+
+html.dark-mode ::-webkit-scrollbar-track {
+  background: var(--scrollbar-track, #18181b);
+}
+
+html.dark-mode ::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, #52525b);
+}
+
+html.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: #71717a;
+}
+

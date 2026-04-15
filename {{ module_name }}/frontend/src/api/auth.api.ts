@@ -1,5 +1,5 @@
 /**
- * API Client for Authentication
+ * API Client for Authentication (session-based)
  */
 
 const API_BASE = '/{{ module_name }}/api'
@@ -8,6 +8,11 @@ export interface LoginRequest {
   username: string
   password: string
   auth_mode?: 'local' | 'usermanager'
+}
+
+export interface UserManagerStatus {
+  available: boolean
+  message: string
 }
 
 export interface LoginResponse {
@@ -20,14 +25,11 @@ export interface LoginResponse {
 
 export interface UserInfo {
   username: string
+  user_id: number
+  role: string
+  level: number
   token: string
   module_id: string
-  password_change_required?: boolean
-}
-
-export interface UserManagerStatus {
-  available: boolean
-  message: string
 }
 
 class AuthApi {
@@ -48,11 +50,9 @@ class AuthApi {
   async login(request: LoginRequest): Promise<LoginResponse> {
     const response = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(request),
-      credentials: 'include' // Include cookies
+      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -65,7 +65,7 @@ class AuthApi {
   async logout(): Promise<void> {
     const response = await fetch(`${API_BASE}/auth/logout`, {
       method: 'POST',
-      credentials: 'include'
+      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -76,37 +76,28 @@ class AuthApi {
   async verifyToken(): Promise<UserInfo | null> {
     try {
       const response = await fetch(`${API_BASE}/auth/verify`, {
-        credentials: 'include'
+        credentials: 'include',
       })
 
-      if (!response.ok) {
-        return null
-      }
+      if (!response.ok) return null
 
       const data = await response.json()
-      return data.user
+      return data.user ?? null
     } catch (error) {
       console.error('Token verification failed:', error)
       return null
     }
   }
 
-  async changePassword(
-    username: string,
-    oldPassword: string,
-    newPassword: string
-  ): Promise<void> {
+  async changePassword(oldPassword: string, newPassword: string): Promise<void> {
     const response = await fetch(`${API_BASE}/auth/change-password`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        username,
         old_password: oldPassword,
-        new_password: newPassword
+        new_password: newPassword,
       }),
-      credentials: 'include'
+      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -117,40 +108,12 @@ class AuthApi {
   async checkUserManagerAvailable(): Promise<UserManagerStatus> {
     try {
       const response = await fetch(`${API_BASE}/auth/check-usermanager`, {
-        credentials: 'include'
+        credentials: 'include',
       })
       if (!response.ok) return { available: false, message: 'Nicht erreichbar' }
       return await response.json()
     } catch {
       return { available: false, message: 'Kein externer UserManager erreichbar' }
-    }
-  }
-
-  async listUsers(): Promise<any[]> {
-    const response = await fetch(`${API_BASE}/auth/users`, {
-      credentials: 'include'
-    })
-
-    if (!response.ok) {
-      throw new Error(await this._errorMessage(response, 'Failed to list users'))
-    }
-
-    const data = await response.json()
-    return data.users
-  }
-
-  async createUser(username: string, password: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/auth/users`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username, password }),
-      credentials: 'include'
-    })
-
-    if (!response.ok) {
-      throw new Error(await this._errorMessage(response, 'Failed to create user'))
     }
   }
 }

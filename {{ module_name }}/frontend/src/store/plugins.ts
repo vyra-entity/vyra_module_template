@@ -6,22 +6,21 @@ import { pluginApi, type UiManifestEntry } from '../features/plugins/plugin.api'
 const PluginErrorFallback = markRaw({ render: () => h('span', { style: 'display:none' }) })
 
 /**
- * Plugin Store — state management for the plugin system
+ * Plugin Store — generic plugin slot loading
  *
- * - Holds the plugin list from the repository
- * - Loads the UI manifest and instantiates Vue components via defineAsyncComponent
- * - Provides slot assignments for the slot system
+ * Loads the UI manifest and instantiates Vue components via defineAsyncComponent.
+ * Provides slot assignments for the slot system.
+ *
+ * Admin operations (plugin list, install/uninstall) live in `usePluginAdminStore`.
  */
 export const usePluginStore = defineStore('plugins', () => {
   // -----------------------------------------------------------------------
   // State
   // -----------------------------------------------------------------------
-  const loading          = ref(false)
-  const error            = ref<string | null>(null)
-
   /** Loaded Vue components per slot: slot_id → Array of { entry, component } */
-  const slotComponents   = ref<Record<string, { entry: UiManifestEntry; component: any }[]>>({})
-  const manifestLoaded   = ref(false)
+  const slotComponents = ref<Record<string, { entry: UiManifestEntry; component: any }[]>>({})
+  const manifestLoaded = ref(false)
+  const error          = ref<string | null>(null)
 
   // -----------------------------------------------------------------------
   // Getters
@@ -48,6 +47,9 @@ export const usePluginStore = defineStore('plugins', () => {
       for (const [slotId, entries] of Object.entries(manifest.ui_slots)) {
         result[slotId] = entries.map(entry => ({
           entry,
+          // Lazily imports index.js via ES module dynamic import.
+          // errorComponent + onError ensure a broken plugin shows nothing and
+          // does not propagate the error to the host.
           component: markRaw(
             defineAsyncComponent({
               loader: () => import(/* @vite-ignore */ entry.js_entry_point),
@@ -68,17 +70,16 @@ export const usePluginStore = defineStore('plugins', () => {
     }
   }
 
-  /** Return components assigned to a slot */
+  /** Return components assigned to a slot. */
   function getSlotComponents(slotId: string) {
     return slotComponents.value[slotId] ?? []
   }
 
   return {
     // State
-    loading,
-    error,
     slotComponents,
     manifestLoaded,
+    error,
     // Getters
     hasSlot,
     // Actions

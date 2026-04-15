@@ -1,7 +1,7 @@
 """
 Plugin Router — Communication endpoints for the plugin system.
 
-These endpoints are registered in {{ module_name }}.
+These endpoints are registered in <module_name>.
 
 Endpoints:
   GET    /plugin/assets/{plugin_id}/{version}/{path} — Asset proxy (JS/CSS/WASM/SVG)
@@ -27,7 +27,7 @@ from .models import (
     UiManifestEntry,
     UiManifestResponse,
 )
-from ...container_injection import provide_plugin_gateway
+from ...container_injection import provide_plugin_gateway, ContainerNotInitializedError
 from vyra_base.plugin.runtime import PluginCallError
 
 logger = logging.getLogger(__name__)
@@ -86,11 +86,21 @@ async def serve_plugin_asset(plugin_id: str, version: str, file_path: str):
         mime_type = "application/octet-stream"
 
     content = asset_path.read_bytes()
+
+    # Versioned assets from the pool (released, immutable path) get long-term
+    # caching.  Assets served from the local repository (dev/editable builds)
+    # must never be cached so a rebuild is immediately visible without a hard
+    # refresh.
+    if asset_path.is_relative_to(_POOL_PATH):
+        cache_header = "public, max-age=31536000, immutable"
+    else:
+        cache_header = "no-store"
+
     return Response(
         content=content,
         media_type=mime_type,
         headers={
-            "Cache-Control": "public, max-age=3600",
+            "Cache-Control": cache_header,
             "Content-Length": str(len(content)),
         },
     )
@@ -115,7 +125,10 @@ async def resolve_plugins(
 ):
     """
     Return the manifest of all active UI slot components for the given scope.
-    Refreshes the local cache via PluginGateway and returns the result.
+
+    Delegates to PluginGateway.resolve_plugins() which, when running inside
+    v2_modulemanager, calls PluginManager._resolve_plugins_impl() directly
+    (no Zenoh round-trip).  Consumer modules use the Zenoh transport path.
     """
     try:
         result = await gateway.resolve_plugins(
@@ -126,6 +139,8 @@ async def resolve_plugins(
             p_id=p_id,
         )
         return result
+    except ContainerNotInitializedError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     except Exception as exc:

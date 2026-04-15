@@ -4,7 +4,26 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
-### Added — Dark theme, settings store, plugins settings page (2026-01-27)
+### Refactored — auth.api.ts aligned with v2_usermanager (2026-01-25)
+
+- **`frontend/src/api/auth.api.ts`** — `UserInfo` interface updated to match backend response (`user_id`, `role`, `level`, `token`, `module_id`). `listUsers()`/`createUser()` removed (moved to `admin.api.ts`).
+- **`frontend/src/api/admin.api.ts`** — New file: extracted `AdminApi` class with `listUsers()` and `createUser()` (typed `LocalUser` interface).
+- **`frontend/src/store/auth.ts`** — `roles` computed now derives from `user.role` (singular string → array).
+
+### Refactored — Auth router, API and store improvements (2026-01-25)
+
+- **`backend_webserver/auth/router.py`** — Added `_extract_token()` helper + `get_current_user` FastAPI dependency. Eliminated duplicated token-extraction logic. `ChangePasswordRequest` no longer includes `username` (derived from session token via dependency). HTTP 503 (was 500) for uninitialized service. `secure=True` on session cookie.
+- **`backend_webserver/auth/auth_service.py`** — Replaced stub `_validate_usermanager_credentials` with full HTTP delegation to `v2_usermanager` (POST login + GET verify).
+- **`frontend/src/api/auth.api.ts`** — `changePassword(oldPassword, newPassword)`: removed `username` parameter.
+- **`frontend/src/store/auth.ts`** — Updated `changePassword` call (no `username` arg). Added `roles`, `isAdmin`, `userId` computed properties.
+
+### Refactored — Dynamic module name in frontend (2026-01-25)
+
+- **`frontend/src/features/settings/pages/PluginsPage.vue`** — Module name derived dynamically from `apiClient.defaults.baseURL`.
+- **`frontend/src/App.vue`** — `resolvePlugins` uses dynamic `MODULE_NAME`.
+- **`frontend/src/store/settings.ts`** — `localStorage` key uses dynamic `SETTINGS_KEY`.
+- **`frontend/src/types/common.ts`** — Removed modulemanager-specific `ModuleInstance`, `RepositoryModule`, `Repository` interfaces.
+
 
 - **`src/store/settings.ts`** — New Pinia store `useSettingsStore` with theme (light/dark/auto), language, notifications toggle. Persists to localStorage. Applies `html.dark-mode` class to document root.
 - **`src/features/settings/pages/PluginsPage.vue`** — New settings page listing all active plugins with UI-slot overview and toggle functionality.

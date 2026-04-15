@@ -101,11 +101,9 @@ import Select from 'primevue/select'
 import Message from 'primevue/message'
 import { useAuthStore } from '../../store/auth'
 import { useToast } from 'primevue/usetoast'
-// Primary: module-specific icon — replace 'logo.svg' in assets/ with your own icon
 import logo from '../../assets/logo.svg'
-// Alternative: use one of the Variobotic logos as placeholder instead
+// Alternative: Variobotic logo as placeholder
 // import logo from '../../assets/variobotic-kreis-transparent-blaugrau.svg'
-// import logo from '../../assets/variobotic-blau.svg'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -136,7 +134,6 @@ const handleLogin = async () => {
       life: 3000
     })
 
-    // Redirect to home
     router.push('/{{ module_name }}/home')
   } catch (error: any) {
     errorMessage.value = error.message || 'Anmeldung fehlgeschlagen'

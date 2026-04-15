@@ -45,12 +45,27 @@ export const useSideDockPopupStore = defineStore('sideDockPopup', () => {
   const activePocketId = ref<string | null>(null)
   const isPanelOpen = ref(false)
 
-  /** Vertical offset (px) from the default 25%-top anchor, persisted to localStorage. */
+  // Y-offset for the strip position — persisted in localStorage
   const _savedOffset = parseFloat(localStorage.getItem('sdp-strip-y-offset') ?? '0')
   const stripYOffset = ref<number>(isNaN(_savedOffset) ? 0 : _savedOffset)
   watch(stripYOffset, (val) => {
     localStorage.setItem('sdp-strip-y-offset', String(val))
   })
+
+  // Pinned pocket ids — persisted in localStorage so state survives page refresh
+  function _loadPinnedIds(): Set<string> {
+    try {
+      const raw = localStorage.getItem('sdp-pinned-pockets')
+      return new Set(raw ? JSON.parse(raw) : [])
+    } catch {
+      return new Set()
+    }
+  }
+
+  function _savePinnedIds(): void {
+    const ids = pockets.value.filter((p) => p.isPinned).map((p) => p.id)
+    localStorage.setItem('sdp-pinned-pockets', JSON.stringify(ids))
+  }
 
   const sortedPockets = computed(() =>
     [...pockets.value].sort((a, b) => a.priority - b.priority),
@@ -83,7 +98,9 @@ export const useSideDockPopupStore = defineStore('sideDockPopup', () => {
   /** Register a new pocket. Silently ignored if a pocket with the same id exists. */
   function registerPocket(pocket: Omit<SdpPocket, 'isOpen' | 'isPinned'>): void {
     if (!pockets.value.find((p) => p.id === pocket.id)) {
-      pockets.value.push({ ...pocket, isOpen: false, isPinned: false })
+      const pinnedIds = _loadPinnedIds()
+      const isPinned = pinnedIds.has(pocket.id)
+      pockets.value.push({ ...pocket, isOpen: isPinned, isPinned })
     }
   }
 
@@ -120,13 +137,17 @@ export const useSideDockPopupStore = defineStore('sideDockPopup', () => {
     if (pocket) {
       pocket.isPinned = true
       pocket.isOpen = true
+      _savePinnedIds()
     }
   }
 
   /** Unpin a pocket (it remains open until explicitly closed). */
   function unpinPocket(id: string): void {
     const pocket = pockets.value.find((p) => p.id === id)
-    if (pocket) pocket.isPinned = false
+    if (pocket) {
+      pocket.isPinned = false
+      _savePinnedIds()
+    }
   }
 
   /** Close all pockets that are not pinned. */
@@ -146,14 +167,8 @@ export const useSideDockPopupStore = defineStore('sideDockPopup', () => {
       pocket.isPinned = false
       pocket.isOpen = false
       if (activePocketId.value === id) activePocketId.value = null
+      _savePinnedIds()
     }
-  }
-
-  /** @deprecated Use closeAllUnpinned(); kept for API compatibility. */
-  function closePanel(): void {
-    isPanelOpen.value = false
-    closeAllUnpinned()
-    activePocketId.value = null
   }
 
   /**
@@ -187,7 +202,6 @@ export const useSideDockPopupStore = defineStore('sideDockPopup', () => {
     closeAllUnpinned,
     pinPocket,
     unpinPocket,
-    closePanel,
     getPocketApi,
   }
 })

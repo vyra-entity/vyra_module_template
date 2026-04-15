@@ -33,7 +33,7 @@
                 <Password id="oldPw" v-model="oldPassword" :feedback="false" toggleMask class="w-full" :inputStyle="{ width: '100%' }" />
               </div>
               <div class="field">
-                <label for="newPw" class="block mb-2 font-semibold">Neues Passwort</label>
+                <label for="newPw" class="block mb-2 font-semibold">Neues Passwort (min. 8 Zeichen)</label>
                 <Password id="newPw" v-model="newPassword" toggleMask class="w-full" :inputStyle="{ width: '100%' }" />
               </div>
               <div class="field">
@@ -46,7 +46,7 @@
                 label="Passwort ändern"
                 icon="pi pi-check"
                 :loading="changingPassword"
-                :disabled="!oldPassword || !newPassword || newPassword !== confirmPassword"
+                :disabled="!oldPassword || newPassword.length < 8 || newPassword !== confirmPassword"
               />
             </form>
           </template>
@@ -76,6 +76,10 @@ const passwordError = ref('')
 
 async function handleChangePassword() {
   passwordError.value = ''
+  if (newPassword.value.length < 8) {
+    passwordError.value = 'Neues Passwort muss mindestens 8 Zeichen haben'
+    return
+  }
   if (newPassword.value !== confirmPassword.value) {
     passwordError.value = 'Passwörter stimmen nicht überein'
     return

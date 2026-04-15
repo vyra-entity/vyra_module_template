@@ -6,7 +6,6 @@ Provides user CRUD operations, authentication, and authorization.
 """
 
 from ..logging_config import get_logger, log_exception, log_function_call, log_function_result
-import hashlib
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 
@@ -14,6 +13,18 @@ from vyra_base.core.entity import VyraEntity
 from vyra_base.storage.db_manipulator import DbManipulator, DBReturnValue
 from vyra_base.storage.db_access import DBSTATUS
 from vyra_base.com import remote_service
+try:
+    from vyra_base.helper.crypto_helper import hash_password_bcrypt, verify_password_bcrypt
+except ImportError:
+    import bcrypt as _bcrypt  # type: ignore
+
+    def hash_password_bcrypt(password: str) -> str:  # type: ignore[misc]
+        """Fallback: hash a password using bcrypt directly."""
+        return _bcrypt.hashpw(password.encode(), _bcrypt.gensalt()).decode()
+
+    def verify_password_bcrypt(password: str, hashed: str) -> bool:  # type: ignore[misc]
+        """Fallback: verify a bcrypt-hashed password."""
+        return _bcrypt.checkpw(password.encode(), hashed.encode())
 
 from .tb_users import User, UserRole, UserLevel
 from ..interface import auto_register_interfaces
@@ -211,8 +222,7 @@ class InternalUserManager:
                 return None
             
             # Verify password
-            password_hash = self._hash_password(password)
-            if password_hash != user.password_hash:
+            if not verify_password_bcrypt(password, user.password_hash):
                 # Increment failed login attempts
                 await self._handle_failed_login(user)
                 logger.warning(f"🔒 Authentication failed: Invalid password for '{username}'")
@@ -663,5 +673,5 @@ class InternalUserManager:
     # =============================================================================
     
     def _hash_password(self, password: str) -> str:
-        """Hash password using SHA-256"""
-        return hashlib.sha256(password.encode()).hexdigest()
+        """Hash password using bcrypt."""
+        return hash_password_bcrypt(password)

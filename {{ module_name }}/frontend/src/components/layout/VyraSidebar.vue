@@ -96,7 +96,7 @@
       </div>
 
       <!-- User panel (clickable → opens dropdown menu) -->
-      <Menu ref="userMenu" :model="userMenuItems" popup />
+      <Menu ref="userMenu" :model="userMenuItems" popup appendTo="body" id="sidebar-user-menu" />
       <div
         v-if="authStore.isAuthenticated"
         class="user-info user-info--clickable"

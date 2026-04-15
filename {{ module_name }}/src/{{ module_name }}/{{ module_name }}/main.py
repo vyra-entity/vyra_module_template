@@ -293,7 +293,7 @@ async def web_backend_runner() -> None:
     logger.info("container_initialized", wait_count=wait_count)
     
     # Get module name dynamically from entity.
-    # entity.module_entry.name is the short package name (e.g. "{{ module_name }}"),
+    # entity.module_entry.name is the short package name (e.g. "v2_modulemanager"),
     # which is also the top-level Python package installed by colcon.
     entity = container_injection.get_entity()
     module_name = entity.module_entry.name

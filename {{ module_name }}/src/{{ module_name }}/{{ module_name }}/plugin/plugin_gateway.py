@@ -24,7 +24,7 @@ PluginGateway
       Service so that other modules (and RemoteRuntimeProxy instances
       running in other modules) can call local WASM plugins.
     - **Consumer** — holds a Vyra Transport client to ``plugin/resolve_plugins``
-      (self-call to {{ module_name }}/PluginManager) and writes the result
+      (self-call to v2_modulemanager/PluginManager) and writes the result
       to ``plugin/cache/plugin_manifest.json``.
 """
 

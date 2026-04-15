@@ -19,6 +19,33 @@ _auth_service: Optional[AuthenticationService] = None
 
 security = HTTPBearer(auto_error=False)
 
+TOKEN_COOKIE_MAX_AGE = 3600 * 8  # 8 hours
+
+
+def _extract_token(
+    auth_token: Optional[str],
+    credentials: Optional[HTTPAuthorizationCredentials],
+) -> str:
+    """Extract session token from cookie or Authorization header."""
+    if auth_token:
+        return auth_token
+    if credentials:
+        return credentials.credentials
+    raise HTTPException(status_code=401, detail="No authentication token provided")
+
+
+async def get_current_user(
+    auth_token: Optional[str] = Cookie(None),
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    auth_service: AuthenticationService = Depends(get_auth_service),
+) -> dict:
+    """FastAPI dependency — validates session token and returns user info."""
+    token = _extract_token(auth_token, credentials)
+    user_info = await auth_service.validate_token(token)
+    if user_info is None:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    return user_info
+
 
 def set_auth_service(auth_service: AuthenticationService):
     """Set the global authentication service instance"""
@@ -29,7 +56,7 @@ def set_auth_service(auth_service: AuthenticationService):
 def get_auth_service() -> AuthenticationService:
     """Dependency to get auth service"""
     if _auth_service is None:
-        raise HTTPException(status_code=500, detail="Auth service not initialized")
+        raise HTTPException(status_code=503, detail="Auth service not initialized")
     return _auth_service
 
 
@@ -51,7 +78,6 @@ class LoginResponse(BaseModel):
 
 class ChangePasswordRequest(BaseModel):
     """Change password request"""
-    username: str
     old_password: str
     new_password: str
 
@@ -117,7 +143,8 @@ async def login(
         key="auth_token",
         value=token,
         httponly=True,
-        max_age=3600 * 8,  # 8 hours
+        secure=True,
+        max_age=TOKEN_COOKIE_MAX_AGE,
         samesite="lax"
     )
     
@@ -139,20 +166,16 @@ async def logout(
 ):
     """
     Logout user and revoke session
-    
+
     Token can be provided via:
     - Cookie: auth_token
     - Authorization header: Bearer <token>
     """
-    token = None
-    
-    # Check cookie first
-    if auth_token:
-        token = auth_token
-    # Then check Authorization header
-    elif credentials:
-        token = credentials.credentials
-    
+    try:
+        token = _extract_token(auth_token, credentials)
+    except HTTPException:
+        token = None
+
     if token:
         await auth_service.revoke_token(token)
         response.delete_cookie("auth_token")
@@ -169,26 +192,15 @@ async def verify_token(
 ):
     """
     Verify authentication token
-    
+
     Returns user info if token is valid
     """
-    token = None
-    
-    # Check cookie first
-    if auth_token:
-        token = auth_token
-    # Then check Authorization header
-    elif credentials:
-        token = credentials.credentials
-    
-    if not token:
-        raise HTTPException(status_code=401, detail="No authentication token provided")
-    
+    token = _extract_token(auth_token, credentials)
     user_info = await auth_service.validate_token(token)
-    
+
     if not user_info:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
-    
+
     return {
         "success": True,
         "user": user_info
@@ -198,39 +210,23 @@ async def verify_token(
 @router.post("/change-password")
 async def change_password(
     request: ChangePasswordRequest,
-    auth_token: Optional[str] = Cookie(None),
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    user: dict = Depends(get_current_user),
     auth_service: AuthenticationService = Depends(get_auth_service)
 ):
     """
-    Change user password
-    
-    Requires valid authentication token
+    Change the current user's password.
+
+    Authentication is validated via the session token (cookie or Bearer header).
     """
-    token = auth_token or (credentials.credentials if credentials else None)
-    
-    if not token:
-        raise HTTPException(status_code=401, detail="Authentication required")
-    
-    # Verify token
-    user_info = await auth_service.validate_token(token)
-    if not user_info:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
-    
-    # Only allow users to change their own password (or admin to change any)
-    if user_info["username"] != request.username and user_info["username"] != "admin":
-        raise HTTPException(status_code=403, detail="Not authorized")
-    
-    # Change password
     success = await auth_service.change_password(
-        request.username,
+        user["username"],
         request.old_password,
         request.new_password
     )
-    
+
     if not success:
         raise HTTPException(status_code=400, detail="Failed to change password")
-    
+
     return {"success": True, "message": "Password changed successfully"}
 
 

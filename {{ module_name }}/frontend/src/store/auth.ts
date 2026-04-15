@@ -14,6 +14,9 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Computed
   const username = computed(() => user.value?.username || '')
+  const roles = computed(() => user.value?.role ? [user.value.role] : [])
+  const isAdmin = computed(() => roles.value.includes('Admin'))
+  const userId = computed(() => user.value?.user_id ?? 0)
 
   // Actions
   async function login(username: string, password: string, authMode: 'local' | 'usermanager' = 'local') {
@@ -90,7 +93,7 @@ export const useAuthStore = defineStore('auth', () => {
       throw new Error('No user logged in')
     }
 
-    await authApi.changePassword(user.value.username, oldPassword, newPassword)
+    await authApi.changePassword(oldPassword, newPassword)
   }
 
   return {
@@ -102,6 +105,9 @@ export const useAuthStore = defineStore('auth', () => {
 
     // Computed
     username,
+    roles,
+    isAdmin,
+    userId,
 
     // Actions
     login,
