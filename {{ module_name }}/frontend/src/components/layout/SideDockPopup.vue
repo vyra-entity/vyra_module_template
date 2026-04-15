@@ -204,22 +204,20 @@ function startStripDrag(e: MouseEvent): void {
   const startY    = e.clientY
   const initOffset = sdpStore.stripYOffset
 
-  // Compute allowed offset range once at drag start (avoids querying on every move)
-  const topbar   = document.querySelector('.vyra-topbar') as HTMLElement | null
-  const footer   = document.querySelector('.vyra-footer') as HTMLElement | null
-  const statusbar = document.querySelector('.vyra-statusbar, .p-toolbar') as HTMLElement | null
+  // Compute allowed offset range once at drag start
   const stripEl  = document.querySelector('.sdp-strip') as HTMLElement | null
   const stripH   = stripEl?.offsetHeight ?? 60
 
-  // Strip top is placed at: 25% of viewport + stripYOffset
+  // Strip center is at: 25% of viewport + stripYOffset (CSS: top: calc(25% + offset))
+  // With transform: translateY(-50%), the visual center equals the top value.
+  // Clamp so the strip stays fully within the viewport (top edge >= 0, bottom edge <= vh).
   const baseY = window.innerHeight * 0.25
-  const minTop = (topbar?.getBoundingClientRect().bottom ?? 52) - baseY + 4
-  const bottomRef = statusbar ?? footer
-  const maxTop = (bottomRef?.getBoundingClientRect().top ?? window.innerHeight) - baseY - stripH - 4
+  const minOffset = stripH / 2 - baseY                              // top edge at y=0
+  const maxOffset = window.innerHeight - stripH / 2 - baseY         // bottom edge at y=vh
 
   const onMove = (ev: MouseEvent) => {
     const raw = initOffset + (ev.clientY - startY)
-    sdpStore.stripYOffset = Math.max(minTop, Math.min(maxTop, raw))
+    sdpStore.stripYOffset = Math.max(minOffset, Math.min(maxOffset, raw))
   }
 
   const onUp = () => {

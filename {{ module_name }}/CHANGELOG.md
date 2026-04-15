@@ -4,6 +4,18 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — Dark theme only partially applied (2026-04-16)
+
+- **`frontend/src/assets/styles.css`** — Added `html.dark-mode` CSS block with dark mode variables. Fixed hardcoded `body { background: #f5f7fa }` → `var(--surface-ground, #f5f7fa)`.
+
+### Fixed — Missing Toast component for plugin notifications (2026-04-16)
+
+- **`frontend/src/App.vue`** — Added `<Toast />` component and `import Toast from 'primevue/toast'`. Without this, `pluginApi.events.notify()` calls (e.g., sdp-system-info "Test Notify") silently failed.
+
+### Added — Sidebar settings tooltips when collapsed (2026-04-16)
+
+- **`frontend/src/components/layout/VyraSidebar.vue`** — Added `v-tooltip.right` on settings navigation items and "Zurück" button, shown only when sidebar is collapsed.
+
 ### Refactored — auth.api.ts aligned with v2_usermanager (2026-01-25)
 
 - **`frontend/src/api/auth.api.ts`** — `UserInfo` interface updated to match backend response (`user_id`, `role`, `level`, `token`, `module_id`). `listUsers()`/`createUser()` removed (moved to `admin.api.ts`).

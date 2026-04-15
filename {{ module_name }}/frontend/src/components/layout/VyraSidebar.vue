@@ -48,7 +48,12 @@
     <!-- ── MAIN NAVIGATION ZONE ────────────────────────────────────────────── -->
     <!-- Settings sub-nav: shown when inside /settings routes -->
     <nav v-if="isInSettings" class="sidebar-main" aria-label="Einstellungen">
-      <button class="settings-back-btn" @click="goBack" title="Zurück zur Hauptnavigation">
+      <button
+        class="settings-back-btn"
+        @click="goBack"
+        title="Zurück zur Hauptnavigation"
+        v-tooltip.right="sidebarStore.isCollapsed ? 'Zurück' : undefined"
+      >
         <i class="pi pi-arrow-left" />
         <span class="btn-label">Zurück</span>
       </button>
@@ -59,6 +64,7 @@
           :to="{ name: item.routeName }"
           class="settings-nav-item"
           active-class="is-active"
+          v-tooltip.right="sidebarStore.isCollapsed ? item.label : undefined"
         >
           <i :class="item.icon" />
           <span class="nav-item-label">{{ item.label }}</span>

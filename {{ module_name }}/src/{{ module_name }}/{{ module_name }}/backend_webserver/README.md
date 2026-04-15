@@ -35,17 +35,80 @@ backend_webserver/
 
 ## Auth (`auth/`)
 
-JWT-based authentication backed by `UserManager`.
+Redis-session-based authentication using `vyra_base.auth.BaseAuthService`.
 
-| Endpoint | Method | Description |
+### Endpoints
+
+| Endpoint | Method | Auth required | Description |
+|---|---|---|---|
+| `/api/auth/login` | POST | ✗ | Authenticate and receive a session token |
+| `/api/auth/logout` | POST | ✗ | Revoke the current session token |
+| `/api/auth/verify` | GET | ✓ | Verify the current token and return user info |
+| `/api/auth/change-password` | POST | ✓ | Change the current user's password |
+| `/api/auth/check-usermanager` | GET | ✗ | Probe whether the external UserManager is reachable |
+| `/api/auth/users` | GET | ✓ admin | List all local users |
+| `/api/auth/users` | POST | ✓ admin | Create a new local user |
+
+Tokens are delivered as:
+- **Cookie** (`auth_token`) — set automatically on login, `HttpOnly`, 8 h TTL.
+- **Header** (`Authorization: Bearer <token>`) — accepted on all protected routes.
+
+### Architecture
+
+```
+auth/
+├── auth_service.py   ← Module-specific subclass of BaseAuthService
+└── router.py         ← FastAPI router; uses make_auth_service_di() for DI setup
+```
+
+All shared logic lives in **`vyra_base.auth`** (shared across all modules):
+
+| Component | Location | Description |
 |---|---|---|
-| `/api/auth/login` | POST | Authenticate and receive access + refresh tokens |
-| `/api/auth/logout` | POST | Invalidate the current session |
-| `/api/auth/verify` | GET | Verify the current token is still valid |
-| `/api/auth/password` | PUT | Change user password |
+| `BaseAuthService` | `vyra_base.auth.base_auth_service` | ABC — session creation, token validation/revocation, local-user management |
+| `UsermanagerUnavailableError` | `vyra_base.auth.exceptions` | Raised when the UM REST API / registry is unreachable |
+| `AuthToken`, `LoginRequest`, `LoginResponse`, … | `vyra_base.auth.models` | Shared Pydantic models |
+| `make_auth_service_di()` | `vyra_base.auth.router_utils` | Factory for `(set_auth_service, get_auth_service)` DI closures |
+| `_extract_token()`, `security`, `TOKEN_COOKIE_MAX_AGE` | `vyra_base.auth.router_utils` | Shared router utilities |
 
-Tokens are passed as `Authorization: Bearer <token>` headers on all protected routes.
-Route protection is applied via FastAPI dependencies defined in `core/dependencies.py`.
+### Module-specific overrides
+
+Each module's `auth_service.py` extends `BaseAuthService` and implements:
+
+```python
+class AuthenticationService(BaseAuthService):
+
+    def _get_user_manager(self) -> Any:
+        """Return the UserManager DI instance (from container_injection)."""
+
+    async def _validate_usermanager_credentials(
+        self, username: str, password: str
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Module-specific UM validation:
+        - v2_modulemanager  → cert-based JWT verification
+        - v2_dashboard / {{ module_name }} → HTTP delegation to v2_usermanager REST
+        """
+
+    async def check_usermanager_available(self) -> Dict[str, Any]:
+        """
+        Probe whether the external UM is reachable:
+        - v2_modulemanager  → queries internal module registry directly
+        - v2_dashboard / {{ module_name }} → HTTP GET to v2_modulemanager endpoint
+        """
+```
+
+### DI wiring (router.py)
+
+```python
+from vyra_base.auth import make_auth_service_di, _extract_token, security, TOKEN_COOKIE_MAX_AGE
+from vyra_base.auth import LoginRequest, LoginResponse, ChangePasswordRequest, CreateUserRequest
+
+set_auth_service, get_auth_service = make_auth_service_di()
+```
+
+`set_auth_service` is called once in `main_rest.py` at application startup.
+`get_auth_service` is used as a `Depends()` target in every route handler.
 
 ## WebSocket (`websocket/`)
 

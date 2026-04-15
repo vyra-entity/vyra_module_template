@@ -545,7 +545,7 @@ class PluginGateway:
             logger.warning("PluginGateway.resolve_plugins: no resolve_client available")
             return self.get_manifest() or self._empty_manifest(scope_type, scope_target)
 
-        if not result or "slots" not in result:
+        if not result or "ui_slots" not in result:
             logger.warning("PluginGateway.resolve_plugins: empty/invalid result from remote")
             return self._empty_manifest(scope_type, scope_target)
 
@@ -567,7 +567,7 @@ class PluginGateway:
         return {
             "scope_type": scope_type,
             "scope_target": scope_target or "",
-            "slots": {},
+            "ui_slots": {},
         }
 
     # ------------------------------------------------------------------

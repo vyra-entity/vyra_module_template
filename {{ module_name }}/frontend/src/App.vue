@@ -77,6 +77,9 @@
     </div>
   </div>
 
+  <!-- Global Toast for plugin notifications and topbar actions -->
+  <Toast />
+
   <!-- Error Feed Dialog -->
   <Dialog
     v-model:visible="errorDialogVisible"
@@ -133,6 +136,7 @@ import PluginSlot from './components/PluginSlot.vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import Menu from 'primevue/menu'
+import Toast from 'primevue/toast'
 import { providePluginApi } from './composables/usePluginApi'
 
 const route        = useRoute()
