@@ -1,5 +1,5 @@
 """
-State type definitions for state management.
+State type definitions for {{ module_name }} state management.
 
 Re-exports all state types from vyra_base.state.state_types and adds
 module-specific data structures for the 3-layer state machine.

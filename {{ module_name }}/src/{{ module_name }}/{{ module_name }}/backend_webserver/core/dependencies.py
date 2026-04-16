@@ -1,5 +1,5 @@
 """
-Common dependencies for VYRA Module API
+Common dependencies for VYRA Module Manager API
 """
 from fastapi import HTTPException, BackgroundTasks, Depends
 from typing import Optional, Dict, Any

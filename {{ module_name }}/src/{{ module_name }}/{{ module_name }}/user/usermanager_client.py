@@ -23,12 +23,14 @@ class UserManagerClient:
 
     def __init__(self, entity: VyraEntity):
         self.entity = entity
-        self.enabled = os.getenv("USERMANAGER_CLIENT_ENABLED", "true").lower() == "true"
         self.target_module_name = os.getenv("EXTERNAL_USERMANAGER_MODULE", "v2_usermanager")
         self.target_module_id = os.getenv("EXTERNAL_USERMANAGER_MODULE_ID", "")
         self.request_token_function = os.getenv("USERMANAGER_TOKEN_FUNCTION", "request_access_token")
         self.healthcheck_function = os.getenv("USERMANAGER_HEALTH_FUNCTION", "ping")
         self._connected = False
+        # Auto-disable when no external module ID is configured
+        _client_enabled = os.getenv("USERMANAGER_CLIENT_ENABLED", "true").lower() == "true"
+        self.enabled = _client_enabled and bool(self.target_module_id)
 
     async def initialize(self) -> bool:
         if not self.enabled:

@@ -63,6 +63,10 @@ class Component(OperationalStateMachine):
         # Define your instances here
         self._heartbeat_task: asyncio.Task | None = None
         self._state_heartbeat_task: asyncio.Task | None = None
+        
+        # Sub-manager instances (set during initialize())
+        self.internal_usermanager = None
+        self.usermanager_detector = None
     
     async def set_interfaces(self):
         """
@@ -83,8 +87,14 @@ class Component(OperationalStateMachine):
         Returns:
             bool: True on success, False on failure
         """
-        try:
-            # TODO: Implement initialize logic
+        try:           
+            # Start periodic NewsFeed heartbeat (5 s interval)
+            self._heartbeat_task = asyncio.create_task(self._heartbeat_loop())
+            logger.info("✅ NewsFeed heartbeat started (5 s interval)")
+
+            # Start periodic StateFeed heartbeat (5 s interval)
+            self._state_heartbeat_task = asyncio.create_task(self._state_heartbeat_loop())
+            logger.info("✅ StateFeed heartbeat started (5 s interval)")
 
             logger.info("✅ Component initialization complete")
             return True
@@ -92,6 +102,44 @@ class Component(OperationalStateMachine):
         except Exception as e:
             logger.exception(f"❌ Component initialization failed: {e}")
             return False
+
+    async def _heartbeat_loop(self) -> None:
+        """
+        Publish a NewsFeed heartbeat every 5 seconds.
+
+        Runs indefinitely as a background asyncio task started in initialize().
+        Cancelled by stop() via self._heartbeat_task.cancel().
+        """
+        logger.info("💓 NewsFeed heartbeat loop started")
+        while True:
+            try:
+                await self.entity.news_feeder.feed(f"heartbeat: {datetime.now().isoformat()}")
+            except Exception as e:
+                logger.warning(f"Heartbeat publish failed: {e}")
+            await asyncio.sleep(5.0)
+
+    async def _state_heartbeat_loop(self) -> None:
+        """
+        Publish a StateFeed heartbeat every 5 seconds.
+
+        Runs indefinitely as a background asyncio task started in initialize().
+        Cancelled by stop() via self._state_heartbeat_task.cancel().
+        """
+        logger.info("💓 StateFeed heartbeat loop started")
+        while True:
+            try:
+                state_data = StateEntry(
+                    previous="N/A",
+                    trigger="heartbeat",
+                    current=str(self._state_machine.get_operational_state().value),
+                    module_id=self.entity.module_entry.uuid,
+                    module_name=self.entity.module_entry.name,
+                    timestamp=datetime.now()
+                )
+                await self.entity.state_feeder.feed(state_data)
+            except Exception as e:
+                logger.warning(f"StateFeed heartbeat publish failed: {e}")
+            await asyncio.sleep(5.0)
 
     @remote_service()
     async def pause(self, request: Any=None, response: Any=None) -> bool:
@@ -220,7 +268,11 @@ async def main() -> None:
     task_manager = container_injection.get_task_manager()
     status_manager = container_injection.get_state_manager()
     component = container_injection.get_component()
-    logger.info(f"🚀 Starting {{ module_name }}...")
+    logger.info("🚀 Starting {{ module_name }}...")
+    
+    if not component:
+        logger.error("❌ Component not available from container injection")
+        return
     
     # Load module configuration
     module_params_path = Path(".module/module_params.yaml")
@@ -236,24 +288,35 @@ async def main() -> None:
     
     # Auto-start if configured
     if auto_start:
-        # Check current operational state
+        # Check current operational state and component initialization status
         current_state = component.get_operational_state()
         logger.info(f"🔍 Current operational state: {current_state}")
 
-        # Only call initialize() if state is IDLE
         if current_state.value == "Idle":
             logger.info("🔄 Initializing component via initialize() method...")
+            
             success = await component.initialize()
-
+            
             if not success:
                 logger.error("❌ Component initialization failed")
                 if component.is_error():
                     logger.error("💥 Component in ERROR state - manual reset required")
         else:
-            logger.info(f"⏭️  Component already in state {current_state}, skipping initialize()")
-            success = True
+            # State is already READY but components not initialized (e.g., after recovery)
+            # Initialize components directly without state transition
+            logger.info(f"🔄 Component in state {current_state} but not initialized, initializing components directly...")
+            try:
+                # TODO: Implement initialization logic here if manually needed
+                
+                success = True
+            except Exception as e:
+                logger.exception(f"❌ Component initialization failed: {e}")
+                success = False
 
+        
         if success:
+            # Setup async components after initialization
+                        
             logger.info("✅ Application setup complete - service running")
     else:
         logger.info("⏸️  Auto-start disabled, waiting for manual initialization")
@@ -262,4 +325,4 @@ async def main() -> None:
     logger.info("♾️  Service running indefinitely...")
 
     while True:
-        await asyncio.sleep(1)
+        await asyncio.sleep(10)

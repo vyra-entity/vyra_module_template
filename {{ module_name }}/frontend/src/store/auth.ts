@@ -11,6 +11,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false)
   const isLoading = ref(false)
   const userManagerAvailable = ref(false)
+  const authMode = ref<string>(localStorage.getItem('vyra_auth_mode') || '')
 
   // Computed
   const username = computed(() => user.value?.username || '')
@@ -19,16 +20,18 @@ export const useAuthStore = defineStore('auth', () => {
   const userId = computed(() => user.value?.user_id ?? 0)
 
   // Actions
-  async function login(username: string, password: string, authMode: 'local' | 'usermanager' = 'local') {
+  async function login(username: string, password: string, authModeParam: 'local' | 'usermanager' = 'local') {
     isLoading.value = true
     try {
       const response = await authApi.login({
         username,
         password,
-        auth_mode: authMode
+        auth_mode: authModeParam
       })
 
       if (response.success) {
+        authMode.value = response.auth_mode
+        localStorage.setItem('vyra_auth_mode', response.auth_mode)
         // Verify token immediately after login
         await verifyAuth()
         return true
@@ -48,6 +51,8 @@ export const useAuthStore = defineStore('auth', () => {
       await authApi.logout()
       user.value = null
       isAuthenticated.value = false
+      authMode.value = ''
+      localStorage.removeItem('vyra_auth_mode')
     } catch (error) {
       console.error('Logout failed:', error)
     } finally {
@@ -102,6 +107,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     isLoading,
     userManagerAvailable,
+    authMode,
 
     // Computed
     username,

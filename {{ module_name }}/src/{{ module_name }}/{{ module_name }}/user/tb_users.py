@@ -16,6 +16,7 @@ logger = get_logger(__name__)
 class UserRole(Enum):
     """User roles for access control"""
     ADMIN = "admin"
+    MANAGER = "manager"
     OPERATOR = "operator"
     VIEWER = "viewer"
     CUSTOM = "custom"
@@ -39,10 +40,12 @@ class User(Base):
     Attributes:
         id (int): Primary key auto-increment
         username (str): Unique username
-        password_hash (str): Hashed password (SHA-256)
+        password_hash (str): Hashed password (bcrypt)
+        display_name (str): Optional display name
+        lock_edit (bool): Whether the account is locked for editing by admins
         email (str): Optional email address
         role (UserRole): User role (admin, operator, viewer, custom)
-        level (UserLevel): Access level (0-4, lower = more access)
+        level (UserLevel): Access level (0-4, higher = more access)
         enabled (bool): Whether user account is active
         permissions (dict): Custom permissions JSON
         created_at (datetime): Account creation timestamp
@@ -58,6 +61,8 @@ class User(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    display_name: Mapped[str] = mapped_column(String(200), nullable=True, default="")
+    lock_edit: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=True)
     
     # Role and access control

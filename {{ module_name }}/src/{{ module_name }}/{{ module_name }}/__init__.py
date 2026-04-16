@@ -1,6 +1,7 @@
 """
-{{ module_name }} - VYRA Module Template Package.
+{{ module_name }} - VYRA {{ module_display_name }} Module Package.
 
-Boilerplate template for creating new VYRA modules.
+Provides {{ module_description }}
+for the VYRA industrial automation system.
 """
 __version__ = "0.1.0"

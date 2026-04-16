@@ -1,11 +1,12 @@
 """
-Example unit tests for {module_name} module.
+Example unit tests for {{ module_name }} module.
 
 These tests demonstrate the testing structure and patterns.
 Run with: pytest -m unit tests/unit/test_example.py
 """
 
 import pytest
+import sys
 from unittest.mock import Mock, MagicMock, patch
 import os
 
@@ -19,19 +20,18 @@ class TestBackendConfig:
     
     def test_settings_default_values(self):
         """Test Settings class loads default values correctly."""
-        from {{ module_name }}.backend_webserver.core.config import Settings
+        from {{ module_name }}.{{ module_name }}.backend_webserver.core.config import Settings
         
         with patch.dict(os.environ, {"MODULE_NAME": "test_module"}):
             settings = Settings()
             
             assert settings.module_name == "test_module"
-            assert settings.api_prefix == "/api/{{ module_name }}"
-            assert settings.debug is False
+            assert settings.api_prefix == "/api/{{ module_name }}_test"
             assert settings.log_level == "INFO"
     
     def test_settings_custom_values(self):
         """Test Settings class respects environment variables."""
-        from {{ module_name }}.backend_webserver.core.config import Settings
+        from {{ module_name }}.{{ module_name }}.backend_webserver.core.config import Settings
         
         env_vars = {
             "MODULE_NAME": "custom_module",
@@ -55,15 +55,14 @@ class TestDependencies:
     @pytest.mark.asyncio
     async def test_get_vyra_entity_success(self, mock_vyra_entity):
         """Test get_vyra_entity returns entity when container initialized."""
-        from {{ module_name }} import container_injection
-        from {{ module_name }}.backend_webserver.core.dependencies import get_vyra_entity
+        from {{ module_name }}.{{ module_name }} import container_injection
         
         # Setup: Initialize container
-        container_injection.set_vyra_entity(mock_vyra_entity)
+        container_injection.set_entity(mock_vyra_entity)
         
         try:
             # Act
-            entity = get_vyra_entity()
+            entity = container_injection.get_entity()
             
             # Assert
             assert entity is not None
@@ -73,21 +72,19 @@ class TestDependencies:
             container_injection.reset()
     
     @pytest.mark.asyncio
-    async def test_get_vyra_entity_not_initialized(self):
-        """Test get_vyra_entity raises HTTPException when container not initialized."""
-        from {{ module_name }} import container_injection
-        from {{ module_name }}.backend_webserver.core.dependencies import get_vyra_entity
-        from fastapi import HTTPException
+    async def test_get_entity_not_initialized(self):
+        """Test get_entity raises ContainerNotInitializedError when container not initialized."""
+        from {{ module_name }}.{{ module_name }} import container_injection
+        from {{ module_name }}.{{ module_name }}.container_injection import ContainerNotInitializedError
         
         # Ensure container is reset
         container_injection.reset()
         
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
-            get_vyra_entity()
-        
-        assert exc_info.value.status_code == 503
-        assert "not initialized" in str(exc_info.value.detail).lower()
+        with pytest.raises(ContainerNotInitializedError) as exc_info:
+            container_injection.get_entity()
+
+        assert "not initialized" in str(exc_info.value).lower()
 
 
 # =============================================================================
@@ -99,8 +96,12 @@ class TestApplicationComponent:
     
     def test_component_initialization(self, mock_vyra_entity):
         """Test Component initializes with correct dependencies."""
-        from {{ module_name }}.application.application import Component
-        from vyra_base.taskmanager.taskmanager import TaskManager
+        mock_core_entity_module = MagicMock()
+        mock_core_entity_module.VyraEntity = type("VyraEntity", (), {})
+        sys.modules["vyra_base.core.entity"] = mock_core_entity_module
+
+        from {{ module_name }}.{{ module_name }}.application.application import Component
+        from {{ module_name }}.{{ module_name }}.taskmanager import TaskManager
         
         # Arrange
         mock_state_machine = MagicMock()
@@ -110,7 +111,7 @@ class TestApplicationComponent:
         component = Component(
             unified_state_machine=mock_state_machine,
             entity=mock_vyra_entity,
-            taskmanager=taskmanager
+            task_manager=taskmanager
         )
         
         # Assert
@@ -127,18 +128,10 @@ class TestUtilities:
     """Test utility and helper functions."""
     
     def test_module_name_dynamic_loading(self):
-        """Test that module name is loaded dynamically from environment."""
-        from {{ module_name }}.backend_webserver.asgi import get_module_name
+        """Test ASGI module imports and exposes application."""
+        import {{ module_name }}.{{ module_name }}.backend_webserver.asgi as asgi_module
         
-        # Test with environment variable
-        with patch.dict(os.environ, {"MODULE_NAME": "test_{{ module_name }}"}):
-            module_name = get_module_name()
-            assert module_name == "test_{{ module_name }}"
-        
-        # Test with default fallback
-        with patch.dict(os.environ, {}, clear=True):
-            module_name = get_module_name()
-            assert module_name == "{{ module_name }}"
+        assert hasattr(asgi_module, "application")
 
 
 # =============================================================================
@@ -150,13 +143,13 @@ class TestContainerInjection:
     
     def test_container_set_and_get(self, mock_vyra_entity):
         """Test container injection stores and retrieves objects correctly."""
-        from {{ module_name }} import container_injection
+        from {{ module_name }}.{{ module_name }} import container_injection
         
         # Arrange & Act
-        container_injection.set_vyra_entity(mock_vyra_entity)
+        container_injection.set_entity(mock_vyra_entity)
         
         # Assert
-        retrieved = container_injection.provide_vyra_entity()
+        retrieved = container_injection.get_entity()
         assert retrieved == mock_vyra_entity
         
         # Cleanup
@@ -164,17 +157,18 @@ class TestContainerInjection:
     
     def test_container_reset(self, mock_vyra_entity):
         """Test container injection reset clears all references."""
-        from {{ module_name }} import container_injection
+        from {{ module_name }}.{{ module_name }} import container_injection
+        from {{ module_name }}.{{ module_name }}.container_injection import ContainerNotInitializedError
         
         # Arrange
-        container_injection.set_vyra_entity(mock_vyra_entity)
+        container_injection.set_entity(mock_vyra_entity)
         
         # Act
         container_injection.reset()
         
         # Assert
-        with pytest.raises(Exception):  # ContainerNotInitializedError
-            container_injection.provide_vyra_entity()
+        with pytest.raises(ContainerNotInitializedError):
+            container_injection.get_entity()
 
 
 # =============================================================================

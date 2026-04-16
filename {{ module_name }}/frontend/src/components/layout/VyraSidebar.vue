@@ -115,6 +115,12 @@
       >
         <i class="pi pi-user user-icon" />
         <span class="user-name">{{ authStore.username }}</span>
+        <Tag
+          v-if="!sidebarStore.isCollapsed && authStore.authMode === 'local'"
+          value="lokal"
+          severity="warn"
+          class="auth-mode-badge"
+        />
         <i class="pi pi-ellipsis-v user-menu-icon" v-if="!sidebarStore.isCollapsed" />
       </div>
     </div>
@@ -130,6 +136,7 @@ import { useAuthStore } from '../../store/auth'
 import { useToast } from 'primevue/usetoast'
 import SidebarNavGroup from './SidebarNavGroup.vue'
 import Menu from 'primevue/menu'
+import Tag from 'primevue/tag'
 
 const router       = useRouter()
 const route        = useRoute()
@@ -489,6 +496,12 @@ async function handleLogout(): Promise<void> {
   color: var(--text-color-secondary, #607D8B);
   flex-shrink: 0;
   margin-left: auto;
+}
+
+.auth-mode-badge {
+  font-size: 0.6rem;
+  padding: 0.1rem 0.3rem;
+  flex-shrink: 0;
 }
 
 /* Bottom buttons */

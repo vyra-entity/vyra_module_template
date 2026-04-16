@@ -10,6 +10,7 @@ Professional test structure with proper separation of concerns:
 
 import asyncio
 import os
+import sys
 import pytest
 import logging
 from pathlib import Path
@@ -21,6 +22,36 @@ logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(levelname)-8s - %(name)s - %(message)s'
 )
+
+# Required env for module imports in unit tests
+os.environ.setdefault("MODULE_NAME", "{{ module_name }}_test")
+os.environ.setdefault("VYRA_SLIM", "true")
+
+
+def _stub_module(name: str, **attrs):
+    mod = MagicMock()
+    for key, value in attrs.items():
+        setattr(mod, key, value)
+    sys.modules.setdefault(name, mod)
+    return mod
+
+
+# Optional dependencies not required for these unit tests
+_stub_module("zenoh")
+_stub_module("ament_index_python")
+_stub_module("ament_index_python.packages", get_package_share_directory=MagicMock(return_value="/mock/share"))
+_stub_module("lark")
+
+# Ensure source import paths for tests
+_TESTS_DIR = Path(__file__).resolve().parent
+_MODULE_ROOT = _TESTS_DIR.parent
+_MODULE_SRC = _MODULE_ROOT / "src"
+_VYRA_BASE_SRC = Path("/home/holgder/VYRA/vyra_base_python/src")
+
+for _path in (_MODULE_SRC, _VYRA_BASE_SRC):
+    path_str = str(_path)
+    if path_str not in sys.path:
+        sys.path.insert(0, path_str)
 
 # ============================================================================
 # Session-scoped fixtures (run once per test session)
@@ -49,10 +80,10 @@ def test_config():
         "database": {
             "type": "sqlite",
             "path": "/tmp/test_vyra_db/",
-            "name": "test_{module_name}.db"
+            "name": "test_{{ module_name }}.db"
         },
         "ros2": {
-            "node_name": "test_{module_name}",
+            "node_name": "test_{{ module_name }}",
             "namespace": "/test",
         },
         "api": {
@@ -105,12 +136,10 @@ def mock_vyra_entity(mock_ros2_node, mock_redis_client):
     Mock VyraEntity for unit tests.
     Combines mocked ROS2 node and Redis client.
     """
-    from vyra_base.core.entity import VyraEntity
-    
-    entity = MagicMock(spec=VyraEntity)
+    entity = MagicMock()
     entity.node = mock_ros2_node
     entity.storage = mock_redis_client
-    entity.module_name = "test_{module_name}"
+    entity.module_name = "test_{{ module_name }}"
     entity.module_id = "test_template_hash"
     return entity
 

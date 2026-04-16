@@ -47,7 +47,7 @@ async def get_current_user(
 async def login(
     request: LoginRequest,
     response: Response,
-    auth_service: AuthenticationService = Depends(get_auth_service),
+    auth_service: AuthenticationService = Depends(get_auth_service)
 ):
     """
     Authenticate user and create session.
@@ -214,9 +214,32 @@ async def create_user(
     if user["username"] != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
 
-    result = await auth_service.create_local_user(request.username, request.password)
+    result = await auth_service.create_local_user(
+        request.username, request.password, role=request.role
+    )
 
     if not result.get("success"):
         raise HTTPException(status_code=400, detail=result.get("message", "Failed to create user"))
 
     return {"success": True, "message": f"User {request.username} created successfully"}
+
+
+@router.delete("/users/{username}")
+async def delete_user(
+    username: str,
+    user: dict = Depends(get_current_user),
+    auth_service: AuthenticationService = Depends(get_auth_service),
+):
+    """Delete local user (admin only)."""
+    if user["username"] != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    if username == "admin":
+        raise HTTPException(status_code=400, detail="Cannot delete admin user")
+
+    result = await auth_service.delete_local_user(username)
+
+    if not result.get("success"):
+        raise HTTPException(status_code=400, detail=result.get("message", "Failed to delete user"))
+
+    return {"success": True, "message": f"User {username} deleted successfully"}

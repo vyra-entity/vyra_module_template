@@ -3,6 +3,7 @@
   <footer v-if="authStore.isAuthenticated" class="vyra-statusbar">
     <PluginSlot slot-id="statusbar.actionbar" />
     <div class="statusbar-right">
+      <span class="statusbar-copyright">VYRA Industrial Automation © 2025</span>
       <slot />
     </div>
   </footer>

@@ -15,6 +15,17 @@ export interface UserManagerStatus {
   message: string
 }
 
+export interface LocalUser {
+  username: string
+  email?: string
+  role?: string
+  level?: number
+  enabled?: boolean
+  lock_edit?: boolean
+  created_at?: string
+  last_login?: string
+}
+
 export interface LoginResponse {
   success: boolean
   token: string
@@ -39,7 +50,10 @@ class AuthApi {
     if (ct.includes('application/json')) {
       try {
         const body = await response.json()
-        return body.detail || fallback
+        const detail = body.detail
+        if (typeof detail === 'string') return detail
+        if (Array.isArray(detail)) return detail.map((e: any) => e.msg ?? JSON.stringify(e)).join('; ')
+        return body.message || fallback
       } catch {
         // JSON parse failed despite content-type header
       }
@@ -114,6 +128,39 @@ class AuthApi {
       return await response.json()
     } catch {
       return { available: false, message: 'Kein externer UserManager erreichbar' }
+    }
+  }
+
+  async listLocalUsers(): Promise<LocalUser[]> {
+    const response = await fetch(`${API_BASE}/auth/users`, {
+      credentials: 'include',
+    })
+    if (!response.ok) {
+      throw new Error(await this._errorMessage(response, 'Failed to list users'))
+    }
+    const data = await response.json()
+    return data.users ?? []
+  }
+
+  async createLocalUser(username: string, password: string, role: string = 'viewer'): Promise<void> {
+    const response = await fetch(`${API_BASE}/auth/users`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password, role }),
+      credentials: 'include',
+    })
+    if (!response.ok) {
+      throw new Error(await this._errorMessage(response, 'Failed to create user'))
+    }
+  }
+
+  async deleteLocalUser(username: string): Promise<void> {
+    const response = await fetch(`${API_BASE}/auth/users/${encodeURIComponent(username)}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+    if (!response.ok) {
+      throw new Error(await this._errorMessage(response, 'Failed to delete user'))
     }
   }
 }

@@ -4,6 +4,37 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Changed — AuthPage aligned with v2_dashboard improvements
+
+- **`frontend/src/features/settings/pages/AuthPage.vue`** — Replaced static auth-mode info card with dynamic auth mode indicator showing local/UserManager availability. Added `userManagerAvailable` ref fetched via `authApi.checkUserManagerAvailable()` on mount. Widened auth mode card to `col-12 md:col-6`. Changed user management section condition from `v-if="isAdmin"` to `v-if="authStore.authMode === 'local' || isAdmin"`. Added `Tag` "Nur für Admin" marker and `:disabled="!isAdmin"` to create-user form fields. Added v-if/v-else empty state for user list. Added `v-else` UserManager-info card block. Expanded minified CSS to multi-line.
+- **`frontend/src/store/sidebar.ts`** — Reordered settings sub-navigation: `settings-auth` (priority 70) now appears before `settings-plugins` (priority 60), matching v2_dashboard order.
+
+### Added — "Lokale Benutzerverwaltung" section in AuthPage
+
+- **`frontend/src/features/settings/pages/AuthPage.vue`** — Added full local user management card (visible for admin users) with create user form, user list DataTable, and delete confirmation. Added imports for DataTable, Column, Tag, InputText, Select, ConfirmDialog, and authApi.
+- **`frontend/src/api/auth.api.ts`** — Added `LocalUser` interface and `listLocalUsers()`, `createLocalUser()`, `deleteLocalUser()` API methods.
+
+### Fixed — Password change HTTP 500 error
+
+- **`user/internal_usermanager.py`** — Fixed reversed arguments in `user_manipulator.update()` call: data dict is now first arg, filters dict second (matching `DbManipulator.update(data, filters)` signature).
+
+### Changed — AuthPage: auth delegation disclaimer
+
+- **`frontend/src/features/settings/pages/AuthPage.vue`** — Added info message clarifying that this module delegates authentication to v2_usermanager.
+
+### Fixed — Sidebar plugin icon
+
+- **`frontend/src/store/sidebar.ts`** — Plugin icon changed from `pi-puzzle` to `pi-box`.
+
+### Added — 401 session expiry interceptor
+
+- **`frontend/src/api/http.ts`** — Added response interceptor: on 401 (outside /auth/) redirects to login.
+
+### Fixed — App.vue layout and statusbar
+
+- **`frontend/src/App.vue`** — `.vyra-app` uses `height: 100vh; overflow: hidden`; footer block removed.
+- **`frontend/src/components/layout/VyraStatusbar.vue`** — Added copyright span.
+
 ### Fixed — Dark theme only partially applied (2026-04-16)
 
 - **`frontend/src/assets/styles.css`** — Added `html.dark-mode` CSS block with dark mode variables. Fixed hardcoded `body { background: #f5f7fa }` → `var(--surface-ground, #f5f7fa)`.

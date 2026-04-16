@@ -44,8 +44,8 @@ const DEFAULT_SETTINGS_ITEMS: SettingsNavItem[] = [
   { id: 'settings-general',       label: 'Allgemein',          icon: 'pi pi-sliders-h', routeName: 'settings-general',       priority: 100 },
   { id: 'settings-appearance',    label: 'Darstellung',        icon: 'pi pi-palette',   routeName: 'settings-appearance',    priority: 90  },
   { id: 'settings-notifications', label: 'Benachrichtigungen', icon: 'pi pi-bell',      routeName: 'settings-notifications', priority: 80  },
-  { id: 'settings-plugins',        label: 'Plugins',            icon: 'pi pi-puzzle',    routeName: 'settings-plugins',        priority: 60  },
   { id: 'settings-auth',          label: 'Authentifizierung',  icon: 'pi pi-lock',      routeName: 'settings-auth',          priority: 70  },
+  { id: 'settings-plugins',        label: 'Plugins',            icon: 'pi pi-box',       routeName: 'settings-plugins',        priority: 60  },
 ]
 
 export const useSidebarStore = defineStore('sidebar', () => {

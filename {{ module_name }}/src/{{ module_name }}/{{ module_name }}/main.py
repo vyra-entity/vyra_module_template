@@ -293,7 +293,7 @@ async def web_backend_runner() -> None:
     logger.info("container_initialized", wait_count=wait_count)
     
     # Get module name dynamically from entity.
-    # entity.module_entry.name is the short package name (e.g. "v2_modulemanager"),
+    # entity.module_entry.name is the short package name (e.g. "{{ module_name }}"),
     # which is also the top-level Python package installed by colcon.
     entity = container_injection.get_entity()
     module_name = entity.module_entry.name
@@ -322,7 +322,6 @@ async def web_backend_runner() -> None:
             host="0.0.0.0",
             port=8443,
             log_level="info",
-            log_config=None,  # Use our existing logging config instead of uvicorn's default
             ssl_certfile=cert_path,
             ssl_keyfile=key_path,
             reload=False
@@ -339,7 +338,6 @@ async def web_backend_runner() -> None:
             host="0.0.0.0",
             port=8443,
             log_level="info",
-            log_config=None,  # Use our existing logging config instead of uvicorn's default
             reload=False
         )
     

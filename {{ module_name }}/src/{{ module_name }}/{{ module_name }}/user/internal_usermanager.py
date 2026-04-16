@@ -222,7 +222,8 @@ class InternalUserManager:
                 return None
             
             # Verify password
-            if not verify_password_bcrypt(password, user.password_hash):
+            password_hash = self._hash_password(password)
+            if password_hash != user.password_hash:
                 # Increment failed login attempts
                 await self._handle_failed_login(user)
                 logger.warning(f"🔒 Authentication failed: Invalid password for '{username}'")
@@ -435,6 +436,7 @@ class InternalUserManager:
                         "role": user.role.value,
                         "level": user.level.value,
                         "enabled": user.enabled,
+                        "lock_edit": getattr(user, "lock_edit", False),
                         "created_at": user.created_at.isoformat(),
                         "last_login": user.last_login.isoformat() if user.last_login else None
                     }
@@ -511,8 +513,8 @@ class InternalUserManager:
                     logger.info(f"✅ Password change requirement cleared for user: {username}")
             
             result = await self.user_manipulator.update(
-                {"username": username},
-                update_data
+                update_data,
+                {"username": username}
             )
             
             if result.status == DBSTATUS.SUCCESS:
@@ -613,6 +615,12 @@ class InternalUserManager:
                     logger.warning(f"⚠️  Cannot delete last admin user: {username}")
                     return False
             
+            # Prevent deleting a locked user
+            target = await self.get_user_impl(username)
+            if target and getattr(target, "lock_edit", False):
+                logger.warning(f"⚠️  Cannot delete locked user: {username}")
+                return False
+
             result = await self.user_manipulator.delete({"username": username})
             
             if result.status == DBSTATUS.SUCCESS:

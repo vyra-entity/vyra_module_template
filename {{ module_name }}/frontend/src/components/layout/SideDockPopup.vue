@@ -19,8 +19,9 @@
 
     <!-- Right-edge strip: one widget per visible pocket -->
     <div class="sdp-strip" :style="stripStyle" role="complementary" aria-label="Side Dock Widgets">
-      <!-- Y-axis drag handle – reposition the whole strip -->
+      <!-- Y-axis drag handle – reposition the whole strip (only shown when pockets exist) -->
       <div
+        v-if="visiblePockets.length > 0"
         class="sdp-strip-handle"
         @mousedown.prevent="startStripDrag"
         title="Drag to reposition"
@@ -217,7 +218,19 @@ function startStripDrag(e: MouseEvent): void {
 
   const onMove = (ev: MouseEvent) => {
     const raw = initOffset + (ev.clientY - startY)
-    sdpStore.stripYOffset = Math.max(minOffset, Math.min(maxOffset, raw))
+    const newOffset = Math.max(minOffset, Math.min(maxOffset, raw))
+    const delta = newOffset - sdpStore.stripYOffset
+
+    // Compensate popup positions so they stay fixed on screen while the strip moves
+    for (const pocket of sdpStore.pockets.filter(p => p.isOpen)) {
+      const current = dragOffsets.value[pocket.id] ?? { x: 0, y: 0 }
+      dragOffsets.value[pocket.id] = {
+        x: current.x,
+        y: current.y - delta,
+      }
+    }
+
+    sdpStore.stripYOffset = newOffset
   }
 
   const onUp = () => {
@@ -231,14 +244,14 @@ function startStripDrag(e: MouseEvent): void {
 
 // ── Tab color palette (glassmorphism, index-based) ──────────────────────────
 const TAB_COLORS = [
-  { bg: 'rgba(99,102,241,0.62)',  bgHover: 'rgba(99,102,241,0.82)',  border: 'rgba(99,102,241,0.75)',  shadow: 'rgba(99,102,241,0.28)' },
-  { bg: 'rgba(16,185,129,0.62)', bgHover: 'rgba(16,185,129,0.82)', border: 'rgba(16,185,129,0.75)', shadow: 'rgba(16,185,129,0.28)' },
-  { bg: 'rgba(249,115,22,0.62)', bgHover: 'rgba(249,115,22,0.82)', border: 'rgba(249,115,22,0.75)', shadow: 'rgba(249,115,22,0.28)' },
-  { bg: 'rgba(168,85,247,0.62)', bgHover: 'rgba(168,85,247,0.82)', border: 'rgba(168,85,247,0.75)', shadow: 'rgba(168,85,247,0.28)' },
-  { bg: 'rgba(20,184,166,0.62)', bgHover: 'rgba(20,184,166,0.82)', border: 'rgba(20,184,166,0.75)', shadow: 'rgba(20,184,166,0.28)' },
-  { bg: 'rgba(244,63,94,0.62)',  bgHover: 'rgba(244,63,94,0.82)',  border: 'rgba(244,63,94,0.75)',  shadow: 'rgba(244,63,94,0.28)' },
-  { bg: 'rgba(245,158,11,0.62)', bgHover: 'rgba(245,158,11,0.82)', border: 'rgba(245,158,11,0.75)', shadow: 'rgba(245,158,11,0.28)' },
-  { bg: 'rgba(14,165,233,0.62)', bgHover: 'rgba(14,165,233,0.82)', border: 'rgba(14,165,233,0.75)', shadow: 'rgba(14,165,233,0.28)' },
+  { bg: 'rgba(99,102,241,0.38)',  bgHover: 'rgba(99,102,241,0.60)',  border: 'rgba(99,102,241,0.55)',  shadow: 'rgba(99,102,241,0.22)' },
+  { bg: 'rgba(16,185,129,0.38)', bgHover: 'rgba(16,185,129,0.60)', border: 'rgba(16,185,129,0.55)', shadow: 'rgba(16,185,129,0.22)' },
+  { bg: 'rgba(249,115,22,0.38)', bgHover: 'rgba(249,115,22,0.60)', border: 'rgba(249,115,22,0.55)', shadow: 'rgba(249,115,22,0.22)' },
+  { bg: 'rgba(168,85,247,0.38)', bgHover: 'rgba(168,85,247,0.60)', border: 'rgba(168,85,247,0.55)', shadow: 'rgba(168,85,247,0.22)' },
+  { bg: 'rgba(20,184,166,0.38)', bgHover: 'rgba(20,184,166,0.60)', border: 'rgba(20,184,166,0.55)', shadow: 'rgba(20,184,166,0.22)' },
+  { bg: 'rgba(244,63,94,0.38)',  bgHover: 'rgba(244,63,94,0.60)',  border: 'rgba(244,63,94,0.55)',  shadow: 'rgba(244,63,94,0.22)' },
+  { bg: 'rgba(245,158,11,0.38)', bgHover: 'rgba(245,158,11,0.60)', border: 'rgba(245,158,11,0.55)', shadow: 'rgba(245,158,11,0.22)' },
+  { bg: 'rgba(14,165,233,0.38)', bgHover: 'rgba(14,165,233,0.60)', border: 'rgba(14,165,233,0.55)', shadow: 'rgba(14,165,233,0.22)' },
 ] as const
 
 /** Inject glassmorphism color CSS vars into each tab via pocket index. */
@@ -412,22 +425,23 @@ function tabStyle(pocket: SdpPocket): Record<string, string> {
   display: flex;
   flex-direction: column;
 
-  background: var(--surface-card, #fff);
-  border: 1px solid var(--surface-border, #e0e0e0);
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.40);
   border-radius: 10px;
-  box-shadow: -4px 4px 24px rgba(0, 0, 0, 0.16);
+  box-shadow: -4px 4px 28px rgba(0, 0, 0, 0.18);
   z-index: 1101;
-  overflow: hidden;
 }
-
 .sdp-popup-header {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.65rem 0.85rem;
-  border-bottom: 1px solid var(--surface-border, #e0e0e0);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px 10px 0 0;
   flex-shrink: 0;
-  background: #E8F0FE;
+  background: rgba(232, 240, 254, 0.08);
   cursor: move;
 }
 
@@ -495,15 +509,17 @@ function tabStyle(pocket: SdpPocket): Record<string, string> {
 .sdp-popup-body {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 0.75rem;
-  background: #F0FBF4;
+  background: transparent;
 }
 
 .sdp-popup-footer {
   flex-shrink: 0;
   min-height: 8px;
-  border-top: 1px solid var(--surface-border, #e0e0e0);
-  background: #F5F0FF;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 0 0 10px 10px;
+  background: transparent;
 }
 
 /* ───────────────────────────────────────────────

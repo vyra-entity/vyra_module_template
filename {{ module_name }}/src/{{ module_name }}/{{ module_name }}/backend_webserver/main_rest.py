@@ -1,5 +1,5 @@
 """
-Main REST API application for V2 Usermanager Backend Webserver
+Main REST API application for {{ module_name }} Backend Webserver
 
 Modern FastAPI application with direct dependency injection (no gRPC).
 Communicates with core application components via container_injection.

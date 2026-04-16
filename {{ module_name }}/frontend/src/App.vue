@@ -3,15 +3,15 @@
     <!-- Invisible infrastructure plugin slots (rendered at App root, no visual output) -->
     <PluginSlot v-if="authStore.isAuthenticated" slot-id="background" />
     <PluginSlot v-if="authStore.isAuthenticated" slot-id="notification-provider" />
-    <PluginSlot v-if="authStore.isAuthenticated" slot-id="component-decorator" />    <!-- SDP registration wrappers: load at App root so they survive navigation -->
+    <PluginSlot v-if="authStore.isAuthenticated" slot-id="component-decorator" />
+    <!-- SDP registration wrappers: load at App root so they survive navigation -->
     <PluginSlot v-if="authStore.isAuthenticated" slot-id="side-dock-popup.header" />
     <PluginSlot v-if="authStore.isAuthenticated" slot-id="side-dock-popup.content" />
     <PluginSlot v-if="authStore.isAuthenticated" slot-id="side-dock-popup.footer" />
-    <!-- Overlay / popup layers -->
+    <!-- Overlay / popup / context-menu layers -->
     <PluginSlot v-if="authStore.isAuthenticated" slot-id="overlay" />
     <PluginSlot v-if="authStore.isAuthenticated" slot-id="popup" />
 
-    <!-- Side-Dock-Popup panel (right fly-in) -->
     <!-- Side-Dock-Popup floating widgets -->
     <SideDockPopup v-if="authStore.isAuthenticated && uiSettingsStore.sideDockPocketEnabled" />
 
@@ -70,10 +70,6 @@
 
       <!-- Status bar with plugin action slots -->
       <VyraStatusbar v-if="authStore.isAuthenticated" />
-
-      <footer v-if="authStore.isAuthenticated" class="vyra-footer">
-        <span>VYRA Industrial Automation © 2025</span>
-      </footer>
     </div>
   </div>
 
@@ -137,6 +133,7 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import Menu from 'primevue/menu'
 import Toast from 'primevue/toast'
+import { useToast } from 'primevue/usetoast'
 import { providePluginApi } from './composables/usePluginApi'
 
 const route        = useRoute()
@@ -145,6 +142,7 @@ const sidebarStore = useSidebarStore()
 const authStore    = useAuthStore()
 const systemStore  = useSystemStore()
 const feedStore    = useModuleFeedStore()
+const toast        = useToast()
 
 // Provide the Global Plugin API to all child components (including plugins)
 providePluginApi()
@@ -152,9 +150,9 @@ providePluginApi()
 /** Derive the current module name from the API base URL at runtime */
 const MODULE_NAME = (apiClient.defaults.baseURL ?? '').replace(/\/api$/, '').replace(/^\//, '')
 
-const pluginStore         = usePluginStore()
-const uiSettingsStore     = useUiSettingsStore()
-const settingsStore       = useSettingsStore()
+const pluginStore      = usePluginStore()
+const uiSettingsStore  = useUiSettingsStore()
+const settingsStore    = useSettingsStore()
 
 // Load plugins as soon as the user is authenticated so that infrastructure
 // slots (SDP pockets, background workers, etc.) are active from the start.
@@ -169,13 +167,30 @@ watch(
 )
 
 const topMenu      = ref<InstanceType<typeof Menu> | null>(null)
-const topMenuItems = [
+
+async function handleTopbarLogout(): Promise<void> {
+  try {
+    await authStore.logout()
+    toast.add({ severity: 'success', summary: 'Abgemeldet', detail: 'Sie wurden erfolgreich abgemeldet', life: 3000 })
+    router.push('/{{ module_name }}/login')
+  } catch {
+    toast.add({ severity: 'error', summary: 'Fehler', detail: 'Abmeldung fehlgeschlagen', life: 3000 })
+  }
+}
+
+const topMenuItems = computed(() => [
   {
     label: 'Einstellungen',
     icon:  'pi pi-cog',
     command: () => router.push({ name: 'settings' }),
   },
-]
+  { separator: true },
+  {
+    label: 'Abmelden',
+    icon:  'pi pi-sign-out',
+    command: () => { void handleTopbarLogout() },
+  },
+])
 
 const errorDialogVisible = ref(false)
 const errorFeeds         = computed(() => feedStore.errorFeeds)
@@ -222,7 +237,8 @@ onUnmounted(() => {
 .vyra-app {
   display: flex;
   flex-direction: row;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: var(--surface-ground, #f5f7fa);
 }
 
@@ -259,15 +275,6 @@ onUnmounted(() => {
   overflow: auto;
 }
 
-/* ── Footer ── */
-.vyra-footer {
-  padding: 1rem 2rem;
-  text-align: center;
-  border-top: 1px solid var(--surface-border, #e0e0e0);
-  color: var(--text-color-secondary, #607D8B);
-  font-size: 0.875rem;
-  flex-shrink: 0;
-}
 
 /* ── Responsive: on very small screens hide the sidebar space offset ── */
 @media (max-width: 480px) {
