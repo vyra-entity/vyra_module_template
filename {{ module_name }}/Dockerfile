@@ -82,11 +82,11 @@ RUN if [ -f ".module/pre-install.sh" ]; then \
 
 # Install module-specific system packages
 RUN if [ -f ".module/system-packages.txt" ]; then \
-        apt-get update -qq && \
+        apt-get update -o Acquire::ForceIPv4=true -qq && \
         while read -r package; do \
             [ -z "$package" ] && continue; \
             [ "${package:0:1}" = "#" ] && continue; \
-            apt-get install -y "$package" || echo "⚠️  Failed to install $package, skipping"; \
+            apt-get install -y -o Acquire::ForceIPv4=true "$package" || echo "⚠️  Failed to install $package, skipping"; \
         done < .module/system-packages.txt; \
         apt-get clean && rm -rf /var/lib/apt/lists/*; \
     fi
@@ -148,8 +148,8 @@ RUN if [ "${VYRA_SLIM:-false}" = "true" ]; then \
         rm -rf /workspace/install /workspace/build; \
         \
         # Install gRPC C++ plugin for proto code generation \
-        apt-get update -qq && \
-        (apt-get install -y --no-install-recommends protobuf-compiler-grpc 2>/dev/null || \
+        apt-get update -o Acquire::ForceIPv4=true -qq && \
+        (apt-get install -y -o Acquire::ForceIPv4=true --no-install-recommends protobuf-compiler-grpc 2>/dev/null || \
          echo "⚠️  grpc_cpp_plugin not available - C++ proto generation will be skipped") && \
         apt-get clean && rm -rf /var/lib/apt/lists/*; \
         \

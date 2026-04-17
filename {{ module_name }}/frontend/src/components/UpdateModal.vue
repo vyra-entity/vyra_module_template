@@ -42,7 +42,7 @@
                       :inputId="`update_${update.repository_id}`"
                     />
                     <label :for="`update_${update.repository_id}`" class="font-semibold cursor-pointer">
-                      {%- raw %}{{ update.repository_name }}{%- endraw %}
+                      {% raw %}{{ update.repository_name }}{% endraw %}
                     </label>
                   </div>
                   
@@ -52,7 +52,7 @@
                   </div>
                   
                   <div v-if="update.description" class="ml-4 mt-2 text-sm text-600">
-                    {%- raw %}{{ update.description }}{%- endraw %}
+                    {% raw %}{{ update.description }}{% endraw %}
                   </div>
                 </div>
                 

@@ -27,7 +27,7 @@
                 <i :class="['pi', userManagerAvailable ? 'pi-check-circle text-green-500' : 'pi-times-circle text-red-400']"></i>
                 <span>
                   <strong>UserManager:</strong>
-                  {%- raw %}{{ userManagerAvailable ? 'Externer UserManager verfügbar' : 'Kein UserManager erreichbar' }}{%- endraw %}
+                  {% raw %}{{ userManagerAvailable ? 'Externer UserManager verfügbar' : 'Kein UserManager erreichbar' }}{% endraw %}
                 </span>
               </div>
             </div>
@@ -64,7 +64,7 @@
                     <label for="confirmPw" class="block mb-2 font-semibold">Passwort bestätigen</label>
                     <Password id="confirmPw" v-model="confirmPassword" :feedback="false" toggleMask class="w-full" :inputStyle="{ width: '100%' }" :pt="{ input: { autocomplete: 'new-password' } }" />
                   </div>
-                  <Message v-if="passwordError" severity="error" :closable="false">{{ passwordError }}</Message>
+                  <Message v-if="passwordError" severity="error" :closable="false">{% raw %}{{ passwordError }}{% endraw %}</Message>
                   <Button
                     type="submit"
                     label="Passwort ändern"
@@ -115,7 +115,7 @@
                       :disabled="!isAdmin"
                     />
                   </div>
-                  <Message v-if="createUserError" severity="error" :closable="false">{%- raw %}{{ createUserError }}{%- endraw %}</Message>
+                  <Message v-if="createUserError" severity="error" :closable="false">{% raw %}{{ createUserError }}{% endraw %}</Message>
                   <Button
                     type="submit"
                     label="Benutzer anlegen"
@@ -155,7 +155,7 @@
                   </Column>
                   <Column field="created_at" header="Erstellt am">
                     <template #body="{ data }">
-                      {{ data.created_at ? formatDate(data.created_at) : '–' }}
+                      {% raw %}{{ data.created_at ? formatDate(data.created_at) : '–' }}{% endraw %}
                     </template>
                   </Column>
                   <Column header="" style="width: 4rem">

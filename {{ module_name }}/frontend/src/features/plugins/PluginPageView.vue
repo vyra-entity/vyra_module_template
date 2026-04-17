@@ -3,7 +3,7 @@
     <div v-if="!component" class="plugin-page-not-found">
       <i class="pi pi-exclamation-circle plugin-page-icon" />
       <h2>Plugin page not found</h2>
-      <p>No route-injection plugin is registered for <code>/p/{{ pluginSlug }}</code>.</p>
+      <p>No route-injection plugin is registered for <code>/p/{% raw %}{{ pluginSlug }}{% endraw %}</code>.</p>
     </div>
     <component v-else :is="component" />
   </div>

@@ -67,7 +67,7 @@
           v-tooltip.right="sidebarStore.isCollapsed ? item.label : undefined"
         >
           <i :class="item.icon" />
-          <span class="nav-item-label">{{ item.label }}</span>
+          <span class="nav-item-label">{% raw %}{{ item.label }}{% endraw %}</span>
         </RouterLink>
       </div>
     </nav>
@@ -98,7 +98,7 @@
         :aria-label="`System Status: ${healthLabel}`"
       >
         <span class="health-dot" />
-        <span class="health-label">{%- raw %}{{ healthLabel }}{%- endraw %}</span>
+        <span class="health-label">{% raw %}{{ healthLabel }}{% endraw %}</span>
       </div>
 
       <!-- User panel (clickable → opens dropdown menu) -->
@@ -114,7 +114,7 @@
         v-tooltip.right="sidebarStore.isCollapsed ? authStore.username : undefined"
       >
         <i class="pi pi-user user-icon" />
-        <span class="user-name">{{ authStore.username }}</span>
+        <span class="user-name">{% raw %}{{ authStore.username }}{% endraw %}</span>
         <Tag
           v-if="!sidebarStore.isCollapsed && authStore.authMode === 'local'"
           value="lokal"

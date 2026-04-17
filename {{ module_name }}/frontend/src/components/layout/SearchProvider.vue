@@ -38,8 +38,8 @@
         >
           <i v-if="result.icon" :class="result.icon" class="result-icon" />
           <div class="result-text">
-            <span class="result-title">{{ result.title }}</span>
-            <span v-if="result.description" class="result-desc">{{ result.description }}</span>
+            <span class="result-title">{% raw %}{{ result.title }}{% endraw %}</span>
+            <span v-if="result.description" class="result-desc">{% raw %}{{ result.description }}{% endraw %}</span>
           </div>
         </li>
       </ul>

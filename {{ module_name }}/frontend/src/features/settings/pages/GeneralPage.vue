@@ -22,7 +22,7 @@
             <div class="flex flex-column gap-3">
               <div>
                 <label class="block mb-1 font-semibold text-sm">Benutzername</label>
-                <span>{{ authStore.username }}</span>
+                <span>{% raw %}{{ authStore.username }}{% endraw %}</span>
               </div>
               <div>
                 <label class="block mb-1 font-semibold text-sm">Rollen</label>

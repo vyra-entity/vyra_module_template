@@ -28,7 +28,7 @@
       <i class="pi pi-puzzle" style="font-size: 2.5rem; color: var(--text-color-secondary); opacity: 0.4" />
       <p>Keine Plugins aktiv.</p>
       <p class="plugins-settings__empty-hint">
-        Installiere Plugins über den {%- raw %}{{ MODULE_NAME }}{%- endraw %}.
+        Installiere Plugins über den {% raw %}{{ MODULE_NAME }}{% endraw %}.
       </p>
     </div>
 
@@ -61,9 +61,9 @@
             />
           </div>
           <div class="plugin-row__meta">
-            <div class="plugin-row__name">{%- raw %}{{ plugin.title }}{%- endraw %}</div>
+            <div class="plugin-row__name">{% raw %}{{ plugin.title }}{% endraw %}</div>
             <div class="plugin-row__id">
-              <code>{%- raw %}{{ plugin.pluginId }}{%- endraw %}</code>
+              <code>{% raw %}{{ plugin.pluginId }}{% endraw %}</code>
               <Tag :value="`v${plugin.version}`" severity="secondary" class="text-xs" />
               <Tag
                 :value="plugin.scopeType"
@@ -95,7 +95,7 @@
                   v-for="sid in (slot.slot_ids?.length ? slot.slot_ids : [slot.slot_id])"
                   :key="sid"
                   class="slot-row__label"
-                >{%- raw %}{{ sid }}{%- endraw %}</span>
+                >{% raw %}{{ sid }}{% endraw %}</span>
               </div>
               <Tag
                 v-if="slot.slot_type"
@@ -120,7 +120,7 @@
             </div>
             <div class="slot-row__actions">
               <span class="slot-row__status" :class="slot.is_active ? 'slot-row__status--active' : 'slot-row__status--inactive'">
-                {%- raw %}{{ slot.is_active ? 'Aktiv' : 'Inaktiv' }}{%- endraw %}
+                {% raw %}{{ slot.is_active ? 'Aktiv' : 'Inaktiv' }}{% endraw %}
               </span>
               <InputSwitch v-model="activeMap[slot.assignment_id]" :loading="toggling.has(slot.assignment_id)" @change="toggleSlot(slot)" />
             </div>

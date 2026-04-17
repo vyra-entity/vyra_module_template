@@ -6,7 +6,7 @@
       :class="{ hidden: sidebarStore.isCollapsed }"
       aria-hidden="true"
     >
-      <span class="group-label">{%- raw %}{{ group.label }}{%- endraw %}</span>
+      <span class="group-label">{% raw %}{{ group.label }}{% endraw %}</span>
     </div>
 
     <!-- Divider line (always shown, acts as visual separator in collapsed mode) -->

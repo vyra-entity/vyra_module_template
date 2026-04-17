@@ -337,7 +337,7 @@ echo "=== NFS INTERFACE MANAGEMENT ==="
 # Read UUID from .module/module_data.yaml
 MODULE_DATA_FILE="/workspace/.module/module_data.yaml"
 if [ -f "$MODULE_DATA_FILE" ]; then
-    INSTANCE_ID=$(grep '^uuid:' "$MODULE_DATA_FILE" | awk '{print $2}')
+    INSTANCE_ID=$(grep '^uuid:' "$MODULE_DATA_FILE" | awk '{print $2}' | tr -d '"')
     echo "ℹ️  Module: $MODULE_NAME, Instance: $INSTANCE_ID (from module_data.yaml)"
 else
     INSTANCE_ID="${HOSTNAME#${MODULE_NAME}_}"

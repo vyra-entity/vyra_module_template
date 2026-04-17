@@ -34,7 +34,7 @@
           <i class="pi pi-bars" />
         </button>
         <div class="topbar-title">
-          <span class="page-title">{%- raw %}{{ pageTitle }}{%- endraw %}</span>
+          <span class="page-title">{% raw %}{{ pageTitle }}{% endraw %}</span>
         </div>
 
         <!-- Topbar plugin slots -->
@@ -51,7 +51,7 @@
             :aria-label="`${errorCount} Fehlermeldungen`"
           >
             <i class="pi pi-bell alarm-bell-icon" :class="{ 'bell-ring': errorCount > 0 }" />
-            <span v-if="errorCount > 0" class="alarm-badge">{%- raw %}{{ errorCount > 99 ? '99+' : errorCount }}{%- endraw %}</span>
+            <span v-if="errorCount > 0" class="alarm-badge">{% raw %}{{ errorCount > 99 ? '99+' : errorCount }}{% endraw %}</span>
           </button>
           <button
             class="top-menu-btn"
@@ -95,10 +95,10 @@
         class="error-feed-item"
       >
         <div class="error-feed-header">
-          <span class="error-feed-module">{%- raw %}{{ feed.module_name || feed.module_id }}{%- endraw %}</span>
-          <span class="error-feed-time">{%- raw %}{{ new Date(feed.timestamp).toLocaleString('de-DE') }}{%- endraw %}</span>
+          <span class="error-feed-module">{% raw %}{{ feed.module_name || feed.module_id }}{% endraw %}</span>
+          <span class="error-feed-time">{% raw %}{{ new Date(feed.timestamp).toLocaleString('de-DE') }}{% endraw %}</span>
         </div>
-        <p class="error-feed-message">{%- raw %}{{ feed.message }}{%- endraw %}</p>
+        <p class="error-feed-message">{% raw %}{{ feed.message }}{% endraw %}</p>
       </div>
     </div>
     <template #footer>

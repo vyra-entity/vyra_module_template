@@ -21,11 +21,11 @@
         v-if="badgeCount > 0"
         class="nav-badge"
         :aria-label="`${badgeCount} Benachrichtigungen`"
-      >{%- raw %}{{ badgeCount > 99 ? '99+' : badgeCount }}{%- endraw %}</span>
+      >{% raw %}{{ badgeCount > 99 ? '99+' : badgeCount }}{% endraw %}</span>
     </span>
 
     <!-- Label (hidden when collapsed via CSS) -->
-    <span class="nav-label">{%- raw %}{{ item.label }}{%- endraw %}</span>
+    <span class="nav-label">{% raw %}{{ item.label }}{% endraw %}</span>
   </li>
 </template>
 

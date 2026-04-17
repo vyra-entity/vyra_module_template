@@ -64,7 +64,7 @@
 
             <!-- Error Message -->
             <Message v-if="errorMessage" severity="error" :closable="false">
-              {%- raw %}{{ errorMessage }}{%- endraw %}
+              {% raw %}{{ errorMessage }}{% endraw %}
             </Message>
 
             <!-- Login Button -->

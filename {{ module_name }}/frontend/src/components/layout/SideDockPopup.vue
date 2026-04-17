@@ -48,7 +48,7 @@
           :aria-expanded="pocket.isOpen"
         >
           <i :class="pocket.icon" class="sdp-tab-icon" aria-hidden="true" />
-          <span class="sdp-tab-label">{{ pocket.title }}</span>
+          <span class="sdp-tab-label">{% raw %}{{ pocket.title }}{% endraw %}</span>
         </button>
 
         <!-- Popup panel — appears to the left of the strip -->
@@ -67,7 +67,7 @@
               @mousedown.prevent="startDrag($event, pocket.id)"
             >
               <i :class="pocket.icon" class="sdp-popup-header-icon" aria-hidden="true" />
-              <span class="sdp-popup-title">{{ pocket.title }}</span>
+              <span class="sdp-popup-title">{% raw %}{{ pocket.title }}{% endraw %}</span>
               <div class="sdp-popup-header-actions">
                 <button
                   v-if="pocket.isPinnable"
