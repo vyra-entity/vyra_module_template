@@ -19,7 +19,7 @@ import ssl
 from typing import Any, Dict, Optional
 
 import aiohttp
-from {{ module_name }}.logging_config import get_logger
+from {{ module_name }}.{{ module_name }}.logging_config import get_logger
 
 from vyra_base.auth import BaseAuthService, UsermanagerUnavailableError
 from vyra_base.com.transport.t_redis.communication import RedisClient

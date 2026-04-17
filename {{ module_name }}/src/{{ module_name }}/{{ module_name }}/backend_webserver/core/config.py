@@ -60,7 +60,12 @@ class Settings:
         self.ensure_directories()
     
     def ensure_directories(self):
-        """Ensure all required directories exist"""
+        """Ensure all required directories exist.
+
+        Failure to create a directory is silently ignored so that importing
+        this module outside of a Docker container (e.g. during unit tests)
+        does not raise PermissionError / OSError when /workspace is absent.
+        """
         directories = [
             self.MODULES_PATH,
             self.STORAGE_PATH,
@@ -70,7 +75,10 @@ class Settings:
         ]
         
         for directory in directories:
-            directory.mkdir(parents=True, exist_ok=True)
+            try:
+                directory.mkdir(parents=True, exist_ok=True)
+            except (PermissionError, OSError):
+                pass
     
     @property
     def has_ssl_certificates(self) -> bool:

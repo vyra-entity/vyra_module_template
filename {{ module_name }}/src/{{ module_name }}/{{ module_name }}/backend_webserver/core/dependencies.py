@@ -3,7 +3,7 @@ Common dependencies for VYRA Module Manager API
 """
 from fastapi import HTTPException, BackgroundTasks, Depends
 from typing import Optional, Dict, Any
-from {{ module_name }}.logging_config import get_logger, log_exception, log_function_call, log_function_result
+from {{ module_name }}.{{ module_name }}.logging_config import get_logger, log_exception, log_function_call, log_function_result
 import uuid
 from pathlib import Path
 

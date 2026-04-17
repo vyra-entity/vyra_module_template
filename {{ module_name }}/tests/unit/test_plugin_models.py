@@ -37,13 +37,17 @@ def _load_module_from_file(dotted_name: str, filepath: Path):
     return mod
 
 
-# Stub heavy runtime deps that models.py imports
+# Stub heavy runtime deps that models.py imports.
+# NOTE: Do NOT stub "vyra_base" itself — it is a real importable package and
+# stubbing it at module-level poisons sys.modules for every other test file
+# that is collected in the same session.  The sub-module stubs below are
+# enough because Python uses the sys.modules cache directly when all
+# relevant sub-module keys are already present.
 for _name in (
     "vyra_base.plugin.runtime",
     "vyra_base.plugin.host_functions",
     "vyra_base.plugin",
     "vyra_base.com",
-    "vyra_base",
 ):
     sys.modules.setdefault(_name, MagicMock())
 

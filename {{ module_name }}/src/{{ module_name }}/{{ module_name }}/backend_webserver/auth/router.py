@@ -7,7 +7,7 @@ from typing import Optional
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 from fastapi.security import HTTPAuthorizationCredentials
 
-from {{ module_name }}.logging_config import get_logger
+from {{ module_name }}.{{ module_name }}.logging_config import get_logger
 
 from vyra_base.auth import (
     TOKEN_COOKIE_MAX_AGE,

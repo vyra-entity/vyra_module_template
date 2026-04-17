@@ -26,6 +26,10 @@ logging.basicConfig(
 # Required env for module imports in unit tests
 os.environ.setdefault("MODULE_NAME", "{{ module_name }}_test")
 os.environ.setdefault("VYRA_SLIM", "true")
+# Provide sensible defaults for path-dependent settings so tests can run
+# outside a Docker container (where /workspace is not present).
+os.environ.setdefault("WORKSPACE_ROOT", "/tmp")
+os.environ.setdefault("MODULES_PATH", "/tmp/test_modules")
 
 
 def _stub_module(name: str, **attrs):
@@ -52,6 +56,11 @@ for _path in (_MODULE_SRC, _VYRA_BASE_SRC):
     path_str = str(_path)
     if path_str not in sys.path:
         sys.path.insert(0, path_str)
+
+# Force vyra_base to load as a real package BEFORE any test-file module-level
+# code can stub it.  Some test files call sys.modules.setdefault("vyra_base", MagicMock())
+# at collection time; if vyra_base is already loaded here that setdefault is a no-op.
+import vyra_base  # noqa: F401
 
 # ============================================================================
 # Session-scoped fixtures (run once per test session)
