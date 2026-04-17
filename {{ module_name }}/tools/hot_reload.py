@@ -279,19 +279,30 @@ class HotReloadHandler(FileSystemEventHandler):
                 self.last_modified_time = time.time()
                 time.sleep(1)  # Wait for filesystem to settle
             
-            # Step 2: Clean both build AND install directories for fresh build
+            # Step 2: Clean build directory and egg-info only (NOT the install
+            # directory). Removing the entire install/v2_dashboard while a colcon
+            # build is running creates a race-condition: if Docker Swarm restarts
+            # the container mid-build, the entrypoint finds the install directory
+            # empty and restores the stale image backup, discarding source fixes.
+            # Deleting only the build dir + egg-info forces pip to reinstall from
+            # source without ever leaving the install tree in a broken state.
             packages_to_clean = [
                 self.package_name,
                 f'{self.package_name}_interfaces'
             ]
             
             for pkg in packages_to_clean:
-                # Clean install directory
-                install_dir = self.workspace_path / "install" / pkg
-                if install_dir.exists():
-                    logger.info(f"🧹 Cleaning install directory: {install_dir}")
-                    shutil.rmtree(install_dir)
-                
+                # Remove stale egg-info from the install tree so pip treats the
+                # package as not yet installed and performs a full file copy.
+                site_pkgs = (
+                    self.workspace_path / "install" / pkg
+                    / "lib"
+                )
+                if site_pkgs.exists():
+                    for egg_info in site_pkgs.rglob(f"{pkg}-*.egg-info"):
+                        logger.info(f"🧹 Removing egg-info: {egg_info}")
+                        shutil.rmtree(egg_info)
+
                 # Clean build directory to remove cached build info
                 build_dir = self.workspace_path / "build" / pkg
                 if build_dir.exists():

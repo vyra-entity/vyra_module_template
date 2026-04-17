@@ -222,8 +222,7 @@ class InternalUserManager:
                 return None
             
             # Verify password
-            password_hash = self._hash_password(password)
-            if password_hash != user.password_hash:
+            if not verify_password_bcrypt(password, user.password_hash):
                 # Increment failed login attempts
                 await self._handle_failed_login(user)
                 logger.warning(f"🔒 Authentication failed: Invalid password for '{username}'")
@@ -268,8 +267,8 @@ class InternalUserManager:
                 logger.warning(f"🔒 Account locked due to failed login attempts: {user.username}")
             
             await self.user_manipulator.update(
-                {"username": user.username},
-                update_data
+                update_data,
+                {"username": user.username}
             )
             
         except Exception as e:
@@ -279,12 +278,12 @@ class InternalUserManager:
         """Handle successful login"""
         try:
             await self.user_manipulator.update(
-                {"username": user.username},
                 {
                     "login_attempts": 0,
                     "locked_until": None,
                     "last_login": datetime.now()
-                }
+                },
+                {"username": user.username}
             )
         except Exception as e:
             logger.error(f"❌ Error handling successful login: {e}")
@@ -387,8 +386,15 @@ class InternalUserManager:
             
             result = await self.user_manipulator.add(user_data)
             
-            if result.status == DBSTATUS.SUCCESS and isinstance(result.value, list):
-                user_id = result.value[0].id
+            if result.status == DBSTATUS.SUCCESS:
+                # Extract user_id from various possible result formats
+                user_id = None
+                if isinstance(result.value, list) and result.value:
+                    user_id = result.value[0].id
+                elif result.value is not None and hasattr(result.value, 'id'):
+                    user_id = result.value.id
+                elif isinstance(result.details, dict):
+                    user_id = result.details.get('id') or result.details.get('data', {}).get('id')
                 logger.info(f"✅ User created: {username} (ID: {user_id})")
                 return {
                     "success": True,
@@ -578,8 +584,8 @@ class InternalUserManager:
                 return None
             
             result = await self.user_manipulator.update(
-                {"username": username},
-                update_data
+                update_data,
+                {"username": username}
             )
             
             if result.status == DBSTATUS.SUCCESS:
@@ -660,8 +666,8 @@ class InternalUserManager:
                         return False
             
             result = await self.user_manipulator.update(
-                {"username": username},
-                {"enabled": enabled}
+                {"enabled": enabled},
+                {"username": username}
             )
             
             if result.status == DBSTATUS.SUCCESS:
