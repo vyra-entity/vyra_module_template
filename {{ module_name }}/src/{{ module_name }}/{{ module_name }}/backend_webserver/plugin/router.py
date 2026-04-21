@@ -35,7 +35,9 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 _LOCAL_REPO = Path(os.getenv("LOCAL_REPOSITORY_PATH", "/local_repository"))
-_POOL_PATH = Path(os.getenv("PLUGIN_POOL_PATH", "/plugin_pool"))
+# Plugin pool is mounted at /host/plugin_pool in Docker Swarm (see docker-compose.modules.yml).
+# Fall back to /plugin_pool for non-containerised environments.
+_POOL_PATH = Path(os.getenv("PLUGIN_POOL_PATH", "/host/plugin_pool"))
 
 
 # ---------------------------------------------------------------------------

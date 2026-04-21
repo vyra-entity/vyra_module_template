@@ -80,17 +80,13 @@ router.beforeEach(async (to, from, next) => {
     return
   }
   
-  // Verify authentication status
-  if (!authStore.isAuthenticated) {
-    const isValid = await authStore.verifyAuth()
-    
-    if (!isValid) {
-      // Not authenticated, redirect to login
-      next({ name: 'login', query: { redirect: to.fullPath } })
-      return
-    }
+  // Always verify auth for protected routes so expired tokens redirect immediately on navigation
+  const isValid = await authStore.verifyAuth()
+  if (!isValid) {
+    next({ name: 'login', query: { redirect: to.fullPath } })
+    return
   }
-  
+
   // Authenticated, allow access
   next()
 })

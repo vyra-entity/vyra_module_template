@@ -7,6 +7,7 @@
         <p class="text-sm text-color-secondary m-0">Authentifizierungseinstellungen &amp; Passwort</p>
       </div>
     </div>
+
     <div class="grid">
       <!-- Auth Mode Info -->
       <div class="col-12 md:col-6">
@@ -41,13 +42,13 @@
           <template #title>
             <div class="flex align-items-center gap-2">
               <i class="pi pi-users"></i>
-              <span>Lokale Benutzerverwaltung</span>
+              <span>Lokale Benutzerverwaltung<span v-if="isLocalAuth" class="font-normal text-color-secondary"> ({{ authStore.user?.username }})</span></span>
             </div>
           </template>
           <template #content>
             <div class="grid">
               <!-- Password Change Section -->
-              <div class="col-12 md:col-6">
+              <div v-if="isLocalAuth" class="col-12 md:col-6">
                 <h3 class="text-lg font-semibold mb-3">
                   <i class="pi pi-key mr-2"></i>Passwort ändern
                 </h3>
@@ -232,6 +233,7 @@ const authStore = useAuthStore()
 
 const userManagerAvailable = ref(false)
 const isAdmin = computed(() => authStore.user?.username === 'admin')
+const isLocalAuth = computed(() => authStore.authMode === 'local')
 
 // ─── Password change ─────────────────────────────────────────────────────────
 const oldPassword = ref('')

@@ -122,7 +122,6 @@
               <span class="slot-row__status" :class="slot.is_active ? 'slot-row__status--active' : 'slot-row__status--inactive'">
                 {% raw %}{{ slot.is_active ? 'Aktiv' : 'Inaktiv' }}{% endraw %}
               </span>
-              <InputSwitch v-model="activeMap[slot.assignment_id]" :loading="toggling.has(slot.assignment_id)" @change="toggleSlot(slot)" />
             </div>
           </div>
         </div>
@@ -136,12 +135,11 @@
  * PluginsPage — Einstellungsseite für aktive Plugins im aktuellen Webinterface.
  * Listet alle geladenen UI-Slots mit Aktivierungsstatus und Toggle-Funktion.
  */
-import { ref, computed, reactive } from 'vue'
+import { ref, computed } from 'vue'
 import { usePluginStore } from '../../../store/plugins'
 import type { UiManifestEntry } from '../../plugins/plugin.api'
 import apiClient from '../../../api/http'
 import Button from 'primevue/button'
-import InputSwitch from 'primevue/inputswitch'
 
 /** Derive the current module name from the API base URL at runtime */
 const MODULE_NAME = (apiClient.defaults.baseURL ?? '').replace(/\/api$/, '').replace(/^\//, '')
@@ -150,27 +148,11 @@ import Tag from 'primevue/tag'
 const pluginStore = usePluginStore()
 const refreshing  = ref(false)
 
-const toggling = reactive(new Set<string>())
-
 const activeMap = computed<Record<string, boolean>>(() => {
   const result: Record<string, boolean> = {}
   for (const entry of allEntries.value) result[entry.assignment_id] = entry.is_active
   return result
 })
-
-/** Toggle plugin slot active state via plugin_admin_service (mm backend). */
-async function toggleSlot(slot: UiManifestEntry): Promise<void> {
-  if (toggling.has(slot.assignment_id)) return
-  toggling.add(slot.assignment_id)
-  try {
-    await apiClient.patch(`/plugin_admin_service/assignments/${slot.assignment_id}/toggle`)
-    await pluginStore.resolvePlugins('MODULE', MODULE_NAME)
-  } catch (e) {
-    console.error('[PluginsPage] Toggle failed:', e)
-  } finally {
-    toggling.delete(slot.assignment_id)
-  }
-}
 
 /** Flat list of all UiManifestEntries across all slots */
 const allEntries = computed<UiManifestEntry[]>(() =>
