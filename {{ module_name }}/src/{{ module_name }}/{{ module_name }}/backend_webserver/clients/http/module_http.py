@@ -4,7 +4,7 @@ Module HTTP Client
 Provides HTTP-based communication with Container Manager for module operations.
 Replaces container_manager_client.py with modern architecture.
 """
-from {{ module_name }}.{{ module_name }}.logging_config import get_logger, log_exception, log_function_call, log_function_result
+from {{ module_name }}.logging_config import get_logger, log_exception, log_function_call, log_function_result
 from typing import Any, Dict, List, Optional
 from pathlib import Path
 

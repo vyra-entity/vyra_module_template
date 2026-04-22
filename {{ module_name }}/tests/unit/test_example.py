@@ -20,7 +20,7 @@ class TestBackendConfig:
     
     def test_settings_default_values(self):
         """Test Settings class loads default values correctly."""
-        from {{ module_name }}.{{ module_name }}.backend_webserver.core.config import Settings
+        from {{ module_name }}.backend_webserver.core.config import Settings
         
         settings = Settings()
         
@@ -30,7 +30,7 @@ class TestBackendConfig:
     
     def test_settings_custom_values(self):
         """Test Settings class exposes log-level from current environment."""
-        from {{ module_name }}.{{ module_name }}.backend_webserver.core.config import Settings
+        from {{ module_name }}.backend_webserver.core.config import Settings
         
         # Settings class variables are evaluated at class-definition time, so
         # they reflect env vars present when the module was first imported.
@@ -72,7 +72,7 @@ class TestDependencies:
     async def test_get_entity_not_initialized(self):
         """Test get_entity raises ContainerNotInitializedError when container not initialized."""
         from {{ module_name }}.{{ module_name }} import container_injection
-        from {{ module_name }}.{{ module_name }}.container_injection import ContainerNotInitializedError
+        from {{ module_name }}.container_injection import ContainerNotInitializedError
         
         # Ensure container is reset
         container_injection.reset()
@@ -97,8 +97,8 @@ class TestApplicationComponent:
         mock_core_entity_module.VyraEntity = type("VyraEntity", (), {})
         sys.modules["vyra_base.core.entity"] = mock_core_entity_module
 
-        from {{ module_name }}.{{ module_name }}.application.application import Component
-        from {{ module_name }}.{{ module_name }}.taskmanager import TaskManager
+        from {{ module_name }}.application.application import Component
+        from {{ module_name }}.taskmanager import TaskManager
         
         # Arrange
         mock_state_machine = MagicMock()
@@ -126,7 +126,7 @@ class TestUtilities:
     
     def test_module_name_dynamic_loading(self):
         """Test ASGI module imports and exposes application."""
-        import {{ module_name }}.{{ module_name }}.backend_webserver.asgi as asgi_module
+        import {{ module_name }}.backend_webserver.asgi as asgi_module
         
         assert hasattr(asgi_module, "application")
 
@@ -155,7 +155,7 @@ class TestContainerInjection:
     def test_container_reset(self, mock_vyra_entity):
         """Test container injection reset clears all references."""
         from {{ module_name }}.{{ module_name }} import container_injection
-        from {{ module_name }}.{{ module_name }}.container_injection import ContainerNotInitializedError
+        from {{ module_name }}.container_injection import ContainerNotInitializedError
         
         # Arrange
         container_injection.set_entity(mock_vyra_entity)

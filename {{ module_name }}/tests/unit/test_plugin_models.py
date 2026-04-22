@@ -203,21 +203,21 @@ class TestPluginGatewayEmptyManifest:
         for name in (
             "{{ module_name }}",
             "{{ module_name }}.{{ module_name }}",
-            "{{ module_name }}.{{ module_name }}.container_injection",
-            "{{ module_name }}.{{ module_name }}.interface",
-            "{{ module_name }}.{{ module_name }}.plugin",
+            "{{ module_name }}.container_injection",
+            "{{ module_name }}.interface",
+            "{{ module_name }}.plugin",
         ):
             sys.modules.setdefault(name, MagicMock())
 
         filepath = _SRC_ROOT / "{{ module_name }}" / "{{ module_name }}" / "plugin" / "plugin_gateway.py"
         spec = importlib.util.spec_from_file_location(
-            "{{ module_name }}.{{ module_name }}.plugin.plugin_gateway",
+            "{{ module_name }}.plugin.plugin_gateway",
             str(filepath),
             submodule_search_locations=[],
         )
         mod = importlib.util.module_from_spec(spec)
-        mod.__package__ = "{{ module_name }}.{{ module_name }}.plugin"
-        sys.modules["{{ module_name }}.{{ module_name }}.plugin.plugin_gateway"] = mod
+        mod.__package__ = "{{ module_name }}.plugin"
+        sys.modules["{{ module_name }}.plugin.plugin_gateway"] = mod
         spec.loader.exec_module(mod)
         self.PluginGateway = mod.PluginGateway
 

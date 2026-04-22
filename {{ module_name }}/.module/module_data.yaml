@@ -4,8 +4,8 @@ description: "{{ module_description }}"
 version: "{{ module_version }}"
 author: "{{ author_name }}"
 author_email: "{{ author_email }}"
-template:
-{% for t in module_template.split(',') %}
+blueprints:
+{% for t in module_blueprints.split(',') %}
   - "{{ t.strip() }}"
 {% endfor %}
 uuid: ""

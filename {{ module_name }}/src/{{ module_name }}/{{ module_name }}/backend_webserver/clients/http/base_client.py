@@ -5,7 +5,7 @@ Provides thread-safe HTTP client with connection pooling and retry logic
 for industrial automation applications.
 """
 import asyncio
-from {{ module_name }}.{{ module_name }}.logging_config import get_logger, log_exception, log_function_call, log_function_result
+from {{ module_name }}.logging_config import get_logger, log_exception, log_function_call, log_function_result
 from typing import Dict, Optional, Any
 from contextlib import asynccontextmanager
 import aiohttp

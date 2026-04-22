@@ -19,7 +19,7 @@ from typing import Any, Dict, Optional
 
 from vyra_base.com.transport.t_redis.communication import RedisClient
 
-from {{ module_name }}.{{ module_name }}.logging_config import (
+from {{ module_name }}.logging_config import (
     get_logger,
     log_exception,
 )

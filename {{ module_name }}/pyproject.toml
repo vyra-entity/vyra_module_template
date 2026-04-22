@@ -1,7 +1,7 @@
 
 [tool.vyra]
 module_name = "{{ module_name }}"
-module_template = "basic"
+module_blueprints = "basic"
 module_description = "This template could be used to create a vyra module with basic functionality."
 module_links = [
     { name = "Vyra-Documentation", url = "https://vyra-entity.github.io/vyra_base_python/" }

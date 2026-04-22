@@ -51,10 +51,10 @@ module_version:
   default: "1.0.0"
   validator: "{% if not (module_version | regex_search('^\\d+\\.\\d+\\.\\d+$')) %}Version muss im Format X.Y.Z sein (z.B. 1.0.0){% endif %}"
 
-module_template:
+module_blueprints:
   type: str
-  help: "Welches Template(s) soll als Basis verwendet werden? (kommagetrennt, z.B. basic  oder basic,production-line-1)"
-  validator: "{% if not (module_template | regex_search('^[a-z][a-z0-9_]*(,[a-z][a-z0-9_]*)*$')) %}Nur Kleinbuchstaben, Zahlen und Unterstriche erlaubt; mehrere Werte kommagetrennt{% endif %}"
+  help: "Welches Blueprint(s) soll als Basis verwendet werden? (kommagetrennt, z.B. basic  oder basic,production-line-1)"
+  validator: "{% if not (module_blueprints | regex_search('^[a-z][a-z0-9_]*(,[a-z][a-z0-9_]*)*$')) %}Nur Kleinbuchstaben, Zahlen und Unterstriche erlaubt; mehrere Werte kommagetrennt{% endif %}"
 
 author_name:
   type: str
