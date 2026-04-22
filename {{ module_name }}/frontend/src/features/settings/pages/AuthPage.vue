@@ -42,7 +42,7 @@
           <template #title>
             <div class="flex align-items-center gap-2">
               <i class="pi pi-users"></i>
-              <span>Lokale Benutzerverwaltung<span v-if="isLocalAuth" class="font-normal text-color-secondary"> ({{ authStore.user?.username }})</span></span>
+              <span>Lokale Benutzerverwaltung<span v-if="isLocalAuth" class="font-normal text-color-secondary"> ({% raw %}{{ authStore.user?.username }}{% endraw %})</span></span>
             </div>
           </template>
           <template #content>
