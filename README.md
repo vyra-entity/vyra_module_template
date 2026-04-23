@@ -62,7 +62,7 @@ copier copy --trust ~/VYRA/vyra_module_template module-storages/
 | `module_display_name` | `str` | Human-readable display name shown in the dashboard UI. Defaults to title-case of `module_name`. | `My Detector Module` |
 | `module_description` | `str` | Short description of the module. Written into `README.md` and `.module/module_data.yaml`. | `Detects anomalies in sensor data` |
 | `module_version` | `str` | Semantic version (`Major.Minor.Patch`). No pre-release or build metadata tags. Defaults to `1.0.0`. | `1.0.0` |
-| `module_template` | `str` | One or more template names (comma-separated) this module is based on. Used for tracking and registry metadata. | `basic` or `basic,production-line-1` |
+| `module_blueprints` | `str` | One or more blueprint names (comma-separated) this module is based on. Used for tracking and registry metadata. | `basic` or `basic,production-line-1` |
 | `author_name` | `str` | Name of the module author. | `Max Mustermann` |
 | `author_email` | `str` | Email address of the module author. | `max@example.com` |
 
@@ -96,7 +96,7 @@ module-storages/
 └── {module_name}_{uuid}/          ← instance directory (UUID v4, 32 hex chars)
     └── {version}/                 ← versioned module root (e.g. 1.0.0/)
         ├── .module/
-        │   └── module_data.yaml   ← name, version, description, uuid, author, template
+        │   └── module_data.yaml   ← name, version, description, uuid, author, blueprints
         ├── .copier-answers.yml    ← copier metadata (do not edit manually)
         ├── Dockerfile
         ├── Makefile

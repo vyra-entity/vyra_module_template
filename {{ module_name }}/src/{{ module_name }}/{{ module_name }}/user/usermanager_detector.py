@@ -17,7 +17,7 @@ class UserManagerDetector:
     """
     Detects availability of external usermanager module.
     
-    Checks registered modules to find modules with template "usermanager".
+    Checks registered modules to find modules with blueprints "usermanager".
     """
     
     def __init__(self, module_registry: ModuleRegistry):
@@ -36,7 +36,7 @@ class UserManagerDetector:
         """
         Check if external usermanager module is available
         
-        Queries registered modules for modules with template="usermanager".
+        Queries registered modules for modules with blueprints="usermanager".
         
         Returns:
             Dict with:
@@ -60,10 +60,10 @@ class UserManagerDetector:
             
             modules = result.get("modules", [])
             
-            # Search for usermanager template
+            # Search for usermanager blueprints
             for module in modules:
-                template = module.get("template", "")
-                if template.lower() == "usermanager":
+                blueprints = str(module.get("blueprints", ""))
+                if blueprints.lower() == "usermanager":
                     logger.info(f"✅ External usermanager found: {module.get('name')}")
                     return {
                         "available": True,

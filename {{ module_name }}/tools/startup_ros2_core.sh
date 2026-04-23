@@ -31,6 +31,15 @@ echo "SECURITY ENCLAVE: $ROS_SECURITY_ENCLAVE"
 # causing log entries to appear in bursts instead of in real time.
 export PYTHONUNBUFFERED=1
 
+# In dev mode prefer the bind-mounted source tree over the generated ros2 run
+# wrapper. This avoids stale install/ console scripts after partial rebuilds.
+SOURCE_PACKAGE_DIR="/workspace/src/${MODULE_NAME}"
+if [ "${VYRA_DEV_MODE:-false}" = "true" ] && [ -d "$SOURCE_PACKAGE_DIR" ]; then
+    export PYTHONPATH="$SOURCE_PACKAGE_DIR:${PYTHONPATH:-}"
+    echo "🚀 Starting Core Module from source tree..."
+    exec python3 -m "${MODULE_NAME}.main"
+fi
+
 # Start main module node
 echo "🚀 Starting Core Module..."
 # All logs are now handled by Python Logger -> log/ros2/ros2_stdout.log

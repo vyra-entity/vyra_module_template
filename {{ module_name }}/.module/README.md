@@ -73,8 +73,8 @@ description: "{{ module_description }}"   # Short description shown in module re
 version: "{{ module_version }}"           # Semantic version (e.g. "1.0.0")
 author: "{{ author_name }}"               # Primary author / maintainer
 author_email: "{{ author_email }}"        # Contact / support email
-template:                                 # Template tags — set from copier prompt
-  - "slim"                                # e.g. slim | full | ros2 | frontend
+blueprints:                               # Blueprint tags — set from copier prompt
+  - "basic"                               # e.g. basic | production_line_1 | custom_blueprint
 uuid: ""                                  # Auto-generated UUID (36 chars) — DO NOT edit manually
 alias: ""                                 # Short URL alias, e.g. "mm" for v2_modulemanager
 ```
@@ -87,7 +87,7 @@ alias: ""                                 # Short URL alias, e.g. "mm" for v2_mo
 | `version`       | Copier / dev   | Versioning for update checks in Module Manager         |
 | `author`        | Copier         | Shown in module info panel                            |
 | `author_email`  | Copier         | Contact address                                       |
-| `template`      | Copier         | Template variant tags; used for runtime capability checks |
+| `blueprints`    | Copier         | Blueprint variant tags; used for runtime capability checks |
 | `uuid`          | post_copier_setup.sh | Universally unique ID — generated once, never changes |
 | `alias`         | post_copier_setup.sh | Short routing alias (e.g. `mm`, `db`)             |
 

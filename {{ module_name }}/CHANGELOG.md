@@ -4,6 +4,19 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Changed — Metadata docs now use canonical blueprints key (2026-04-23)
+
+- **`../README.md`** and **`.module/README.md`** now describe `module_blueprints` / `blueprints` instead of legacy `module_template` / `template` for generated module metadata.
+
+### Fixed — Dev full-mode startup now bypasses stale ROS2 console wrappers (2026-04-23)
+
+- **`tools/startup_ros2_core.sh`** — In `VYRA_DEV_MODE=true`, new modules now start core from `/workspace/src/<module>` via `python3 -m <module>.main` after ROS2 setup.
+- This prevents stale `install/` entry-point wrappers from crashing freshly generated modules during partial rebuild cycles.
+
+### Changed — Usermanager detector now reads canonical blueprints key (2026-04-23)
+
+- **`src/{{ module_name }}/{{ module_name }}/user/usermanager_detector.py`** — Detection logic now uses `module["blueprints"]` instead of legacy `module["template"]`.
+
 ### Changed — AuthPage aligned with v2_dashboard improvements
 
 - **`frontend/src/features/settings/pages/AuthPage.vue`** — Replaced static auth-mode info card with dynamic auth mode indicator showing local/UserManager availability. Added `userManagerAvailable` ref fetched via `authApi.checkUserManagerAvailable()` on mount. Widened auth mode card to `col-12 md:col-6`. Changed user management section condition from `v-if="isAdmin"` to `v-if="authStore.authMode === 'local' || isAdmin"`. Added `Tag` "Nur für Admin" marker and `:disabled="!isAdmin"` to create-user form fields. Added v-if/v-else empty state for user list. Added `v-else` UserManager-info card block. Expanded minified CSS to multi-line.
