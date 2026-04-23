@@ -549,7 +549,7 @@ async def _load_project_settings() -> dict[str, Any]:
             "project_settings_loaded",
             module_name=module_settings.get('name', 'unknown'),
             version=module_settings.get('version', 'unknown'),
-            template=module_settings.get('template', 'unknown')
+            blueprints=module_settings.get('blueprints', 'unknown')
         )
         log_function_result(logger, success=True, function="_load_project_settings")
         
@@ -558,6 +558,43 @@ async def _load_project_settings() -> dict[str, Any]:
     except Exception as e:
         log_exception(logger, e, context={"function": "_load_project_settings", "path": str(pyproject_path)})
         raise
+
+
+def _resolve_module_blueprints(
+    project_settings: dict[str, Any],
+    module_data: Optional[dict[str, Any]] = None,
+) -> str:
+    """Resolve the module blueprint value from canonical blueprint settings."""
+    if isinstance(module_data, dict):
+        value = module_data.get("blueprints")
+        if value not in (None, "", "null"):
+            return str(value)
+
+    for key in ("module_blueprints", "blueprints"):
+        value = project_settings.get(key)
+        if value not in (None, "", "null"):
+            return str(value)
+
+    return "unknown"
+
+
+def _build_module_data_payload(
+    project_settings: dict[str, Any],
+    module_data: Optional[dict[str, Any]] = None,
+) -> dict[str, str]:
+    """Build a module_data payload that persists blueprints as the canonical key."""
+    source_data = module_data if isinstance(module_data, dict) else {}
+    blueprints = _resolve_module_blueprints(project_settings, source_data)
+
+    return {
+        "uuid": str(source_data.get("uuid") or ModuleEntry.gen_uuid()),
+        "name": str(source_data.get("name") or project_settings["module_name"]),
+        "blueprints": blueprints,
+        "description": str(
+            source_data.get("description") or project_settings["module_description"]
+        ),
+        "version": str(source_data.get("version") or project_settings["version"]),
+    }
 
 async def build_entity(project_settings) -> VyraEntity:
     """
@@ -584,7 +621,9 @@ async def build_entity(project_settings) -> VyraEntity:
     try:
         logger.debug("loading_module_data")
         module_data: Optional[dict] = await _load_module_data()
-        needed_fields: list[str] = ['uuid', 'name', 'template', 'description', 'version']
+        normalized_module_data = _build_module_data_payload(project_settings, module_data)
+        needed_fields: list[str] = ['uuid', 'name', 'description', 'version']
+        has_blueprints_field = isinstance(module_data, dict) and 'blueprints' in module_data
 
         if not module_data or module_data == {}:
             logger.info(
@@ -594,18 +633,20 @@ async def build_entity(project_settings) -> VyraEntity:
             )
 
             me = ModuleEntry(
-                uuid= ModuleEntry.gen_uuid(),
-                name=project_settings['module_name'],
-                template=project_settings['module_template'],
-                description=project_settings['module_description'],
-                version=project_settings['version'],
+                uuid=normalized_module_data['uuid'],
+                name=normalized_module_data['name'],
+                template=normalized_module_data['blueprints'],
+                description=normalized_module_data['description'],
+                version=normalized_module_data['version'],
             )
             logger.debug("new_module_entry_created", uuid=me.uuid, name=me.name)
             
-        elif not all(field in module_data for field in needed_fields):
+        elif not all(field in module_data for field in needed_fields) or not has_blueprints_field:
             missing_field: list[str] = [
                 field for field in needed_fields if field not in module_data
             ]
+            if not has_blueprints_field:
+                missing_field.append('blueprints')
             
             logger.warning(
                 "module_data_incomplete",
@@ -614,11 +655,11 @@ async def build_entity(project_settings) -> VyraEntity:
             )
 
             me = ModuleEntry(
-                uuid=module_data.get('uuid', ModuleEntry.gen_uuid()),
-                name=module_data.get('name', project_settings['module_name']),
-                template=module_data.get('template', project_settings['module_template']),
-                description=module_data.get('description', project_settings['module_description']),
-                version=module_data.get('version', project_settings['version']),
+                uuid=normalized_module_data['uuid'],
+                name=normalized_module_data['name'],
+                template=normalized_module_data['blueprints'],
+                description=normalized_module_data['description'],
+                version=normalized_module_data['version'],
             )
 
             logger.info(
@@ -641,28 +682,26 @@ async def build_entity(project_settings) -> VyraEntity:
                 )
                 module_data['uuid'] = ModuleEntry.gen_uuid()
 
+            normalized_module_data = _build_module_data_payload(project_settings, module_data)
+
             me = ModuleEntry(
-                uuid=module_data['uuid'],
-                name=module_data['name'],
-                template=module_data['template'],
-                description=module_data['description'],
-                version=module_data['version'],
+                uuid=normalized_module_data['uuid'],
+                name=normalized_module_data['name'],
+                template=normalized_module_data['blueprints'],
+                description=normalized_module_data['description'],
+                version=normalized_module_data['version'],
             )
             logger.debug("module_entry_loaded", uuid=me.uuid, name=me.name)
         
         # Persist module data
         logger.debug("persisting_module_data")
-
-        if isinstance(module_data, dict):
-            await _write_module_data(module_data)
-        else:
-            logger.warning(f"module_data is not a dict, cannot persist: {module_data}")
+        await _write_module_data(normalized_module_data)
         
         logger.info(
             "module_entry_ready",
             uuid=me.uuid,
             name=me.name,
-            template=me.template,
+            blueprints=normalized_module_data['blueprints'],
             version=me.version
         )
 
