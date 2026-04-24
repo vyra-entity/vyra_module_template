@@ -83,6 +83,11 @@ async def login(
             detail="Usermanager ist nicht erreichbar. Nur lokaler Login möglich.",
         ) from exc
     except Exception as exc:
+        if "access_denied" in str(exc):
+            raise HTTPException(
+                status_code=403,
+                detail="Access to this module is not permitted for your account",
+            ) from exc
         raise HTTPException(status_code=401, detail="Authentication failed") from exc
 
     if not user_info:

@@ -25,10 +25,10 @@
                 <span><strong>Lokal:</strong> Integrierte Benutzerdatenbank</span>
               </div>
               <div class="flex align-items-center gap-2">
-                <i :class="['pi', userManagerAvailable ? 'pi-check-circle text-green-500' : 'pi-times-circle text-red-400']"></i>
+                <i :class="['pi', authStore.authMode === 'usermanager' ? 'pi-check-circle text-green-500' : 'pi-circle text-color-secondary']"></i>
                 <span>
                   <strong>UserManager:</strong>
-                  {% raw %}{{ userManagerAvailable ? 'Externer UserManager verfügbar' : 'Kein UserManager erreichbar' }}{% endraw %}
+                  {% raw %}{{ authStore.authMode === 'usermanager' ? 'Aktive Anmeldung über UserManager' : (userManagerAvailable ? 'Externer UserManager verfügbar' : 'Kein UserManager erreichbar') }}{% endraw %}
                 </span>
               </div>
             </div>
@@ -36,8 +36,8 @@
         </Card>
       </div>
 
-      <!-- Local User Management (local auth mode or admin via UserManager) -->
-      <div v-if="authStore.authMode === 'local' || isAdmin" class="col-12">
+      <!-- Local User Management -->
+      <div v-if="isLocalAuth" class="col-12">
         <Card>
           <template #title>
             <div class="flex align-items-center gap-2">
@@ -48,14 +48,14 @@
           <template #content>
             <div class="grid">
               <!-- Password Change Section -->
-              <div v-if="isLocalAuth" class="col-12 md:col-6">
+              <div class="col-12 md:col-6">
                 <h3 class="text-lg font-semibold mb-3">
                   <i class="pi pi-key mr-2"></i>Passwort ändern
                 </h3>
                 <form @submit.prevent="handleChangePassword" class="flex flex-column gap-3">
                   <div class="field">
                     <label for="oldPw" class="block mb-2 font-semibold">Aktuelles Passwort</label>
-                    <Password id="oldPw" v-model="oldPassword" :feedback="false" toggleMask class="w-full" :inputStyle="{ width: '100%' }" :pt="{ input: { autocomplete: 'current-password' } }" />
+                    <Password id="oldPw" v-model="oldPassword" :feedback="false" toggleMask class="w-full" :inputStyle="{ width: '100%' }" :pt="{ input: { autocomplete: 'off' } }" />
                   </div>
                   <div class="field">
                     <label for="newPw" class="block mb-2 font-semibold">Neues Passwort (min. 8 Zeichen)</label>
@@ -66,6 +66,9 @@
                     <Password id="confirmPw" v-model="confirmPassword" :feedback="false" toggleMask class="w-full" :inputStyle="{ width: '100%' }" :pt="{ input: { autocomplete: 'new-password' } }" />
                   </div>
                   <Message v-if="passwordError" severity="error" :closable="false">{% raw %}{{ passwordError }}{% endraw %}</Message>
+                  <Message v-if="newPassword.length > 0 && newPassword.length < 8" severity="warn" :closable="false">
+                    Das neue Passwort muss mindestens 8 Zeichen haben.
+                  </Message>
                   <Button
                     type="submit"
                     label="Passwort ändern"
@@ -117,6 +120,9 @@
                     />
                   </div>
                   <Message v-if="createUserError" severity="error" :closable="false">{% raw %}{{ createUserError }}{% endraw %}</Message>
+                  <Message v-if="newUserPassword.length > 0 && newUserPassword.length < 8" severity="warn" :closable="false">
+                    Das Passwort muss mindestens 8 Zeichen haben.
+                  </Message>
                   <Button
                     type="submit"
                     label="Benutzer anlegen"
@@ -186,24 +192,6 @@
         </Card>
       </div>
 
-      <!-- UserManager info (usermanager auth mode) -->
-      <div v-else class="col-12">
-        <Card>
-          <template #title>
-            <div class="flex align-items-center gap-2">
-              <i class="pi pi-shield"></i>
-              <span>Benutzerverwaltung</span>
-            </div>
-          </template>
-          <template #content>
-            <Message severity="info" :closable="false">
-              <strong>UserManager-Modus aktiv:</strong> Benutzer, Rollen und Zugriffsrechte werden
-              zentral im <strong>UserManager</strong> verwaltet. Bitte melde dich dort an, um
-              Benutzer zu verwalten.
-            </Message>
-          </template>
-        </Card>
-      </div>
     </div>
 
     <ConfirmDialog />
@@ -269,7 +257,7 @@ async function handleChangePassword() {
 // ─── Create user ─────────────────────────────────────────────────────────────
 const newUsername = ref('')
 const newUserPassword = ref('')
-const newUserRole = ref(authStore.user?.role ?? 'viewer')
+const newUserRole = ref('viewer')
 const creatingUser = ref(false)
 const createUserError = ref('')
 

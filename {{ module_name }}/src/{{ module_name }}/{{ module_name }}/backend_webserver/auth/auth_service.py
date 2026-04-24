@@ -52,13 +52,14 @@ class AuthenticationService(BaseAuthService):
         self, username: str, password: str
     ) -> Optional[Dict[str, Any]]:
         """
-        Validate credentials by delegating to the external v2_usermanager service.
+        Validate credentials by delegating to the external UserManager service.
 
-        POSTs to ``{GATEWAY_URL}/v2_usermanager/api/auth/login`` then GETs
+        POSTs to ``{GATEWAY_URL}/{um_name}/api/auth/login`` then GETs
         ``/auth/verify`` to retrieve the full user claims (user_id, role, level).
         """
         gateway = os.environ.get("GATEWAY_URL", "https://traefik:443")
-        login_url = f"{gateway}/v2_usermanager/api/auth/login"
+        um_name = await self._resolve_usermanager_name()
+        login_url = f"{gateway}/{um_name}/api/auth/login"
 
         ssl_ctx = ssl.create_default_context()
         ssl_ctx.check_hostname = False
@@ -79,6 +80,12 @@ class AuthenticationService(BaseAuthService):
                     ssl=ssl_ctx,
                     timeout=aiohttp.ClientTimeout(total=10),
                 ) as resp:
+                    if resp.status == 403:
+                        logger.warning(
+                            "❌ Access denied by UserManager for '%s' on {{ module_name }}",
+                            username,
+                        )
+                        raise Exception("access_denied")
                     if resp.status in (502, 503, 504, 404):
                         raise UsermanagerUnavailableError(
                             f"UserManager service not reachable (HTTP {resp.status})"
@@ -97,7 +104,7 @@ class AuthenticationService(BaseAuthService):
                 roles: list = data.get("roles", [])
                 primary_role: str = roles[0] if roles else "viewer"
 
-                verify_url = f"{gateway}/v2_usermanager/api/auth/verify"
+                verify_url = f"{gateway}/{um_name}/api/auth/verify"
                 async with session.get(
                     verify_url,
                     headers={"Authorization": f"Bearer {token}"},
@@ -133,8 +140,10 @@ class AuthenticationService(BaseAuthService):
             logger.warning(f"❌ UserManager not reachable (connection error): {exc}")
             raise UsermanagerUnavailableError("UserManager service not reachable") from exc
         except Exception as exc:
-            logger.error(f"❌ Error authenticating via v2_usermanager: {exc}", exc_info=True)
-            raise Exception("v2_usermanager authentication error") from exc
+            if "access_denied" in str(exc):
+                raise
+            logger.error(f"❌ Error authenticating via usermanager: {exc}", exc_info=True)
+            raise Exception("usermanager authentication error") from exc
 
     async def check_usermanager_available(self) -> Dict[str, Any]:
         """
@@ -162,3 +171,17 @@ class AuthenticationService(BaseAuthService):
         except Exception as exc:
             logger.error(f"❌ Error checking usermanager availability: {exc}", exc_info=True)
             return {"available": False, "message": f"Error reaching module manager: {exc}"}
+
+    async def _resolve_usermanager_name(self) -> str:
+        """Resolve UserManager module name from MM availability response."""
+        try:
+            um_info = await self.check_usermanager_available()
+            modules = um_info.get("modules", []) if isinstance(um_info, dict) else []
+            if modules:
+                module = modules[0] or {}
+                resolved = module.get("module_name") or module.get("name")
+                if isinstance(resolved, str) and resolved.strip():
+                    return resolved.strip()
+        except Exception:
+            pass
+        return "v2_usermanager"

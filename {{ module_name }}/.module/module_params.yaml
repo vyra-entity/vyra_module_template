@@ -60,7 +60,9 @@ resources:
 # These labels will be added to the service's deploy.labels section
 # Labels will be prefixed with the module name to avoid conflicts
 labels:
-  # modulemanager.module_id is set automatically by container_manager on installation.
+  modulemanager:
+    module_id: null
+  # modulemanager.module_id should point to the active modulemanager instance.
   # Example custom labels (flat key: "value" format required for Docker labels):
   # com.example.team: "frontend"
   # com.example.version: "1.0.0"

@@ -4,6 +4,15 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — Template UserManager auth resolves module name dynamically (2026-04-24)
+
+- **`src/{{ module_name }}/{{ module_name }}/backend_webserver/auth/auth_service.py`**
+  - `_validate_usermanager_credentials()` now resolves the UserManager module name from `check-usermanager` response instead of hardcoding `v2_usermanager`.
+  - Added `_resolve_usermanager_name()` with safe fallback to `v2_usermanager`.
+  - Added explicit 403 handling (`access_denied`) passthrough for UserManager module access restrictions.
+- **`src/{{ module_name }}/{{ module_name }}/backend_webserver/auth/router.py`**
+  - Added MM-consistent HTTP 403 response when UserManager denies module access.
+
 ### Changed — Metadata docs now use canonical blueprints key (2026-04-23)
 
 - **`../README.md`** and **`.module/README.md`** now describe `module_blueprints` / `blueprints` instead of legacy `module_template` / `template` for generated module metadata.
