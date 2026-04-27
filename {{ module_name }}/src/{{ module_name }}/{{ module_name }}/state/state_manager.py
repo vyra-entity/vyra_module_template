@@ -41,6 +41,7 @@ from typing import TYPE_CHECKING, Any, Deque, Dict, List, Optional
 from ..logging_config import get_logger, log_exception
 
 from dataclasses import dataclass, field
+from datetime import datetime as _dt
 from typing import Callable, Awaitable
 
 from vyra_base.com import remote_service, remote_actionServer
@@ -50,6 +51,7 @@ from vyra_base.state.state_types import (
     OperationalState,
 )
 from vyra_base.state.unified import UnifiedStateMachine
+from vyra_base.defaults.entries import StateEntry
 
 # TYPE_CHECKING-only imports – not executed at runtime, so no rclpy/ament chain
 if TYPE_CHECKING:
@@ -807,47 +809,31 @@ class StateManager:
             return {"success": False, "error": str(exc)}
 
     # ─────────────────────────────────────────────────────────────────────────
-    # State broadcasting (called by async task runner) [OBSOLETE]
+    # State broadcasting (called by async task runner)
     # ─────────────────────────────────────────────────────────────────────────
 
-    # async def broadcast_state(self) -> None:
-    #     """
-    #     Broadcast the current state via the VyraEntity StateFeeder (1 Hz).
+    async def broadcast_state(self) -> None:
+        """
+        Broadcast the current state via the Zenoh StateFeeder.
 
-    #     Detects changes since the last broadcast and records them in the
-    #     history buffer.
-    #     """
-    #     try:
-    #         current = self.get_current_state()
-    #         states = self._state_machine.get_all_states()
+        Called from shutdown_to_offline() for the final Offline notification.
+        """
+        try:
+            state_data = StateEntry(
+                previous="N/A",
+                trigger="broadcast",
+                current=str(self._state_machine.get_operational_state().value),
+                module_id=self.module_id,
+                module_name=self.module_name,
+                timestamp=_dt.now(),
+            )
+            await self.entity.state_feeder.feed(state_data)
+        except Exception as exc:
+            logger.error(f"Failed to broadcast state: {exc}")
 
-    #         feed_element = State
-
-    #         self.entity.state_feeder.feed(
-    #             lifecycle_state=states["lifecycle"],
-    #             operational_state=states["operational"],
-    #             health_state=states["health"],
-    #             metadata={
-    #                 "module_name": self.module_name,
-    #                 "module_id": self.module_id,
-    #                 "is_operational": self._state_machine.is_operational(),
-    #                 "is_healthy": self._state_machine.is_healthy(),
-    #                 "timestamp": current.timestamp.isoformat(),
-    #             },
-    #         )
-
-    #         if self._last_state is not None:
-    #             self._record_history_diff(self._last_state, current)
-
-    #         self._last_state = current
-
-    #     except Exception as exc:
-    #         logger.error(f"Failed to broadcast state: {exc}")
-
-    # # Backward-compatibility alias
-    # async def broadcast_status(self) -> None:
-    #     """Alias for :meth:`broadcast_state` (backward compatibility)."""
-    #     await self.broadcast_state()
+    async def broadcast_status(self) -> None:
+        """Alias for :meth:`broadcast_state` (backward compatibility)."""
+        await self.broadcast_state()
 
     # ─────────────────────────────────────────────────────────────────────────
     # Internal state-mutation helpers (called only by application code)
@@ -933,11 +919,11 @@ class StateManager:
         except Exception as exc:
             logger.warning(f"complete_shutdown transition failed: {exc}")
 
-        # try:
-        #     await self.broadcast_state()
-        #     logger.info("📡 Offline state broadcasted to all clients")
-        # except Exception as exc:
-        #     logger.warning(f"Failed to broadcast offline state: {exc}")
+        try:
+            await self.broadcast_state()
+            logger.info("📡 Offline state broadcasted to all clients")
+        except Exception as exc:
+            logger.warning(f"Failed to broadcast offline state: {exc}")
 
 
     def _dispatch_action(

@@ -3,7 +3,6 @@ display_name: "{{ module_display_name }}"
 description: "{{ module_description }}"
 version: "{{ module_version }}"
 author: "{{ author_name }}"
-author_email: "{{ author_email }}"
 blueprints:
 {% for t in module_blueprints.split(',') %}
   - "{{ t.strip() }}"
