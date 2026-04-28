@@ -70,8 +70,10 @@ log_config = {
 cert_path = "/workspace/storage/certificates/webserver.crt"
 key_path = "/workspace/storage/certificates/webserver.key"
 
-# Check if SSL certificates exist
-if os.path.exists(cert_path) and os.path.exists(key_path):
+# Check if SSL certificates exist and are readable by this process
+cert_exists = os.path.exists(cert_path) and os.path.exists(key_path)
+cert_readable = os.access(cert_path, os.R_OK) and os.access(key_path, os.R_OK)
+if cert_exists and cert_readable:
     print(f"🔒 SSL certificates found - enabling HTTPS")
     print(f"   Certificate: {cert_path}")
     print(f"   Private Key: {key_path}")
@@ -94,10 +96,14 @@ if os.path.exists(cert_path) and os.path.exists(key_path):
     
     print("✅ Uvicorn will start with HTTPS enabled (TLS 1.2+)")
 else:
-    print("⚠️ SSL certificates not found - starting in HTTP mode")
-    print(f"   Expected certificate: {cert_path}")
-    print(f"   Expected key: {key_path}")
-    print("   Run './tools/create_ssl_certificates.sh --name webserver' to create certificates")
+    if cert_exists and not cert_readable:
+        print("❌ SSL certificates exist but are not readable (Permission denied) - starting in HTTP mode")
+        print(f"   Fix with: chmod 644 {cert_path} {key_path}")
+    else:
+        print("⚠️ SSL certificates not found - starting in HTTP mode")
+        print(f"   Expected certificate: {cert_path}")
+        print(f"   Expected key: {key_path}")
+        print("   Run './tools/create_ssl_certificates.sh --name webserver' to create certificates")
     
     # No SSL configuration
     ssl_certfile = None

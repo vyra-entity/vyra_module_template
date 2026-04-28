@@ -159,9 +159,11 @@ def run(pyproject_path: Path, module_data_path: Path) -> int:
     author      = authors[0] if isinstance(authors, list) and authors else str(authors or "")
     template    = str(vyra.get("module_template", ""))
 
-    # Preserve uuid
+    # Preserve uuid, alias and blueprints (never overwritten by this script)
     existing = _load_yaml(module_data_path)
-    uuid = existing.get("uuid", "")
+    uuid       = existing.get("uuid", "")
+    alias      = existing.get("alias", "")
+    blueprints = existing.get("blueprints", "")
 
     new_data = {
         "name":        name,
@@ -170,14 +172,16 @@ def run(pyproject_path: Path, module_data_path: Path) -> int:
         "template":    template,
         "author":      author,
         "uuid":        uuid,
+        "alias":       alias,
+        "blueprints":  blueprints,
     }
 
     _write_yaml(module_data_path, new_data)
 
     print(f"✅ module_data.yaml updated:")
     print(f"   name={name}  version={version}  template={template}")
-    print(f"   author={author}")
-    print(f"   uuid={uuid}  (preserved)")
+    print(f"   author={author}  blueprints={blueprints}")
+    print(f"   uuid={uuid}  alias={alias}  (preserved)")
     print("=== update_manifest.py done ===")
     return 0
 

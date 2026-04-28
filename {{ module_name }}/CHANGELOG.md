@@ -4,6 +4,13 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — SSL certificate readability check prevents PermissionError (2026-04-28)
+
+- **Root cause**: `webserver.key` is owned by `root` with `600` permissions; non-root process cannot read it. `os.path.exists()` returns `True` (file exists) but uvicorn then raises `PermissionError: [Errno 13] Permission denied` when loading the cert chain.
+- **`src/{{ module_name }}/{{ module_name }}/main.py`** — `web_backend_runner()` now checks `os.access(cert_path, os.R_OK)` in addition to `os.path.exists()` before enabling SSL. Logs `uvicorn_ssl_permission_denied` (ERROR) when files exist but cannot be read, falls back to HTTP.
+- **`src/{{ module_name }}/{{ module_name }}/backend_webserver/asgi.py`** — Same fix applied to the `__main__` dev-runner SSL check.
+- **`config/uvicorn.py`** — Same fix applied; prints clear error and fix hint (`chmod 644`) when permission is denied.
+
 ### Fixed — Template UserManager auth resolves module name dynamically (2026-04-24)
 
 - **`src/{{ module_name }}/{{ module_name }}/backend_webserver/auth/auth_service.py`**

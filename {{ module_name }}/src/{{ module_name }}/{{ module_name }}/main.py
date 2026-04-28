@@ -308,8 +308,10 @@ async def web_backend_runner() -> None:
     cert_path = "/workspace/storage/certificates/webserver.crt"
     key_path = "/workspace/storage/certificates/webserver.key"
     
-    # Check for SSL certificates
-    ssl_enabled = os.path.exists(cert_path) and os.path.exists(key_path)
+    # Check for SSL certificates: must exist AND be readable by this process
+    cert_exists = os.path.exists(cert_path) and os.path.exists(key_path)
+    cert_readable = os.access(cert_path, os.R_OK) and os.access(key_path, os.R_OK)
+    ssl_enabled = cert_exists and cert_readable
     
     if ssl_enabled:
         logger.info(
@@ -327,12 +329,20 @@ async def web_backend_runner() -> None:
             reload=False
         )
     else:
-        logger.warning(
-            "uvicorn_ssl_disabled",
-            reason="certificates_not_found",
-            expected_cert=cert_path,
-            expected_key=key_path
-        )
+        if cert_exists and not cert_readable:
+            logger.error(
+                "uvicorn_ssl_permission_denied",
+                reason="certificates_not_readable",
+                cert_path=cert_path,
+                key_path=key_path
+            )
+        else:
+            logger.warning(
+                "uvicorn_ssl_disabled",
+                reason="certificates_not_found",
+                expected_cert=cert_path,
+                expected_key=key_path
+            )
         config = uvicorn.Config(
             app=app_path,
             host="0.0.0.0",

@@ -564,16 +564,29 @@ def _resolve_module_blueprints(
     project_settings: dict[str, Any],
     module_data: Optional[dict[str, Any]] = None,
 ) -> str:
-    """Resolve the module blueprint value from canonical blueprint settings."""
+    """Resolve the module blueprint value from canonical blueprint settings.
+    
+    Handles both string and list values from YAML. A YAML list like
+    ``[test, basic]`` is joined to ``"test, basic"`` rather than being
+    converted to the Python repr ``"['test', 'basic']"``.
+    """
+    def _normalise(value: Any) -> Optional[str]:
+        if value in (None, "", "null"):
+            return None
+        if isinstance(value, list):
+            joined = ", ".join(str(v).strip() for v in value if str(v).strip())
+            return joined if joined else None
+        return str(value)
+
     if isinstance(module_data, dict):
-        value = module_data.get("blueprints")
-        if value not in (None, "", "null"):
-            return str(value)
+        result = _normalise(module_data.get("blueprints"))
+        if result is not None:
+            return result
 
     for key in ("module_blueprints", "blueprints"):
-        value = project_settings.get(key)
-        if value not in (None, "", "null"):
-            return str(value)
+        result = _normalise(project_settings.get(key))
+        if result is not None:
+            return result
 
     return "unknown"
 
@@ -581,20 +594,33 @@ def _resolve_module_blueprints(
 def _build_module_data_payload(
     project_settings: dict[str, Any],
     module_data: Optional[dict[str, Any]] = None,
-) -> dict[str, str]:
-    """Build a module_data payload that persists blueprints as the canonical key."""
+) -> dict[str, Any]:
+    """Build a module_data payload that persists all canonical fields.
+    
+    Preserves ``author``, ``alias`` and ``display_name`` from the existing
+    ``module_data`` so that these fields are never stripped when the file is
+    rewritten on startup.
+    """
     source_data = module_data if isinstance(module_data, dict) else {}
     blueprints = _resolve_module_blueprints(project_settings, source_data)
 
-    return {
+    payload: dict[str, Any] = {
         "uuid": str(source_data.get("uuid") or ModuleEntry.gen_uuid()),
-        "name": str(source_data.get("name") or project_settings["module_name"]),
+        "name": str(source_data.get("name") or project_settings.get("module_name", "")),
         "blueprints": blueprints,
         "description": str(
-            source_data.get("description") or project_settings["module_description"]
+            source_data.get("description") or project_settings.get("module_description", "")
         ),
-        "version": str(source_data.get("version") or project_settings["version"]),
+        "version": str(source_data.get("version") or project_settings.get("version", "0.0.0")),
+        "author": str(source_data.get("author") or project_settings.get("author", "")),
+        "alias": str(source_data.get("alias") or ""),
     }
+
+    display_name = str(source_data.get("display_name") or project_settings.get("display_name", ""))
+    if display_name:
+        payload["display_name"] = display_name
+
+    return payload
 
 async def build_entity(project_settings) -> VyraEntity:
     """
@@ -635,7 +661,7 @@ async def build_entity(project_settings) -> VyraEntity:
             me = ModuleEntry(
                 uuid=normalized_module_data['uuid'],
                 name=normalized_module_data['name'],
-                template=normalized_module_data['blueprints'],
+                blueprints=normalized_module_data['blueprints'],
                 description=normalized_module_data['description'],
                 version=normalized_module_data['version'],
             )
@@ -657,7 +683,7 @@ async def build_entity(project_settings) -> VyraEntity:
             me = ModuleEntry(
                 uuid=normalized_module_data['uuid'],
                 name=normalized_module_data['name'],
-                template=normalized_module_data['blueprints'],
+                blueprints=normalized_module_data['blueprints'],
                 description=normalized_module_data['description'],
                 version=normalized_module_data['version'],
             )
@@ -687,7 +713,7 @@ async def build_entity(project_settings) -> VyraEntity:
             me = ModuleEntry(
                 uuid=normalized_module_data['uuid'],
                 name=normalized_module_data['name'],
-                template=normalized_module_data['blueprints'],
+                blueprints=normalized_module_data['blueprints'],
                 description=normalized_module_data['description'],
                 version=normalized_module_data['version'],
             )

@@ -90,8 +90,10 @@ if __name__ == "__main__":
     module_name = os.getenv('MODULE_NAME', '{{ module_name }}')
     app_path = f"{module_name}.{module_name}.backend_webserver.asgi:application"
     
-    # Check for SSL certificates
-    if os.path.exists(cert_path) and os.path.exists(key_path):
+    # Check for SSL certificates (exist AND readable)
+    cert_exists = os.path.exists(cert_path) and os.path.exists(key_path)
+    cert_readable = os.access(cert_path, os.R_OK) and os.access(key_path, os.R_OK)
+    if cert_exists and cert_readable:
         logger.info("🔒 Starting with SSL/TLS encryption")
         uvicorn.run(
             app_path,
@@ -104,8 +106,12 @@ if __name__ == "__main__":
             ssl_keyfile=key_path
         )
     else:
-        logger.warning("⚠️ SSL certificates not found, starting without encryption")
-        logger.info(f"   Expected: {cert_path} and {key_path}")
+        if cert_exists and not cert_readable:
+            logger.error("❌ SSL certificates exist but are not readable (Permission denied) - starting without encryption")
+            logger.info(f"   Fix with: chmod 644 {cert_path} {key_path}")
+        else:
+            logger.warning("⚠️ SSL certificates not found, starting without encryption")
+            logger.info(f"   Expected: {cert_path} and {key_path}")
         uvicorn.run(
             app_path,
             host="0.0.0.0",

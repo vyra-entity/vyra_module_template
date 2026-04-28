@@ -323,6 +323,42 @@ echo "===================================="
 python3 tools/setup_interfaces.py
 
 # =============================================================================
+# SLIM Mode: Write config and proto interfaces to NFS
+# In full mode this is handled by the NFS Interface Management block below.
+# In SLIM mode the NFS block is skipped, so we write interface files here.
+# =============================================================================
+if [ "${VYRA_SLIM:-false}" = "true" ]; then
+    NFS_VOLUME_PATH="${NFS_VOLUME_PATH:-/nfs/vyra_interfaces}"
+    if [ -d "$NFS_VOLUME_PATH" ]; then
+        echo "=== SLIM MODE: Writing config and proto interfaces to NFS ==="
+        MODULE_DATA_FILE="/workspace/.module/module_data.yaml"
+        if [ -f "$MODULE_DATA_FILE" ]; then
+            INSTANCE_ID=$(grep '^uuid:' "$MODULE_DATA_FILE" | awk '{print $2}')
+        else
+            INSTANCE_ID="${HOSTNAME}"
+        fi
+        INTERFACE_SRC_DIR="/workspace/src/${MODULE_NAME}_interfaces"
+        NFS_MODULE_DIR="$NFS_VOLUME_PATH/${MODULE_NAME}_${INSTANCE_ID}_interfaces"
+        NFS_CONFIG_DIR="$NFS_MODULE_DIR/config"
+        mkdir -p "$NFS_CONFIG_DIR"
+        if [ -d "$INTERFACE_SRC_DIR/config" ]; then
+            cp -r "$INTERFACE_SRC_DIR/config"/.  "$NFS_CONFIG_DIR"/
+            echo "✅ SLIM: config/ deployed to NFS"
+        fi
+        for sub in msg srv; do
+            if [ -d "$INTERFACE_SRC_DIR/$sub/_gen" ]; then
+                mkdir -p "$NFS_MODULE_DIR/$sub/_gen"
+                cp -r "$INTERFACE_SRC_DIR/$sub/_gen"/.  "$NFS_MODULE_DIR/$sub/_gen"/
+                echo "✅ SLIM: $sub/_gen deployed to NFS"
+            fi
+        done
+        echo "✅ SLIM: NFS write complete at $NFS_MODULE_DIR"
+    else
+        echo "ℹ️  SLIM MODE: NFS volume not found at $NFS_VOLUME_PATH, skipping NFS write"
+    fi
+fi
+
+# =============================================================================
 # NFS Interface Management
 # New NFS layout per module:
 #   NFS_MODULE_DIR/
@@ -337,7 +373,7 @@ echo "=== NFS INTERFACE MANAGEMENT ==="
 # Read UUID from .module/module_data.yaml
 MODULE_DATA_FILE="/workspace/.module/module_data.yaml"
 if [ -f "$MODULE_DATA_FILE" ]; then
-    INSTANCE_ID=$(grep '^uuid:' "$MODULE_DATA_FILE" | awk '{print $2}' | tr -d '"')
+    INSTANCE_ID=$(grep '^uuid:' "$MODULE_DATA_FILE" | awk '{print $2}')
     echo "ℹ️  Module: $MODULE_NAME, Instance: $INSTANCE_ID (from module_data.yaml)"
 else
     INSTANCE_ID="${HOSTNAME#${MODULE_NAME}_}"
