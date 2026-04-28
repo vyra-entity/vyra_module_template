@@ -61,7 +61,7 @@ onMounted(async () => {
 /* ── Summary tiles ──────────────────────────────────────────────────── */
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 1rem;
 }
 
@@ -100,4 +100,19 @@ onMounted(async () => {
 .summary-tile__number  { font-size: 2.25rem; font-weight: 700; color: var(--p-text-color, #111); line-height: 1; margin: 0.25rem 0; }
 .summary-tile__detail  { display: flex; align-items: center; font-size: 0.8rem; }
 .summary-tile__sub     { margin-top: auto; }
+
+@media (max-width: 480px) {
+  .summary-tile {
+    padding: 0.9rem;
+  }
+
+  .summary-tile__number {
+    font-size: 1.6rem;
+  }
+
+  .summary-tile__icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}
 </style>

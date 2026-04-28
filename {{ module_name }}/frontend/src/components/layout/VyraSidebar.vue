@@ -128,7 +128,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useSidebarStore } from '../../store/sidebar'
 import { useSystemStore } from '../../store/system'
@@ -154,7 +154,7 @@ function goBack(): void {
 
 // ─── Mobile detection ──────────────────────────────────────────────────────
 const MOBILE_BREAKPOINT  = 768
-const DRAWER_BREAKPOINT  = 480
+const DRAWER_BREAKPOINT  = 768
 
 const isMobile          = ref(false)
 const isMobileDrawerOpen = ref(false)
@@ -191,6 +191,13 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', checkViewport)
 })
+
+watch(
+  () => route.fullPath,
+  () => {
+    isMobileDrawerOpen.value = false
+  },
+)
 
 // ─── System health ─────────────────────────────────────────────────────────
 const healthLabel = computed(() => {
@@ -257,7 +264,7 @@ async function handleLogout(): Promise<void> {
 .vyra-sidebar {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: 100dvh;
   width: var(--sb-width);
   min-width: var(--sb-width);
   background: var(--sb-bg);
@@ -517,7 +524,7 @@ async function handleLogout(): Promise<void> {
   cursor: pointer;
   font-size: 0.875rem;
   text-align: left;
-  min-height: 38px;
+  min-height: 48px;
   overflow: hidden;
   transition: background 0.15s ease, color 0.15s ease;
   width: 100%;
@@ -554,7 +561,7 @@ async function handleLogout(): Promise<void> {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
-  z-index: 99;
+  z-index: 999;
 }
 
 .backdrop-fade-enter-active,
@@ -567,11 +574,12 @@ async function handleLogout(): Promise<void> {
 }
 
 /* ── Responsive: mobile drawer ── */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .vyra-sidebar {
     position: fixed;
     left: 0;
     top: 0;
+    z-index: 1000;
     transform: translateX(calc(-1 * var(--sb-width)));
     transition:
       transform var(--sb-transition),
@@ -614,7 +622,7 @@ async function handleLogout(): Promise<void> {
   cursor: pointer;
   font-size: 0.875rem;
   text-align: left;
-  min-height: 38px;
+  min-height: 48px;
   overflow: hidden;
   width: 100%;
   transition: background 0.15s ease, color 0.15s ease;
@@ -657,7 +665,7 @@ async function handleLogout(): Promise<void> {
   cursor: pointer;
   font-size: 0.875rem;
   text-decoration: none;
-  min-height: 38px;
+  min-height: 48px;
   overflow: hidden;
   transition: background 0.15s ease, color 0.15s ease;
 }

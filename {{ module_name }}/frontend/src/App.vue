@@ -237,7 +237,7 @@ onUnmounted(() => {
 .vyra-app {
   display: flex;
   flex-direction: row;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: var(--surface-ground, #f5f7fa);
 }
@@ -255,7 +255,7 @@ onUnmounted(() => {
 .vyra-topbar {
   display: flex;
   align-items: center;
-  padding: 0.75rem 2rem;
+  padding: calc(0.75rem + var(--safe-area-top, 0px)) 2rem 0.75rem;
   border-bottom: 1px solid var(--surface-border, #e0e0e0);
   background: var(--surface-card, #fff);
   min-height: 52px;
@@ -282,12 +282,8 @@ onUnmounted(() => {
     flex-direction: column;
   }
 
-  .vyra-main {
-    padding-top: 52px; /* space for the floating toggle button */
-  }
-
   .vyra-topbar {
-    padding: 0.75rem 1rem;
+    padding: calc(0.5rem + var(--safe-area-top, 0px)) 1rem 0.5rem;
     gap: 0.75rem;
   }
 
@@ -300,13 +296,27 @@ onUnmounted(() => {
   }
 }
 
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  .vyra-topbar {
+    padding: calc(0.5rem + var(--safe-area-top, 0px)) 1rem 0.5rem;
+  }
+
+  .topbar-actions {
+    gap: 0.25rem;
+  }
+}
+
 /* ── Three-dot menu button ── */
 .top-menu-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -324,8 +334,8 @@ onUnmounted(() => {
   display: none;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -353,8 +363,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border: none;
   background: transparent;
   cursor: pointer;

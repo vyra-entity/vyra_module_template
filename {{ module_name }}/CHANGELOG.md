@@ -4,6 +4,12 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Enhanced — Professional smartphone responsive frontend baseline for generated modules (2026-04-28)
+
+- Improved responsive layout baseline for generated module frontend shell: dynamic viewport (`100dvh`), safe-area insets, larger touch targets, and `viewport-fit=cover` in `frontend/index.html`.
+- Optimized `frontend/src/App.vue`, `frontend/src/components/layout/VyraSidebar.vue`, and `frontend/src/components/layout/VyraStatusbar.vue` for smartphone/tablet behavior (drawer sidebar up to 768px, better topbar spacing, compact mobile statusbar).
+- Upgraded `frontend/src/features/home/HomeView.vue` summary tiles for narrow phone widths.
+
 ### Fixed — SSL certificate readability check prevents PermissionError (2026-04-28)
 
 - **Root cause**: `webserver.key` is owned by `root` with `600` permissions; non-root process cannot read it. `os.path.exists()` returns `True` (file exists) but uvicorn then raises `PermissionError: [Errno 13] Permission denied` when loading the cert chain.

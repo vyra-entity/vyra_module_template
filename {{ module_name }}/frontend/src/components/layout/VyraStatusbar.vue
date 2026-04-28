@@ -21,7 +21,7 @@ const authStore = useAuthStore()
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.25rem 1rem;
+  padding: 0.25rem 1rem calc(0.25rem + var(--safe-area-bottom, 0px));
   min-height: 28px;
   background: var(--surface-ground, #f5f7fa);
   border-top: 1px solid var(--surface-border, #e0e0e0);
@@ -35,5 +35,11 @@ const authStore = useAuthStore()
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+@media (max-width: 480px) {
+  .statusbar-copyright {
+    display: none;
+  }
 }
 </style>
