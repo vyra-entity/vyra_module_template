@@ -4,6 +4,35 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — Active plugins: newest version display and slot dedup (2026-04-29)
+
+- `frontend/src/features/settings/pages/PluginsPage.vue`
+  - Active plugin list now deduplicates logical slots and prefers the newest semver for plugin header version.
+  - Prevents stale version display (for example `1.0.0` instead of installed `1.0.1`) and duplicate slot rows.
+
+### Fixed — Settings save visibility + deduplicated active plugin slots (2026-04-29)
+
+- `frontend/src/features/settings/pages/GeneralPage.vue`
+  - "Speichern" for module permissions is now only shown when settings were changed.
+- `frontend/src/features/settings/pages/PluginsPage.vue`
+  - Active plugin assignments are deduplicated by `assignment_id`.
+  - Slot labels are normalized to unique values to avoid duplicated entries (for example `side-dock-popup.header`).
+
+### Added — Settings: Module permissions from module_params.yaml (2026-04-29)
+
+- Added new settings backend router:
+  - `GET /settings/permissions` to load permissions from `.module/module_params.yaml`
+  - `PUT /settings/permissions` to persist changes (admin only)
+- Registered settings router in `backend_webserver/main_rest.py`.
+- Added `frontend/src/api/settings.api.ts` for permissions load/save.
+- Extended `frontend/src/features/settings/pages/GeneralPage.vue` with a new permissions section and admin save action.
+- Added unit tests in `tests/unit/test_settings_permissions_router.py`.
+
+### Fixed — Generated modules no longer default to protected mode (2026-04-29)
+
+- `/.module/module_params.yaml` now sets `permissions.protected: false` by default.
+- This ensures newly generated modules expose normal lifecycle actions in Module Manager unless explicitly configured otherwise.
+
 ### Enhanced — Professional smartphone responsive frontend baseline for generated modules (2026-04-28)
 
 - Improved responsive layout baseline for generated module frontend shell: dynamic viewport (`100dvh`), safe-area insets, larger touch targets, and `viewport-fit=cover` in `frontend/index.html`.

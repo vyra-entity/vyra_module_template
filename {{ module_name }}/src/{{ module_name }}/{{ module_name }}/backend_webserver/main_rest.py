@@ -28,6 +28,7 @@ from .services.redis_service import redis_service
 
 # Import authentication
 from .auth import auth_router, set_auth_service, AuthenticationService
+from .settings import settings_router
 
 
 # Add additional imports for {{ module_name }}-specific routers, services, clients, etc. here
@@ -105,6 +106,11 @@ app.include_router(
     plugin_router,
     prefix="/plugin",
     tags=["Plugin System"]
+)
+
+app.include_router(
+    settings_router,
+    tags=["Settings"]
 )
 
 

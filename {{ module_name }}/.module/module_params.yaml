@@ -20,7 +20,7 @@ permissions:
   multi_instance: true  # true: Multiple instances allowed
   
   # Requires elevated permissions for operations
-  protected: true
+  protected: false
 
 # Module Behavior Configuration
 behavior:

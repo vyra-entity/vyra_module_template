@@ -16,7 +16,7 @@ export const useAuthStore = defineStore('auth', () => {
   // Computed
   const username = computed(() => user.value?.username || '')
   const roles = computed(() => user.value?.role ? [user.value.role] : [])
-  const isAdmin = computed(() => roles.value.includes('Admin'))
+  const isAdmin = computed(() => roles.value.some(r => String(r).toLowerCase() === 'admin'))
   const userId = computed(() => user.value?.user_id ?? 0)
 
   // Actions

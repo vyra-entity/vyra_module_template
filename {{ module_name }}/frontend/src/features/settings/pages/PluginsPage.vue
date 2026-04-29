@@ -92,7 +92,7 @@
               <i class="pi pi-window-minimize slot-row__icon" />
               <div class="slot-row__ids">
                 <span
-                  v-for="sid in (slot.slot_ids?.length ? slot.slot_ids : [slot.slot_id])"
+                    v-for="sid in uniqueSlotLabels(slot)"
                   :key="sid"
                   class="slot-row__label"
                 >{% raw %}{{ sid }}{% endraw %}</span>
@@ -154,10 +154,54 @@ const activeMap = computed<Record<string, boolean>>(() => {
   return result
 })
 
+function semverCompare(a: string, b: string): number {
+  const parse = (v: string) => v.replace(/[^0-9.]/g, '').split('.').map(Number)
+  const pa = parse(a)
+  const pb = parse(b)
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const diff = (pa[i] ?? 0) - (pb[i] ?? 0)
+    if (diff !== 0) return diff
+  }
+  return 0
+}
+
 /** Flat list of all UiManifestEntries across all slots */
-const allEntries = computed<UiManifestEntry[]>(() =>
-  Object.values(pluginStore.slotComponents).flat().map(sc => sc.entry)
-)
+function uniqueSlotLabels(slot: UiManifestEntry): string[] {
+  const labels = slot.slot_ids?.length ? slot.slot_ids : [slot.slot_id]
+  return Array.from(new Set(labels.filter((sid): sid is string => Boolean(sid))))
+}
+
+/** Flat list of all UiManifestEntries across all slots, deduplicated by logical slot identity. */
+const allEntries = computed<UiManifestEntry[]>(() => {
+  const byLogicalSlot = new Map<string, UiManifestEntry>()
+
+  for (const assignments of Object.values(pluginStore.slotComponents)) {
+    for (const assignment of assignments) {
+      const entry = assignment.entry
+      const scopeTarget = entry.scope_target ?? ''
+      const logicalKey = `${entry.plugin_id}|${entry.scope_type}|${scopeTarget}|${entry.slot_id}`
+      const existing = byLogicalSlot.get(logicalKey)
+      if (!existing) {
+        byLogicalSlot.set(logicalKey, {
+          ...entry,
+          slot_ids: uniqueSlotLabels(entry),
+        })
+        continue
+      }
+
+      if (semverCompare(entry.version, existing.version) <= 0) {
+        continue
+      }
+
+      byLogicalSlot.set(logicalKey, {
+        ...entry,
+        slot_ids: Array.from(new Set([...uniqueSlotLabels(existing), ...uniqueSlotLabels(entry)])),
+      })
+    }
+  }
+
+  return Array.from(byLogicalSlot.values())
+})
 
 interface PluginGroup {
   pluginId:    string
@@ -184,7 +228,15 @@ const groupedPlugins = computed<PluginGroup[]>(() => {
         slots:       [],
       })
     }
-    map.get(entry.plugin_id)!.slots.push(entry)
+    const group = map.get(entry.plugin_id)!
+    if (semverCompare(entry.version, group.version) > 0) {
+      group.version = entry.version
+      group.scopeType = entry.scope_type
+      group.scopeTarget = entry.scope_target
+      if (entry.icon) group.icon = entry.icon
+      if (entry.title) group.title = entry.title
+    }
+    group.slots.push(entry)
   }
   return [...map.values()].sort((a, b) => a.title.localeCompare(b.title))
 })
