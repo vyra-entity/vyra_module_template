@@ -172,6 +172,7 @@ echo "=== SETTING UP LOG DIRECTORIES ==="
 mkdir -p /workspace/log/nginx
 mkdir -p /workspace/log/ros2
 mkdir -p /workspace/log/core
+mkdir -p /workspace/log/uvicorn
 
 # Set write permissions for all users (ROS2 logging needs this)
 chmod -R 777 /workspace/log/
@@ -333,7 +334,7 @@ if [ "${VYRA_SLIM:-false}" = "true" ]; then
         echo "=== SLIM MODE: Writing config and proto interfaces to NFS ==="
         MODULE_DATA_FILE="/workspace/.module/module_data.yaml"
         if [ -f "$MODULE_DATA_FILE" ]; then
-            INSTANCE_ID=$(grep '^uuid:' "$MODULE_DATA_FILE" | awk '{print $2}')
+            INSTANCE_ID=$(grep '^uuid:' "$MODULE_DATA_FILE" | awk '{print $2}' | tr -d '"' | tr -d "'")
         else
             INSTANCE_ID="${HOSTNAME}"
         fi
@@ -373,7 +374,7 @@ echo "=== NFS INTERFACE MANAGEMENT ==="
 # Read UUID from .module/module_data.yaml
 MODULE_DATA_FILE="/workspace/.module/module_data.yaml"
 if [ -f "$MODULE_DATA_FILE" ]; then
-    INSTANCE_ID=$(grep '^uuid:' "$MODULE_DATA_FILE" | awk '{print $2}')
+    INSTANCE_ID=$(grep '^uuid:' "$MODULE_DATA_FILE" | awk '{print $2}' | tr -d '"' | tr -d "'")
     echo "ℹ️  Module: $MODULE_NAME, Instance: $INSTANCE_ID (from module_data.yaml)"
 else
     INSTANCE_ID="${HOSTNAME#${MODULE_NAME}_}"
@@ -683,7 +684,7 @@ check_and_create_certificates() {
             -out "$cert_path" \
             -days 365 \
             -nodes \
-            -subj "/CN=localhost/O={{ module_name }}/OU=${cert_name}/C=DE" >/dev/null 2>&1; then
+            -subj "/CN=localhost/O=${MODULE_NAME}/OU=${cert_name}/C=DE" >/dev/null 2>&1; then
             
             # Set secure permissions and correct ownership
             chown vyrauser:vyrauser "$key_path" "$cert_path" 2>/dev/null || true
@@ -734,13 +735,14 @@ echo "=== CREATING LOG DIRECTORIES ==="
 
 mkdir -p /workspace/log/core
 mkdir -p /workspace/log/nginx
+mkdir -p /workspace/log/uvicorn
 
 # Only create ros2 logs directory if not in SLIM mode
 if [ "${VYRA_SLIM:-false}" != "true" ]; then
     mkdir -p /workspace/log/ros2
-    echo "✅ Created core, nginx, and ros2 log directories"
+    echo "✅ Created core, nginx, ros2, and uvicorn log directories"
 else
-    echo "✅ Created core and nginx log directories (slim mode: skipping ros2)"
+    echo "✅ Created core, nginx, and uvicorn log directories (slim mode: skipping ros2)"
 fi
 
 echo "===================================="

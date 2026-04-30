@@ -4,6 +4,20 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — Plugin manifest resolve uses canonical module target names (2026-04-30)
+
+- `frontend/src/store/plugins.ts`
+  - Added normalization for hash-suffixed module instance names before calling `/plugin/resolve_plugins`.
+  - Prevents missing slot plugins in generated modules when routes include instance suffixes.
+
+### Changed — Gateway WASM runtime now supports manifest service_exports dispatch (2026-04-30)
+
+- `src/{{ module_name }}/{{ module_name }}/plugin/gateway_wasm_runtime.py`
+  - Synced module-agnostic runtime behavior from PM implementation.
+  - Added manifest-driven `entry_points.backend.service_exports` loading.
+  - Added service-export dispatch path (`_dispatch_service_export`) with async/sync service method support.
+  - Runtime start now supports service-export-only plugins (without WASM exports).
+
 ### Fixed — Active plugins: newest version display and slot dedup (2026-04-29)
 
 - `frontend/src/features/settings/pages/PluginsPage.vue`

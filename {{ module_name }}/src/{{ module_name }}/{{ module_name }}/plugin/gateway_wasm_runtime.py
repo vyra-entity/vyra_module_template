@@ -23,6 +23,7 @@ GatewayWasmRuntimePool
 from __future__ import annotations
 
 import asyncio
+import inspect
 import json
 import logging
 from pathlib import Path
@@ -67,10 +68,6 @@ class GatewayWasmRuntime(PluginRuntime):
         gateway: "PluginGateway",
         initial_state: dict[str, Any] | None = None,
     ) -> None:
-        if not _WASMTIME_AVAILABLE:
-            raise ImportError(
-                "wasmtime is not installed. Install it with: pip install wasmtime"
-            )
         super().__init__(plugin_id, str(wasm_path), host=None)
         self._gateway = gateway
         self._initial_state = initial_state.copy() if initial_state else {}
@@ -78,6 +75,7 @@ class GatewayWasmRuntime(PluginRuntime):
         self._instance: Any = None
         self._exports: dict[str, Any] = {}
         self._exports_meta: dict[str, list[dict[str, str]]] = {}
+        self._service_exports: dict[str, dict[str, Any]] = {}
 
     # ------------------------------------------------------------------
     # Lifecycle
@@ -89,44 +87,55 @@ class GatewayWasmRuntime(PluginRuntime):
             return
 
         wasm_path = Path(self.wasm_path)
-        if not wasm_path.exists():
-            raise FileNotFoundError(
-                f"[{self.plugin_id}] WASM file not found: {wasm_path}"
-            )
 
         # --- load export metadata (manifest.yaml preferred, metadata.json fallback) ---
         self._load_export_meta(wasm_path.parent)
 
-        # --- load WASM module with gateway linker ---
-        engine = Engine()
-        self._store = Store(engine)
-        wasm_module = WasmModule(engine, wasm_path.read_bytes())
-
-        # Use gateway linker (pre-populated with host functions)
-        linker = self._gateway.get_linker(engine)
-        self._instance = linker.instantiate(self._store, wasm_module)
-
-        # Cache known exports
-        exports_obj = self._instance.exports(self._store)
-        for fn_name in self._exports_meta:
-            fn = exports_obj.get(fn_name)
-            if fn is not None:
-                self._exports[fn_name] = fn
-            else:
-                logger.warning(
-                    "[%s] WASM does not export '%s' (declared in manifest)",
-                    self.plugin_id, fn_name,
+        if wasm_path.exists():
+            if not _WASMTIME_AVAILABLE:
+                raise ImportError(
+                    "wasmtime is not installed. Install it with: pip install wasmtime"
                 )
+
+            # --- load WASM module with gateway linker ---
+            engine = Engine()
+            self._store = Store(engine)
+            wasm_module = WasmModule(engine, wasm_path.read_bytes())
+
+            # Use gateway linker (pre-populated with host functions)
+            linker = self._gateway.get_linker(engine)
+            self._instance = linker.instantiate(self._store, wasm_module)
+
+            # Cache known exports
+            exports_obj = self._instance.exports(self._store)
+            for fn_name in self._exports_meta:
+                fn = exports_obj.get(fn_name)
+                if fn is not None:
+                    self._exports[fn_name] = fn
+                else:
+                    logger.warning(
+                        "[%s] WASM does not export '%s' (declared in manifest)",
+                        self.plugin_id, fn_name,
+                    )
+        elif not self._service_exports:
+            raise FileNotFoundError(
+                f"[{self.plugin_id}] WASM file not found: {wasm_path}"
+            )
+        else:
+            logger.info(
+                "[%s] starting in service-export mode (no local logic.wasm)",
+                self.plugin_id,
+            )
 
         self._started = True
         logger.info(
             "✅ [%s] GatewayWasmRuntime started | exports=%s | size=%s bytes",
             self.plugin_id,
-            list(self._exports.keys()),
-            wasm_path.stat().st_size,
+            list(self._exports.keys()) + list(self._service_exports.keys()),
+            wasm_path.stat().st_size if wasm_path.exists() else 0,
         )
 
-        if self._initial_state and "init" in self._exports:
+        if self._initial_state and ("init" in self._exports or "init" in self._service_exports):
             await self.call("init", self._initial_state)
 
     async def stop(self) -> None:
@@ -134,6 +143,7 @@ class GatewayWasmRuntime(PluginRuntime):
         self._instance = None
         self._exports = {}
         self._exports_meta = {}
+        self._service_exports = {}
         logger.info("🛑 [%s] GatewayWasmRuntime stopped", self.plugin_id)
 
     async def call(self, function_name: str, data: dict[str, Any]) -> dict[str, Any]:
@@ -166,9 +176,21 @@ class GatewayWasmRuntime(PluginRuntime):
                     fn_name = export.get("name", "")
                     if fn_name:
                         self._exports_meta[fn_name] = export.get("args", [])
+
+                service_exports = (
+                    data.get("entry_points", {})
+                        .get("backend", {})
+                        .get("service_exports", [])
+                )
+                for export in service_exports:
+                    fn_name = export.get("name", "")
+                    if fn_name:
+                        self._service_exports[fn_name] = export
                 logger.info(
-                    "📋 [%s] manifest.yaml loaded | exports=%s",
-                    self.plugin_id, list(self._exports_meta.keys()),
+                    "📋 [%s] manifest.yaml loaded | wasm_exports=%s | service_exports=%s",
+                    self.plugin_id,
+                    list(self._exports_meta.keys()),
+                    list(self._service_exports.keys()),
                 )
                 return
             except Exception as exc:
@@ -201,6 +223,9 @@ class GatewayWasmRuntime(PluginRuntime):
         if function_name == "ping":
             return {"status": "ok", "plugin_id": self.plugin_id, "runtime": "gateway_wasm"}
 
+        if function_name in self._service_exports:
+            return await self._dispatch_service_export(function_name, data)
+
         if function_name not in self._exports_meta:
             raise PluginCallError(
                 self.plugin_id, function_name,
@@ -227,6 +252,59 @@ class GatewayWasmRuntime(PluginRuntime):
         if raw_result is None:
             return {}
         return {"result": raw_result}
+
+    async def _dispatch_service_export(
+        self,
+        function_name: str,
+        data: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Dispatch a manifest-declared service export via ServiceRegistry."""
+        export = self._service_exports.get(function_name) or {}
+        service_name = str(export.get("service") or "").strip()
+        method_name = str(export.get("method") or "").strip()
+        passthrough = export.get("passthrough") or []
+        static_kwargs = export.get("kwargs") or {}
+
+        if not service_name or not method_name:
+            raise PluginCallError(
+                self.plugin_id,
+                function_name,
+                "Invalid service export config: 'service' and 'method' are required",
+            )
+
+        from .. import container_injection
+
+        service = container_injection.get_service(service_name)
+        if service is None:
+            raise PluginCallError(
+                self.plugin_id,
+                function_name,
+                f"Service '{service_name}' is not registered",
+            )
+
+        method = getattr(service, method_name, None)
+        if method is None or not callable(method):
+            raise PluginCallError(
+                self.plugin_id,
+                function_name,
+                f"Service '{service_name}' has no callable method '{method_name}'",
+            )
+
+        kwargs = dict(static_kwargs)
+        if passthrough == "*":
+            kwargs.update(data)
+        elif isinstance(passthrough, list):
+            for key in passthrough:
+                if key in data:
+                    kwargs[key] = data[key]
+
+        result = method(**kwargs)
+        if inspect.isawaitable(result):
+            result = await result
+
+        if isinstance(result, dict):
+            return result
+        return {"result": result}
 
 
 # ---------------------------------------------------------------------------

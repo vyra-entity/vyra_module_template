@@ -658,13 +658,28 @@ async def build_entity(project_settings) -> VyraEntity:
                 source="project_settings"
             )
 
-            me = ModuleEntry(
-                uuid=normalized_module_data['uuid'],
-                name=normalized_module_data['name'],
-                blueprints=normalized_module_data['blueprints'],
-                description=normalized_module_data['description'],
-                version=normalized_module_data['version'],
-            )
+            try:
+                me = ModuleEntry(
+                    uuid=normalized_module_data['uuid'],
+                    name=normalized_module_data['name'],
+                    blueprints=normalized_module_data['blueprints'],
+                    description=normalized_module_data['description'],
+                    version=normalized_module_data['version'],
+                )
+            except TypeError as exc:
+                if "blueprints" not in str(exc):
+                    raise
+                logger.warning(
+                    "module_entry_without_blueprints_fallback",
+                    reason="base_moduleentry_signature_legacy"
+                )
+                me = ModuleEntry(
+                    uuid=normalized_module_data['uuid'],
+                    name=normalized_module_data['name'],
+                    template=normalized_module_data['blueprints'],
+                    description=normalized_module_data['description'],
+                    version=normalized_module_data['version'],
+                )
             logger.debug("new_module_entry_created", uuid=me.uuid, name=me.name)
             
         elif not all(field in module_data for field in needed_fields) or not has_blueprints_field:
@@ -680,13 +695,28 @@ async def build_entity(project_settings) -> VyraEntity:
                 will_recover=True
             )
 
-            me = ModuleEntry(
-                uuid=normalized_module_data['uuid'],
-                name=normalized_module_data['name'],
-                blueprints=normalized_module_data['blueprints'],
-                description=normalized_module_data['description'],
-                version=normalized_module_data['version'],
-            )
+            try:
+                me = ModuleEntry(
+                    uuid=normalized_module_data['uuid'],
+                    name=normalized_module_data['name'],
+                    blueprints=normalized_module_data['blueprints'],
+                    description=normalized_module_data['description'],
+                    version=normalized_module_data['version'],
+                )
+            except TypeError as exc:
+                if "blueprints" not in str(exc):
+                    raise
+                logger.warning(
+                    "module_entry_without_blueprints_fallback",
+                    reason="base_moduleentry_signature_legacy"
+                )
+                me = ModuleEntry(
+                    uuid=normalized_module_data['uuid'],
+                    name=normalized_module_data['name'],
+                    template=normalized_module_data['blueprints'],
+                    description=normalized_module_data['description'],
+                    version=normalized_module_data['version'],
+                )
 
             logger.info(
                 "module_data_recovered",
@@ -710,13 +740,28 @@ async def build_entity(project_settings) -> VyraEntity:
 
             normalized_module_data = _build_module_data_payload(project_settings, module_data)
 
-            me = ModuleEntry(
-                uuid=normalized_module_data['uuid'],
-                name=normalized_module_data['name'],
-                blueprints=normalized_module_data['blueprints'],
-                description=normalized_module_data['description'],
-                version=normalized_module_data['version'],
-            )
+            try:
+                me = ModuleEntry(
+                    uuid=normalized_module_data['uuid'],
+                    name=normalized_module_data['name'],
+                    blueprints=normalized_module_data['blueprints'],
+                    description=normalized_module_data['description'],
+                    version=normalized_module_data['version'],
+                )
+            except TypeError as exc:
+                if "blueprints" not in str(exc):
+                    raise
+                logger.warning(
+                    "module_entry_without_blueprints_fallback",
+                    reason="base_moduleentry_signature_legacy"
+                )
+                me = ModuleEntry(
+                    uuid=normalized_module_data['uuid'],
+                    name=normalized_module_data['name'],
+                    template=normalized_module_data['blueprints'],
+                    description=normalized_module_data['description'],
+                    version=normalized_module_data['version'],
+                )
             logger.debug("module_entry_loaded", uuid=me.uuid, name=me.name)
         
         # Persist module data

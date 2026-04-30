@@ -5,6 +5,15 @@ import { pluginApi, type UiManifestEntry } from '../features/plugins/plugin.api'
 /** Silent placeholder rendered when a plugin fails to load or throws at runtime. */
 const PluginErrorFallback = markRaw({ render: () => h('span', { style: 'display:none' }) })
 
+function normalizeScopeTarget(scopeTarget?: string): string | undefined {
+  const raw = (scopeTarget ?? '').trim()
+  if (!raw) {
+    return undefined
+  }
+  // Convert hash-suffixed module instance names to canonical module names.
+  return raw.replace(/_[0-9a-f]{32}$/i, '')
+}
+
 /**
  * Plugin Store — generic plugin slot loading
  *
@@ -41,7 +50,11 @@ export const usePluginStore = defineStore('plugins', () => {
    */
   async function resolvePlugins(scopeType = 'MODULE', scopeTarget?: string) {
     try {
-      const manifest = await pluginApi.resolvePlugins({ scope_type: scopeType, scope_target: scopeTarget })
+      const normalizedScopeTarget = normalizeScopeTarget(scopeTarget)
+      const manifest = await pluginApi.resolvePlugins({
+        scope_type: scopeType,
+        scope_target: normalizedScopeTarget,
+      })
       const result: Record<string, { entry: UiManifestEntry; component: any }[]> = {}
 
       for (const [slotId, entries] of Object.entries(manifest.ui_slots)) {
