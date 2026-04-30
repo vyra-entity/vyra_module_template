@@ -19,9 +19,15 @@
     </div>
 
     <!-- Empty state -->
-    <div v-if="!pluginStore.manifestLoaded" class="plugins-settings__empty">
+    <div v-if="pluginStore.loadingManifest" class="plugins-settings__empty">
       <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: var(--text-color-secondary)" />
       <p>Plugin-Manifest wird geladen…</p>
+    </div>
+
+    <div v-else-if="pluginStore.error" class="plugins-settings__empty">
+      <i class="pi pi-exclamation-triangle" style="font-size: 2rem; color: #f59e0b" />
+      <p>Plugin-Manifest konnte nicht geladen werden.</p>
+      <p class="plugins-settings__empty-hint">{{ pluginStore.error }}</p>
     </div>
 
     <div v-else-if="groupedPlugins.length === 0" class="plugins-settings__empty">
@@ -92,7 +98,7 @@
               <i class="pi pi-window-minimize slot-row__icon" />
               <div class="slot-row__ids">
                 <span
-                    v-for="sid in uniqueSlotLabels(slot)"
+                  v-for="sid in uniqueSlotLabels(slot)"
                   :key="sid"
                   class="slot-row__label"
                 >{% raw %}{{ sid }}{% endraw %}</span>
@@ -165,7 +171,6 @@ function semverCompare(a: string, b: string): number {
   return 0
 }
 
-/** Flat list of all UiManifestEntries across all slots */
 function uniqueSlotLabels(slot: UiManifestEntry): string[] {
   const labels = slot.slot_ids?.length ? slot.slot_ids : [slot.slot_id]
   return Array.from(new Set(labels.filter((sid): sid is string => Boolean(sid))))

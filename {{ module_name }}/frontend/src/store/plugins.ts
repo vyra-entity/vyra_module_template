@@ -28,6 +28,7 @@ export const usePluginStore = defineStore('plugins', () => {
   // -----------------------------------------------------------------------
   /** Loaded Vue components per slot: slot_id → Array of { entry, component } */
   const slotComponents = ref<Record<string, { entry: UiManifestEntry; component: any }[]>>({})
+  const loadingManifest = ref(false)
   const manifestLoaded = ref(false)
   const error          = ref<string | null>(null)
 
@@ -49,11 +50,14 @@ export const usePluginStore = defineStore('plugins', () => {
    * a broken plugin never crashes the host application.
    */
   async function resolvePlugins(scopeType = 'MODULE', scopeTarget?: string) {
+    loadingManifest.value = true
+    error.value = null
     try {
       const normalizedScopeTarget = normalizeScopeTarget(scopeTarget)
       const manifest = await pluginApi.resolvePlugins({
         scope_type: scopeType,
         scope_target: normalizedScopeTarget,
+        module_name: normalizedScopeTarget,
       })
       const result: Record<string, { entry: UiManifestEntry; component: any }[]> = {}
 
@@ -77,9 +81,12 @@ export const usePluginStore = defineStore('plugins', () => {
       }
 
       slotComponents.value = result
-      manifestLoaded.value  = true
     } catch (e: any) {
       error.value = e?.message ?? 'Failed to load UI manifest'
+      slotComponents.value = {}
+    } finally {
+      manifestLoaded.value = true
+      loadingManifest.value = false
     }
   }
 
@@ -91,6 +98,7 @@ export const usePluginStore = defineStore('plugins', () => {
   return {
     // State
     slotComponents,
+    loadingManifest,
     manifestLoaded,
     error,
     // Getters
