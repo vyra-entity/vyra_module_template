@@ -26,6 +26,7 @@ import asyncio
 import inspect
 import json
 import logging
+import re
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Union
 
@@ -37,6 +38,8 @@ if TYPE_CHECKING:
     from .plugin_gateway import PluginGateway
 
 logger = logging.getLogger(__name__)
+
+_INSTANCE_NAME_RE = re.compile(r"^(?P<name>.+)_(?P<id>[0-9a-fA-F]{32})$")
 
 try:
     from wasmtime import Store, Module as WasmModule, Engine  # type: ignore[import]
@@ -466,15 +469,29 @@ class RemoteRuntimeProxy(PluginRuntime):
             return
         try:
             from vyra_base.com.core.factory import InterfaceFactory  # type: ignore[import]
+
+            target_name = (self._module_name or "").strip()
+            target_module_name = target_name
+            target_module_id: str | None = None
+
+            match = _INSTANCE_NAME_RE.match(target_name)
+            if match:
+                target_module_name = match.group("name")
+                target_module_id = match.group("id")
+            elif target_name:
+                target_module_id = target_name
+
             self._client = await InterfaceFactory.create_client(
                 name="ui_function_call",
-                module_name=self._module_name,
+                module_name=target_module_name,
+                module_id=target_module_id,
                 namespace="plugin",
             )
             self._started = True
             logger.info(
                 "✅ RemoteRuntimeProxy [%s] → %s started",
-                self.plugin_id, self._module_name,
+                self.plugin_id,
+                target_name,
             )
         except Exception as exc:
             logger.warning(
@@ -500,12 +517,18 @@ class RemoteRuntimeProxy(PluginRuntime):
                 self.plugin_id, function_name, "RemoteRuntimeProxy not started"
             )
         try:
-            result: dict[str, Any] = await self._client.call({
+            result: dict[str, Any] | None = await self._client.call({
                 "plugin_id":     self.plugin_id,
                 "function_name": function_name,
                 "data":          data,
             })
-            return result or {}
+            if result is None:
+                raise PluginCallError(
+                    self.plugin_id,
+                    function_name,
+                    "Remote call returned no response payload",
+                )
+            return result
         except Exception as exc:
             raise PluginCallError(
                 self.plugin_id, function_name, f"Remote call failed: {exc}"

@@ -34,6 +34,8 @@ import asyncio
 import inspect
 import json
 import logging
+import ssl
+import urllib.request
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -355,8 +357,9 @@ class PluginGateway:
         """
         from .gateway_wasm_runtime import GatewayWasmRuntimePool
         self.entity = container_injection.get_entity()
-        self._own_module_name = getattr(self.entity, "name", "") or ""
-        self._own_module_id = getattr(self.entity, "module_id", "") or ""
+        module_entry = getattr(self.entity, "module_entry", None)
+        self._own_module_name = getattr(module_entry, "name", "") or "{{ module_name }}"
+        self._own_module_id = getattr(module_entry, "uuid", "") or ""
         self._linker_factory = LinkerFactory(gateway=self)
         self._runtime_pool = GatewayWasmRuntimePool(gateway=self)
         logger.info("✅ PluginGateway: setup complete (module=%s)", self._own_module_name)
@@ -379,19 +382,15 @@ class PluginGateway:
         routing requests to the correct v2_modulemanager instance.
         """
         full_instance_name = self._read_modulemanager_id()
-        if full_instance_name:
-            # Split "v2_modulemanager_733256b82d6b48a48bc52b5ec73ebfff"
-            # into module_name="v2_modulemanager" and module_id="733256b8..."
-            parts = full_instance_name.rsplit("_", 1)
-            if len(parts) == 2 and len(parts[1]) == 32:
-                target_module_name = parts[0]
-                target_module_id = parts[1]
-            else:
-                target_module_name = full_instance_name
-                target_module_id = full_instance_name
+        # Split "v2_modulemanager_733256b82d6b48a48bc52b5ec73ebfff"
+        # into module_name="v2_modulemanager" and module_id="733256b8..."
+        parts = full_instance_name.rsplit("_", 1)
+        if len(parts) == 2 and len(parts[1]) == 32:
+            target_module_name = parts[0]
+            target_module_id = parts[1]
         else:
-            target_module_name = self._own_module_name
-            target_module_id = self._own_module_id
+            target_module_name = full_instance_name
+            target_module_id = full_instance_name
 
         try:
             self._resolve_client = await InterfaceFactory.create_client(
@@ -418,14 +417,15 @@ class PluginGateway:
             self._get_nfs_path_client = None
 
     @staticmethod
-    def _read_modulemanager_id() -> str | None:
+    def _read_modulemanager_id() -> str:
         """
         Read ``labels.modulemanager.module_id`` from
         ``/workspace/.module/module_params.yaml``.
 
         :returns: The full module instance name of the managing v2_modulemanager,
-                  e.g. ``v2_modulemanager_733256b82d6b48a48bc52b5ec73ebfff``,
-                  or ``None`` if the value is not set / file not found.
+              e.g. ``v2_modulemanager_733256b82d6b48a48bc52b5ec73ebfff``.
+        :raises RuntimeError: If ``module_params.yaml`` is missing or
+                      ``labels.modulemanager.module_id`` is not set.
         """
         params_path = Path("/workspace/.module/module_params.yaml")
         try:
@@ -438,17 +438,23 @@ class PluginGateway:
             # Fallback: flat key format "modulemanager.module_id"
             if not module_id:
                 module_id = labels.get("modulemanager.module_id") or None
-            if module_id:
-                logger.debug("PluginGateway: resolved modulemanager.module_id=%s", module_id)
-            else:
-                logger.debug("PluginGateway: modulemanager.module_id not set in module_params.yaml")
+            module_id = str(module_id).strip() if module_id is not None else ""
+            if not module_id:
+                raise RuntimeError(
+                    "PluginGateway: required labels.modulemanager.module_id is missing in "
+                    f"{params_path}. Module startup is invalid."
+                )
+            logger.debug("PluginGateway: resolved modulemanager.module_id=%s", module_id)
             return module_id
         except FileNotFoundError:
-            logger.debug("PluginGateway: module_params.yaml not found at %s", params_path)
-            return None
+            raise RuntimeError(
+                f"PluginGateway: required module params file not found at {params_path}. "
+                "Module startup is invalid."
+            )
         except Exception as exc:
-            logger.warning("PluginGateway: could not read module_params.yaml: %s", exc)
-            return None
+            if isinstance(exc, RuntimeError):
+                raise
+            raise RuntimeError(f"PluginGateway: could not read module_params.yaml: {exc}") from exc
 
     async def run(self) -> None:
         """
@@ -589,7 +595,7 @@ class PluginGateway:
     # Vyra transport Remote Service: ui_function_call  (provider side)
     # ------------------------------------------------------------------
 
-    @remote_service()
+    @remote_service(namespace="plugin")
     async def ui_function_call(self, request: dict, response: dict) -> dict:
         """
         Vyra transport Remote Service: ``plugin/ui_function_call``

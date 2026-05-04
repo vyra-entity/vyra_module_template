@@ -4,6 +4,24 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — PluginGateway now requires modulemanager.module_id in module params (2026-05-04)
+
+- `src/{{ module_name }}/{{ module_name }}/plugin/plugin_gateway.py`
+  - `_read_modulemanager_id()` now strictly requires `labels.modulemanager.module_id` from `/workspace/.module/module_params.yaml`.
+  - Raises a startup error when the value is missing instead of attempting Traefik discovery.
+
+### Fixed — RemoteRuntimeProxy now uses stable module_id fallback and fails on empty remote replies (2026-05-04)
+
+- `src/{{ module_name }}/{{ module_name }}/plugin/gateway_wasm_runtime.py`
+  - Added instance-aware remote module parsing and `module_id=target_name` fallback.
+  - Raises an explicit plugin call error if the remote call returns no payload (`None`) instead of silently returning `{}`.
+
+### Fixed — PluginGateway setup reads module metadata from entity.module_entry (2026-05-04)
+
+- `src/{{ module_name }}/{{ module_name }}/plugin/plugin_gateway.py`
+  - `setup()` now reads module name/id from `entity.module_entry.name` and `entity.module_entry.uuid`.
+  - Prevents missing module identity in generated modules.
+
 ### Fixed — Plugin manifest resolve uses canonical module target names (2026-04-30)
 
 - `frontend/src/store/plugins.ts`
