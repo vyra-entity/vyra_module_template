@@ -137,12 +137,14 @@ async def plugin_gateway_runner() -> None:
     await gateway.run()
 
 @log_call
-async def setup_statemanager(entity: VyraEntity) -> StateManager:
+async def setup_statemanager(entity: VyraEntity, state_manager: StateManager) -> StateManager:
     """
     Initialize and configure the State Manager.
     
     Args:
         entity: VyraEntity instance from core application
+        state_manager: Pre-built StateManager from build_base() so action callbacks
+            are bound before set_interfaces() is called.
         
     Returns:
         Configured StateManager instance
@@ -152,8 +154,6 @@ async def setup_statemanager(entity: VyraEntity) -> StateManager:
     """
     logger.info("state_manager_initializing")
     
-    # Initialize state manager
-    state_manager = StateManager(entity)
     logger.debug("state_manager_created", state_manager_type=type(state_manager).__name__)
     
     await state_manager.setup_interfaces()
@@ -384,7 +384,8 @@ async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, State
     """
     # Build base entity
     logger.debug("building_base_entity")
-    entity: VyraEntity = await _base_.build_base()
+    entity: VyraEntity
+    entity, pre_built_statemanager = await _base_.build_base()
     logger.info(
         "entity_created",
         module_name=entity.module_entry.name,
@@ -393,7 +394,7 @@ async def initialize_module(taskmanager: TaskManager) -> tuple[VyraEntity, State
     
     # Setup state manager
     logger.debug("setting_up_state_manager")
-    statemanager: StateManager = await setup_statemanager(entity)
+    statemanager: StateManager = await setup_statemanager(entity, pre_built_statemanager)
     logger.info("state_manager_ready")
 
     # Setup user manager

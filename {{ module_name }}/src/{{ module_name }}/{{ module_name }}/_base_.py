@@ -178,47 +178,47 @@ async def _create_base_interfaces() -> list[FunctionConfigEntry]:
     
     interface_metadata: list = []
 
-    base_interfaces: list[str] = [
-        'vyra_core.meta.json',
-        'vyra_com.meta.json',
-        'vyra_security.meta.json'
-    ]
+    import vyra_base as _vyra_base_module
 
     module_name = os.getenv("MODULE_NAME", "")
+    interfaces_pkg = f'{module_name}_interfaces'
+
+    # Dynamically discover all *.meta.json files from the installed config directory
+    try:
+        config_dir = _get_package_dir(interfaces_pkg) / 'config'
+        all_meta_files = sorted(config_dir.glob('*.meta.json'))
+    except Exception as e:
+        log_exception(logger, e, context={"operation": "discover_meta_files", "package": interfaces_pkg})
+        raise
+
+    # Validate against schema — warn and skip invalid files
+    valid_files, invalid_files = _vyra_base_module.validate_config_schema(all_meta_files)
+
+    for bad_file, reason in invalid_files:
+        logger.warning(
+            "invalid_meta_json_skipped",
+            file=bad_file.name,
+            reason=reason,
+            package=interfaces_pkg
+        )
+
     logger.debug(
         "loading_base_interfaces",
         module_name=module_name,
-        interface_files=base_interfaces
+        discovered=len(all_meta_files),
+        valid=len(valid_files),
+        invalid=len(invalid_files)
     )
 
-    for interface_file in base_interfaces:
-        if isinstance(interface_file, str):
-            try:
-                logger.debug(
-                    "loading_interface_metadata",
-                    module=module_name,
-                    file=interface_file
-                )
-                metadata = await load_resource(
-                    f'{module_name}_interfaces',
-                    Path('config', interface_file)
-                )
-                interface_metadata.extend(metadata)
-                logger.debug(
-                    "interface_metadata_loaded",
-                    file=interface_file,
-                    entries_count=len(metadata)
-                )
-            except Exception as e:
-                log_exception(
-                    logger,
-                    e,
-                    context={
-                        "operation": "load_interface_metadata",
-                        "file": interface_file
-                    }
-                )
-                raise
+    for meta_file in valid_files:
+        try:
+            logger.debug("loading_interface_metadata", module=module_name, file=meta_file.name)
+            metadata = await load_resource(interfaces_pkg, Path('config', meta_file.name))
+            interface_metadata.extend(metadata)
+            logger.debug("interface_metadata_loaded", file=meta_file.name, entries_count=len(metadata))
+        except Exception as e:
+            log_exception(logger, e, context={"operation": "load_interface_metadata", "file": meta_file.name})
+            raise
 
     interface_functions: list[FunctionConfigEntry] = []
     
@@ -676,7 +676,7 @@ async def build_entity(project_settings) -> VyraEntity:
                 me = ModuleEntry(
                     uuid=normalized_module_data['uuid'],
                     name=normalized_module_data['name'],
-                    template=normalized_module_data['blueprints'],
+                    blueprints=normalized_module_data['blueprints'],
                     description=normalized_module_data['description'],
                     version=normalized_module_data['version'],
                 )
@@ -713,7 +713,7 @@ async def build_entity(project_settings) -> VyraEntity:
                 me = ModuleEntry(
                     uuid=normalized_module_data['uuid'],
                     name=normalized_module_data['name'],
-                    template=normalized_module_data['blueprints'],
+                    blueprints=normalized_module_data['blueprints'],
                     description=normalized_module_data['description'],
                     version=normalized_module_data['version'],
                 )
@@ -758,7 +758,7 @@ async def build_entity(project_settings) -> VyraEntity:
                 me = ModuleEntry(
                     uuid=normalized_module_data['uuid'],
                     name=normalized_module_data['name'],
-                    template=normalized_module_data['blueprints'],
+                    blueprints=normalized_module_data['blueprints'],
                     description=normalized_module_data['description'],
                     version=normalized_module_data['version'],
                 )
@@ -987,6 +987,14 @@ async def build_base():
         # BLUEPRINT STRATEGY — Phase 2: bind callbacks before registering interfaces
         # Interface definitions (JSON metadata) are separated from implementations
         # (entity methods). We bind here so set_interfaces creates real queryables.
+        # StateManager must be created HERE so its @remote_actionServer callbacks
+        # (request_lc_suspend, request_lc_resume) are bound before set_interfaces()
+        # is called. Creating it after build_base() would cause ValueError because
+        # the action server would have no callbacks registered.
+        from .state.state_manager import StateManager  # local import to avoid circular deps
+        state_manager = StateManager(entity)
+        logger.debug("state_manager_pre_created_for_callback_binding")
+
         _callback_sources: list[Any] = [entity]
         if hasattr(entity, 'param_manager') and entity.param_manager is not None:
             _callback_sources.append(entity.param_manager)
@@ -994,6 +1002,7 @@ async def build_base():
             _callback_sources.append(entity.security_manager)
         if hasattr(entity, 'volatile') and entity.volatile is not None:
             _callback_sources.append(entity.volatile)
+        _callback_sources.append(state_manager)
 
         for component in _callback_sources:
             bound = entity.bind_interface_callbacks(component, base_interfaces)
@@ -1029,7 +1038,7 @@ async def build_base():
             module=entity.module_entry.name
         )
 
-        return entity
+        return entity, state_manager
         
     except Exception as e:
         log_exception(logger, e, context={"function": "build_base"})

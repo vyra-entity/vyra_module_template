@@ -4,6 +4,11 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — Base interface loading now includes vyra_plugin meta interfaces (2026-05-05)
+
+- `src/{{ module_name }}/{{ module_name }}/_base_.py`
+  - Added `vyra_plugin.meta.json` to `_create_base_interfaces()` so plugin interfaces are registered during startup in generated modules.
+
 ### Fixed — PluginGateway now requires modulemanager.module_id in module params (2026-05-04)
 
 - `src/{{ module_name }}/{{ module_name }}/plugin/plugin_gateway.py`

@@ -394,5 +394,109 @@
             "visible": false,
             "published": false
         }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "action",
+        "functionname": "request_lc_suspend",
+        "displayname": "Request Lifecycle Suspend",
+        "description": "Request a lifecycle suspend transition (ACTIVE -> SUSPENDED). Runs registered suspend callbacks with priorities before completing. Streams feedback during execution.",
+        "filetype": [
+            "VBASEStateRequestLcSuspend.proto"
+        ],
+        "params": [],
+        "feedback": [
+            {
+                "name": "status",
+                "datatype": "string",
+                "displayname": "Status",
+                "description": "Current status message during suspend execution"
+            },
+            {
+                "name": "progress",
+                "datatype": "int32",
+                "displayname": "Progress",
+                "description": "Progress percentage (0-100)"
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Whether the suspend completed successfully"
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "Result message"
+            },
+            {
+                "name": "final_state",
+                "datatype": "string",
+                "displayname": "Final State",
+                "description": "The final lifecycle state after the action completed"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": false,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "action",
+        "functionname": "request_lc_resume",
+        "displayname": "Request Lifecycle Resume",
+        "description": "Request a lifecycle resume transition (SUSPENDED -> ACTIVE). Runs registered resume callbacks with priorities before completing. Streams feedback during execution.",
+        "filetype": [
+            "VBASEStateRequestLcResume.proto"
+        ],
+        "params": [],
+        "feedback": [
+            {
+                "name": "status",
+                "datatype": "string",
+                "displayname": "Status",
+                "description": "Current status message during resume execution"
+            },
+            {
+                "name": "progress",
+                "datatype": "int32",
+                "displayname": "Progress",
+                "description": "Progress percentage (0-100)"
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Whether the resume completed successfully"
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "Result message"
+            },
+            {
+                "name": "final_state",
+                "datatype": "string",
+                "displayname": "Final State",
+                "description": "The final lifecycle state after the action completed"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": false,
+            "published": false
+        }
     }
 ]
