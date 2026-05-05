@@ -20,6 +20,7 @@ export interface PluginCallResponse {
 }
 
 export interface UiManifestEntry {
+  comp_id:         string
   slot_id:         string
   /** List of scope target IDs (new field; mirrors `scope:` in manifest.yaml). */
   slot_ids:        string[]
@@ -31,6 +32,12 @@ export interface UiManifestEntry {
   is_active:       boolean
   scope_type:      string
   scope_target:    string | null
+  slot_scope_type: string | null
+  slot_scope_target: string | null
+  is_frontend_scope: boolean
+  ui_binding_id:   string | null
+  communication_module_name: string | null
+  hosting_module_name: string
   /** Human-readable plugin title shown in UI. */
   title:           string
   /** Render priority (lower = rendered first). Default: 50. */
