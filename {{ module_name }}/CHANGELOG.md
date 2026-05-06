@@ -4,6 +4,13 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — Plugin settings binding save hardened for missing component IDs (2026-05-06)
+
+- `src/{{ module_name }}/{{ module_name }}/backend_webserver/plugin/models.py`
+  - Extended `UiManifestEntry` with `comp_id`, slot-scope metadata, and binding fields (`ui_binding_id`, `communication_module_name`, `hosting_module_name`) so generated modules keep complete resolve payloads.
+- `frontend/src/features/settings/pages/PluginsPage.vue`
+  - Added stable slot row/input identifiers (`slotRowKey`, `bindingInputId`) and a guard that blocks save when `comp_id` is missing.
+
 ### Fixed — Base interface loading now includes vyra_plugin meta interfaces (2026-05-05)
 
 - `src/{{ module_name }}/{{ module_name }}/_base_.py`

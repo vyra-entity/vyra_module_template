@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # ==============================================================================
 # VYRA Module Dockerfile - Optimized Multi-Stage Build
 # Module: ${MODULE_NAME}
@@ -201,7 +202,8 @@ RUN if [ "${VYRA_SLIM:-false}" = "true" ]; then \
 
 RUN mkdir -p ./storage/sros2_keystore
 
-RUN if [ -d "frontend" ] && [ -f "frontend/package.json" ] && [ -d "frontend/src/views" ] && [ "$(ls -A frontend/src/views)" ]; then \
+RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+    if [ -d "frontend" ] && [ -f "frontend/package.json" ] && [ -d "frontend/src/views" ] && [ "$(ls -A frontend/src/views)" ]; then \
         cd frontend && \
         # npm install @vue/eslint-config-typescript@latest eslint@latest --save-dev && \
         npm install && \

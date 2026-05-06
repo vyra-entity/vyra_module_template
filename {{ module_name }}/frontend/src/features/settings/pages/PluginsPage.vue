@@ -115,7 +115,7 @@
             <div class="plugin-row__slots">
               <div
                 v-for="slot in plugin.slots"
-                :key="slot.comp_id"
+                :key="slotRowKey(slot)"
                 class="slot-row"
               >
                 <div class="slot-row__info">
@@ -166,9 +166,9 @@
                   </span>
                 </div>
                 <div v-if="requiresCommunicationBinding(slot)" class="slot-row__binding">
-                  <label class="slot-row__binding-label" :for="`binding-${slot.comp_id}`">Kommunikationsmodul</label>
+                  <label class="slot-row__binding-label" :for="bindingInputId(slot)">Kommunikationsmodul</label>
                   <select
-                    :id="`binding-${slot.comp_id}`"
+                    :id="bindingInputId(slot)"
                     v-model="bindingDrafts[slot.comp_id]"
                     class="slot-row__binding-select"
                     :disabled="savingBindings.has(slot.comp_id)"
@@ -286,6 +286,14 @@ function uniqueSlotLabels(slot: UiManifestEntry): string[] {
   return Array.from(new Set(labels.filter((sid): sid is string => Boolean(sid))))
 }
 
+function slotRowKey(slot: UiManifestEntry): string {
+  return slot.comp_id || `${slot.assignment_id}-${slot.slot_id}`
+}
+
+function bindingInputId(slot: UiManifestEntry): string {
+  return `binding-${slotRowKey(slot)}`
+}
+
 function hasFrontendScope(entry: UiManifestEntry): boolean {
   return Boolean(entry.is_frontend_scope || entry.slot_scope_type)
 }
@@ -310,6 +318,7 @@ function requiresCommunicationBinding(entry: UiManifestEntry): boolean {
 }
 
 function hasBindingChanged(entry: UiManifestEntry): boolean {
+  if (!entry.comp_id) return false
   return (bindingDrafts.value[entry.comp_id] ?? '') !== (entry.communication_module_name ?? '')
 }
 
@@ -546,6 +555,11 @@ async function doRefresh(): Promise<void> {
 }
 
 async function saveBinding(entry: UiManifestEntry): Promise<void> {
+  if (!entry.comp_id) {
+    resolveError.value = 'UI-Komponenten-ID fehlt. Plugin-Daten bitte neu laden.'
+    return
+  }
+
   const nextValue = (bindingDrafts.value[entry.comp_id] ?? '').trim()
   const pending = new Set(savingBindings.value)
   pending.add(entry.comp_id)

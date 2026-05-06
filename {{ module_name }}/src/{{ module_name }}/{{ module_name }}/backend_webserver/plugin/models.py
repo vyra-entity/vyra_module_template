@@ -49,6 +49,7 @@ class PluginListEntry(BaseModel):
 
 
 class UiManifestEntry(BaseModel):
+    comp_id:         str = ""
     slot_id:         str
     component_name:  str
     js_entry_point:  str            # URL via /plugin/assets/ proxy
@@ -59,6 +60,12 @@ class UiManifestEntry(BaseModel):
     is_active:       bool = True
     scope_type:      str = ""
     scope_target:    str | None = None
+    slot_scope_type: str | None = None
+    slot_scope_target: str | None = None
+    is_frontend_scope: bool = False
+    ui_binding_id:   str | None = None
+    communication_module_name: str | None = None
+    hosting_module_name: str = ""
     # Plugin slot infrastructure fields (mirrors manifest.yaml / TypeScript UiManifestEntry)
     slot_ids:        list[str] = Field(default_factory=list)
     title:           str = ""
