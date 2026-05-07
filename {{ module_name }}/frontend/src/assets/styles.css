@@ -1,3 +1,6 @@
+@import "tailwindcss";
+@import "tailwindcss-primeui";
+
 /* VYRA Module Manager - Global Styles */
 
 :root {

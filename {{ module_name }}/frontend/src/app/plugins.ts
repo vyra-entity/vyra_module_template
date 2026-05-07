@@ -23,7 +23,11 @@ export function setupPlugins(app: App): void {
     theme: {
       preset: Aura,
       options: {
-        darkModeSelector: '.dark-mode'
+        darkModeSelector: '.dark-mode',
+        cssLayer: {
+          name: 'primevue',
+          order: 'theme, base, primevue'
+        }
       }
     }
   })

@@ -4,6 +4,14 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Changed — Generated frontends now include Tailwind CSS pipeline by default (2026-05-07)
+
+- `frontend/package.json`
+- `frontend/postcss.config.mjs`
+- `frontend/src/assets/styles.css`
+- `frontend/src/app/plugins.ts`
+  - Added Tailwind CSS v4 + `tailwindcss-primeui` integration to the module template so newly generated modules install and build Tailwind automatically via the normal Node/Vite pipeline.
+
 ### Fixed — Plugin settings binding save hardened for missing component IDs (2026-05-06)
 
 - `src/{{ module_name }}/{{ module_name }}/backend_webserver/plugin/models.py`
