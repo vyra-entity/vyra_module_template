@@ -271,7 +271,7 @@ onUnmounted(() => {
 /* ── Content ── */
 .vyra-content {
   flex: 1;
-  padding: 2rem;
+  padding: var(--vyra-page-padding, clamp(1rem, 1.4vw + 0.6rem, 2rem));
   overflow: auto;
 }
 

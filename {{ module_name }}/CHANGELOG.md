@@ -4,6 +4,14 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Fixed — Generated frontend baseline spacing and control sizing harmonized (2026-05-07)
+
+- `frontend/src/assets/styles.css`
+- `frontend/src/App.vue`
+  - Added shared layout/control tokens for page padding, control height, control inner spacing, and card inner padding.
+  - Increased global spacing for PrimeVue inputs/selects/tables to reduce cramped layouts across views.
+  - Fixed vertical alignment of the password toggle icon to keep the eye icon centered.
+
 ### Changed — Generated frontends now include Tailwind CSS pipeline by default (2026-05-07)
 
 - `frontend/package.json`

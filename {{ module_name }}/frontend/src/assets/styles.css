@@ -10,6 +10,10 @@
   --vyra-warning:       #FF9800;
   --vyra-danger:        #F44336;
   --vyra-info:          #00BCD4;
+  --vyra-control-min-height: 2.75rem;
+  --vyra-control-padding-x: 0.875rem;
+  --vyra-card-inner-padding: 1.25rem;
+  --vyra-page-padding: clamp(1rem, 1.4vw + 0.6rem, 2rem);
 
   /* Derived alpha variant used by sidebar active-state */
   --vyra-primary-alpha: rgba(33, 150, 243, 0.1);
@@ -88,6 +92,51 @@ body {
 .touch-target {
   min-width: 44px;
   min-height: 44px;
+}
+
+/* Global control sizing and spacing baseline */
+.p-inputtext,
+.p-select,
+.p-multiselect,
+.p-autocomplete-input,
+.p-password-input {
+  min-height: var(--vyra-control-min-height);
+}
+
+.p-inputtext,
+.p-autocomplete-input,
+.p-password-input,
+.p-select .p-select-label,
+.p-multiselect .p-multiselect-label {
+  padding-left: var(--vyra-control-padding-x);
+  padding-right: var(--vyra-control-padding-x);
+}
+
+.p-select,
+.p-multiselect,
+.p-password {
+  width: 100%;
+}
+
+.p-password .p-inputtext {
+  width: 100%;
+  padding-right: 2.75rem;
+}
+
+.p-password .p-password-toggle-mask-icon {
+  top: 50%;
+  transform: translateY(-50%);
+  margin-top: 0;
+  line-height: 1;
+}
+
+.p-card .p-card-body {
+  padding: var(--vyra-card-inner-padding);
+}
+
+.p-datatable .p-datatable-thead > tr > th,
+.p-datatable .p-datatable-tbody > tr > td {
+  padding: 0.85rem 1rem;
 }
 
 /* .vyra-content is now scoped inside App.vue → removed from global */
