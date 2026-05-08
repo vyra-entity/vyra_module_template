@@ -4,6 +4,40 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Changed — SDP left-drag opens popup at movable drop point (2026-05-08)
+
+- `frontend/src/components/layout/SideDockPopup.vue`
+  - Dragging a side-dock widget to the left now shows a movable square drop proxy.
+  - Releasing the mouse opens the popup at the dropped proxy position instead of opening immediately at a fixed trigger threshold.
+  - Existing strip-drag compensation remains active, so open popups stay visually fixed while the strip is moved.
+
+### Fixed — Persist SDP popup positions across browser reload (2026-05-08)
+
+- `frontend/src/components/layout/SideDockPopup.vue`
+  - Persisted per-pocket popup drag offsets in `localStorage`.
+  - Popup position is now restored after page reload.
+
+### Fixed — Cross-module frontend style sync and stable SDP popup anchoring (2026-05-08)
+
+- `frontend/src/components/layout/SideDockPopup.vue`
+  - Open SDP popups are now viewport-fixed and no longer move when the right-side widget strip is dragged.
+  - Popup position now changes only via widget left-detach drop placement or direct popup-header drag.
+- `frontend/src/style.css`
+- `frontend/src/assets/styles.css`
+  - Synced shared browser CSS baseline with MM/UM/DB/PM for consistent generated-module styling.
+
+### Changed — SideDockPopup Phase 3: stagger convoy, left-drag detach, popup lock (2026-05-09)
+
+- `frontend/src/components/layout/SideDockPopup.vue`
+  - Grab cursor on tab; stagger convoy animation; left-drag detach to floating ghost badge; popup position independence during strip drag; per-widget `position: fixed`.
+
+### Changed — Side dock widget drag replaces strip handle (2026-05-08)
+
+- `frontend/src/components/layout/SideDockPopup.vue`
+  - Removed `sdp-strip-handle` and switched strip repositioning to widget/tab drag.
+  - Strip drag remains vertical-only with viewport clamping so widgets stay fully visible.
+  - Dragging a widget into the screen center opens its popup like a click while preserving drag behavior.
+
 ### Fixed — Generated frontend baseline spacing and control sizing harmonized (2026-05-07)
 
 - `frontend/src/assets/styles.css`

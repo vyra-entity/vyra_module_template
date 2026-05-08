@@ -46,6 +46,19 @@ html.dark-mode {
   --text-color:           #f4f4f5;
   --text-color-secondary: #a1a1aa;
 
+  /* PrimeVue semantic surface tokens (dark) — used by section-card, summary-tile etc. */
+  --p-surface-0:       #09090b;
+  --p-surface-ground:  #09090b;
+  --p-surface-card:    #18181b;
+  --p-surface-border:  #3f3f46;
+  --p-surface-section: #18181b;
+  --p-surface-hover:   rgba(255, 255, 255, 0.06);
+
+  /* PrimeVue text tokens */
+  --p-text-color:           #f4f4f5;
+  --p-text-secondary-color: #a1a1aa;
+  --p-text-muted-color:     #71717a;
+
   /* Dark scrollbars */
   --scrollbar-track: #18181b;
   --scrollbar-thumb: #52525b;
@@ -66,6 +79,17 @@ html.dark-mode ::-webkit-scrollbar-thumb {
 html.dark-mode ::-webkit-scrollbar-thumb:hover {
   background: #71717a;
 }
+
+/* ── Dark Mode: PrimeVue colored-surface utility class overrides ── */
+/* Summary tile icon backgrounds use bg-*-100 classes (primitive palette, no dark variant) */
+html.dark-mode .bg-blue-100   { background-color: rgba(59,  130, 246, 0.18) !important; }
+html.dark-mode .bg-purple-100 { background-color: rgba(139,  92, 246, 0.18) !important; }
+html.dark-mode .bg-green-100  { background-color: rgba( 34, 197,  94, 0.18) !important; }
+html.dark-mode .bg-red-100    { background-color: rgba(239,  68,  68, 0.18) !important; }
+html.dark-mode .bg-orange-100 { background-color: rgba(249, 115,  22, 0.18) !important; }
+html.dark-mode .bg-yellow-100 { background-color: rgba(234, 179,   8, 0.18) !important; }
+html.dark-mode .bg-surface-200 { background-color: #3f3f46 !important; }
+html.dark-mode .bg-surface-100 { background-color: #27272a !important; }
 
 * {
   margin: 0;
@@ -298,3 +322,125 @@ body {
 .hover-shadow:hover {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VYRA UI FIXES — PrimeVue v4 / Aura theme overrides
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── ToggleSwitch handle: fix vertical centering ────────────────────────── */
+/* PrimeVue v4 uses `translate: 0 -50%` which may not apply correctly;      */
+/* override with transform to reliably center the knob in the slider track.  */
+.p-toggleswitch .p-toggleswitch-handle {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  translate: none !important;
+}
+
+/* ── Buttons: more generous vertical + horizontal padding ────────────────── */
+/* Default button */
+.p-button {
+  padding-block: 0.6rem;
+  padding-inline: 1.25rem;
+}
+/* Small button variant */
+.p-button.p-button-sm,
+.p-button[size="small"] {
+  padding-block: 0.45rem;
+  padding-inline: 1rem;
+}
+/* Icon-only buttons (e.g. three-dot menu, rounded action buttons) */
+.p-button.p-button-icon-only {
+  padding: 0.55rem;
+}
+.p-button.p-button-icon-only.p-button-sm,
+.p-button.p-button-icon-only[size="small"] {
+  padding: 0.42rem;
+}
+.p-button.p-button-icon-only.p-button-rounded {
+  padding: 0.5rem;
+}
+
+/* ── Tag / Badge: more padding so text isn't squeezed ────────────────────── */
+.p-tag {
+  padding: 0.3rem 0.65rem;
+  line-height: 1.35;
+  font-size: 0.75rem;
+}
+.p-tag.text-xs {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.55rem;
+}
+
+/* ── Tooltip: more breathing room ────────────────────────────────────────── */
+.p-tooltip .p-tooltip-text {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+/* ── Select / Dropdown options: more vertical padding ────────────────────── */
+.p-select-option {
+  padding: 0.65rem var(--vyra-control-padding-x, 0.875rem);
+}
+/* Overlay panel list items (used by Select, MultiSelect, etc.) */
+.p-select-list .p-select-option {
+  padding: 0.65rem var(--vyra-control-padding-x, 0.875rem);
+}
+
+/* ── Select label: ensure it's vertically centered inside the control ─────── */
+.p-select .p-select-label {
+  display: flex;
+  align-items: center;
+  min-height: calc(var(--vyra-control-min-height, 2.75rem) - 2px);
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: 1;
+}
+
+/* ── ToggleButton: fix icon vertical alignment ────────────────────────────── */
+.p-togglebutton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.p-togglebutton .p-togglebutton-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.p-togglebutton .p-togglebutton-icon {
+  line-height: 1;
+  vertical-align: middle;
+}
+
+/* ── Context/popup Menu items: more vertical padding ─────────────────────── */
+.p-menu .p-menu-item-content {
+  padding: 0;
+}
+.p-menu .p-menu-item-link {
+  padding: 0.6rem 0.875rem;
+}
+
+/* ── Dialog (Modal): more generous padding ───────────────────────────────── */
+.p-dialog .p-dialog-header {
+  padding: 1.25rem 1.75rem;
+}
+.p-dialog .p-dialog-content {
+  padding: 1.25rem 1.75rem;
+}
+.p-dialog .p-dialog-footer {
+  padding: 1rem 1.75rem 1.25rem;
+}
+
+/* ── Toast (Notifications): more generous padding ────────────────────────── */
+.p-toast .p-toast-message-content {
+  padding: 1rem 1.25rem;
+  gap: 0.75rem;
+}
+.p-toast .p-toast-summary {
+  margin-bottom: 0.2rem;
+}
+.p-toast .p-toast-detail {
+  margin: 0.25rem 0 0;
+}
+

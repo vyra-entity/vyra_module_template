@@ -268,6 +268,21 @@ The statusbar is a new bar at the **bottom** of the screen (`VyraStatusbar.vue`)
 
 ---
 
+#### `statusbar.infobar`
+
+Adds contextual single-line information to the **left side** of the statusbar.
+
+- Intended for compact runtime context (for example: current project, environment, active mode).
+- Host applies single-line truncation with ellipsis on overflow.
+- Plugin should provide full text through tooltip/title for long values.
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `text` | `string` | Single-line context message shown in the infobar |
+| `tooltip` | `string` | Optional full message shown on hover |
+
+---
+
 #### `statusbar.actionbar`
 
 Adds a quick-action button to the status bar.
@@ -656,6 +671,47 @@ watch(() => props.query, (q) => {
 <template><span style="display:none" /></template>
 ```
 
+### Integrating a new UI slot in a frontend module
+
+When introducing a new UI slot in a module frontend, use this workflow:
+
+1. Add or update the shared slot registry in `src/types/plugin_slots.ts` only for cross-module slots.
+2. Add module-exclusive slots in `src/types/plugin_slots_module.ts`.
+3. Merge module slots into the final registry via `...MODULE_SLOT_REGISTRY` in `SLOT_REGISTRY`.
+4. Render the new slot where needed with `<PluginSlot slot-id="your.slot.id" />`.
+5. Document module-exclusive slots in a dedicated file named `<module-or-feature>_PLUGIN_SLOTS.md`.
+
+Minimal `plugin_slots_module.ts` example:
+
+```typescript
+import type { SlotDefinition } from './plugin_slots'
+
+export const MODULE_SLOT_REGISTRY: Record<string, SlotDefinition> = {
+  'my-module.custom-slot': {
+    id: 'my-module.custom-slot',
+    category: 'sidebar',
+    description: 'Module-exclusive sidebar slot.',
+    areas: ['Left sidebar - custom zone'],
+    extraProps: { isCollapsed: 'boolean' },
+  },
+}
+```
+
+Minimal plugin usage example (`manifest.yaml`):
+
+```yaml
+entry_points:
+  frontend:
+    type: module
+    file: plugins/my-plugin/1.0.0/ui/index.js
+    slots:
+      - scope:
+          - my-module.custom-slot
+        component: MyCustomSlot
+        title: My Custom Slot
+        priority: 50
+```
+
 ---
 
 ## 8. Frontend File Reference
@@ -663,13 +719,14 @@ watch(() => props.query, (q) => {
 | File | Purpose |
 |------|---------|
 | `src/types/plugin_slots.ts` | Complete typed slot registry (`SLOT_REGISTRY`, `SlotCategory`, `PluginGlobalApi`) |
+| `src/types/plugin_slots_module.ts` | Module-specific slot extensions (`MODULE_SLOT_REGISTRY`) merged into `SLOT_REGISTRY` |
 | `src/composables/usePluginApi.ts` | Host-side Plugin API factory (props, events, functions) |
 | `src/components/PluginSlot.vue` | Generic slot renderer — loads plugins, injects API, error-boundary |
 | `src/features/plugins/PluginSlotHost.vue` | Alternative slot host |
 | `src/store/plugins.ts` | Plugin manifest store (Pinia) |
 | `src/store/sideDockPopup.ts` | SDP pocket registry and state |
 | `src/components/layout/SideDockPopup.vue` | Right-side fly-in pocket component |
-| `src/components/layout/VyraStatusbar.vue` | Bottom statusbar with actionbar slots |
+| `src/components/layout/VyraStatusbar.vue` | Bottom statusbar with infobar (left) and actionbar (right) slots |
 | `src/components/layout/SearchProvider.vue` | CMD+K global search dialog |
 | `src/components/layout/ContextMenuProvider.vue` | Right-click context menu aggregator |
 | `src/directives/pluginDecorator.ts` | `v-plugin-decorator` directive for component decorators |

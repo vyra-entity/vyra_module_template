@@ -69,7 +69,16 @@ export const usePluginStore = defineStore('plugins', () => {
           // does not propagate the error to the host.
           component: markRaw(
             defineAsyncComponent({
-              loader: () => import(/* @vite-ignore */ entry.js_entry_point),
+              loader: async () => {
+                const module = await import(/* @vite-ignore */ entry.js_entry_point)
+                const componentName = entry.component_name
+                // Use the named export matching component_name if available,
+                // otherwise fall back to the default export.
+                if (componentName && Object.prototype.hasOwnProperty.call(module, componentName)) {
+                  return (module as Record<string, unknown>)[componentName]
+                }
+                return (module as Record<string, unknown>).default ?? module
+              },
               errorComponent: PluginErrorFallback,
               onError(err, _retry, fail) {
                 console.error(`[PluginSlot] Plugin '${entry.plugin_id}' (${entry.js_entry_point}) failed to load:`, err)

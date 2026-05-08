@@ -5,6 +5,8 @@
  * registrations, manifest entries, and the Global Plugin API.
  */
 
+import { MODULE_SLOT_REGISTRY } from './plugin_slots_module'
+
 // ---------------------------------------------------------------------------
 // Slot category taxonomy
 // ---------------------------------------------------------------------------
@@ -235,6 +237,12 @@ export const SLOT_REGISTRY: Readonly<Record<string, SlotDefinition>> = {
   },
 
   // ── Statusbar ─────────────────────────────────────────────────────────────
+  'statusbar.infobar': {
+    id: 'statusbar.infobar',
+    category: 'statusbar',
+    description: 'Left-aligned info area in the statusbar for short single-line contextual messages. Long text is truncated with ellipsis; full text shown as tooltip on hover.',
+    areas: ['Bottom status bar — left side'],
+  },
   'statusbar.actionbar': {
     id: 'statusbar.actionbar',
     category: 'statusbar',
@@ -346,4 +354,8 @@ export const SLOT_REGISTRY: Readonly<Record<string, SlotDefinition>> = {
     description: 'Adds a settings card / section to the module Settings view.',
     areas: ['Settings page'],
   },
+
+  // ── Module-specific slots ─────────────────────────────────────────────────
+  // Exclusive to this module. Add them in ./plugin_slots_module.ts.
+  ...MODULE_SLOT_REGISTRY,
 } as const

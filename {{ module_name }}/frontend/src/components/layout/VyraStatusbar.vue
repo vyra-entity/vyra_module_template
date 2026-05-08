@@ -1,8 +1,13 @@
 <template>
-  <!-- Bottom status bar — renders statusbar.actionbar plugin slots -->
+  <!-- Bottom status bar — infobar (left) + actionbar + copyright (right) -->
   <footer v-if="authStore.isAuthenticated" class="vyra-statusbar">
-    <PluginSlot slot-id="statusbar.actionbar" />
+    <!-- Left: infobar slot for contextual single-line info (ellipsis + tooltip for overflow) -->
+    <div class="statusbar-infobar">
+      <PluginSlot slot-id="statusbar.infobar" />
+    </div>
+    <!-- Right: action chips + copyright -->
     <div class="statusbar-right">
+      <PluginSlot slot-id="statusbar.actionbar" />
       <span class="statusbar-copyright">VYRA Industrial Automation © 2025</span>
       <slot />
     </div>
@@ -30,8 +35,16 @@ const authStore = useAuthStore()
   color: var(--text-color-secondary, #666);
 }
 
+.statusbar-infobar {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
 .statusbar-right {
-  margin-left: auto;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;

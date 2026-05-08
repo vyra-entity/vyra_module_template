@@ -18,21 +18,18 @@
     </Transition>
 
     <!-- Right-edge strip: one widget per visible pocket -->
-    <div class="sdp-strip" :style="stripStyle" role="complementary" aria-label="Side Dock Widgets">
-      <!-- Y-axis drag handle – reposition the whole strip (only shown when pockets exist) -->
-      <div
-        v-if="visiblePockets.length > 0"
-        class="sdp-strip-handle"
-        @mousedown.prevent="startStripDrag"
-        title="Drag to reposition"
-        aria-label="Reposition side dock"
-      >
-        <i class="pi pi-ellipsis-h" aria-hidden="true" />
-      </div>
+    <div
+      class="sdp-strip"
+      :class="{ 'sdp-strip--dragging': isStripDragging }"
+      :style="stripStyle"
+      role="complementary"
+      aria-label="Side Dock Widgets"
+    >
       <div
         v-for="pocket in visiblePockets"
         :key="pocket.id"
         class="sdp-widget"
+        :data-pocket-id="pocket.id"
         :class="{
           'sdp-widget--open': pocket.isOpen,
           'sdp-widget--pinned': pocket.isPinned,
@@ -42,7 +39,8 @@
         <button
           class="sdp-tab"
           :style="tabStyle(pocket)"
-          @click="togglePocket(pocket)"
+          @mousedown.prevent="startWidgetDrag($event, pocket)"
+          @click="onTabClick($event, pocket)"
           :aria-label="pocket.title"
           :title="pocket.title"
           :aria-expanded="pocket.isOpen"
@@ -101,11 +99,21 @@
         </Transition>
       </div>
     </div>
+
+    <!-- Floating drop proxy shown while dragging a widget left for detached popup placement. -->
+    <div
+      v-if="dropProxy.active"
+      class="sdp-drop-proxy"
+      :style="dropProxyStyle"
+      aria-hidden="true"
+    >
+      <i :class="dropProxy.icon" class="sdp-drop-proxy-icon" aria-hidden="true" />
+    </div>
   </Teleport>
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSideDockPopupStore } from '../../store/sideDockPopup'
 import type { SdpPocket } from '../../store/sideDockPopup'
@@ -115,6 +123,12 @@ const sdpStore = useSideDockPopupStore()
 const route = useRoute()
 const pluginApi = inject(PLUGIN_API_INJECTION_KEY, undefined)
 const activeContext = computed(() => String(route.name ?? route.path))
+const POPUP_OFFSETS_STORAGE_KEY = 'sdp-popup-drag-offsets-v1'
+const POPUP_WIDTH_PX = 300
+const POPUP_RIGHT_PX = 130
+const DROP_PROXY_SIZE_PX = 44
+const DROP_PROXY_MARGIN_PX = 8
+const DROP_TRIGGER_LEFT_PX = 56
 
 /** Inline style for the strip — positions it at 25% from top + persistent Y offset. */
 const stripStyle = computed(() => ({
@@ -137,10 +151,64 @@ const hasUnpinnedOpen = computed(() =>
 
 // ── Drag state ──────────────────────────────────────────────────────────────
 /** Per-pocket accumulated drag offset (x = horizontal, y = vertical). */
-const dragOffsets = ref<Record<string, { x: number; y: number }>>({})
+const dragOffsets = ref<Record<string, { x: number; y: number }>>(loadDragOffsets())
+
+/** Restore persisted popup drag offsets from localStorage. */
+function loadDragOffsets(): Record<string, { x: number; y: number }> {
+  try {
+    const raw = localStorage.getItem(POPUP_OFFSETS_STORAGE_KEY)
+    if (!raw) return {}
+    const parsed: unknown = JSON.parse(raw)
+    if (!parsed || typeof parsed !== 'object') return {}
+
+    const out: Record<string, { x: number; y: number }> = {}
+    for (const [id, val] of Object.entries(parsed as Record<string, unknown>)) {
+      if (!val || typeof val !== 'object') continue
+      const x = Number((val as { x?: unknown }).x)
+      const y = Number((val as { y?: unknown }).y)
+      if (!Number.isFinite(x) || !Number.isFinite(y)) continue
+      out[id] = { x, y }
+    }
+    return out
+  } catch {
+    return {}
+  }
+}
+
+watch(
+  dragOffsets,
+  (offsets) => {
+    localStorage.setItem(POPUP_OFFSETS_STORAGE_KEY, JSON.stringify(offsets))
+  },
+  { deep: true },
+)
 
 /** ID of the pocket currently being dragged, or null. */
 const draggingId = ref<string | null>(null)
+
+/** True while dragging the SDP widget strip (tab drag). */
+const isStripDragging = ref(false)
+
+/** Vertical compensation so open popups do not move when strip moves. */
+const stripDragCompensationY = ref(0)
+
+/** Pocket ID for which the next click should be ignored after dragging. */
+const suppressClickPocketId = ref<string | null>(null)
+
+/** Temporary square proxy used as detached drop target during left drag. */
+const dropProxy = ref<{ active: boolean; pocketId: string | null; x: number; y: number; icon: string }>({
+  active: false,
+  pocketId: null,
+  x: 0,
+  y: 0,
+  icon: 'pi pi-th-large',
+})
+
+/** Inline style for the detached drop proxy. */
+const dropProxyStyle = computed(() => ({
+  left: `${dropProxy.value.x}px`,
+  top: `${dropProxy.value.y}px`,
+}))
 
 /** Whether a given pocket popup is being dragged right now. */
 function isDragging(id: string): boolean {
@@ -150,8 +218,66 @@ function isDragging(id: string): boolean {
 /** Inline style for the popup — applies accumulated drag transform. */
 function popupStyle(id: string): Record<string, string> {
   const off = dragOffsets.value[id]
-  if (!off) return {}
-  return { transform: `translate(${off.x}px, ${off.y}px)` }
+  const baseX = off?.x ?? 0
+  const baseY = off?.y ?? 0
+  const y = baseY + stripDragCompensationY.value
+  if (baseX === 0 && y === 0) return {}
+  return { transform: `translate(${baseX}px, ${y}px)` }
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value))
+}
+
+/** Find the current widget element by pocket ID. */
+function getWidgetElement(pocketId: string): HTMLElement | null {
+  return Array.from(document.querySelectorAll<HTMLElement>('.sdp-widget')).find(
+    (el) => el.dataset.pocketId === pocketId,
+  ) ?? null
+}
+
+/** Compute popup base top-left before dragOffset transform is applied. */
+function getPopupBasePosition(pocketId: string): { left: number; top: number } | null {
+  const widgetEl = getWidgetElement(pocketId)
+  if (!widgetEl) return null
+
+  const rect = widgetEl.getBoundingClientRect()
+  return {
+    left: rect.left + rect.width - POPUP_RIGHT_PX - POPUP_WIDTH_PX,
+    top: rect.top,
+  }
+}
+
+/** Position popup so its top-left follows dropped proxy coordinates (clamped in viewport). */
+function placePopupAtDropPosition(pocketId: string, dropX: number, dropY: number): void {
+  const base = getPopupBasePosition(pocketId)
+  if (!base) return
+
+  const targetLeft = clamp(
+    dropX,
+    12,
+    window.innerWidth - POPUP_WIDTH_PX - 12,
+  )
+  const targetTop = clamp(dropY, 12, window.innerHeight - 120)
+
+  dragOffsets.value[pocketId] = {
+    x: targetLeft - base.left,
+    y: targetTop - base.top,
+  }
+}
+
+/** Update detached drop proxy coordinates around the cursor and keep it on-screen. */
+function updateDropProxyPosition(clientX: number, clientY: number): void {
+  dropProxy.value.x = clamp(
+    clientX - DROP_PROXY_SIZE_PX / 2,
+    DROP_PROXY_MARGIN_PX,
+    window.innerWidth - DROP_PROXY_SIZE_PX - DROP_PROXY_MARGIN_PX,
+  )
+  dropProxy.value.y = clamp(
+    clientY - DROP_PROXY_SIZE_PX / 2,
+    DROP_PROXY_MARGIN_PX,
+    window.innerHeight - DROP_PROXY_SIZE_PX - DROP_PROXY_MARGIN_PX,
+  )
 }
 
 /**
@@ -182,9 +308,8 @@ function startDrag(e: MouseEvent, id: string): void {
   window.addEventListener('mouseup', onUp)
 }
 
-/** Close a pocket and reset its drag offset so it reopens at the default position. */
+/** Close a pocket while keeping its last drag offset for reload persistence. */
 function closePocket(pocket: SdpPocket): void {
-  delete dragOffsets.value[pocket.id]
   sdpStore.closePocketForcefully(pocket.id)
 }
 
@@ -197,45 +322,110 @@ function togglePocket(pocket: SdpPocket): void {
   }
 }
 
-/**
- * Drag the strip vertically. Only the Y axis is tracked; X is ignored.
- * The accumulated offset is stored in the Pinia store (localStorage-persisted).
- */
-function startStripDrag(e: MouseEvent): void {
-  const startY    = e.clientY
-  const initOffset = sdpStore.stripYOffset
-
-  // Compute allowed offset range once at drag start
-  const stripEl  = document.querySelector('.sdp-strip') as HTMLElement | null
-  const stripH   = stripEl?.offsetHeight ?? 60
-
-  // Strip center is at: 25% of viewport + stripYOffset (CSS: top: calc(25% + offset))
-  // With transform: translateY(-50%), the visual center equals the top value.
-  // Clamp so the strip stays fully within the viewport (top edge >= 0, bottom edge <= vh).
+/** Keep the complete strip inside the viewport while moving it vertically. */
+function getStripOffsetBounds(): { minOffset: number; maxOffset: number } {
+  const stripEl = document.querySelector('.sdp-strip') as HTMLElement | null
+  const stripH = stripEl?.offsetHeight ?? 60
   const baseY = window.innerHeight * 0.25
-  const minOffset = stripH / 2 - baseY                              // top edge at y=0
-  const maxOffset = window.innerHeight - stripH / 2 - baseY         // bottom edge at y=vh
+  return {
+    minOffset: stripH / 2 - baseY,
+    maxOffset: window.innerHeight - stripH / 2 - baseY,
+  }
+}
+
+/** Ignore the synthetic click that follows a drag gesture. */
+function onTabClick(event: MouseEvent, pocket: SdpPocket): void {
+  if (suppressClickPocketId.value === pocket.id) {
+    event.preventDefault()
+    event.stopPropagation()
+    suppressClickPocketId.value = null
+    return
+  }
+  togglePocket(pocket)
+}
+
+/**
+ * Dragging a widget moves the complete strip on Y.
+ * Dragging left spawns a detached drop proxy; releasing opens popup at that spot.
+ */
+function startWidgetDrag(e: MouseEvent, pocket: SdpPocket): void {
+  if (e.button !== 0) return
+
+  const startX = e.clientX
+  const startY = e.clientY
+  const initOffset = sdpStore.stripYOffset
+  const openPocketIdsAtDragStart = new Set(
+    sdpStore.pockets.filter((p) => p.isOpen).map((p) => p.id),
+  )
+  let moved = false
+  let detachedForDrop = false
+
+  isStripDragging.value = true
+  document.body.style.cursor = 'grabbing'
 
   const onMove = (ev: MouseEvent) => {
-    const raw = initOffset + (ev.clientY - startY)
-    const newOffset = Math.max(minOffset, Math.min(maxOffset, raw))
-    const delta = newOffset - sdpStore.stripYOffset
+    const dx = ev.clientX - startX
+    const dy = ev.clientY - startY
 
-    // Compensate popup positions so they stay fixed on screen while the strip moves
-    for (const pocket of sdpStore.pockets.filter(p => p.isOpen)) {
-      const current = dragOffsets.value[pocket.id] ?? { x: 0, y: 0 }
-      dragOffsets.value[pocket.id] = {
-        x: current.x,
-        y: current.y - delta,
-      }
+    if (!moved && Math.hypot(dx, dy) >= 4) {
+      moved = true
     }
 
-    sdpStore.stripYOffset = newOffset
+    if (moved && !detachedForDrop) {
+      const { minOffset, maxOffset } = getStripOffsetBounds()
+      const raw = initOffset + dy
+      const clamped = Math.max(minOffset, Math.min(maxOffset, raw))
+      sdpStore.stripYOffset = clamped
+
+      // Counter-shift popups so they visually stay at their screen position.
+      stripDragCompensationY.value = initOffset - clamped
+    }
+
+    if (!detachedForDrop && startX - ev.clientX >= DROP_TRIGGER_LEFT_PX) {
+      detachedForDrop = true
+      dropProxy.value.active = true
+      dropProxy.value.pocketId = pocket.id
+      dropProxy.value.icon = pocket.icon
+      updateDropProxyPosition(ev.clientX, ev.clientY)
+    }
+
+    if (detachedForDrop) {
+      updateDropProxyPosition(ev.clientX, ev.clientY)
+    }
   }
 
   const onUp = () => {
     window.removeEventListener('mousemove', onMove)
     window.removeEventListener('mouseup', onUp)
+
+    const finalCompensationY = stripDragCompensationY.value
+    if (finalCompensationY !== 0) {
+      for (const id of openPocketIdsAtDragStart) {
+        const curr = dragOffsets.value[id] ?? { x: 0, y: 0 }
+        dragOffsets.value[id] = { x: curr.x, y: curr.y + finalCompensationY }
+      }
+    }
+
+    if (detachedForDrop && dropProxy.value.active && dropProxy.value.pocketId === pocket.id) {
+      sdpStore.openPocket(pocket.id)
+      placePopupAtDropPosition(pocket.id, dropProxy.value.x, dropProxy.value.y)
+    }
+
+    dropProxy.value.active = false
+    dropProxy.value.pocketId = null
+
+    isStripDragging.value = false
+    stripDragCompensationY.value = 0
+    document.body.style.cursor = ''
+
+    if (moved || detachedForDrop) {
+      suppressClickPocketId.value = pocket.id
+      window.setTimeout(() => {
+        if (suppressClickPocketId.value === pocket.id) {
+          suppressClickPocketId.value = null
+        }
+      }, 0)
+    }
   }
 
   window.addEventListener('mousemove', onMove)
@@ -295,34 +485,6 @@ function tabStyle(pocket: SdpPocket): Record<string, string> {
 }
 
 /* ───────────────────────────────────────────────
-   Strip Y-drag handle
-──────────────────────────────────────────────── */
-.sdp-strip-handle {
-  pointer-events: all;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 18px;
-  margin-left: auto;
-  margin-right: 0;
-  background: var(--surface-card, #fff);
-  border: 1px solid var(--surface-border, #e0e0e0);
-  border-right: none;
-  border-radius: 6px 0 0 6px;
-  cursor: ns-resize;
-  color: var(--text-color-secondary, #607d8b);
-  font-size: 0.65rem;
-  box-shadow: -1px 0 4px rgba(0, 0, 0, 0.06);
-  transition: background 0.12s;
-}
-
-.sdp-strip-handle:hover {
-  background: var(--surface-hover, #f5f5f5);
-  color: var(--primary-color, #6366f1);
-}
-
-/* ───────────────────────────────────────────────
    Widget wrapper
 ──────────────────────────────────────────────── */
 .sdp-widget {
@@ -331,6 +493,40 @@ function tabStyle(pocket: SdpPocket): Record<string, string> {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  cursor: grab;
+}
+
+.sdp-widget:active {
+  cursor: grabbing;
+}
+
+.sdp-strip--dragging .sdp-widget {
+  cursor: grabbing;
+}
+
+/* Floating square button that marks detached popup drop placement. */
+.sdp-drop-proxy {
+  position: fixed;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(99, 102, 241, 0.55);
+  background: rgba(99, 102, 241, 0.36);
+  backdrop-filter: blur(10px) saturate(1.5);
+  -webkit-backdrop-filter: blur(10px) saturate(1.5);
+  box-shadow:
+    -4px 3px 18px rgba(99, 102, 241, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1102;
+}
+
+.sdp-drop-proxy-icon {
+  color: rgba(255, 255, 255, 0.98);
+  font-size: 1rem;
 }
 
 /* ───────────────────────────────────────────────
@@ -352,7 +548,7 @@ function tabStyle(pocket: SdpPocket): Record<string, string> {
   border: 1px solid var(--tab-border, rgba(99, 102, 241, 0.75));
   border-right: none;
   border-radius: 10px 0 0 10px;
-  cursor: pointer;
+  cursor: grab;
   color: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px) saturate(1.5);
   -webkit-backdrop-filter: blur(10px) saturate(1.5);
@@ -366,6 +562,10 @@ function tabStyle(pocket: SdpPocket): Record<string, string> {
     background 0.15s ease,
     box-shadow 0.15s ease,
     color 0.15s ease;
+}
+
+.sdp-tab:active {
+  cursor: grabbing;
 }
 
 /* Expanded on hover or when the popup is open */
@@ -481,14 +681,15 @@ function tabStyle(pocket: SdpPocket): Record<string, string> {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
+  padding: 0.35rem;
   border: none;
   background: transparent;
   cursor: pointer;
   border-radius: 5px;
   color: var(--text-color-secondary, #607d8b);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   transition: background 0.12s, color 0.12s;
 }
 

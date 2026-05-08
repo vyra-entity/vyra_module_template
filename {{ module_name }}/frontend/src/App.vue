@@ -4,10 +4,13 @@
     <PluginSlot v-if="authStore.isAuthenticated" slot-id="background" />
     <PluginSlot v-if="authStore.isAuthenticated" slot-id="notification-provider" />
     <PluginSlot v-if="authStore.isAuthenticated" slot-id="component-decorator" />
-    <!-- SDP registration wrappers: load at App root so they survive navigation -->
-    <PluginSlot v-if="authStore.isAuthenticated" slot-id="side-dock-popup.header" />
-    <PluginSlot v-if="authStore.isAuthenticated" slot-id="side-dock-popup.content" />
-    <PluginSlot v-if="authStore.isAuthenticated" slot-id="side-dock-popup.footer" />
+    <!-- SDP registration wrappers: load at App root so they survive navigation.
+         Visually hidden so they don't interfere with the flex layout. -->
+    <div v-if="authStore.isAuthenticated" style="display:none" aria-hidden="true">
+      <PluginSlot slot-id="side-dock-popup.header" />
+      <PluginSlot slot-id="side-dock-popup.content" />
+      <PluginSlot slot-id="side-dock-popup.footer" />
+    </div>
     <!-- Overlay / popup / context-menu layers -->
     <PluginSlot v-if="authStore.isAuthenticated" slot-id="overlay" />
     <PluginSlot v-if="authStore.isAuthenticated" slot-id="popup" />
